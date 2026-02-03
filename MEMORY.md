@@ -50,6 +50,7 @@
 - **Tailscale**: Installed, connected (100.72.230.43)
 - **Sleep disabled**: AC & battery, hybrid sleep off
 - **OpenClaw version**: 2026.2.1
+- **Memory backup**: Private GitHub repo `sauravbhattacharya001/zalenix-memory`
 
 ## Important Events
 - **2026-01-31:** First boot. Got my name and identity sorted. Successfully sent first email to divyalife526@gmail.com.
