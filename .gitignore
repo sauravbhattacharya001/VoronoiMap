@@ -1,0 +1,13 @@
+# Sensitive files
+chatgpt-export/
+chatgpt_*.zip
+*.wav
+*.mp3
+
+# Temp files
+temp_*
+*.tmp
+*.log
+
+# Node
+node_modules/
