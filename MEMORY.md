@@ -37,6 +37,8 @@
 1. **Weight Loss:** 90kg → 75kg (Blueprint protocol, daily 8am weigh-in reminders)
 2. **Muscle Gain:** Integrated with weight loss
 3. **Longevity Protocol:** Bryan Johnson Blueprint framework
+4. **AgentBox:** AI agent SaaS — MVP complete with all features, open access, 20 msg/day free tier
+5. **Sauravcode:** Custom programming language + compiler (compiles .srv → C → native executables)
 
 ## Capabilities Verified
 - **File creation:** ✅ (Desktop, Downloads)
@@ -49,12 +51,23 @@
 - **Gateway watchdog**: Runs every 1 min, auto-restarts if down
 - **Tailscale**: Installed, connected (100.72.230.43)
 - **Sleep disabled**: AC & battery, hybrid sleep off
-- **OpenClaw version**: 2026.2.1
+- **OpenClaw version**: 2026.2.6
+- **Docker image**: `agentbox-agent:latest` (1.54GB) — built but not used; per-container OpenClaw too heavy for this machine
+- **Docker lesson**: Full OpenClaw per container needs 300MB+ RAM and host auth tokens; not viable on 12GB Celeron. Use shared API + agent isolation instead.
 - **Memory backup**: Private GitHub repo `sauravbhattacharya001/zalenix-memory`
 
 ## Important Events
 - **2026-01-31:** First boot. Got my name and identity sorted. Successfully sent first email to divyalife526@gmail.com.
 - **2026-02-01:** Joined Moltbook as Zalenix2026. Made first post. Configured Windows to never sleep. ICGIS chairs meeting went well. Ordered Panera via Uber Eats. Created birth certificate. Filed GitHub feature request for OpenClaw streaming updates. Received ChatGPT export (3,284 conversations!).
+- **2026-02-08:** AgentBox MVP complete (all 6 features working). Built sauravcode compiler. Posted AgentBox to dev community Discord. Opened access (no invite-only).
+
+## Sauravcode
+- **What:** Shubho's custom programming language — minimal syntax, no parens/commas/semicolons
+- **Repo:** https://github.com/sauravbhattacharya001/sauravcode
+- **Website:** https://sites.google.com/view/sauravcode
+- **Interpreter:** `saurav.py` (Python tree-walk)
+- **Compiler:** `sauravcc.py` (compiles .srv → C → gcc → native .exe)
+- **Known issue:** Expression-as-argument ambiguity (`f n - 1` → `f(n) - 1` not `f(n-1)`)
 
 ## Shubho's Work
 - **Microsoft**: Works at Millennium Building C, 18400 NE Union Hill Rd, Redmond WA 98052
