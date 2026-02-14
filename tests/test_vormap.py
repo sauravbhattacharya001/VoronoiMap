@@ -168,3 +168,102 @@ class TestSetBounds:
             assert vormap.IND_E == 20
         finally:
             vormap.set_bounds(*old)
+
+
+# ── Security: path traversal ────────────────────────────────────────
+
+class TestPathTraversal:
+    """Verify that load_data rejects filenames that escape data/."""
+
+    def test_reject_dot_dot(self, tmp_path):
+        """Relative path traversal via '..' must be rejected."""
+        old_cwd = os.getcwd()
+        os.chdir(tmp_path)
+        try:
+            with pytest.raises(ValueError, match="[Pp]ath traversal"):
+                vormap.load_data("../../etc/passwd")
+        finally:
+            os.chdir(old_cwd)
+
+    def test_reject_absolute_path(self, tmp_path):
+        """Absolute paths must be rejected outright."""
+        old_cwd = os.getcwd()
+        os.chdir(tmp_path)
+        try:
+            with pytest.raises(ValueError, match="[Aa]bsolute"):
+                vormap.load_data("/etc/passwd")
+        finally:
+            os.chdir(old_cwd)
+
+    def test_reject_dot_dot_backslash(self, tmp_path):
+        """Path traversal with mixed separators must be rejected."""
+        old_cwd = os.getcwd()
+        os.chdir(tmp_path)
+        try:
+            with pytest.raises(ValueError, match="[Pp]ath traversal|[Aa]bsolute"):
+                vormap.load_data("..\\..\\windows\\system32\\config\\sam")
+        finally:
+            os.chdir(old_cwd)
+
+    def test_normal_filename_accepted(self, tmp_path):
+        """A plain filename inside data/ should work normally."""
+        data_dir = tmp_path / "data"
+        data_dir.mkdir()
+        (data_dir / "safe.txt").write_text("1.0 2.0\n3.0 4.0\n")
+
+        old_cwd = os.getcwd()
+        os.chdir(tmp_path)
+        try:
+            vormap._data_cache.pop("safe.txt", None)
+            vormap._kdtree_cache.pop("safe.txt", None)
+            points = vormap.load_data("safe.txt")
+            assert len(points) == 2
+        finally:
+            os.chdir(old_cwd)
+            vormap._data_cache.pop("safe.txt", None)
+            vormap._kdtree_cache.pop("safe.txt", None)
+
+
+# ── Security: malformed input ───────────────────────────────────────
+
+class TestMalformedInput:
+    """Verify load_data handles malformed/malicious data gracefully."""
+
+    def test_nan_coordinates_skipped(self, tmp_path):
+        """NaN coordinates should be silently skipped."""
+        data_dir = tmp_path / "data"
+        data_dir.mkdir()
+        (data_dir / "bad.txt").write_text("nan inf\n1.0 2.0\n")
+
+        old_cwd = os.getcwd()
+        os.chdir(tmp_path)
+        try:
+            vormap._data_cache.pop("bad.txt", None)
+            vormap._kdtree_cache.pop("bad.txt", None)
+            points = vormap.load_data("bad.txt")
+            assert len(points) == 1
+            assert points[0] == (1.0, 2.0)
+        finally:
+            os.chdir(old_cwd)
+            vormap._data_cache.pop("bad.txt", None)
+            vormap._kdtree_cache.pop("bad.txt", None)
+
+    def test_non_numeric_lines_skipped(self, tmp_path):
+        """Lines with non-numeric content should be skipped."""
+        data_dir = tmp_path / "data"
+        data_dir.mkdir()
+        (data_dir / "mixed.txt").write_text(
+            "hello world\n1.0 2.0\n__import__('os').system('ls')\n3.0 4.0\n"
+        )
+
+        old_cwd = os.getcwd()
+        os.chdir(tmp_path)
+        try:
+            vormap._data_cache.pop("mixed.txt", None)
+            vormap._kdtree_cache.pop("mixed.txt", None)
+            points = vormap.load_data("mixed.txt")
+            assert len(points) == 2
+        finally:
+            os.chdir(old_cwd)
+            vormap._data_cache.pop("mixed.txt", None)
+            vormap._kdtree_cache.pop("mixed.txt", None)

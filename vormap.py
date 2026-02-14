@@ -67,21 +67,49 @@ def load_data(filename, auto_bounds=True):
 
     When *scipy* is available a ``KDTree`` is also built and cached so
     that ``get_NN`` can use O(log n) lookups instead of O(n) scans.
+
+    Raises ``ValueError`` if *filename* contains path traversal sequences
+    (e.g. ``..``, absolute paths) that would escape the ``data/`` directory.
     """
     global IND_S, IND_N, IND_W, IND_E
 
     if filename in _data_cache:
         return _data_cache[filename]
 
+    # --- Path traversal protection ---
+    # Reject filenames that attempt to escape the data/ directory.
+    # This prevents reading arbitrary files on the filesystem via crafted
+    # filenames like "../../etc/passwd" or "/etc/shadow".
+    import os
+    if os.path.isabs(filename):
+        raise ValueError(
+            "Absolute paths are not allowed: '%s'" % filename
+        )
+    # Normalise and check that the resolved path stays inside data/
+    data_dir = os.path.abspath("data")
+    resolved = os.path.abspath(os.path.join("data", filename))
+    if not resolved.startswith(data_dir + os.sep) and resolved != data_dir:
+        raise ValueError(
+            "Path traversal detected — filename '%s' resolves outside "
+            "the data/ directory" % filename
+        )
+
     points = []
-    with open("data/" + filename, "r") as objf:
+    with open(resolved, "r") as objf:
         for line in objf:
             if not line.strip():
                 continue
             coord = line.split()
             if len(coord) < 2:
                 continue
-            points.append((float(coord[0]), float(coord[1])))
+            try:
+                lng_val = float(coord[0])
+                lat_val = float(coord[1])
+            except (ValueError, OverflowError):
+                continue  # skip malformed lines instead of crashing
+            if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
+                continue  # reject NaN/Inf coordinates
+            points.append((lng_val, lat_val))
 
     if not points:
         raise ValueError("No valid points found in '%s'" % filename)
