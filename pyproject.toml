@@ -61,7 +61,7 @@ Issues = "https://github.com/sauravbhattacharya001/VoronoiMap/issues"
 Documentation = "https://sauravbhattacharya001.github.io/VoronoiMap/"
 
 [tool.setuptools]
-py-modules = ["vormap"]
+py-modules = ["vormap", "vormap_viz"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -767,6 +767,35 @@ def main():
         help='Explicit search space boundaries: south north west east. '
              'Disables auto-detection from data.',
     )
+    parser.add_argument(
+        '--visualize',
+        metavar='OUTPUT',
+        help='Generate an SVG visualization of the Voronoi diagram. '
+             'Provide the output file path (e.g. diagram.svg).',
+    )
+    parser.add_argument(
+        '--color-scheme',
+        default='pastel',
+        choices=['pastel', 'warm', 'cool', 'earth', 'mono', 'rainbow'],
+        help='Color scheme for SVG visualization (default: pastel).',
+    )
+    parser.add_argument(
+        '--show-labels',
+        action='store_true',
+        help='Label each Voronoi region with its seed index in the SVG.',
+    )
+    parser.add_argument(
+        '--svg-width',
+        type=int,
+        default=800,
+        help='SVG canvas width in pixels (default: 800).',
+    )
+    parser.add_argument(
+        '--svg-height',
+        type=int,
+        default=600,
+        help='SVG canvas height in pixels (default: 600).',
+    )
 
     args = parser.parse_args()
 
@@ -780,6 +809,28 @@ def main():
         result, max_e, avg_e = get_sum(args.datafile, args.n)
         print('Run %d: regions=%d  max_edges=%d  avg_edges=%.1f'
               % (run + 1, result, max_e, avg_e))
+
+    # SVG visualization
+    if args.visualize:
+        import vormap_viz
+
+        data = load_data(args.datafile)
+        print('Computing Voronoi regions for visualization...')
+        regions = vormap_viz.compute_regions(data)
+        print('Traced %d of %d regions' % (len(regions), len(data)))
+
+        vormap_viz.export_svg(
+            regions,
+            data,
+            args.visualize,
+            width=args.svg_width,
+            height=args.svg_height,
+            color_scheme=args.color_scheme,
+            show_labels=args.show_labels,
+            title='Voronoi Diagram — %s (%d points)'
+                  % (args.datafile, len(data)),
+        )
+        print('SVG saved to %s' % args.visualize)
 
 
 if __name__ == '__main__':
