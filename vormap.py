@@ -69,12 +69,15 @@ def collinear(x1, y1, x2, y2, x3, y3):
     if (y1 == y3 and y2 != y3):
         return False
 
-    m1 = round((float(y2 - y1) / (x2 - x1)), 2)
-    m2 = round((float(y3 - y1) / (x3 - x1)), 2)
+    m1 = round((float(y2 - y1) / (x2 - x1)), 4)
+    m2 = round((float(y3 - y1) / (x3 - x1)), 4)
 
     if (m1 == m2):
         return True
     return False
+
+
+NEW_DIR_MAX_ITER = 200
 
 
 def new_dir(FILENAME, aplng, aplat, alng, alat, dlng, dlat):
@@ -93,7 +96,7 @@ def new_dir(FILENAME, aplng, aplat, alng, alat, dlng, dlat):
     tth = 0.5
     th = math.atan(tth)
     #print "TH = ", th
-    while(True):
+    for _iter in range(NEW_DIR_MAX_ITER):
         #print "NewDirection"
         ac1 = a1 + th
         ac2 = ac1 + th
