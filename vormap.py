@@ -367,6 +367,12 @@ def find_CXY(B, dlng, dlat):
 
     n = ((y2 - y1) * (x3 - x1) - (x2 - x1) * (y3 - y1))
     d = ((y2 - y1) ** 2 + (x2 - x1) ** 2)
+
+    # Guard against division by zero when both boundary endpoints coincide
+    # (e.g. when the line passes through a corner of the search region).
+    if d < 1e-12:
+        return x1, y1
+
     k = (float)(n) / d
     x4 = x3 - k * (y2 - y1)
     y4 = y3 + k * (x2 - x1)
@@ -418,6 +424,12 @@ def find_BXY(B, dlng, dlat):
 
     n = ((y2 - y1) * (x3 - x1) - (x2 - x1) * (y3 - y1))
     d = ((y2 - y1) ** 2 + (x2 - x1) ** 2)
+
+    # Guard against division by zero when both boundary endpoints coincide
+    # (e.g. when the line passes through a corner of the search region).
+    if d < 1e-12:
+        return x1, y1
+
     k = (float)(n) / d
     x4 = x3 - k * (y2 - y1)
     y4 = y3 + k * (x2 - x1)
