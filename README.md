@@ -1,5 +1,83 @@
 # VoronoiMap
 
-This report explains a how some partially informed attacker can estimate aggregate statistics of an unknown set of objects embedded in the Euclidean plane using available partial data, a nearest-neighbor oracle. The algorithm presented employs Voronoi Partitioning of the set space, where each object contained in the set is associated with some geo-location parameters. Next, a real world usage of the algorithm EstimateSUM is illustrated along with corresponding performance metric results. Some alternatives have been suggested to make the work of the attacker difficult.
+Voronoi partitioning of a geometric 2-dimensional space. This project implements an algorithm that estimates aggregate statistics of an unknown set of objects embedded in the Euclidean plane using a nearest-neighbor oracle and Voronoi partitioning.
 
-Find complete report here: http://docdro.id/5HXe2wV
+## Background
+
+A partially informed attacker can estimate aggregate statistics of an unknown set of objects using available partial data (a nearest-neighbor oracle). The algorithm `EstimateSUM` constructs Voronoi regions around each discovered point and uses area ratios to estimate the total number of objects in the search space.
+
+📄 **Full report:** [http://docdro.id/5HXe2wV](http://docdro.id/5HXe2wV)
+
+## How It Works
+
+1. Random points are sampled within a bounded 2D region (1000 × 2000 by default)
+2. For each sample, the nearest neighbor is found via an oracle that reads from data files
+3. The Voronoi region around each nearest neighbor is approximated using binary search along perpendicular bisectors
+4. Region areas are computed using the [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula)
+5. The sum estimate is derived from the ratio of total area to individual Voronoi cell areas
+
+## Requirements
+
+- Python 3.6+
+- No external dependencies (uses only the standard library)
+
+## Usage
+
+### Data Format
+
+Place data files in a `data/` directory. Each file should contain one point per line with space-separated longitude and latitude coordinates:
+
+```
+100.5 200.3
+450.2 750.1
+800.0 500.0
+```
+
+### Running
+
+```bash
+python vormap.py
+```
+
+By default, the main block is commented out. To run experiments, uncomment the desired distribution blocks in `__main__` and ensure the corresponding data files exist in `data/`.
+
+You can also use the module programmatically:
+
+```python
+from vormap import get_sum, find_area, get_NN
+
+# Estimate the number of objects in a dataset
+estimated_count, max_edges, avg_edges = get_sum("datauni5.txt", 5)
+
+# Find area of a single Voronoi region
+area, vertices = find_area("datauni5.txt", 100.5, 200.3)
+
+# Query nearest neighbor
+nearest_lng, nearest_lat = get_NN("datauni5.txt", 500.0, 500.0)
+```
+
+## Project Structure
+
+```
+VoronoiMap/
+├── vormap.py       # Main algorithm implementation
+├── data/           # Data files (not tracked in git)
+├── .gitignore
+├── LICENSE
+└── README.md
+```
+
+## Key Parameters
+
+| Parameter    | Default  | Description                          |
+|-------------|----------|--------------------------------------|
+| `IND_S`     | 0.0      | Southern boundary of search space    |
+| `IND_N`     | 1000.0   | Northern boundary of search space    |
+| `IND_W`     | 0.0      | Western boundary of search space     |
+| `IND_E`     | 2000.0   | Eastern boundary of search space     |
+| `BIN_PREC`  | 1e-6     | Binary search precision threshold    |
+| `MAX_RETRIES` | 50     | Maximum retry attempts for estimation |
+
+## License
+
+MIT — see [LICENSE](LICENSE) for details.
