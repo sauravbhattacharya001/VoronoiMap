@@ -111,7 +111,7 @@ def get_NN(data, lng, lat):
             )
 
     # --- Fallback: brute-force scan ---
-    mindist = 1e99
+    mindist = math.inf
     minlng = None
     minlat = None
 
@@ -137,7 +137,7 @@ def mid_point(x1, y1, x2, y2):
 def perp_dir(x1, y1, x2, y2):
     if (y2 != y1):
         return round(((float)(x2 - x1) / (y1 - y2)), 2)
-    return 1e99
+    return math.inf
 
 
 def collinear(x1, y1, x2, y2, x3, y3, eps=1e-8):
@@ -169,7 +169,7 @@ NEW_DIR_MAX_ITER = 200
 
 def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
     if (alng == dlng):
-        m1 = 1e99
+        m1 = math.inf
     else:
         m1 = float(alat - dlat) / (alng - dlng)
 
@@ -208,7 +208,7 @@ def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
             break
 
     if (c1x == alng):
-        return 1e99
+        return math.inf
     ##print "C1 C2 A = ", c1x, c1y, c2x, c2y, alng, alat
     m = float(c1y - alat) / (c1x - alng)
     ##print "SLOPE=", m
@@ -262,7 +262,7 @@ def isect(x1, y1, x2, y2, x3, y3, x4, y4):
 
 def isect_B(alng, alat, dirn):
     ret = []
-    if (dirn == 1e99):
+    if math.isinf(dirn):
         ret.append(alng)
         ret.append(IND_N)
         ret.append(alng)
