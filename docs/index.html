@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoronoiMap — Voronoi Partitioning for Statistical Estimation</title>
+    <meta name="description" content="Estimate aggregate statistics of unknown point sets using Voronoi partitioning and nearest-neighbor oracles.">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent2: #3fb950;
+            --accent3: #d2a8ff;
+            --code-bg: #1c2128;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+            border-bottom: 1px solid var(--border);
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 640px;
+            margin: 0 auto 24px;
+        }
+        .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .badges img { height: 22px; }
+
+        /* Sections */
+        section { padding: 60px 0; border-bottom: 1px solid var(--border); }
+        section:last-child { border-bottom: none; }
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        h3 { font-size: 1.2rem; margin: 24px 0 12px; color: var(--accent3); }
+        p, li { color: var(--text-muted); margin-bottom: 12px; }
+        ul, ol { padding-left: 24px; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Code */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        code {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            color: var(--accent2);
+        }
+        pre code { color: var(--text); }
+
+        /* Demo canvas */
+        .demo-wrapper {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+        .demo-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .demo-controls button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .demo-controls button:hover { opacity: 0.85; }
+        .demo-controls label { color: var(--text-muted); font-size: 0.9rem; }
+        .demo-controls input[type="range"] { width: 120px; }
+        #voronoi-canvas {
+            width: 100%;
+            height: 400px;
+            background: #0d1117;
+            border-radius: 8px;
+            cursor: crosshair;
+        }
+        .stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .stat-item strong { color: var(--accent2); }
+
+        /* Algorithm steps */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .step {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .step-num {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .step h4 { margin-bottom: 8px; color: var(--text); }
+        .step p { font-size: 0.9rem; margin: 0; }
+
+        /* API table */
+        .api-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        .api-table th, .api-table td {
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .api-table th {
+            color: var(--accent3);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .api-table td code { color: var(--accent); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 1rem; }
+            #voronoi-canvas { height: 280px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <div class="container">
+        <h1>VoronoiMap</h1>
+        <p>Estimate aggregate statistics of unknown point sets using Voronoi partitioning and nearest-neighbor oracles.</p>
+        <div class="badges">
+            <img src="https://img.shields.io/github/license/sauravbhattacharya001/VoronoiMap?style=flat-square&color=58a6ff" alt="License">
+            <img src="https://img.shields.io/github/languages/top/sauravbhattacharya001/VoronoiMap?style=flat-square&color=3fb950" alt="Language">
+            <img src="https://img.shields.io/github/actions/workflow/status/sauravbhattacharya001/VoronoiMap/ci.yml?style=flat-square&label=CI&color=58a6ff" alt="CI">
+            <img src="https://img.shields.io/github/stars/sauravbhattacharya001/VoronoiMap?style=flat-square&color=d2a8ff" alt="Stars">
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <section id="demo">
+        <h2>Interactive Demo</h2>
+        <p>Click on the canvas to add points and see Voronoi regions computed in real time. Each colored cell represents the region closest to its generating point.</p>
+        <div class="demo-wrapper">
+            <div class="demo-controls">
+                <button onclick="generateRandom()">Random Points</button>
+                <button onclick="clearCanvas()" style="background: var(--border);">Clear</button>
+                <label>Points: <input type="range" id="numPoints" min="3" max="50" value="12" oninput="generateFromSlider()"> <span id="numLabel">12</span></label>
+            </div>
+            <canvas id="voronoi-canvas"></canvas>
+            <div class="stats">
+                <div class="stat-item">Points: <strong id="stat-points">0</strong></div>
+                <div class="stat-item">Regions: <strong id="stat-regions">0</strong></div>
+                <div class="stat-item">Estimated Sum: <strong id="stat-estimate">—</strong></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="algorithm">
+        <h2>How It Works</h2>
+        <p>VoronoiMap implements the <code>EstimateSUM</code> algorithm: a partially informed attacker estimates aggregate statistics of an unknown point set using only a nearest-neighbor oracle.</p>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <h4>Sample</h4>
+                <p>Random points are sampled uniformly within the bounded 2D search space.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <h4>Query Oracle</h4>
+                <p>For each sample, the nearest data point is found via the nearest-neighbor oracle.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <h4>Build Voronoi</h4>
+                <p>Voronoi region boundaries are approximated using binary search along perpendicular bisectors.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <h4>Compute Areas</h4>
+                <p>Region areas are computed using the Shoelace formula on the discovered vertices.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">5</div>
+                <h4>Estimate</h4>
+                <p>The total count is estimated from the ratio of total search area to individual cell areas.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="install">
+        <h2>Installation</h2>
+        <pre><code># Clone the repository
+git clone https://github.com/sauravbhattacharya001/VoronoiMap.git
+cd VoronoiMap
+
+# Install optional dependencies for O(log n) nearest-neighbor via KDTree
+pip install -r requirements.txt</code></pre>
+    </section>
+
+    <section id="usage">
+        <h2>Usage</h2>
+        <h3>Command Line</h3>
+        <pre><code># Basic usage: estimate count from 5-point dataset
+python vormap.py datauni5.txt 5
+
+# Multiple independent runs for better accuracy
+python vormap.py datauni5.txt 5 --runs 3</code></pre>
+
+        <h3>Python API</h3>
+        <pre><code>from vormap import get_sum, find_area, get_NN, load_data
+
+# Estimate the number of objects in a dataset
+estimated_count, max_edges, avg_edges = get_sum("datauni5.txt", 5)
+
+# Load data for direct function calls
+data = load_data("datauni5.txt")
+
+# Find area of a single Voronoi region
+area, vertices = find_area(data, 100.5, 200.3)
+
+# Query nearest neighbor
+nearest_lng, nearest_lat = get_NN(data, 500.0, 500.0)</code></pre>
+    </section>
+
+    <section id="api">
+        <h2>API Reference</h2>
+        <table class="api-table">
+            <thead>
+                <tr><th>Function</th><th>Parameters</th><th>Returns</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>get_sum(file, k)</code></td>
+                    <td>filename, sample count</td>
+                    <td>(estimate, max_edges, avg_edges)</td>
+                    <td>Core estimation algorithm. Samples k points, builds Voronoi cells, returns estimated total count.</td>
+                </tr>
+                <tr>
+                    <td><code>load_data(file)</code></td>
+                    <td>filename, auto_bounds=True</td>
+                    <td>[(lng, lat), ...]</td>
+                    <td>Load point data from file. Caches results. Auto-detects search bounds.</td>
+                </tr>
+                <tr>
+                    <td><code>find_area(data, lng, lat)</code></td>
+                    <td>data list, coordinates</td>
+                    <td>(area, vertices)</td>
+                    <td>Compute the Voronoi region area around the nearest neighbor of (lng, lat).</td>
+                </tr>
+                <tr>
+                    <td><code>get_NN(data, lng, lat)</code></td>
+                    <td>data list, coordinates</td>
+                    <td>(lng, lat)</td>
+                    <td>Find nearest neighbor. Uses KDTree (O(log n)) if scipy is available.</td>
+                </tr>
+                <tr>
+                    <td><code>set_bounds(s, n, w, e)</code></td>
+                    <td>south, north, west, east</td>
+                    <td>None</td>
+                    <td>Manually set the search space boundaries.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="params">
+        <h2>Parameters</h2>
+        <table class="api-table">
+            <thead>
+                <tr><th>Parameter</th><th>Default</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>IND_S / IND_N</code></td><td>0.0 / 1000.0</td><td>South / North boundaries of the search space</td></tr>
+                <tr><td><code>IND_W / IND_E</code></td><td>0.0 / 2000.0</td><td>West / East boundaries of the search space</td></tr>
+                <tr><td><code>BIN_PREC</code></td><td>1e-6</td><td>Binary search precision threshold</td></tr>
+                <tr><td><code>MAX_VERTICES</code></td><td>50</td><td>Maximum vertices per Voronoi cell before aborting</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<footer>
+    <div class="container">
+        <p>VoronoiMap &mdash; MIT License &mdash; <a href="https://github.com/sauravbhattacharya001/VoronoiMap">View on GitHub</a></p>
+    </div>
+</footer>
+
+<script>
+// Voronoi diagram interactive demo using Fortune's algorithm approximation
+const canvas = document.getElementById('voronoi-canvas');
+const ctx = canvas.getContext('2d');
+let points = [];
+const palette = [
+    '#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd',
+    '#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf',
+    '#aec7e8','#ffbb78','#98df8a','#ff9896','#c5b0d5',
+    '#c49c94','#f7b6d2','#c7c7c7','#dbdb8d','#9edae5',
+    '#393b79','#5254a3','#6b6ecf','#9c9ede','#637939',
+    '#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39',
+    '#e7ba52','#e7cb94','#843c39','#ad494a','#d6616b',
+    '#e7969c','#7b4173','#a55194','#ce6dbd','#de9ed6',
+    '#3182bd','#6baed6','#9ecae1','#c6dbef','#e6550d',
+    '#fd8d3c','#fdae6b','#fdd0a2','#31a354','#74c476'
+];
+
+function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = canvas.offsetWidth * devicePixelRatio;
+    canvas.height = canvas.offsetHeight * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    draw();
+}
+
+function draw() {
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    ctx.clearRect(0, 0, w, h);
+
+    if (points.length === 0) {
+        ctx.fillStyle = '#8b949e';
+        ctx.font = '16px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Click to add points or press "Random Points"', w / 2, h / 2);
+        updateStats();
+        return;
+    }
+
+    // Draw Voronoi cells using brute-force pixel sampling (efficient enough for demo)
+    const imgData = ctx.createImageData(w, h);
+    const data = imgData.data;
+
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            let minDist = Infinity;
+            let closest = 0;
+            for (let i = 0; i < points.length; i++) {
+                const dx = x - points[i].x;
+                const dy = y - points[i].y;
+                const d = dx * dx + dy * dy;
+                if (d < minDist) {
+                    minDist = d;
+                    closest = i;
+                }
+            }
+            const color = hexToRgb(palette[closest % palette.length]);
+            const idx = (y * w + x) * 4;
+            data[idx] = color.r;
+            data[idx + 1] = color.g;
+            data[idx + 2] = color.b;
+            data[idx + 3] = 60; // semi-transparent fill
+        }
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    // Draw cell borders (where color changes)
+    ctx.strokeStyle = 'rgba(88, 166, 255, 0.3)';
+    ctx.lineWidth = 1;
+    for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++) {
+            const idx = (y * w + x) * 4;
+            const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+            // Check neighbors
+            const right = ((y * w + x + 1) * 4);
+            const below = (((y + 1) * w + x) * 4);
+            if (data[right] !== r || data[right + 1] !== g || data[right + 2] !== b ||
+                data[below] !== r || data[below + 1] !== g || data[below + 2] !== b) {
+                ctx.fillStyle = 'rgba(88, 166, 255, 0.5)';
+                ctx.fillRect(x, y, 1, 1);
+            }
+        }
+    }
+
+    // Draw points
+    for (let i = 0; i < points.length; i++) {
+        ctx.beginPath();
+        ctx.arc(points[i].x, points[i].y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.strokeStyle = palette[i % palette.length];
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    updateStats();
+}
+
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : { r: 0, g: 0, b: 0 };
+}
+
+function updateStats() {
+    document.getElementById('stat-points').textContent = points.length;
+    document.getElementById('stat-regions').textContent = points.length;
+    if (points.length > 0) {
+        // Simple area-based estimate (total area / avg cell area = N)
+        const w = canvas.offsetWidth;
+        const h = canvas.offsetHeight;
+        const totalArea = w * h;
+        const avgCellArea = totalArea / points.length;
+        document.getElementById('stat-estimate').textContent =
+            `~${points.length} (area ratio: ${Math.round(totalArea)}/${Math.round(avgCellArea)})`;
+    } else {
+        document.getElementById('stat-estimate').textContent = '—';
+    }
+}
+
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    points.push({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    });
+    draw();
+});
+
+function generateRandom() {
+    const n = parseInt(document.getElementById('numPoints').value);
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    points = [];
+    for (let i = 0; i < n; i++) {
+        points.push({
+            x: 20 + Math.random() * (w - 40),
+            y: 20 + Math.random() * (h - 40)
+        });
+    }
+    draw();
+}
+
+function generateFromSlider() {
+    document.getElementById('numLabel').textContent = document.getElementById('numPoints').value;
+    generateRandom();
+}
+
+function clearCanvas() {
+    points = [];
+    draw();
+}
+
+window.addEventListener('resize', resize);
+resize();
+</script>
+
+</body>
+</html>
