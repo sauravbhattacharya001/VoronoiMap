@@ -561,7 +561,6 @@ def find_area(data, dlng, dlat):
     elng, elat = get_NN(data, dlng, dlat)
     alng, alat = mid_point(dlng, dlat, elng, elat)
     dirn = perp_dir(elng, elat, dlng, dlat)
-    Oracle.calls = 0
     #print "E_POINT= ", elng, elat
     #print "A_POINT= ", alng, alat
 
