@@ -657,52 +657,31 @@ def get_sum(FILENAME, N1, _depth=0):
 
 
 if __name__ == '__main__':
-    uni = "uni"
-    gau = "gau"
-    tri = "tri"
+    import argparse
 
-    FNAME = "data"
-    SNAME = "sum"
-    FEXT = ".txt"
-    #print "Uniform"
-    #for i in (5, 10, 50):
-        #FILENAME = FNAME + uni + str(i) + FEXT
-        #OUTNAME = SNAME + uni + str(i) + FEXT
-        #f = open("sumdir/" + OUTNAME, "w")
-        #print OUTNAME
-        #for j in range(0, 10):
-            #unisum, max_e, avg_e = get_sum(FILENAME, i)
-            #f.write(str(unisum) + " " + str(max_e) + " " + str(avg_e))
-            #f.write('\n')
-        #f.close()
-    #print "-------------------"
-    #print "Normal"
-    #for i in (5, 10, 50):
-        #FILENAME = FNAME + gau + str(i) + FEXT
-        #OUTNAME = SNAME + gau + str(i) + FEXT
-        #f = open("sumdir/" + OUTNAME, "w")
-        #print OUTNAME
-        #for j in range(0, 10):
-            #gausum, max_e, avg_e = get_sum(FILENAME, i)
-            #f.write(str(gausum) + " " + str(max_e) + " " + str(avg_e))
-            #f.write('\n')
-        #f.close()
-    #print "-------------------"
-    #print "Trianle"
-    #for i in (10, 10):
-        #FILENAME = FNAME + tri + str(i) + FEXT
-        #OUTNAME = SNAME + tri + str(i) + FEXT
-        #f = open("sumdir/" + OUTNAME, "w")
-        #print OUTNAME
-        #for j in range(0, 10):
-            #trisum, max_e, avg_e = get_sum(FILENAME, i)
-            #f.write(str(trisum) + " " + str(max_e) + " " + str(avg_e))
-            #f.write('\n')
-        #f.close()
-    #print "-------------------"
+    parser = argparse.ArgumentParser(
+        description='Estimate Voronoi region count via random point sampling.',
+        epilog='Example: python vormap.py datauni5.txt 5',
+    )
+    parser.add_argument(
+        'datafile',
+        help='Point data filename inside the data/ directory (e.g. datauni5.txt)',
+    )
+    parser.add_argument(
+        'n',
+        type=int,
+        help='Expected number of Voronoi regions (sample size)',
+    )
+    parser.add_argument(
+        '--runs',
+        type=int,
+        default=1,
+        help='Number of independent estimation runs (default: 1)',
+    )
 
+    args = parser.parse_args()
 
-
-##print collinear(1047.72, 1000.0, 993.34, 1000.0, 1135.52, 1000.0)
-##print collinear(779.46, 796.48, 870.2, 740.49, 591.12, 912.69)
-##print collinear(780.16, 796.04, 870.69, 740.19, 593.21, 911.4)
+    for run in range(args.runs):
+        result, max_e, avg_e = get_sum(args.datafile, args.n)
+        print('Run %d: regions=%d  max_edges=%d  avg_edges=%.1f'
+              % (run + 1, result, max_e, avg_e))
