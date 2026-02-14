@@ -222,8 +222,11 @@ def isect_B(alng, alat, dirn):
     if (len(ret) == 4):
         return ret
     else:
-        #print "Error: Intersection with B"
-        return -1
+        raise RuntimeError(
+            "Line from (%s, %s) with slope %s does not intersect search "
+            "boundary [%s,%s]x[%s,%s]"
+            % (alng, alat, dirn, IND_W, IND_E, IND_S, IND_N)
+        )
 
 
 def eudist(x1, y1, x2, y2):
@@ -231,30 +234,27 @@ def eudist(x1, y1, x2, y2):
 
 
 def bin_search(FILENAME, x1, y1, x2, y2, dlng, dlat):
+    """Binary search for a Voronoi boundary point between two positions.
 
+    Raises RuntimeError if the search fails to converge (instead of
+    terminating the process).
+    """
     xm = -1
     ym = -1
-    ##print "BINSEARCH BVALUES=", x1, y1
-    ##print "BINSEARCH AVALUES=", x2, y2
 
     while(eudist(x1, y1, x2, y2) > BIN_PREC):
 
         xm = float(x1 + x2) / 2
         ym = float(y1 + y2) / 2
-        ##print "binsearch...", xm, ym
         lg, lt = get_NN(FILENAME, xm, ym)
-        ##print "CLOSEST OBJECT ", lg, lt
         d1 = round(eudist(lg, lt, xm, ym), 2)
         d2 = round(eudist(xm, ym, dlng, dlat), 2)
         if(d1 == d2):
             x2 = xm
             y2 = ym
-            ##print "INSIDE"
         else:
             x1 = xm
             y1 = ym
-            ##print "OUTSIDE"
-        ##print "BIN"
 
     if(xm != -1 and ym != -1):
         xm = round(xm, 2)
@@ -263,15 +263,16 @@ def bin_search(FILENAME, x1, y1, x2, y2, dlng, dlat):
             xm = 0.0
         if (ym == -0.0):
             ym = 0.0
-        ##print "BINSEARCH  RESULTS=", xm, ym
         return xm, ym
     else:
-        #print "ERROR IN BINARY SEARCH"
-        #print xm, ym
-        sys.exit()
+        raise RuntimeError(
+            "Binary search failed to converge for query (%s, %s) in '%s'"
+            % (dlng, dlat, FILENAME)
+        )
 
 
 def find_CXY(B, dlng, dlat):
+    """Find the clockwise boundary endpoint for a Voronoi edge ray."""
     x1 = B[0]
     y1 = B[1]
     x2 = B[2]
@@ -285,7 +286,6 @@ def find_CXY(B, dlng, dlat):
     x4 = x3 - k * (y2 - y1)
     y4 = y3 + k * (x2 - x1)
 
-    ##print x3, y3, x4, y4
     if (x4 > x3):
         if (y2 < y1):
             By = y2
@@ -315,10 +315,15 @@ def find_CXY(B, dlng, dlat):
             else:
                 Bx = x2
                 By = y2
+        else:
+            # Degenerate case: projection coincides with query point
+            Bx = x1
+            By = y1
     return Bx, By
 
 
 def find_BXY(B, dlng, dlat):
+    """Find the counter-clockwise boundary endpoint for a Voronoi edge ray."""
     x1 = B[0]
     y1 = B[1]
     x2 = B[2]
@@ -361,6 +366,10 @@ def find_BXY(B, dlng, dlat):
             else:
                 Bx = x2
                 By = y2
+        else:
+            # Degenerate case: projection coincides with query point
+            Bx = x1
+            By = y1
     return Bx, By
 
 
@@ -429,10 +438,11 @@ def find_area(FILENAME, dlng, dlat):
         if get_NN(FILENAME, a_g, a_t) == (dlng, dlat):
             ag[i + 1] = a_g
             at[i + 1] = a_t
-            #print "VERTEX ADDED=", i + 1, ag[i + 1], at[i + 1]
         else:
-            print("ERROR ADDING NODE")
-            sys.exit()
+            raise RuntimeError(
+                "Voronoi vertex (%s, %s) does not map back to data point (%s, %s)"
+                % (a_g, a_t, dlng, dlat)
+            )
 
         dirn1 = new_dir(FILENAME,
             ag[i], at[i], ag[i + 1], at[i + 1], dlng, dlat)
