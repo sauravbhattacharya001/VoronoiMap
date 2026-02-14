@@ -1,0 +1,6 @@
+# Optional dependencies for improved performance
+# Install with: pip install -r requirements.txt
+
+# KDTree-accelerated nearest-neighbor lookups (O(log n) instead of O(n))
+numpy>=1.20
+scipy>=1.7

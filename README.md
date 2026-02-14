@@ -19,7 +19,12 @@ A partially informed attacker can estimate aggregate statistics of an unknown se
 ## Requirements
 
 - Python 3.6+
-- No external dependencies (uses only the standard library)
+- **Optional:** `numpy` and `scipy` for O(log n) nearest-neighbor lookups via KDTree (falls back to brute-force O(n) scan if not installed)
+
+```bash
+# Install optional dependencies for better performance
+pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -36,10 +41,12 @@ Place data files in a `data/` directory. Each file should contain one point per 
 ### Running
 
 ```bash
-python vormap.py
-```
+# Basic usage
+python vormap.py datauni5.txt 5
 
-By default, the main block is commented out. To run experiments, uncomment the desired distribution blocks in `__main__` and ensure the corresponding data files exist in `data/`.
+# Multiple independent runs
+python vormap.py datauni5.txt 5 --runs 3
+```
 
 You can also use the module programmatically:
 
