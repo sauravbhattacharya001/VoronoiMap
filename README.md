@@ -4,6 +4,7 @@
     <strong>Estimate aggregate statistics of unknown point sets using Voronoi partitioning and nearest-neighbor oracles</strong>
   </p>
   <p align="center">
+    <a href="https://pypi.org/project/voronoimap/"><img src="https://img.shields.io/pypi/v/voronoimap?color=blue&logo=pypi&logoColor=white" alt="PyPI"></a>
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/ci.yml"><img src="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="https://codecov.io/gh/sauravbhattacharya001/VoronoiMap"><img src="https://codecov.io/gh/sauravbhattacharya001/VoronoiMap/graph/badge.svg" alt="codecov"></a>
     <a href="LICENSE"><img src="https://img.shields.io/github/license/sauravbhattacharya001/VoronoiMap?color=blue" alt="License"></a>
@@ -36,13 +37,25 @@ The algorithm discovers data points by sampling random locations, queries a near
 
 ## 🔧 Installation
 
+### From PyPI (Recommended)
+
+```bash
+# Install the base package
+pip install voronoimap
+
+# Install with fast KDTree-accelerated nearest-neighbor lookups
+pip install voronoimap[fast]
+```
+
+### From Source
+
 ```bash
 # Clone the repository
 git clone https://github.com/sauravbhattacharya001/VoronoiMap.git
 cd VoronoiMap
 
-# Install optional dependencies for O(log n) nearest-neighbor via KDTree
-pip install -r requirements.txt
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
 ```
 
 **Dependencies:**
@@ -69,14 +82,17 @@ Place data files in a `data/` directory. Each file contains one point per line w
 ### Command Line
 
 ```bash
-# Estimate the count from a 5-point dataset
-python vormap.py datauni5.txt 5
+# After pip install:
+voronoimap datauni5.txt 5
 
 # Multiple independent runs for better accuracy
-python vormap.py datauni5.txt 5 --runs 3
+voronoimap datauni5.txt 5 --runs 3
 
 # Custom search space boundaries (south north west east)
-python vormap.py datauni5.txt 5 --bounds 0 500 0 1000
+voronoimap datauni5.txt 5 --bounds 0 500 0 1000
+
+# Or run directly from source:
+python vormap.py datauni5.txt 5
 ```
 
 ### Python API

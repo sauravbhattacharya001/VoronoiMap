@@ -737,12 +737,13 @@ def get_sum(FILENAME, N1, _depth=0):
     return result, est_max_e, est_avg_e
 
 
-if __name__ == '__main__':
+def main():
+    """CLI entry point for VoronoiMap estimation."""
     import argparse
 
     parser = argparse.ArgumentParser(
         description='Estimate Voronoi region count via random point sampling.',
-        epilog='Example: python vormap.py datauni5.txt 5',
+        epilog='Example: voronoimap datauni5.txt 5',
     )
     parser.add_argument(
         'datafile',
@@ -780,3 +781,7 @@ if __name__ == '__main__':
         result, max_e, avg_e = get_sum(args.datafile, args.n)
         print('Run %d: regions=%d  max_edges=%d  avg_edges=%.1f'
               % (run + 1, result, max_e, avg_e))
+
+
+if __name__ == '__main__':
+    main()

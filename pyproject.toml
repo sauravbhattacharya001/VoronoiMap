@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "voronoimap"
+version = "1.0.0"
+description = "Estimate aggregate statistics of unknown point sets using Voronoi partitioning and nearest-neighbor oracles"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.6"
+authors = [
+    {name = "Saurav Bhattacharya", email = "online.saurav@gmail.com"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+keywords = [
+    "voronoi",
+    "nearest-neighbor",
+    "spatial-analysis",
+    "estimation",
+    "aggregate-statistics",
+    "computational-geometry",
+]
+
+[project.optional-dependencies]
+fast = [
+    "numpy>=1.20",
+    "scipy>=1.7",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "numpy>=1.20",
+    "scipy>=1.7",
+]
+
+[project.scripts]
+voronoimap = "vormap:main"
+
+[project.urls]
+Homepage = "https://github.com/sauravbhattacharya001/VoronoiMap"
+Repository = "https://github.com/sauravbhattacharya001/VoronoiMap"
+Issues = "https://github.com/sauravbhattacharya001/VoronoiMap/issues"
+Documentation = "https://sauravbhattacharya001.github.io/VoronoiMap/"
+
+[tool.setuptools]
+py-modules = ["vormap"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["vormap"]
