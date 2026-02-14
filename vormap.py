@@ -17,15 +17,21 @@ class Oracle:
 
 
 def get_NN(FILENAME, lng, lat):
+    """Return the nearest neighbor (lng, lat) from the data file.
+
+    Raises ValueError if the data file contains no valid points.
+    """
     Oracle.calls += 1
-    slat = 0
-    slng = 0
     mindist = 1e99
+    minlng = None
+    minlat = None
     with open("data/" + FILENAME, "r") as objf:
         for lines in objf:
             if not lines.strip():
                 continue
             coord = lines.split()
+            if len(coord) < 2:
+                continue
 
             slng = float(coord[0])
             slat = float(coord[1])
@@ -36,6 +42,12 @@ def get_NN(FILENAME, lng, lat):
                 mindist = dist
                 minlat = slat
                 minlng = slng
+
+    if minlng is None or minlat is None:
+        raise ValueError(
+            "No valid nearest neighbor found in '%s' for query (%s, %s)"
+            % (FILENAME, lng, lat)
+        )
     return minlng, minlat
 
 
@@ -43,7 +55,7 @@ def mid_point(x1, y1, x2, y2):
     return round(((float)(x1 + x2) / 2), 2), round(((float)(y1 + y2) / 2), 2)
 
 
-def  perp_dir(x1, y1, x2, y2):
+def perp_dir(x1, y1, x2, y2):
     if (y2 != y1):
         return round(((float)(x2 - x1) / (y1 - y2)), 2)
     return 1e99
