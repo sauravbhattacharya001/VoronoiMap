@@ -474,3 +474,402 @@ def generate_diagram(
 def list_color_schemes():
     """Return a sorted list of available color scheme names."""
     return sorted(_COLOR_SCHEMES.keys())
+
+
+# ── Interactive HTML export ──────────────────────────────────────────
+
+def _compute_region_area(vertices):
+    """Compute polygon area using the Shoelace formula."""
+    n = len(vertices)
+    if n < 3:
+        return 0.0
+    area = 0.0
+    for i in range(n):
+        j = (i + 1) % n
+        area += vertices[i][0] * vertices[j][1]
+        area -= vertices[j][0] * vertices[i][1]
+    return abs(area) / 2.0
+
+
+def export_html(
+    regions,
+    data,
+    output_path,
+    *,
+    width=960,
+    height=700,
+    color_scheme=DEFAULT_COLOR_SCHEME,
+    title=None,
+):
+    """Export an interactive HTML visualization of Voronoi regions.
+
+    The generated HTML file is self-contained (zero external dependencies)
+    and supports:
+
+    - **Pan & zoom** via mouse wheel / drag (Canvas 2D transforms)
+    - **Hover tooltips** showing region index, seed coordinates, area,
+      and vertex count
+    - **Live color scheme switching** between all 6 built-in schemes
+    - **Region highlighting** on hover
+    - **Zoom controls** (+/−/reset buttons)
+    - **Dark/light theme toggle**
+    - **Responsive layout** that fills the browser window
+
+    Parameters
+    ----------
+    regions : dict
+        Output of ``compute_regions()`` — maps seed → vertex list.
+    data : list of (float, float)
+        All seed points.
+    output_path : str
+        Path to write the HTML file.
+    width, height : int
+        Initial canvas dimensions (resizes to fit window).
+    color_scheme : str
+        Initial color scheme (pastel, warm, cool, earth, mono, rainbow).
+    title : str or None
+        Optional title displayed at the top.
+
+    Returns
+    -------
+    str
+        Path to the generated HTML file.
+    """
+    if not regions:
+        raise ValueError("No regions to visualize")
+
+    # Prepare region data as JSON-serializable structures
+    sorted_seeds = sorted(regions.keys())
+    region_list = []
+    for idx, seed in enumerate(sorted_seeds):
+        verts = regions[seed]
+        area = _compute_region_area(verts)
+        # Find seed index in original data
+        try:
+            data_idx = data.index(seed)
+        except ValueError:
+            data_idx = idx
+
+        region_list.append({
+            "seed": list(seed),
+            "vertices": [list(v) for v in verts],
+            "area": round(area, 2),
+            "vertexCount": len(verts),
+            "dataIndex": data_idx,
+        })
+
+    import json
+    regions_json = json.dumps(region_list)
+    points_json = json.dumps([list(p) for p in data])
+    title_text = title or ("Voronoi Diagram — %d regions" % len(regions))
+
+    html = _INTERACTIVE_HTML_TEMPLATE.replace("{{REGIONS_JSON}}", regions_json)
+    html = html.replace("{{POINTS_JSON}}", points_json)
+    html = html.replace("{{TITLE}}", title_text)
+    html = html.replace("{{INITIAL_SCHEME}}", color_scheme)
+    html = html.replace("{{WIDTH}}", str(width))
+    html = html.replace("{{HEIGHT}}", str(height))
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    return output_path
+
+
+_INTERACTIVE_HTML_TEMPLATE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;overflow:hidden;
+  transition:background .3s,color .3s}
+body.light{background:#f5f5f5;color:#222}
+body.dark{background:#1a1a2e;color:#e0e0e0}
+#header{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;gap:12px;flex-wrap:wrap;z-index:10;position:relative}
+body.light #header{background:#fff;border-bottom:1px solid #ddd}
+body.dark #header{background:#16213e;border-bottom:1px solid #333}
+h1{font-size:16px;font-weight:600;white-space:nowrap}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+select,button{font-size:13px;padding:4px 10px;border-radius:4px;cursor:pointer;
+  border:1px solid #aaa;background:#fff;color:#222;transition:all .2s}
+body.dark select,body.dark button{background:#0f3460;color:#e0e0e0;border-color:#555}
+button:hover{opacity:0.85}
+.zoom-btn{width:32px;font-size:16px;font-weight:bold;text-align:center;padding:4px}
+#canvas-wrap{position:relative;flex:1;overflow:hidden}
+canvas{display:block;cursor:grab}
+canvas.grabbing{cursor:grabbing}
+#tooltip{position:fixed;pointer-events:none;padding:8px 12px;border-radius:6px;
+  font-size:12px;line-height:1.5;white-space:nowrap;opacity:0;
+  transition:opacity .15s;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+body.light #tooltip{background:#222;color:#fff}
+body.dark #tooltip{background:#e8e8e8;color:#111}
+#stats{font-size:12px;opacity:0.7;white-space:nowrap}
+</style>
+</head>
+<body class="light">
+<div id="header">
+  <h1>{{TITLE}}</h1>
+  <div class="controls">
+    <label>Color: <select id="scheme">
+      <option value="pastel">Pastel</option>
+      <option value="warm">Warm</option>
+      <option value="cool">Cool</option>
+      <option value="earth">Earth</option>
+      <option value="mono">Mono</option>
+      <option value="rainbow">Rainbow</option>
+    </select></label>
+    <button class="zoom-btn" id="zoom-in" title="Zoom in">+</button>
+    <button class="zoom-btn" id="zoom-out" title="Zoom out">−</button>
+    <button id="zoom-reset" title="Reset view">Reset</button>
+    <button id="theme-btn" title="Toggle dark/light">🌙</button>
+    <span id="stats"></span>
+  </div>
+</div>
+<div id="canvas-wrap"><canvas id="c"></canvas></div>
+<div id="tooltip"></div>
+
+<script>
+(function(){
+"use strict";
+
+var regions = {{REGIONS_JSON}};
+var points  = {{POINTS_JSON}};
+var initialScheme = "{{INITIAL_SCHEME}}";
+
+// ── Color scheme generators ──
+function hslToHex(h,s,l){
+  h%=1; if(h<0)h+=1;
+  var c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((h*6)%2-1)), m=l-c/2;
+  var r,g,b;
+  if(h<1/6){r=c;g=x;b=0}else if(h<2/6){r=x;g=c;b=0}
+  else if(h<3/6){r=0;g=c;b=x}else if(h<4/6){r=0;g=x;b=c}
+  else if(h<5/6){r=x;g=0;b=c}else{r=c;g=0;b=x}
+  r=Math.round((r+m)*255);g=Math.round((g+m)*255);b=Math.round((b+m)*255);
+  return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+}
+function grayHex(l){var v=Math.max(0,Math.min(255,Math.round(l*255)));
+  return "#"+((1<<24)+(v<<16)+(v<<8)+v).toString(16).slice(1)}
+
+var schemes = {
+  pastel:  function(i,n){return hslToHex(i/Math.max(n,1),.65,.82)},
+  warm:    function(i,n){return hslToHex((i/Math.max(n,1))*.15,.70,.75)},
+  cool:    function(i,n){return hslToHex(.5+(i/Math.max(n,1))*.2,.60,.78)},
+  earth:   function(i,n){return hslToHex(.08+(i/Math.max(n,1))*.1,.45,.65)},
+  mono:    function(i,n){return grayHex(.88-.35*(i/Math.max(n,1)))},
+  rainbow: function(i,n){return hslToHex(i/Math.max(n,1),.70,.68)}
+};
+
+var curScheme = initialScheme;
+
+// ── Data bounds ──
+var allX=[], allY=[];
+points.forEach(function(p){allX.push(p[0]);allY.push(p[1])});
+regions.forEach(function(r){r.vertices.forEach(function(v){allX.push(v[0]);allY.push(v[1])})});
+var minX=Math.min.apply(null,allX), maxX=Math.max.apply(null,allX);
+var minY=Math.min.apply(null,allY), maxY=Math.max.apply(null,allY);
+var rangeX=Math.max(maxX-minX,1e-6), rangeY=Math.max(maxY-minY,1e-6);
+
+// ── Canvas setup ──
+var canvas=document.getElementById("c"), ctx=canvas.getContext("2d");
+var wrap=document.getElementById("canvas-wrap");
+var tooltip=document.getElementById("tooltip");
+
+function resize(){
+  canvas.width=wrap.clientWidth;
+  canvas.height=wrap.clientHeight;
+  draw();
+}
+window.addEventListener("resize",resize);
+
+// ── Transform state ──
+var panX=0, panY=0, zoom=1;
+
+function fitView(){
+  var cw=canvas.width, ch=canvas.height, margin=50;
+  var dw=cw-2*margin, dh=ch-2*margin;
+  zoom=Math.min(dw/rangeX, dh/rangeY);
+  panX=margin+(dw-rangeX*zoom)/2;
+  panY=margin+(dh-rangeY*zoom)/2;
+}
+
+function tx(x){return panX+(x-minX)*zoom}
+function ty(y){return panY+(maxY-y)*zoom}  // flip Y
+
+// ── Hit testing ──
+var hoverIdx=-1;
+
+function pointInPoly(px,py,verts){
+  var inside=false, n=verts.length;
+  for(var i=0,j=n-1;i<n;j=i++){
+    var xi=tx(verts[i][0]),yi=ty(verts[i][1]);
+    var xj=tx(verts[j][0]),yj=ty(verts[j][1]);
+    if(((yi>py)!==(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))
+      inside=!inside;
+  }
+  return inside;
+}
+
+function findRegion(mx,my){
+  for(var i=0;i<regions.length;i++){
+    if(pointInPoly(mx,my,regions[i].vertices)) return i;
+  }
+  return -1;
+}
+
+// ── Drawing ──
+function draw(){
+  var cw=canvas.width, ch=canvas.height;
+  var isDark=document.body.classList.contains("dark");
+  ctx.clearRect(0,0,cw,ch);
+  ctx.fillStyle=isDark?"#1a1a2e":"#f5f5f5";
+  ctx.fillRect(0,0,cw,ch);
+
+  var colorFn=schemes[curScheme]||schemes.pastel;
+  var n=regions.length;
+
+  // Draw regions
+  for(var i=0;i<n;i++){
+    var r=regions[i], verts=r.vertices;
+    ctx.beginPath();
+    ctx.moveTo(tx(verts[0][0]),ty(verts[0][1]));
+    for(var j=1;j<verts.length;j++) ctx.lineTo(tx(verts[j][0]),ty(verts[j][1]));
+    ctx.closePath();
+    ctx.fillStyle=colorFn(i,n);
+    if(i===hoverIdx){
+      // Brighten on hover
+      ctx.globalAlpha=0.85;
+      ctx.fill();
+      ctx.globalAlpha=1;
+      ctx.strokeStyle=isDark?"#fff":"#000";
+      ctx.lineWidth=2.5;
+    } else {
+      ctx.fill();
+      ctx.strokeStyle=isDark?"#555":"#444";
+      ctx.lineWidth=1;
+    }
+    ctx.stroke();
+  }
+
+  // Draw seed points
+  ctx.fillStyle=isDark?"#e0e0e0":"#222";
+  ctx.strokeStyle=isDark?"#1a1a2e":"#fff";
+  ctx.lineWidth=1;
+  for(var i=0;i<points.length;i++){
+    ctx.beginPath();
+    ctx.arc(tx(points[i][0]),ty(points[i][1]),3.5*Math.min(zoom/5+0.5,1.5),0,Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+  }
+}
+
+// ── Mouse interaction: pan & zoom ──
+var dragging=false, dragStartX=0, dragStartY=0, panStartX=0, panStartY=0;
+
+canvas.addEventListener("mousedown",function(e){
+  if(e.button===0){
+    dragging=true;
+    dragStartX=e.clientX; dragStartY=e.clientY;
+    panStartX=panX; panStartY=panY;
+    canvas.classList.add("grabbing");
+  }
+});
+window.addEventListener("mousemove",function(e){
+  if(dragging){
+    panX=panStartX+(e.clientX-dragStartX);
+    panY=panStartY+(e.clientY-dragStartY);
+    draw();
+  }
+});
+window.addEventListener("mouseup",function(){
+  dragging=false;
+  canvas.classList.remove("grabbing");
+});
+
+canvas.addEventListener("wheel",function(e){
+  e.preventDefault();
+  var rect=canvas.getBoundingClientRect();
+  var mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  var factor=e.deltaY<0?1.15:1/1.15;
+  // Zoom centered on cursor
+  panX=mx-factor*(mx-panX);
+  panY=my-factor*(my-panY);
+  zoom*=factor;
+  draw();
+},{passive:false});
+
+// ── Hover / tooltip ──
+canvas.addEventListener("mousemove",function(e){
+  if(dragging) return;
+  var rect=canvas.getBoundingClientRect();
+  var mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  var idx=findRegion(mx,my);
+  if(idx!==hoverIdx){
+    hoverIdx=idx;
+    draw();
+  }
+  if(idx>=0){
+    var r=regions[idx];
+    tooltip.innerHTML="<b>Region #"+(r.dataIndex+1)+"</b><br>"+
+      "Seed: ("+r.seed[0].toFixed(2)+", "+r.seed[1].toFixed(2)+")<br>"+
+      "Area: "+r.area.toFixed(2)+" sq units<br>"+
+      "Vertices: "+r.vertexCount;
+    tooltip.style.opacity="1";
+    tooltip.style.left=(e.clientX+14)+"px";
+    tooltip.style.top=(e.clientY+14)+"px";
+  } else {
+    tooltip.style.opacity="0";
+  }
+});
+canvas.addEventListener("mouseleave",function(){
+  hoverIdx=-1;
+  tooltip.style.opacity="0";
+  draw();
+});
+
+// ── Controls ──
+var schemeSelect=document.getElementById("scheme");
+schemeSelect.value=initialScheme;
+schemeSelect.addEventListener("change",function(){
+  curScheme=this.value;
+  draw();
+});
+
+document.getElementById("zoom-in").addEventListener("click",function(){
+  var cx=canvas.width/2, cy=canvas.height/2;
+  panX=cx-1.3*(cx-panX); panY=cy-1.3*(cy-panY);
+  zoom*=1.3; draw();
+});
+document.getElementById("zoom-out").addEventListener("click",function(){
+  var cx=canvas.width/2, cy=canvas.height/2;
+  panX=cx-(cx-panX)/1.3; panY=cy-(cy-panY)/1.3;
+  zoom/=1.3; draw();
+});
+document.getElementById("zoom-reset").addEventListener("click",function(){
+  fitView(); draw();
+});
+
+// Theme toggle
+var themeBtn=document.getElementById("theme-btn");
+themeBtn.addEventListener("click",function(){
+  var isDark=document.body.classList.toggle("dark");
+  document.body.classList.toggle("light",!isDark);
+  themeBtn.textContent=isDark?"☀️":"🌙";
+  draw();
+});
+
+// Stats
+document.getElementById("stats").textContent=
+  regions.length+" regions · "+points.length+" points";
+
+// Init
+resize();
+fitView();
+draw();
+})();
+</script>
+</body>
+</html>"""

@@ -796,6 +796,13 @@ def main():
         default=600,
         help='SVG canvas height in pixels (default: 600).',
     )
+    parser.add_argument(
+        '--interactive',
+        metavar='OUTPUT',
+        help='Generate an interactive HTML visualization with pan/zoom, '
+             'hover tooltips, and live color switching. Provide the output '
+             'file path (e.g. diagram.html).',
+    )
 
     args = parser.parse_args()
 
@@ -831,6 +838,27 @@ def main():
                   % (args.datafile, len(data)),
         )
         print('SVG saved to %s' % args.visualize)
+
+    # Interactive HTML visualization
+    if args.interactive:
+        import vormap_viz
+
+        data = load_data(args.datafile)
+        print('Computing Voronoi regions for interactive visualization...')
+        regions = vormap_viz.compute_regions(data)
+        print('Traced %d of %d regions' % (len(regions), len(data)))
+
+        vormap_viz.export_html(
+            regions,
+            data,
+            args.interactive,
+            width=args.svg_width,
+            height=args.svg_height,
+            color_scheme=args.color_scheme,
+            title='Voronoi Diagram — %s (%d points)'
+                  % (args.datafile, len(data)),
+        )
+        print('Interactive HTML saved to %s' % args.interactive)
 
 
 if __name__ == '__main__':

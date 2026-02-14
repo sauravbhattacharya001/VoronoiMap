@@ -33,6 +33,8 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Data Caching** — Files loaded once from disk and cached in memory for subsequent queries
 - **Robust Geometry** — Cross-product collinearity tests, relative tolerance parallel-line detection, convergence-bounded loops
 - **Security Hardened** — Path traversal protection, NaN/Inf rejection, malformed input handling
+- **SVG Export** — Static SVG visualization with 6 color schemes
+- **Interactive HTML Export** — Pan/zoom, hover tooltips, live color switching, dark/light theme toggle
 - **CLI & API** — Full-featured command-line interface and importable Python API
 
 ## 🔧 Installation
@@ -93,6 +95,12 @@ voronoimap datauni5.txt 5 --bounds 0 500 0 1000
 
 # Or run directly from source:
 python vormap.py datauni5.txt 5
+
+# Generate static SVG visualization
+voronoimap datauni5.txt 5 --visualize diagram.svg --color-scheme rainbow
+
+# Generate interactive HTML visualization (pan/zoom, tooltips, theme toggle)
+voronoimap datauni5.txt 5 --interactive diagram.html
 ```
 
 ### Python API
@@ -118,6 +126,26 @@ nearest_lng, nearest_lat = get_NN(data, 500.0, 500.0)
 set_bounds(south=0, north=500, west=0, east=1000)
 ```
 
+### Visualization
+
+```python
+import vormap
+import vormap_viz
+
+# Load data and compute regions
+data = vormap.load_data("datauni5.txt")
+regions = vormap_viz.compute_regions(data)
+
+# Static SVG export
+vormap_viz.export_svg(regions, data, "diagram.svg", color_scheme="rainbow")
+
+# Interactive HTML export (pan/zoom, hover tooltips, color switching, dark mode)
+vormap_viz.export_html(regions, data, "diagram.html", title="My Voronoi Diagram")
+
+# One-call SVG generation
+vormap_viz.generate_diagram("datauni5.txt", "quick.svg")
+```
+
 ## 📚 API Reference
 
 ### Core Functions
@@ -130,6 +158,16 @@ set_bounds(south=0, north=500, west=0, east=1000)
 | `get_NN` | `(data, lng, lat) → (lng, lat)` | Find nearest neighbor. Uses KDTree O(log n) if SciPy available, O(n) otherwise. |
 | `set_bounds` | `(south, north, west, east) → None` | Manually set the search space boundaries. |
 | `compute_bounds` | `(points, padding=0.1) → (s, n, w, e)` | Compute bounds from points with padding. |
+
+### Visualization Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `compute_regions` | `(data) → {seed: [(x,y), ...]}` | Compute Voronoi region polygons for all seed points. Uses SciPy when available. |
+| `export_svg` | `(regions, data, path, **opts) → path` | Export static SVG with color schemes, labels, and custom dimensions. |
+| `export_html` | `(regions, data, path, **opts) → path` | Export interactive HTML with pan/zoom, hover tooltips, live color switching, and dark/light theme. |
+| `generate_diagram` | `(datafile, path, **opts) → path` | One-call convenience: load → compute → export SVG. |
+| `list_color_schemes` | `() → [str, ...]` | List available color schemes (pastel, warm, cool, earth, mono, rainbow). |
 
 ### Geometry Helpers
 
@@ -171,6 +209,7 @@ set_bounds(south=0, north=500, west=0, east=1000)
 ```
 VoronoiMap/
 ├── vormap.py                    # Core algorithm implementation
+├── vormap_viz.py                # SVG + interactive HTML visualization
 ├── requirements.txt             # Optional dependencies
 ├── .coveragerc                  # Coverage configuration
 ├── LICENSE                      # MIT License
@@ -178,7 +217,8 @@ VoronoiMap/
 ├── docs/
 │   └── index.html               # Interactive demo page (GitHub Pages)
 ├── tests/
-│   └── test_vormap.py           # Unit & security tests
+│   ├── test_vormap.py           # Unit & security tests
+│   └── test_vormap_viz.py       # Visualization tests (SVG + HTML)
 └── .github/
     ├── copilot-instructions.md  # Copilot agent context
     ├── copilot-setup-steps.yml  # Copilot agent setup
