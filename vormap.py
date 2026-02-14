@@ -12,11 +12,33 @@ except ImportError:
     _HAS_SCIPY = False
 
 
+# Default search space boundaries — overridden by auto-detection in
+# load_data() or explicitly via set_bounds() / CLI --bounds.
 IND_S = 0.0
 IND_N = 1000.0
 IND_W = 0.0
 IND_E = 2000.0
 BIN_PREC = 1e-6
+
+
+def compute_bounds(points, padding=0.1):
+    """Compute search space boundaries from a set of points.
+
+    Returns (south, north, west, east) with *padding* fraction added
+    on each side so Voronoi cells near the boundary are not clipped.
+    """
+    lngs, lats = zip(*points)
+    w, e = min(lngs), max(lngs)
+    s, n = min(lats), max(lats)
+    pad_x = max((e - w) * padding, 1.0)  # at least 1 unit padding
+    pad_y = max((n - s) * padding, 1.0)
+    return s - pad_y, n + pad_y, w - pad_x, e + pad_x
+
+
+def set_bounds(south, north, west, east):
+    """Manually set the search space boundaries (globals)."""
+    global IND_S, IND_N, IND_W, IND_E
+    IND_S, IND_N, IND_W, IND_E = south, north, west, east
 
 # Maximum vertices a single Voronoi region can have before we give up.
 # Prevents infinite loops on degenerate point configurations.
@@ -32,15 +54,22 @@ class Oracle:
 _data_cache = {}
 
 
-def load_data(filename):
+def load_data(filename, auto_bounds=True):
     """Load point data from a file and cache it in memory.
 
     Returns a list of (lng, lat) tuples.  Subsequent calls with the same
     filename return the cached list without re-reading the file.
 
+    When *auto_bounds* is True (the default) the search space boundaries
+    are automatically computed from the data extents with 10 % padding.
+    This fixes issue #11 — datasets outside the default 1000×2000 region
+    no longer produce silently incorrect results.
+
     When *scipy* is available a ``KDTree`` is also built and cached so
     that ``get_NN`` can use O(log n) lookups instead of O(n) scans.
     """
+    global IND_S, IND_N, IND_W, IND_E
+
     if filename in _data_cache:
         return _data_cache[filename]
 
@@ -56,6 +85,27 @@ def load_data(filename):
 
     if not points:
         raise ValueError("No valid points found in '%s'" % filename)
+
+    # Warn if any points fall outside the current search bounds
+    out_of_bounds = [
+        (lng, lat) for lng, lat in points
+        if lng < IND_W or lng > IND_E or lat < IND_S or lat > IND_N
+    ]
+    if out_of_bounds:
+        warnings.warn(
+            "%d of %d points in '%s' fall outside the current search bounds "
+            "[%.1f, %.1f] x [%.1f, %.1f]. %s"
+            % (
+                len(out_of_bounds), len(points), filename,
+                IND_W, IND_E, IND_S, IND_N,
+                "Auto-adjusting bounds." if auto_bounds
+                else "Results may be incorrect.",
+            )
+        )
+
+    # Auto-detect bounds from data so arbitrary datasets work out of the box
+    if auto_bounds:
+        IND_S, IND_N, IND_W, IND_E = compute_bounds(points)
 
     _data_cache[filename] = points
 
@@ -678,8 +728,22 @@ if __name__ == '__main__':
         default=1,
         help='Number of independent estimation runs (default: 1)',
     )
+    parser.add_argument(
+        '--bounds',
+        nargs=4,
+        type=float,
+        metavar=('S', 'N', 'W', 'E'),
+        help='Explicit search space boundaries: south north west east. '
+             'Disables auto-detection from data.',
+    )
 
     args = parser.parse_args()
+
+    # Apply explicit bounds if given (disables auto-detection)
+    if args.bounds:
+        set_bounds(*args.bounds)
+        # Load data without auto-bounds since the user specified them
+        load_data(args.datafile, auto_bounds=False)
 
     for run in range(args.runs):
         result, max_e, avg_e = get_sum(args.datafile, args.n)
