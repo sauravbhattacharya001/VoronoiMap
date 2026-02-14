@@ -39,6 +39,7 @@
 3. **Longevity Protocol:** Bryan Johnson Blueprint framework
 4. **AgentBox:** AI agent SaaS — MVP complete with all features, open access, 20 msg/day free tier
 5. **Sauravcode:** Custom programming language + compiler (compiles .srv → C → native executables)
+6. **AgentLens:** Observability & explainability for AI agents — "Datadog for AI agents". Python SDK + Node.js backend + dashboard. LangChain integration first. Per agent seat pricing. Repo: https://github.com/sauravbhattacharya001/agentlens
 
 ## Capabilities Verified
 - **File creation:** ✅ (Desktop, Downloads)
@@ -51,7 +52,8 @@
 - **Gateway watchdog**: Runs every 1 min, auto-restarts if down
 - **Tailscale**: Installed, connected (100.72.230.43)
 - **Sleep disabled**: AC & battery, hybrid sleep off
-- **OpenClaw version**: 2026.2.6
+- **OpenClaw version**: 2026.2.12
+- **Hibernate disabled**: timeout set to 0 (was 3hr, caused ~19hr outage on Feb 11)
 - **Docker image**: `agentbox-agent:latest` (1.54GB) — built but not used; per-container OpenClaw too heavy for this machine
 - **Docker lesson**: Full OpenClaw per container needs 300MB+ RAM and host auth tokens; not viable on 12GB Celeron. Use shared API + agent isolation instead.
 - **Memory backup**: Private GitHub repo `sauravbhattacharya001/zalenix-memory`

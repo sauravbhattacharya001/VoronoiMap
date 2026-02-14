@@ -210,3 +210,14 @@ The goal: Be helpful without being annoying. Check in a few times a day, do usef
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.
+
+## Conventions
+
+### Sub-agents for Long Tasks
+For any task that takes more than a few seconds, spawn a sub-agent. The sub-agent should:
+1. Write progress to `C:\Users\onlin\.openclaw\workspace\status.md` as it works
+2. Update status.md at each major step so Shubho can check progress anytime
+3. When done, append a run summary to `C:\Users\onlin\.openclaw\workspace\runs.md` (most recent first, under today's date)
+4. Clean up status.md when done (or leave final summary)
+
+This keeps the main chat responsive and gives visibility into what's happening.
