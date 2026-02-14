@@ -409,7 +409,7 @@ def find_area(FILENAME, dlng, dlat):
 
         a_g, a_t = find_a1(FILENAME,
             ag[i], at[i], dlng, dlat, dirn)
-        if (get_NN(FILENAME, a_g, a_t) == dlng, dlat):
+        if get_NN(FILENAME, a_g, a_t) == (dlng, dlat):
             ag[i + 1] = a_g
             at[i + 1] = a_t
             #print "VERTEX ADDED=", i + 1, ag[i + 1], at[i + 1]
