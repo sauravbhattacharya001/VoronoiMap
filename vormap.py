@@ -15,38 +15,58 @@ class Oracle:
     calls = 0
 
 
+# Cache loaded data files so each file is read from disk exactly once.
+_data_cache = {}
 
-def get_NN(FILENAME, lng, lat):
-    """Return the nearest neighbor (lng, lat) from the data file.
 
-    Raises ValueError if the data file contains no valid points.
+def load_data(filename):
+    """Load point data from a file and cache it in memory.
+
+    Returns a list of (lng, lat) tuples.  Subsequent calls with the same
+    filename return the cached list without re-reading the file.
+    """
+    if filename in _data_cache:
+        return _data_cache[filename]
+
+    points = []
+    with open("data/" + filename, "r") as objf:
+        for line in objf:
+            if not line.strip():
+                continue
+            coord = line.split()
+            if len(coord) < 2:
+                continue
+            points.append((float(coord[0]), float(coord[1])))
+
+    if not points:
+        raise ValueError("No valid points found in '%s'" % filename)
+
+    _data_cache[filename] = points
+    return points
+
+
+def get_NN(data, lng, lat):
+    """Return the nearest neighbor (lng, lat) from pre-loaded point data.
+
+    *data* is a list of (lng, lat) tuples (returned by ``load_data``).
+    Raises ValueError if no valid neighbor is found.
     """
     Oracle.calls += 1
     mindist = 1e99
     minlng = None
     minlat = None
-    with open("data/" + FILENAME, "r") as objf:
-        for lines in objf:
-            if not lines.strip():
-                continue
-            coord = lines.split()
-            if len(coord) < 2:
-                continue
 
-            slng = float(coord[0])
-            slat = float(coord[1])
-
-            dist = eudist(slng, slat, lng, lat)
-
-            if (dist > 0 and dist <= mindist):
-                mindist = dist
-                minlat = slat
-                minlng = slng
+    for slng, slat in data:
+        dist = eudist(slng, slat, lng, lat)
+        if (dist > 0 and dist <= mindist):
+            mindist = dist
+            minlat = slat
+            minlng = slng
 
     if minlng is None or minlat is None:
         raise ValueError(
-            "No valid nearest neighbor found in '%s' for query (%s, %s)"
-            % (FILENAME, lng, lat)
+            "No valid nearest neighbor found for query (%s, %s)"
+            % (lng, lat)
         )
     return minlng, minlat
 
@@ -92,7 +112,7 @@ def collinear(x1, y1, x2, y2, x3, y3):
 NEW_DIR_MAX_ITER = 200
 
 
-def new_dir(FILENAME, aplng, aplat, alng, alat, dlng, dlat):
+def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
     if (alng == dlng):
         m1 = 1e99
     else:
@@ -124,8 +144,8 @@ def new_dir(FILENAME, aplng, aplat, alng, alat, dlng, dlat):
         Bc1x, Bc1y = find_CXY(Bc1, aplng, aplat)
         Bc2x, Bc2y = find_CXY(Bc2, aplng, aplat)
         ##print "C BORDERS=", Bc1x, Bc1y, Bc2x, Bc2y
-        c1x, c1y = bin_search(FILENAME, Bc1x, Bc1y, dlng, dlat, dlng, dlat)
-        c2x, c2y = bin_search(FILENAME, Bc2x, Bc2y, dlng, dlat, dlng, dlat)
+        c1x, c1y = bin_search(data, Bc1x, Bc1y, dlng, dlat, dlng, dlat)
+        c2x, c2y = bin_search(data, Bc2x, Bc2y, dlng, dlat, dlng, dlat)
         ##print "INT C1, C2", c1x, c1y, c2x, c2y
 
         th /= 2
@@ -233,11 +253,11 @@ def eudist(x1, y1, x2, y2):
     return math.sqrt(((x1 - x2) ** 2) + ((y1 - y2) ** 2))
 
 
-def bin_search(FILENAME, x1, y1, x2, y2, dlng, dlat):
+def bin_search(data, x1, y1, x2, y2, dlng, dlat):
     """Binary search for a Voronoi boundary point between two positions.
 
-    Raises RuntimeError if the search fails to converge (instead of
-    terminating the process).
+    *data* is a list of (lng, lat) tuples (returned by ``load_data``).
+    Raises RuntimeError if the search fails to converge.
     """
     xm = -1
     ym = -1
@@ -246,7 +266,7 @@ def bin_search(FILENAME, x1, y1, x2, y2, dlng, dlat):
 
         xm = float(x1 + x2) / 2
         ym = float(y1 + y2) / 2
-        lg, lt = get_NN(FILENAME, xm, ym)
+        lg, lt = get_NN(data, xm, ym)
         d1 = round(eudist(lg, lt, xm, ym), 2)
         d2 = round(eudist(xm, ym, dlng, dlat), 2)
         if(d1 == d2):
@@ -266,8 +286,8 @@ def bin_search(FILENAME, x1, y1, x2, y2, dlng, dlat):
         return xm, ym
     else:
         raise RuntimeError(
-            "Binary search failed to converge for query (%s, %s) in '%s'"
-            % (dlng, dlat, FILENAME)
+            "Binary search failed to converge for query (%s, %s)"
+            % (dlng, dlat)
         )
 
 
@@ -373,7 +393,7 @@ def find_BXY(B, dlng, dlat):
     return Bx, By
 
 
-def find_a1(FILENAME, alng, alat, dlng, dlat, dirn):
+def find_a1(data, alng, alat, dlng, dlat, dirn):
     B = isect_B(alng, alat, dirn)
     #print "B VECTOR", B
     #print alng, alat
@@ -392,7 +412,7 @@ def find_a1(FILENAME, alng, alat, dlng, dlat, dirn):
         Bx = t1
         By = t2
         #print "B POINTS", Bx, By
-    return bin_search(FILENAME, Bx, By, alng, alat, dlng, dlat)
+    return bin_search(data, Bx, By, alng, alat, dlng, dlat)
 
 
 def polygon_area(alng, alat):
@@ -409,9 +429,9 @@ def polygon_area(alng, alat):
     return round(area, 2)
 
 
-def find_area(FILENAME, dlng, dlat):
+def find_area(data, dlng, dlat):
 
-    elng, elat = get_NN(FILENAME, dlng, dlat)
+    elng, elat = get_NN(data, dlng, dlat)
     alng, alat = mid_point(dlng, dlat, elng, elat)
     dirn = perp_dir(elng, elat, dlng, dlat)
     Oracle.calls = 0
@@ -433,9 +453,9 @@ def find_area(FILENAME, dlng, dlat):
         at.append(0)
         #print "COUNTER========================================", i
 
-        a_g, a_t = find_a1(FILENAME,
+        a_g, a_t = find_a1(data,
             ag[i], at[i], dlng, dlat, dirn)
-        if get_NN(FILENAME, a_g, a_t) == (dlng, dlat):
+        if get_NN(data, a_g, a_t) == (dlng, dlat):
             ag[i + 1] = a_g
             at[i + 1] = a_t
         else:
@@ -444,7 +464,7 @@ def find_area(FILENAME, dlng, dlat):
                 % (a_g, a_t, dlng, dlat)
             )
 
-        dirn1 = new_dir(FILENAME,
+        dirn1 = new_dir(data,
             ag[i], at[i], ag[i + 1], at[i + 1], dlng, dlat)
 
         d.append(dirn1)
@@ -489,11 +509,17 @@ MAX_RETRIES = 50
 def get_sum(FILENAME, N1, _depth=0):
     """Estimate the number of Voronoi regions by random point sampling.
 
+    Loads the data file once via ``load_data`` (cached) and passes the
+    in-memory point list through all subsequent calls, eliminating
+    redundant disk I/O.
+
     Uses an iterative retry loop (instead of recursion) to avoid stack
     overflow.  Tracks the best estimate seen so far and returns it when
     max retries are exhausted.  The acceptance window widens slightly on
     each retry so the algorithm converges even on difficult distributions.
     """
+    data = load_data(FILENAME)
+
     best_estimate = None
     best_distance = float('inf')
 
@@ -507,9 +533,9 @@ def get_sum(FILENAME, N1, _depth=0):
         for i in range(0, N):
             plng = random.uniform(IND_W, IND_E)
             plat = random.uniform(IND_S, IND_N)
-            dlng, dlat = get_NN(FILENAME, plng, plat)
+            dlng, dlat = get_NN(data, plng, plat)
 
-            area, v_edges = find_area(FILENAME, dlng, dlat)
+            area, v_edges = find_area(data, dlng, dlat)
 
             S.append(0)
             if (area != 0):
