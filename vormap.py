@@ -292,7 +292,11 @@ def isect(x1, y1, x2, y2, x3, y3, x4, y4):
     m1 = (float)(y2 - y1) / (x2 - x1)
     m2 = (float)(y4 - y3) / (x4 - x3)
 
-    if (m1 == m2):
+    # Use relative tolerance instead of exact equality to catch
+    # near-parallel lines that differ only due to floating-point
+    # rounding.  Without this, (m1 - m2) can be tiny but non-zero,
+    # producing wildly large intersection coordinates.  (fixes #13)
+    if abs(m1 - m2) < 1e-10 * max(abs(m1), abs(m2), 1.0):
         return -1, -1
 
     c1 = y1 - m1 * x1
