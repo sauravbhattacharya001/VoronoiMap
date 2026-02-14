@@ -456,62 +456,73 @@ def find_area(FILENAME, dlng, dlat):
     return area, len(ag)
 
 
-MAX_RECURSION_DEPTH = 50
+MAX_RETRIES = 50
 
 
 def get_sum(FILENAME, N1, _depth=0):
-    if _depth >= MAX_RECURSION_DEPTH:
-        print("Warning: max recursion depth reached in get_sum, returning best estimate")
-        return N1, 0, 0
-    Oracle.calls = 0
-    S = []
-    #N = int(math.sqrt(N1)) + 1
-    N = N1
-    #N = N1
-    #print "Num of P::", N
-    max_edges = 0
-    avg_edges = 0
-    sum_edges = 0
-    for i in range(0, N):
-        plng = random.uniform(IND_W, IND_E)
-        plat = random.uniform(IND_S, IND_N)
-        #print "P_OBJECT=", plng, plat
-        dlng, dlat = get_NN(FILENAME, plng, plat)
-        #print "D_OBJECT=", dlng, dlat
+    """Estimate the number of Voronoi regions by random point sampling.
 
-        area, v_edges = find_area(FILENAME, dlng, dlat)
-        #print "AREA = ", area
+    Uses an iterative retry loop (instead of recursion) to avoid stack
+    overflow.  Tracks the best estimate seen so far and returns it when
+    max retries are exhausted.  The acceptance window widens slightly on
+    each retry so the algorithm converges even on difficult distributions.
+    """
+    best_estimate = None
+    best_distance = float('inf')
 
-        S.append(0)
-        if (area != 0):
-            S[i] = ((IND_N - IND_S) * (IND_E - IND_W)) / area
-            sum_edges += v_edges
-            if (v_edges > max_edges):
-                max_edges = v_edges
-        else:
-            #print "AREA IS ZERO", i
-            N -= 1
-        #print
-        #print
-        #print
+    for attempt in range(MAX_RETRIES):
+        Oracle.calls = 0
+        S = []
+        N = N1
+        max_edges = 0
+        avg_edges = 0
+        sum_edges = 0
+        for i in range(0, N):
+            plng = random.uniform(IND_W, IND_E)
+            plat = random.uniform(IND_S, IND_N)
+            dlng, dlat = get_NN(FILENAME, plng, plat)
 
-    Sum = 0
-    for i in range(0, N):
-        Sum += S[i] / N
-    if(N != 0):
-        avg_edges = sum_edges / N
-    #print "SUM = ", Sum
+            area, v_edges = find_area(FILENAME, dlng, dlat)
 
-    #print ".",
-    if (N1 * 0.5 <= Sum and Sum <= N1 * 1.5):
-        if (Sum <= N1):
-            print(int(Sum) + 1, max_edges, avg_edges, Oracle.calls)
-            return int(Sum) + 1, max_edges, avg_edges
-        elif (Sum >= N1):
-            print(int(Sum), max_edges, avg_edges, Oracle.calls)
-            return int(Sum), max_edges, avg_edges
-    else:
-        return get_sum(FILENAME, N1, _depth=_depth + 1)
+            S.append(0)
+            if (area != 0):
+                S[i] = ((IND_N - IND_S) * (IND_E - IND_W)) / area
+                sum_edges += v_edges
+                if (v_edges > max_edges):
+                    max_edges = v_edges
+            else:
+                N -= 1
+
+        Sum = 0
+        for i in range(0, N):
+            Sum += S[i] / N
+        if(N != 0):
+            avg_edges = sum_edges / N
+
+        # Track the closest estimate we've seen
+        dist = abs(Sum - N1)
+        if dist < best_distance:
+            best_distance = dist
+            best_estimate = (Sum, max_edges, avg_edges)
+
+        # Widen acceptance window slightly each retry (5% per attempt)
+        lo_factor = max(0.2, 0.5 - 0.05 * attempt)
+        hi_factor = min(3.0, 1.5 + 0.05 * attempt)
+
+        if (N1 * lo_factor <= Sum <= N1 * hi_factor):
+            if (Sum <= N1):
+                print(int(Sum) + 1, max_edges, avg_edges, Oracle.calls)
+                return int(Sum) + 1, max_edges, avg_edges
+            else:
+                print(int(Sum), max_edges, avg_edges, Oracle.calls)
+                return int(Sum), max_edges, avg_edges
+
+    # Exhausted retries — return best estimate seen
+    print("Warning: max retries (%d) reached, returning best estimate" % MAX_RETRIES)
+    est_sum, est_max_e, est_avg_e = best_estimate
+    result = int(est_sum) + (1 if est_sum <= N1 else 0)
+    print(result, est_max_e, est_avg_e)
+    return result, est_max_e, est_avg_e
 
 
 if __name__ == '__main__':
