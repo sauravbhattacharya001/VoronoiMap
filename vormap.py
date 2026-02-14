@@ -372,11 +372,13 @@ def find_a1(FILENAME, alng, alat, dlng, dlat, dirn):
 
 
 def polygon_area(alng, alat):
-    # calculate area
+    # calculate area using the Shoelace formula
+    n = len(alat)
     area = 0
-    for i in range(len(alat) - 1):
+    for i in range(n - 1):
         area += alat[i] * alng[i + 1] - alat[i + 1] * alng[i]
-    area += alat[i] * alng[0] - alat[0] * alng[i]
+    # close the polygon: last vertex back to first
+    area += alat[n - 1] * alng[0] - alat[0] * alng[n - 1]
     area = (float)(area / 2)
     if(area < 0):
         area *= -1
