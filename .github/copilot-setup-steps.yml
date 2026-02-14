@@ -1,0 +1,37 @@
+# copilot-setup-steps.yml
+# Sets up the environment for GitHub Copilot coding agents (Claude, Codex)
+# to autonomously work on issues and PRs in this repository.
+
+steps:
+  - name: Set up Python
+    uses: actions/setup-python@v5
+    with:
+      python-version: "3.12"
+
+  - name: Install dependencies
+    run: pip install -r requirements.txt
+
+  - name: Install dev tools
+    run: pip install flake8 pytest
+
+  - name: Create test data directory
+    run: mkdir -p data
+
+  - name: Create sample data file for tests
+    run: |
+      cat > data/test_points.txt << 'EOF'
+      100.0 200.0
+      300.0 400.0
+      500.0 600.0
+      700.0 800.0
+      150.0 750.0
+      EOF
+
+  - name: Verify module imports
+    run: python -c "import vormap; print('vormap imported successfully')"
+
+  - name: Run tests
+    run: python -m pytest tests/ -v --tb=short
+
+  - name: Run linter
+    run: flake8 vormap.py --count --select=E9,F63,F7,F82 --show-source --statistics
