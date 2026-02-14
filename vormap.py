@@ -140,32 +140,28 @@ def perp_dir(x1, y1, x2, y2):
     return 1e99
 
 
-def collinear(x1, y1, x2, y2, x3, y3):
-    if (x1 == x2 and x2 == x3):
-        return True
-    if (y1 == y2 and y2 == y3):
-        return True
+def collinear(x1, y1, x2, y2, x3, y3, eps=1e-8):
+    """Test whether three points are collinear using the cross-product.
 
-    if (x1 == x2 and x2 != x3):
-        return False
-    if (x1 != x2 and x2 == x3):
-        return False
-    if (x1 == x3 and x2 != x3):
-        return False
+    The previous implementation compared rounded slopes, which is fragile:
+    it can produce false positives for nearly-parallel segments and false
+    negatives when small coordinate differences amplify rounding error.
 
-    if (y1 == y2 and y2 != y3):
-        return False
-    if (y1 != y2 and y2 == y3):
-        return False
-    if (y1 == y3 and y2 != y3):
-        return False
+    The cross-product ``(x2-x1)*(y3-y1) - (y2-y1)*(x3-x1)`` is zero iff
+    the points are exactly collinear.  We compare its magnitude against
+    *eps* scaled by the lengths of the two vectors so the tolerance is
+    relative, not absolute — this avoids misclassification for both very
+    large and very small coordinate ranges.
+    """
+    cross = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
 
-    m1 = round((float(y2 - y1) / (x2 - x1)), 4)
-    m2 = round((float(y3 - y1) / (x3 - x1)), 4)
+    # Scale tolerance by the magnitude of the two edge vectors so the
+    # check works regardless of coordinate range.
+    len1 = math.hypot(x2 - x1, y2 - y1)
+    len2 = math.hypot(x3 - x1, y3 - y1)
+    scale = max(len1 * len2, 1e-12)
 
-    if (m1 == m2):
-        return True
-    return False
+    return abs(cross) / scale < eps
 
 
 NEW_DIR_MAX_ITER = 200
@@ -312,16 +308,26 @@ def eudist(x1, y1, x2, y2):
     return math.sqrt(((x1 - x2) ** 2) + ((y1 - y2) ** 2))
 
 
+BIN_SEARCH_MAX_ITER = 100  # ~2^100 precision, far beyond float64 range
+
+
 def bin_search(data, x1, y1, x2, y2, dlng, dlat):
     """Binary search for a Voronoi boundary point between two positions.
 
     *data* is a list of (lng, lat) tuples (returned by ``load_data``).
-    Raises RuntimeError if the search fails to converge.
+
+    An iteration limit (``BIN_SEARCH_MAX_ITER``) prevents runaway loops
+    when the search window stops shrinking — e.g. due to equidistant
+    nearest-neighbor ties where both branches produce the same midpoint.
+    100 iterations is far more than enough for float64 precision (the
+    mantissa has only 52 bits).
     """
     xm = -1
     ym = -1
 
-    while(eudist(x1, y1, x2, y2) > BIN_PREC):
+    for _ in range(BIN_SEARCH_MAX_ITER):
+        if eudist(x1, y1, x2, y2) <= BIN_PREC:
+            break
 
         xm = float(x1 + x2) / 2
         ym = float(y1 + y2) / 2
