@@ -267,3 +267,69 @@ class TestMalformedInput:
             os.chdir(old_cwd)
             vormap._data_cache.pop("mixed.txt", None)
             vormap._kdtree_cache.pop("mixed.txt", None)
+
+
+# ── Refactored get_sum (issue #14 fix) ──────────────────────────────
+
+class TestGetSumBiasFix:
+    """Verify that the refactored get_sum correctly excludes zero-area
+    regions from the estimation average (issue #14)."""
+
+    def test_valid_estimates_only(self):
+        """Confirm that zero-area samples don't pollute the average.
+
+        We monkeypatch find_area to return area=0 for one point and
+        verify the estimate uses only the valid sample.
+        """
+        import unittest.mock as mock
+
+        # Two-point dataset: both at known positions
+        test_data = [(100.0, 100.0), (900.0, 900.0)]
+
+        # Set bounds tightly
+        old_bounds = (vormap.IND_S, vormap.IND_N, vormap.IND_W, vormap.IND_E)
+        vormap.set_bounds(0, 1000, 0, 1000)
+
+        # Mock load_data to return our test points
+        with mock.patch.object(vormap, 'load_data', return_value=test_data):
+            # Mock find_area: first call returns 0 area, second returns valid
+            with mock.patch.object(
+                vormap, 'find_area',
+                side_effect=[(0.0, 4), (500000.0, 6)]
+            ):
+                with mock.patch.object(
+                    vormap, 'get_NN',
+                    side_effect=[(100.0, 100.0), (900.0, 900.0)]
+                ):
+                    result, max_e, avg_e = vormap.get_sum("dummy.txt", 2)
+
+        vormap.set_bounds(*old_bounds)
+
+        # With the fix, only the valid estimate (area=500000) is used.
+        # Estimate = total_area / area = 1000000 / 500000 = 2.0
+        # Since Sum (2.0) <= N1 (2), the function returns int(2) + 1 = 3
+        # The key verification: result is based on 1 valid sample, not
+        # corrupted by the zero-area sample being included in the average.
+        assert result == 3
+        assert avg_e == 6.0  # only valid sample's edges counted
+
+    def test_kdtree_by_id_populated(self, tmp_path):
+        """Verify that _kdtree_by_id is populated on load_data."""
+        data_dir = tmp_path / "data"
+        data_dir.mkdir()
+        (data_dir / "kdtest.txt").write_text("1.0 2.0\n3.0 4.0\n")
+
+        old_cwd = os.getcwd()
+        os.chdir(tmp_path)
+        try:
+            vormap._data_cache.pop("kdtest.txt", None)
+            vormap._kdtree_cache.pop("kdtest.txt", None)
+            points = vormap.load_data("kdtest.txt")
+
+            if vormap._HAS_SCIPY:
+                assert id(points) in vormap._kdtree_by_id
+        finally:
+            os.chdir(old_cwd)
+            vormap._data_cache.pop("kdtest.txt", None)
+            vormap._kdtree_cache.pop("kdtest.txt", None)
+            vormap._kdtree_by_id.pop(id(points), None)

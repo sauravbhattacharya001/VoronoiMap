@@ -53,6 +53,10 @@ class Oracle:
 # When scipy is available, a KDTree is stored alongside the point list.
 _data_cache = {}
 
+# Maps id(data_list) → KDTree for O(1) lookup in get_NN.
+# This replaces the old O(n) identity scan over _data_cache.
+_kdtree_by_id = {}
+
 
 def load_data(filename, auto_bounds=True):
     """Load point data from a file and cache it in memory.
@@ -139,7 +143,9 @@ def load_data(filename, auto_bounds=True):
 
     # Pre-build a KDTree for fast nearest-neighbor queries
     if _HAS_SCIPY:
-        _kdtree_cache[filename] = KDTree(np.array(points))
+        tree = KDTree(np.array(points))
+        _kdtree_cache[filename] = tree
+        _kdtree_by_id[id(points)] = tree
 
     return points
 
@@ -164,13 +170,9 @@ def get_NN(data, lng, lat):
 
     # --- Fast path: KDTree lookup ---
     if _HAS_SCIPY:
-        # Find the filename key for this data list so we can grab its tree.
-        # Since load_data caches the *same* list object, identity check is O(1).
-        tree = None
-        for fname, cached_data in _data_cache.items():
-            if cached_data is data:
-                tree = _kdtree_cache.get(fname)
-                break
+        # O(1) lookup by list identity — replaces the old O(n) scan
+        # over _data_cache that ran on every single NN query.
+        tree = _kdtree_by_id.get(id(data))
 
         if tree is not None:
             # Query the 2 closest points — if the nearest is the query point
@@ -252,15 +254,8 @@ def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
         m1 = float(alat - dlat) / (alng - dlng)
 
     a1 = math.atan(m1)
-    #print "ANGLE A1", a1
-    c1x = -1.1
-    c1y = -2.5
-    c2x = -3.3
-    c2y = -5.7
-
     tth = 0.5
     th = math.atan(tth)
-    #print "TH = ", th
     for _iter in range(NEW_DIR_MAX_ITER):
         #print "NewDirection"
         ac1 = a1 + th
@@ -676,6 +671,11 @@ def get_sum(FILENAME, N1, _depth=0):
     overflow.  Tracks the best estimate seen so far and returns it when
     max retries are exhausted.  The acceptance window widens slightly on
     each retry so the algorithm converges even on difficult distributions.
+
+    Fixes issue #14: zero-area regions are excluded from the estimate
+    using a clean valid-only list rather than the old index-mismatch
+    pattern where ``N`` was decremented but zero entries remained in
+    the summation array.
     """
     data = load_data(FILENAME)
 
@@ -684,32 +684,31 @@ def get_sum(FILENAME, N1, _depth=0):
 
     for attempt in range(MAX_RETRIES):
         Oracle.calls = 0
-        S = []
-        N = N1
         max_edges = 0
-        avg_edges = 0
         sum_edges = 0
-        for i in range(0, N):
+        valid_estimates = []
+
+        for i in range(N1):
             plng = random.uniform(IND_W, IND_E)
             plat = random.uniform(IND_S, IND_N)
             dlng, dlat = get_NN(data, plng, plat)
 
             area, v_edges = find_area(data, dlng, dlat)
 
-            S.append(0)
-            if (area != 0):
-                S[i] = ((IND_N - IND_S) * (IND_E - IND_W)) / area
+            if area > 0:
+                estimate = ((IND_N - IND_S) * (IND_E - IND_W)) / area
+                valid_estimates.append(estimate)
                 sum_edges += v_edges
-                if (v_edges > max_edges):
+                if v_edges > max_edges:
                     max_edges = v_edges
-            else:
-                N -= 1
 
-        Sum = 0
-        for i in range(0, N):
-            Sum += S[i] / N
-        if(N != 0):
-            avg_edges = sum_edges / N
+        # Compute mean over valid samples only (fixes #14 bias)
+        if valid_estimates:
+            Sum = sum(valid_estimates) / len(valid_estimates)
+            avg_edges = sum_edges / len(valid_estimates)
+        else:
+            Sum = 0
+            avg_edges = 0
 
         # Track the closest estimate we've seen
         dist = abs(Sum - N1)
