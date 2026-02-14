@@ -2,6 +2,14 @@
 import random
 import sys
 import math
+import warnings
+
+try:
+    import numpy as np
+    from scipy.spatial import KDTree
+    _HAS_SCIPY = True
+except ImportError:
+    _HAS_SCIPY = False
 
 
 IND_S = 0.0
@@ -10,12 +18,17 @@ IND_W = 0.0
 IND_E = 2000.0
 BIN_PREC = 1e-6
 
+# Maximum vertices a single Voronoi region can have before we give up.
+# Prevents infinite loops on degenerate point configurations.
+MAX_VERTICES = 50
+
 
 class Oracle:
     calls = 0
 
 
 # Cache loaded data files so each file is read from disk exactly once.
+# When scipy is available, a KDTree is stored alongside the point list.
 _data_cache = {}
 
 
@@ -24,6 +37,9 @@ def load_data(filename):
 
     Returns a list of (lng, lat) tuples.  Subsequent calls with the same
     filename return the cached list without re-reading the file.
+
+    When *scipy* is available a ``KDTree`` is also built and cached so
+    that ``get_NN`` can use O(log n) lookups instead of O(n) scans.
     """
     if filename in _data_cache:
         return _data_cache[filename]
@@ -42,16 +58,59 @@ def load_data(filename):
         raise ValueError("No valid points found in '%s'" % filename)
 
     _data_cache[filename] = points
+
+    # Pre-build a KDTree for fast nearest-neighbor queries
+    if _HAS_SCIPY:
+        _kdtree_cache[filename] = KDTree(np.array(points))
+
     return points
+
+
+# Separate cache for KDTree objects (keyed by filename like _data_cache).
+_kdtree_cache = {}
 
 
 def get_NN(data, lng, lat):
     """Return the nearest neighbor (lng, lat) from pre-loaded point data.
 
-    *data* is a list of (lng, lat) tuples (returned by ``load_data``).
+    When *scipy* is available this uses a KDTree for O(log n) lookups.
+    Falls back to a brute-force O(n) scan otherwise.
+
+    The original ``dist > 0`` guard is preserved so that exact matches
+    (query point *is* a data point) are skipped, matching the original
+    semantics used by the Voronoi boundary search.
+
     Raises ValueError if no valid neighbor is found.
     """
     Oracle.calls += 1
+
+    # --- Fast path: KDTree lookup ---
+    if _HAS_SCIPY:
+        # Find the filename key for this data list so we can grab its tree.
+        # Since load_data caches the *same* list object, identity check is O(1).
+        tree = None
+        for fname, cached_data in _data_cache.items():
+            if cached_data is data:
+                tree = _kdtree_cache.get(fname)
+                break
+
+        if tree is not None:
+            # Query the 2 closest points — if the nearest is the query point
+            # itself (dist ≈ 0), we return the second-nearest instead.
+            k = min(2, len(data))
+            dists, idxs = tree.query([lng, lat], k=k)
+            if k == 1:
+                dists = [dists]
+                idxs = [idxs]
+            for d, idx in zip(dists, idxs):
+                if d > 0:
+                    return data[idx]
+            raise ValueError(
+                "No valid nearest neighbor found for query (%s, %s)"
+                % (lng, lat)
+            )
+
+    # --- Fallback: brute-force scan ---
     mindist = 1e99
     minlng = None
     minlat = None
@@ -474,20 +533,21 @@ def find_area(data, dlng, dlat):
         #elng = enlng
         #elat = enlat
         if (i > 2):
-            #if (dirn in d):
-                #break
-            #if (at[i + 1] == at[i] and ag[i + 1] == ag[i]):
-                #break
             if (dirn == dirn1):
                 break
 
-            #if(termin(ag[i + 1], at[i + 1], dirn1, e0g, e0t, d0)is True):
-                #break
             fin_isect = isect(
                 ag[i + 1], at[i + 1], ag[i], at[i], e0g, e0t, dlng, dlat)
 
-            #print "FIN_ISECT=", fin_isect
-            if (fin_isect != (-1, -1) or i == 10):
+            if fin_isect != (-1, -1):
+                break
+
+            if i >= MAX_VERTICES:
+                warnings.warn(
+                    "Voronoi region for point (%s, %s) exceeded %d vertices; "
+                    "polygon may be incomplete"
+                    % (dlng, dlat, MAX_VERTICES)
+                )
                 break
 
         dirn = dirn1
