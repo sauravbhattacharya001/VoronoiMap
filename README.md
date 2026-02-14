@@ -1,5 +1,8 @@
 # VoronoiMap
 
+[![CI](https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/ci.yml/badge.svg)](https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/sauravbhattacharya001/VoronoiMap/graph/badge.svg)](https://codecov.io/gh/sauravbhattacharya001/VoronoiMap)
+
 Voronoi partitioning of a geometric 2-dimensional space. This project implements an algorithm that estimates aggregate statistics of an unknown set of objects embedded in the Euclidean plane using a nearest-neighbor oracle and Voronoi partitioning.
 
 ## Background

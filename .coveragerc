@@ -1,0 +1,18 @@
+[run]
+source = vormap.py
+omit =
+    tests/*
+    setup.py
+
+[report]
+show_missing = true
+precision = 2
+fail_under = 50
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if __name__ == .__main__
+    raise NotImplementedError
+
+[html]
+directory = htmlcov

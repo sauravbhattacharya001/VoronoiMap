@@ -22,3 +22,9 @@ Thumbs.db
 .env
 .env.local
 venv/
+
+# Coverage
+htmlcov/
+coverage.xml
+.coverage
+.coverage.*
