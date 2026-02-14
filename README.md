@@ -44,16 +44,20 @@ By default, the main block is commented out. To run experiments, uncomment the d
 You can also use the module programmatically:
 
 ```python
-from vormap import get_sum, find_area, get_NN
+from vormap import get_sum, find_area, get_NN, load_data
 
 # Estimate the number of objects in a dataset
+# get_sum takes a filename (it calls load_data internally)
 estimated_count, max_edges, avg_edges = get_sum("datauni5.txt", 5)
 
+# Load data for direct function calls
+data = load_data("datauni5.txt")
+
 # Find area of a single Voronoi region
-area, vertices = find_area("datauni5.txt", 100.5, 200.3)
+area, vertices = find_area(data, 100.5, 200.3)
 
 # Query nearest neighbor
-nearest_lng, nearest_lat = get_NN("datauni5.txt", 500.0, 500.0)
+nearest_lng, nearest_lat = get_NN(data, 500.0, 500.0)
 ```
 
 ## Project Structure
