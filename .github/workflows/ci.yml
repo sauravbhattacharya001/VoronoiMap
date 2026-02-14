@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install linter
+        run: pip install flake8
+
+      - name: Run flake8
+        run: |
+          # Stop on syntax errors or undefined names (real bugs)
+          flake8 vormap.py --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Warn on style issues (non-blocking)
+          flake8 vormap.py --count --exit-zero --max-complexity=15 --max-line-length=120 --statistics
+
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create test data directory
+        run: mkdir -p data
+
+      - name: Create test data file
+        run: |
+          cat > data/test_points.txt << 'EOF'
+          100.0 200.0
+          300.0 400.0
+          500.0 600.0
+          700.0 800.0
+          150.0 750.0
+          EOF
+
+      - name: Run smoke tests
+        run: python -m pytest tests/ -v --tb=short
+
+  import-check:
+    name: Import Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify module imports cleanly
+        run: python -c "import vormap; print('Module imported successfully')"
+
+      - name: Install optional deps and re-check
+        run: |
+          pip install -r requirements.txt
+          python -c "
+          import vormap
+          assert vormap._HAS_SCIPY, 'scipy should be available'
+          print('Module imported with scipy support')
+          "

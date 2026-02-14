@@ -4,3 +4,6 @@
 # KDTree-accelerated nearest-neighbor lookups (O(log n) instead of O(n))
 numpy>=1.20
 scipy>=1.7
+
+# Testing
+pytest>=7.0
