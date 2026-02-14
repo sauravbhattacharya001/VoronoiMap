@@ -21,25 +21,21 @@ def get_NN(FILENAME, lng, lat):
     slat = 0
     slng = 0
     mindist = 1e99
-    objf = open("data/" + FILENAME, "r")
-    #objf = open("objects2.txt", "r")
-    while (True):
-        lines = objf.readline()
-        if not lines:
-            break
-        coord = lines.split()
+    with open("data/" + FILENAME, "r") as objf:
+        for lines in objf:
+            if not lines.strip():
+                continue
+            coord = lines.split()
 
-        slng = float(coord[0])
-        slat = float(coord[1])
+            slng = float(coord[0])
+            slat = float(coord[1])
 
-        dist = eudist(slng, slat, lng, lat)
+            dist = eudist(slng, slat, lng, lat)
 
-        if (dist > 0 and dist <= mindist):
-            mindist = dist
-            minlat = slat
-            minlng = slng
-    objf.close()
-    ##print "Nearest Neighbour"
+            if (dist > 0 and dist <= mindist):
+                mindist = dist
+                minlat = slat
+                minlng = slng
     return minlng, minlat
 
 
@@ -82,7 +78,7 @@ def collinear(x1, y1, x2, y2, x3, y3):
 
 
 def new_dir(FILENAME, aplng, aplat, alng, alat, dlng, dlat):
-    if (alng is dlng):
+    if (alng == dlng):
         m1 = 1e99
     else:
         m1 = float(alat - dlat) / (alng - dlng)
@@ -460,10 +456,13 @@ def find_area(FILENAME, dlng, dlat):
     return area, len(ag)
 
 
-def get_sum(FILENAME, N1):
-    #geocode(address="Dominos+HIMALAYA+MALL,+AHMADABAD+Ahmedabad",
-    #sensor="false")
-    #for count in range(50):
+MAX_RECURSION_DEPTH = 50
+
+
+def get_sum(FILENAME, N1, _depth=0):
+    if _depth >= MAX_RECURSION_DEPTH:
+        print("Warning: max recursion depth reached in get_sum, returning best estimate")
+        return N1, 0, 0
     Oracle.calls = 0
     S = []
     #N = int(math.sqrt(N1)) + 1
@@ -506,13 +505,13 @@ def get_sum(FILENAME, N1):
     #print ".",
     if (N1 * 0.5 <= Sum and Sum <= N1 * 1.5):
         if (Sum <= N1):
-            print int(Sum) + 1, max_edges, avg_edges, Oracle.calls
+            print(int(Sum) + 1, max_edges, avg_edges, Oracle.calls)
             return int(Sum) + 1, max_edges, avg_edges
         elif (Sum >= N1):
-            print int(Sum), max_edges, avg_edges, Oracle.calls
+            print(int(Sum), max_edges, avg_edges, Oracle.calls)
             return int(Sum), max_edges, avg_edges
     else:
-        return get_sum(FILENAME, N1)
+        return get_sum(FILENAME, N1, _depth=_depth + 1)
 
 
 if __name__ == '__main__':
