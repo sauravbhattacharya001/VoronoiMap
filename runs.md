@@ -1,5 +1,26 @@
 ## 2026-02-15
 
+### Gardener Run 229-230 (2:02 PM PST)
+- ⚡ **everything** — perf_improvement: Added O(1) event lookup index (Map-based `_idIndex`) to EventProvider, replacing O(n) `removeWhere`/`indexWhere` scans. Added `getEventById()` method used by EventDetailScreen (was `firstWhere` linear scan). Cached filtered/sorted results in HomeScreen's `_getFilteredEvents()` to avoid redundant O(n log n) sort on every widget rebuild when inputs haven't changed.
+- 📋 **agenticchat** — open_issue: Filed #15 — `SnippetLibrary.save()` silently fails when localStorage quota exceeded or unavailable. `load()` has try/catch but `save()` does not, causing silent data loss where UI shows snippet saved but it's gone on reload. Includes suggested fix with error propagation and user feedback.
+
+### Gardener Run 227-228 (1:54 PM PST)
+- 🔧 **Vidly** — fix_issue: Fixed TOCTOU race condition in rental checkout (#11). Added atomic `Checkout()` method to `IRentalRepository` that checks movie availability and creates the rental in a single lock acquisition. Previously `IsMovieRentedOut()` and `Add()` were separate lock ops allowing duplicate rentals. Updated controller to use atomic method with proper error handling. Added 5 tests including 10-thread concurrent race condition test using `Barrier` synchronization. +218/-6 lines.
+- 📦 **sauravbhattacharya001** — create_release: Created v1.0.0 "Profile Portfolio" release with comprehensive changelog covering README, PROJECTS.md portfolio, CI workflow, and project stats.
+
+### GitHub Profile Refresh #2 (1:56 PM PST)
+- ✅ Refreshed profile README (`sauravbhattacharya001/sauravbhattacharya001`)
+- **Added:** Animated typing SVG header banner
+- **Added:** Repo/Release/Live Sites counter badges (16 / 12 / 14)
+- **Added:** `zalenix-memory` repo to AI & Agents section (Zalenix AI agent memory/workspace)
+- **Added:** GitHub activity contribution graph
+- **Upgraded:** Header badges from `flat` to `for-the-badge` style
+- **Upgraded:** Tech stack badges to `flat-square` for consistency
+- **Added:** `include_all_commits=true` to GitHub stats card
+- **Updated:** Repo count 15 → 16
+- Commit: `bacface` pushed to master
+- 43 insertions, 33 deletions
+
 ### Gardener Run 225-226 (1:41 PM PST)
 - **Repo:** everything (Dart/Flutter)
 - ♻️ **refactor:** Extracted EventService to eliminate duplicated persistence logic. HomeScreen and EventDetailScreen both had their own EventRepository instances with duplicate try/catch persistence patterns. New EventService coordinates EventProvider + EventRepository in one place. Added 8 unit tests. +268/-61 lines.
@@ -11,6 +32,10 @@
 - Fixed VoronoiMap release badge (removed non-existent v1.0.0 — no actual release exists)
 - Corrected total release count: 13 → 12
 - Commit: `f293b4a` pushed to master
+
+### Memory Backup (1:53 PM PST)
+- ✅ 4 files changed (gardener-weights.json, memory/2026-02-15.md, runs.md, status.md)
+- Commit `471401b` pushed to zalenix-memory
 
 ### Memory Backup (1:40 PM PST)
 - ✅ Pushed 7 files (MEMORY.md, builder-state.json, gardener-weights.json, memory/2026-02-15.md, runs.md, status.md, temp-cron.json) → zalenix-memory `f939148`
