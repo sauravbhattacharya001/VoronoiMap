@@ -247,6 +247,20 @@ def collinear(x1, y1, x2, y2, x3, y3, eps=1e-8):
 NEW_DIR_MAX_ITER = 200
 
 
+def _slopes_equal(m1, m2, rtol=1e-6):
+    """Test whether two slopes are effectively equal.
+
+    Handles the special case where both slopes are infinite (vertical
+    lines).  For finite slopes, uses a relative tolerance comparison
+    to avoid the fragility of exact float equality or rounding.
+    """
+    if math.isinf(m1) and math.isinf(m2):
+        return True
+    if math.isinf(m1) or math.isinf(m2):
+        return False
+    return abs(m1 - m2) <= rtol * max(abs(m1), abs(m2), 1.0)
+
+
 def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
     if (alng == dlng):
         m1 = math.inf
@@ -285,10 +299,15 @@ def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
     ##print "C1 C2 A = ", c1x, c1y, c2x, c2y, alng, alat
     m = float(c1y - alat) / (c1x - alng)
     ##print "SLOPE=", m
-    m_ = round(m, 2)
-    if (m_ == -0.0):
-        m_ = 0.0
-    return m_
+    # Return the full-precision slope instead of rounding to 2 decimal
+    # places.  The old ``round(m, 2)`` caused incorrect polygon tracing:
+    # two genuinely different directions could round to the same value
+    # (premature loop termination → incomplete polygon) or the same
+    # direction could round differently across iterations (missed match).
+    # Callers now use epsilon comparison via ``_slopes_equal()``.
+    if m == 0.0 or m == -0.0:
+        m = 0.0
+    return m
 
 
 def isect(x1, y1, x2, y2, x3, y3, x4, y4):
@@ -398,6 +417,13 @@ def bin_search(data, x1, y1, x2, y2, dlng, dlat):
     nearest-neighbor ties where both branches produce the same midpoint.
     100 iterations is far more than enough for float64 precision (the
     mantissa has only 52 bits).
+
+    The distance comparison uses a relative epsilon tolerance instead of
+    rounding to 2 decimal places.  The old ``round(..., 2)`` approach
+    caused the binary search to take incorrect branches when the two
+    distances differed by less than 0.005 — the rounding made them
+    appear equal (or vice versa), leading to misidentified Voronoi
+    boundary points and incorrect region polygons.
     """
     xm = -1
     ym = -1
@@ -409,9 +435,13 @@ def bin_search(data, x1, y1, x2, y2, dlng, dlat):
         xm = float(x1 + x2) / 2
         ym = float(y1 + y2) / 2
         lg, lt = get_NN(data, xm, ym)
-        d1 = round(eudist(lg, lt, xm, ym), 2)
-        d2 = round(eudist(xm, ym, dlng, dlat), 2)
-        if(d1 == d2):
+        d1 = eudist(lg, lt, xm, ym)
+        d2 = eudist(xm, ym, dlng, dlat)
+        # Use relative epsilon comparison instead of rounding.
+        # Two distances are "equal" when they differ by less than
+        # 1e-9 relative to the larger value, meaning the midpoint
+        # sits on (or very near) the Voronoi boundary.
+        if abs(d1 - d2) <= 1e-9 * max(d1, d2, 1e-12):
             x2 = xm
             y2 = ym
         else:
@@ -627,7 +657,7 @@ def find_area(data, dlng, dlat):
         #elng = enlng
         #elat = enlat
         if (i > 2):
-            if (dirn == dirn1):
+            if _slopes_equal(dirn, dirn1):
                 break
 
             fin_isect = isect(

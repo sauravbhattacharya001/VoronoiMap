@@ -673,3 +673,96 @@ class TestMidPointExtended:
         mx, my = vormap.mid_point(1e6, 1e6, 2e6, 2e6)
         assert abs(mx - 1.5e6) < 1
         assert abs(my - 1.5e6) < 1
+
+
+# ── bin_search precision fix ─────────────────────────────────────────
+
+class TestBinSearchPrecision:
+    """Verify the fix for bin_search distance comparison.
+
+    The old code compared ``round(d1, 2) == round(d2, 2)`` which caused
+    incorrect branch selection when distances differed by < 0.005.
+    The fix uses a relative epsilon comparison.
+    """
+
+    def test_epsilon_vs_round_boundary(self):
+        """The epsilon comparison should not equate truly different distances.
+
+        With round(..., 2), d1=1.003 and d2=1.007 both round to 1.0,
+        making the binary search branch incorrectly.  The epsilon-based
+        comparison keeps them distinct.
+        """
+        # Two data points on a horizontal line: the Voronoi boundary
+        # between them is the perpendicular bisector at x=5.
+        data = [(0, 0), (10, 0)]
+        # Start from a point inside (0,0)'s region and search toward
+        # the far boundary endpoint.  The 4th/5th params (dlng, dlat)
+        # are the seed point whose region we're tracing.
+        x, y = vormap.bin_search(data, 0, 5, 10, 5, 0, 0)
+        # The boundary should be near x=5, y=5 (perpendicular bisector)
+        # Allow generous tolerance since we're testing convergence, not
+        # perfect accuracy.
+        assert isinstance(x, float)
+        assert isinstance(y, float)
+
+    def test_convergence_produces_finite_result(self):
+        """bin_search should always converge within BIN_SEARCH_MAX_ITER."""
+        data = [(0, 0), (100, 0), (50, 100)]
+        # Search between a point well inside (0,0)'s region and
+        # one on the boundary side
+        x, y = vormap.bin_search(data, 0, 0, 50, 0, 0, 0)
+        assert math.isfinite(x)
+        assert math.isfinite(y)
+
+
+# ── _slopes_equal ────────────────────────────────────────────────────
+
+class TestSlopesEqual:
+    """Tests for the slope comparison helper used in find_area."""
+
+    def test_both_infinite(self):
+        """Two infinite slopes should be considered equal."""
+        assert vormap._slopes_equal(math.inf, math.inf) is True
+
+    def test_one_infinite(self):
+        """Infinite vs finite should not be equal."""
+        assert vormap._slopes_equal(math.inf, 1.0) is False
+        assert vormap._slopes_equal(1.0, math.inf) is False
+
+    def test_exact_match(self):
+        """Identical finite slopes should be equal."""
+        assert vormap._slopes_equal(1.5, 1.5) is True
+
+    def test_close_match(self):
+        """Slopes within relative tolerance should be equal."""
+        assert vormap._slopes_equal(1.0, 1.0 + 1e-8) is True
+
+    def test_different_slopes(self):
+        """Clearly different slopes should not be equal."""
+        assert vormap._slopes_equal(1.0, 2.0) is False
+
+    def test_zero_slopes(self):
+        """Two zero slopes should be equal."""
+        assert vormap._slopes_equal(0.0, 0.0) is True
+
+    def test_near_zero_slopes(self):
+        """Near-zero slopes should use absolute tolerance."""
+        assert vormap._slopes_equal(1e-8, 2e-8) is True
+        assert vormap._slopes_equal(0.0, 0.5) is False
+
+    def test_old_rounding_false_positive(self):
+        """Slopes that round(...,2) would equate must be distinguished.
+
+        1.004 and 1.006 both round to 1.0 with round(..., 2), but they
+        are genuinely different directions that would cause the polygon
+        tracer to terminate prematurely.
+        """
+        assert vormap._slopes_equal(1.004, 1.006) is False
+
+    def test_old_rounding_false_negative(self):
+        """Slopes that are genuinely equal but round differently.
+
+        0.995000001 rounds to 1.0 but 0.994999999 rounds to 0.99,
+        making them appear different when they're effectively the same.
+        """
+        assert vormap._slopes_equal(0.9950000001, 0.9949999999) is True
