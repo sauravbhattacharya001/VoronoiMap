@@ -1,5 +1,18 @@
 ## 2026-02-15
 
+### Gardener Run 215-216 (11:53 AM PST)
+- **Repo:** BioBots
+- 🤖 auto_labeler — Added auto-labeler workflow with actions/labeler@v5 (file-based labels: csharp, javascript, api, frontend, data, tests, ci, docker, documentation, config), PR size labeler (xs/s/m/l/xl), and stale bot (60+14 day cleanup)
+- 🛡️ add_codeql — Added CodeQL security scanning for JavaScript/TypeScript (build-mode: none) and C# (manual MSBuild build), security-extended queries, weekly schedule
+
+### Gardener Run 213-214 (11:38 AM PST)
+- **Repo:** Ocaml-sample-code
+- 📊 code_coverage — Added bisect_ppx coverage workflow (.github/workflows/coverage.yml), Makefile `coverage` and `coverage-html` targets, coverage badge in README, Testing & Coverage section
+- 📄 contributing_md — Comprehensive CONTRIBUTING.md with file structure template, OCaml style guide, naming conventions, testing instructions, coverage docs
+
+### Memory Backup (11:34 AM PST)
+- ✅ Daily backup pushed to `zalenix-memory`. 2 files changed (memory/2026-02-15.md, runs.md).
+
 ### Memory Backup (11:30 AM PST)
 - ✅ Daily backup pushed to `zalenix-memory`. 3 files changed (memory/2026-02-15.md, runs.md, status.md).
 
