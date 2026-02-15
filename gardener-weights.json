@@ -1,173 +1,173 @@
 {
-  "lastUpdated": "2026-02-15T19:55:39.378Z",
-  "totalRuns": 216,
+  "lastUpdated": "2026-02-15T21:34:55.247Z",
+  "totalRuns": 224,
   "taskTypes": {
     "setup_copilot_agent": {
-      "weight": 50,
+      "weight": 54,
       "runs": 13,
       "successes": 13,
       "description": "Set up GitHub Copilot coding agent"
     },
     "bug_fix": {
-      "weight": 54,
+      "weight": 58,
       "runs": 8,
       "successes": 8,
       "description": "Fix a real bug"
     },
     "security_fix": {
-      "weight": 55,
+      "weight": 59,
       "runs": 11,
       "successes": 11,
       "description": "Fix security vulnerability"
     },
     "perf_improvement": {
-      "weight": 51,
+      "weight": 55,
       "runs": 4,
       "successes": 4,
       "description": "Performance optimization"
     },
     "refactor": {
-      "weight": 46,
+      "weight": 50,
       "runs": 8,
       "successes": 8,
       "description": "Architecture/code refactor"
     },
     "add_tests": {
-      "weight": 53,
+      "weight": 57,
       "runs": 9,
       "successes": 9,
       "description": "Add meaningful tests"
     },
     "readme_overhaul": {
-      "weight": 38,
+      "weight": 42,
       "runs": 12,
       "successes": 12,
       "description": "Overhaul repo README"
     },
     "doc_update": {
-      "weight": 47,
-      "runs": 7,
-      "successes": 7,
+      "weight": 51,
+      "runs": 8,
+      "successes": 8,
       "description": "Improve non-README documentation"
     },
     "code_cleanup": {
-      "weight": 43,
+      "weight": 47,
       "runs": 7,
       "successes": 7,
       "description": "Remove dead code, unused deps"
     },
     "open_issue": {
-      "weight": 47,
+      "weight": 51,
       "runs": 7,
       "successes": 7,
       "description": "Open a thoughtful issue"
     },
     "fix_issue": {
-      "weight": 50,
+      "weight": 54,
       "runs": 5,
       "successes": 5,
       "description": "Fix an existing open issue"
     },
     "add_ci_cd": {
-      "weight": 50,
-      "runs": 10,
-      "successes": 10,
+      "weight": 54,
+      "runs": 11,
+      "successes": 11,
       "description": "Add GitHub Actions CI/CD workflow"
     },
     "add_codeql": {
-      "weight": 37,
+      "weight": 41,
       "runs": 11,
       "successes": 11,
       "description": "Add CodeQL security scanning"
     },
     "add_dependabot": {
-      "weight": 49,
+      "weight": 53,
       "runs": 8,
       "successes": 8,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
-      "weight": 45,
+      "weight": 49,
       "runs": 12,
       "successes": 12,
       "description": "Deploy to GitHub Pages"
     },
     "create_release": {
-      "weight": 47,
+      "weight": 51,
       "runs": 12,
       "successes": 12,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
-      "weight": 46,
-      "runs": 5,
-      "successes": 5,
+      "weight": 50,
+      "runs": 6,
+      "successes": 6,
       "description": "Add Dockerfile"
     },
     "docker_workflow": {
-      "weight": 41,
-      "runs": 10,
-      "successes": 10,
+      "weight": 45,
+      "runs": 11,
+      "successes": 11,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
-      "weight": 60,
+      "weight": 64,
       "runs": 7,
       "successes": 7,
       "description": "Set up package publishing (PyPI/npm/NuGet)"
     },
     "add_badges": {
-      "weight": 35,
+      "weight": 39,
       "runs": 3,
       "successes": 3,
       "description": "Add badges to README"
     },
     "add_license": {
-      "weight": 47,
+      "weight": 51,
       "runs": 4,
       "successes": 4,
       "description": "Add/update LICENSE file"
     },
     "issue_templates": {
-      "weight": 40,
-      "runs": 7,
-      "successes": 7,
+      "weight": 44,
+      "runs": 8,
+      "successes": 8,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
-      "weight": 47,
-      "runs": 4,
-      "successes": 4,
+      "weight": 51,
+      "runs": 5,
+      "successes": 5,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
-      "weight": 31,
+      "weight": 35,
       "runs": 5,
       "successes": 5,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
-      "weight": 42,
-      "runs": 8,
-      "successes": 8,
+      "weight": 46,
+      "runs": 9,
+      "successes": 9,
       "description": "Configure branch protection"
     },
     "code_coverage": {
-      "weight": 42,
+      "weight": 46,
       "runs": 6,
       "successes": 6,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
-      "weight": 47,
+      "weight": 51,
       "runs": 7,
       "successes": 7,
       "description": "Generate & deploy docs site"
     },
     "auto_labeler": {
-      "weight": 38,
-      "runs": 7,
-      "successes": 7,
+      "weight": 42,
+      "runs": 8,
+      "successes": 8,
       "description": "Add auto-labeler or stale bot"
     }
   },
@@ -190,7 +190,9 @@
       "docker_workflow",
       "package_publish",
       "perf_improvement",
-      "create_release"
+      "create_release",
+      "auto_labeler",
+      "contributing_md"
     ],
     "sauravcode": [
       "refactor",
@@ -281,7 +283,9 @@
       "add_dependabot",
       "issue_templates",
       "auto_labeler",
-      "deploy_pages"
+      "deploy_pages",
+      "add_dockerfile",
+      "docker_workflow"
     ],
     "ai": [
       "add_ci_cd",
@@ -401,7 +405,10 @@
       "open_issue",
       "add_codeql",
       "deploy_pages",
-      "bug_fix"
+      "bug_fix",
+      "doc_update",
+      "branch_protection",
+      "add_dockerfile"
     ],
     "gif-captcha": [
       "readme_overhaul",
@@ -416,8 +423,10 @@
       "add_ci_cd"
     ],
     "getagentbox": [
-      "setup_copilot_agent"
+      "setup_copilot_agent",
+      "add_ci_cd",
+      "issue_templates"
     ]
   },
-  "notes": "Run 215-216. BioBots: auto_labeler (labeler.yml + PR size labels + stale bot), add_codeql (JS+C# CodeQL with security-extended queries)."
+  "notes": "Run 223-224. agenticchat: auto_labeler (PR labeler + stale bot workflows), contributing_md (comprehensive contributor guide with architecture docs)."
 }
