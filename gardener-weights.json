@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-02-15T22:08:08.264Z",
-  "totalRuns": 230,
+  "lastUpdated": "2026-02-15T22:42:00.000Z",
+  "totalRuns": 236,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 56,
@@ -52,8 +52,8 @@
     },
     "code_cleanup": {
       "weight": 49,
-      "runs": 7,
-      "successes": 7,
+      "runs": 8,
+      "successes": 8,
       "description": "Remove dead code, unused deps"
     },
     "open_issue": {
@@ -100,8 +100,8 @@
     },
     "add_dockerfile": {
       "weight": 52,
-      "runs": 6,
-      "successes": 6,
+      "runs": 7,
+      "successes": 7,
       "description": "Add Dockerfile"
     },
     "docker_workflow": {
@@ -118,8 +118,8 @@
     },
     "add_badges": {
       "weight": 41,
-      "runs": 3,
-      "successes": 3,
+      "runs": 4,
+      "successes": 4,
       "description": "Add badges to README"
     },
     "add_license": {
@@ -136,8 +136,8 @@
     },
     "contributing_md": {
       "weight": 53,
-      "runs": 5,
-      "successes": 5,
+      "runs": 6,
+      "successes": 6,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
@@ -148,14 +148,14 @@
     },
     "branch_protection": {
       "weight": 48,
-      "runs": 9,
-      "successes": 9,
+      "runs": 10,
+      "successes": 10,
       "description": "Configure branch protection"
     },
     "code_coverage": {
       "weight": 48,
-      "runs": 6,
-      "successes": 6,
+      "runs": 7,
+      "successes": 7,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
@@ -250,7 +250,9 @@
       "repo_topics",
       "fix_issue",
       "add_badges",
-      "bug_fix"
+      "bug_fix",
+      "add_dockerfile",
+      "code_coverage"
     ],
     "BioBots": [
       "setup_copilot_agent",
@@ -270,7 +272,8 @@
       "refactor",
       "add_license",
       "auto_labeler",
-      "add_codeql"
+      "add_codeql",
+      "branch_protection"
     ],
     "GraphVisual": [
       "add_codeql",
@@ -316,7 +319,10 @@
       "fix_issue",
       "add_tests",
       "perf_improvement",
-      "add_license"
+      "add_license",
+      "add_badges",
+      "code_cleanup",
+      "contributing_md"
     ],
     "VoronoiMap": [
       "add_ci_cd",
@@ -434,5 +440,5 @@
       "issue_templates"
     ]
   },
-  "notes": "Run 229-230. everything: perf_improvement (O(1) event lookup index via Map + cached filtered/sorted results in HomeScreen). agenticchat: open_issue (#15 SnippetLibrary.save() lacks error handling for localStorage quota exceeded)."
+  "notes": "Run 235-236. BioBots: branch_protection (required status checks on master, allow force push, no deletions). ai: contributing_md (comprehensive guide with dev setup, testing, code style, PR process, architecture overview)."
 }

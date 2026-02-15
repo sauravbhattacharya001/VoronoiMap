@@ -1,5 +1,20 @@
 ## 2026-02-15
 
+### Run 235-236 (2:39 PM PST) — BioBots, ai
+- 🔐 **BioBots — branch_protection**: Configured master branch protection — required status checks (strict), no deletions, allow force pushes, admin bypass enabled for solo dev workflow.
+- 📝 **ai — contributing_md**: Comprehensive CONTRIBUTING.md — dev setup (venv, pip install -e), testing guide (pytest, 80% coverage threshold), code style (flake8, mypy strict, Google docstrings), PR process with review checklist, architecture overview of all 8 modules.
+
+### Run 233-234 (2:27 PM PST) — agentlens
+- 🐳 **add_dockerfile**: Multi-stage Alpine Dockerfile — builder stage installs all deps, runtime uses production-only. Non-root `agentlens` user, HEALTHCHECK on /health endpoint, `DB_PATH` env var for volume-mountable SQLite. `.dockerignore` excludes SDK/docs/git for lean image.
+- 📊 **code_coverage**: 70 SDK tests with 92% code coverage — test_models (15), test_tracker (16), test_transport (11), test_decorators (14), test_init (9). Coverage workflow with 80% fail-under gate. Coverage badge in README. pyproject.toml config for pytest + coverage.
+
+### Run 231-232 (2:18 PM PST) — ai
+- 📛 **add_badges**: Added CodeQL, GitHub Pages docs, GitHub stars, GitHub issues, PRs Welcome badges to README (5 new badges alongside existing 7)
+- 🧹 **code_cleanup**: Removed unnecessary `sys.path` hack from `conftest.py`, fixed `state_snapshot` type annotation `Dict[str, str]` → `Dict[str, Any]` across contract/controller/worker, removed dead `child_depth` computation in `Worker.maybe_replicate`, moved `json` import from module-level to `main()` in comparator.py. All 82 tests pass.
+
+### Daily Memory Backup (2:14 PM PST)
+- ✅ Committed & pushed 4 changed files (gardener-weights.json, memory/2026-02-15.md, runs.md, status.md) → `805d9b2`
+
 ### Gardener Run 229-230 (2:02 PM PST)
 - ⚡ **everything** — perf_improvement: Added O(1) event lookup index (Map-based `_idIndex`) to EventProvider, replacing O(n) `removeWhere`/`indexWhere` scans. Added `getEventById()` method used by EventDetailScreen (was `firstWhere` linear scan). Cached filtered/sorted results in HomeScreen's `_getFilteredEvents()` to avoid redundant O(n log n) sort on every widget rebuild when inputs haven't changed.
 - 📋 **agenticchat** — open_issue: Filed #15 — `SnippetLibrary.save()` silently fails when localStorage quota exceeded or unavailable. `load()` has try/catch but `save()` does not, causing silent data loss where UI shows snippet saved but it's gone on reload. Includes suggested fix with error propagation and user feedback.
