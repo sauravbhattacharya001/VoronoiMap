@@ -21,7 +21,7 @@ VoronoiMap implements the **EstimateSUM** algorithm — a method where a partial
 
 The algorithm discovers data points by sampling random locations, queries a nearest-neighbor oracle, then constructs Voronoi regions around each discovered point. By computing the ratio of the total search area to individual cell areas, it produces a statistical estimate of the total object count.
 
-📄 **Research Paper:** [Full Report (PDF)](http://docdro.id/5HXe2wV)
+📄 **Research Paper:** *Estimating Aggregate Statistics of Unknown Point Sets Using Voronoi Partitioning and Nearest-Neighbor Oracles* (PDF originally hosted on Docdro — link no longer available)
 
 🌐 **Live Demo:** [Interactive Voronoi Visualization](https://sauravbhattacharya001.github.io/VoronoiMap/)
 
