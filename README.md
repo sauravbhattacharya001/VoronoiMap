@@ -35,6 +35,7 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Security Hardened** — Path traversal protection, NaN/Inf rejection, malformed input handling
 - **SVG Export** — Static SVG visualization with 6 color schemes
 - **Interactive HTML Export** — Pan/zoom, hover tooltips, live color switching, dark/light theme toggle
+- **GeoJSON Export** — Standard FeatureCollection for GIS tools (QGIS, Mapbox, Leaflet, Google Earth, ArcGIS)
 - **CLI & API** — Full-featured command-line interface and importable Python API
 
 ## 🔧 Installation
@@ -101,6 +102,15 @@ voronoimap datauni5.txt 5 --visualize diagram.svg --color-scheme rainbow
 
 # Generate interactive HTML visualization (pan/zoom, tooltips, theme toggle)
 voronoimap datauni5.txt 5 --interactive diagram.html
+
+# Export as GeoJSON for GIS tools (QGIS, Mapbox, Leaflet, etc.)
+voronoimap datauni5.txt 5 --geojson voronoi.geojson
+
+# GeoJSON without seed points (polygons only)
+voronoimap datauni5.txt 5 --geojson voronoi.geojson --no-seeds
+
+# GeoJSON with explicit CRS
+voronoimap datauni5.txt 5 --geojson voronoi.geojson --crs "urn:ogc:def:crs:EPSG::4326"
 ```
 
 ### Python API
@@ -142,6 +152,17 @@ vormap_viz.export_svg(regions, data, "diagram.svg", color_scheme="rainbow")
 # Interactive HTML export (pan/zoom, hover tooltips, color switching, dark mode)
 vormap_viz.export_html(regions, data, "diagram.html", title="My Voronoi Diagram")
 
+# GeoJSON export for GIS tools
+vormap_viz.export_geojson(regions, data, "voronoi.geojson")
+
+# GeoJSON without seed points, with custom CRS
+vormap_viz.export_geojson(regions, data, "voronoi.geojson",
+                          include_seeds=False,
+                          crs_name="urn:ogc:def:crs:EPSG::4326")
+
+# One-call GeoJSON generation
+vormap_viz.generate_geojson("datauni5.txt", "quick.geojson")
+
 # One-call SVG generation
 vormap_viz.generate_diagram("datauni5.txt", "quick.svg")
 ```
@@ -166,7 +187,9 @@ vormap_viz.generate_diagram("datauni5.txt", "quick.svg")
 | `compute_regions` | `(data) → {seed: [(x,y), ...]}` | Compute Voronoi region polygons for all seed points. Uses SciPy when available. |
 | `export_svg` | `(regions, data, path, **opts) → path` | Export static SVG with color schemes, labels, and custom dimensions. |
 | `export_html` | `(regions, data, path, **opts) → path` | Export interactive HTML with pan/zoom, hover tooltips, live color switching, and dark/light theme. |
+| `export_geojson` | `(regions, data, path, **opts) → path` | Export GeoJSON FeatureCollection for GIS tools (QGIS, Mapbox, Leaflet, Google Earth). |
 | `generate_diagram` | `(datafile, path, **opts) → path` | One-call convenience: load → compute → export SVG. |
+| `generate_geojson` | `(datafile, path, **opts) → path` | One-call convenience: load → compute → export GeoJSON. |
 | `list_color_schemes` | `() → [str, ...]` | List available color schemes (pastel, warm, cool, earth, mono, rainbow). |
 
 ### Geometry Helpers

@@ -1,8 +1,12 @@
-"""Voronoi diagram visualization — SVG export for VoronoiMap.
+"""Voronoi diagram visualization — SVG, HTML & GeoJSON export for VoronoiMap.
 
 Generates SVG files showing Voronoi regions, seed points, and boundary
 vertices.  Works with the existing vormap engine; no heavy dependencies
 required (uses only the Python standard library for SVG generation).
+
+GeoJSON export produces a standard FeatureCollection that can be loaded
+directly into GIS tools (QGIS, Mapbox, Leaflet, Google Earth, ArcGIS)
+or consumed by any geospatial pipeline.
 
 When scipy is available, uses ``scipy.spatial.Voronoi`` for precise region
 computation.  Falls back to the vormap binary-search tracer otherwise.
@@ -14,10 +18,12 @@ Usage (as module):
     points = vormap.load_data("datauni5.txt")
     regions = vormap_viz.compute_regions(points)
     vormap_viz.export_svg(regions, points, "diagram.svg")
+    vormap_viz.export_geojson(regions, points, "diagram.geojson")
 
 Usage (CLI):
     voronoimap datauni5.txt 5 --visualize output.svg
     voronoimap datauni5.txt 5 --visualize output.svg --color-scheme warm
+    voronoimap datauni5.txt 5 --geojson output.geojson
 """
 
 import colorsys
@@ -574,6 +580,183 @@ def export_html(
         f.write(html)
 
     return output_path
+
+
+# ── GeoJSON export ───────────────────────────────────────────────────
+
+def export_geojson(
+    regions,
+    data,
+    output_path,
+    *,
+    include_seeds=True,
+    properties_fn=None,
+    crs_name=None,
+):
+    """Export Voronoi regions as a GeoJSON FeatureCollection.
+
+    Produces a standard GeoJSON file that can be loaded into GIS tools
+    like QGIS, Mapbox, Leaflet, Google Earth, ArcGIS, or consumed by
+    any geospatial pipeline.
+
+    Each Voronoi region is a Feature with geometry type ``Polygon``.
+    Seed points can optionally be included as ``Point`` features.
+
+    Parameters
+    ----------
+    regions : dict
+        Output of ``compute_regions()`` — maps seed → vertex list.
+    data : list of (float, float)
+        All seed points.
+    output_path : str
+        Path to write the GeoJSON file.
+    include_seeds : bool
+        If True (default), include seed points as separate Point features
+        in addition to the region polygons.
+    properties_fn : callable or None
+        Optional function ``(seed, vertices, data_index) → dict`` that
+        returns extra properties to attach to each region Feature.
+        The returned dict is merged into the default properties.
+    crs_name : str or None
+        Optional CRS identifier (e.g. ``"urn:ogc:def:crs:EPSG::4326"``).
+        If provided, a top-level ``"crs"`` object is included (GeoJSON
+        2008 style).  Omitted by default per RFC 7946 (assumes WGS84).
+
+    Returns
+    -------
+    str
+        Path to the generated GeoJSON file.
+
+    Raises
+    ------
+    ValueError
+        If *regions* is empty.
+
+    Examples
+    --------
+    >>> import vormap, vormap_viz
+    >>> data = vormap.load_data("datauni5.txt")
+    >>> regions = vormap_viz.compute_regions(data)
+    >>> vormap_viz.export_geojson(regions, data, "voronoi.geojson")
+    'voronoi.geojson'
+
+    With custom properties:
+
+    >>> def add_label(seed, verts, idx):
+    ...     return {"label": f"Region {idx + 1}"}
+    >>> vormap_viz.export_geojson(regions, data, "labeled.geojson",
+    ...                           properties_fn=add_label)
+    """
+    import json
+
+    if not regions:
+        raise ValueError("No regions to export")
+
+    sorted_seeds = sorted(regions.keys())
+    features = []
+
+    for idx, seed in enumerate(sorted_seeds):
+        verts = regions[seed]
+
+        # Find the seed index in the original data list
+        try:
+            data_idx = data.index(seed)
+        except ValueError:
+            data_idx = idx
+
+        area = _compute_region_area(verts)
+
+        # GeoJSON Polygon: exterior ring must be closed (first == last)
+        ring = [[v[0], v[1]] for v in verts]
+        if ring and ring[0] != ring[-1]:
+            ring.append(ring[0])
+
+        properties = {
+            "region_index": data_idx + 1,
+            "seed_x": seed[0],
+            "seed_y": seed[1],
+            "area": round(area, 4),
+            "vertex_count": len(verts),
+        }
+
+        # Merge user-supplied properties
+        if properties_fn is not None:
+            extra = properties_fn(seed, verts, data_idx)
+            if extra and isinstance(extra, dict):
+                properties.update(extra)
+
+        feature = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [ring],
+            },
+            "properties": properties,
+        }
+        features.append(feature)
+
+    # Optionally include seed points as Point features
+    if include_seeds:
+        for idx, (px, py) in enumerate(data):
+            seed_in_regions = (px, py) in regions
+            point_feature = {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [px, py],
+                },
+                "properties": {
+                    "point_index": idx + 1,
+                    "type": "seed",
+                    "has_region": seed_in_regions,
+                },
+            }
+            features.append(point_feature)
+
+    collection = {
+        "type": "FeatureCollection",
+        "features": features,
+    }
+
+    # Optional CRS (GeoJSON 2008 style, useful for non-WGS84 data)
+    if crs_name:
+        collection["crs"] = {
+            "type": "name",
+            "properties": {
+                "name": crs_name,
+            },
+        }
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(collection, f, indent=2, ensure_ascii=False)
+
+    return output_path
+
+
+def generate_geojson(
+    datafile,
+    output_path="voronoi.geojson",
+    **kwargs,
+):
+    """Load data, compute regions, and export GeoJSON in one call.
+
+    Parameters
+    ----------
+    datafile : str
+        Filename inside the data/ directory.
+    output_path : str
+        Where to write the GeoJSON file.
+    **kwargs
+        Passed through to ``export_geojson()``.
+
+    Returns
+    -------
+    str
+        Path to the generated GeoJSON file.
+    """
+    data = vormap.load_data(datafile)
+    regions = compute_regions(data)
+    return export_geojson(regions, data, output_path, **kwargs)
 
 
 _INTERACTIVE_HTML_TEMPLATE = r"""<!DOCTYPE html>

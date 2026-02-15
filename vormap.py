@@ -803,6 +803,24 @@ def main():
              'hover tooltips, and live color switching. Provide the output '
              'file path (e.g. diagram.html).',
     )
+    parser.add_argument(
+        '--geojson',
+        metavar='OUTPUT',
+        help='Export Voronoi regions as GeoJSON for use in GIS tools '
+             '(QGIS, Mapbox, Leaflet, Google Earth). Provide the output '
+             'file path (e.g. diagram.geojson).',
+    )
+    parser.add_argument(
+        '--no-seeds',
+        action='store_true',
+        help='When exporting GeoJSON, omit seed points (include only region polygons).',
+    )
+    parser.add_argument(
+        '--crs',
+        metavar='CRS',
+        help='CRS identifier for GeoJSON export (e.g. '
+             '"urn:ogc:def:crs:EPSG::4326"). Omitted by default per RFC 7946.',
+    )
 
     args = parser.parse_args()
 
@@ -859,6 +877,24 @@ def main():
                   % (args.datafile, len(data)),
         )
         print('Interactive HTML saved to %s' % args.interactive)
+
+    # GeoJSON export
+    if args.geojson:
+        import vormap_viz
+
+        data = load_data(args.datafile)
+        print('Computing Voronoi regions for GeoJSON export...')
+        regions = vormap_viz.compute_regions(data)
+        print('Traced %d of %d regions' % (len(regions), len(data)))
+
+        vormap_viz.export_geojson(
+            regions,
+            data,
+            args.geojson,
+            include_seeds=not args.no_seeds,
+            crs_name=args.crs,
+        )
+        print('GeoJSON saved to %s' % args.geojson)
 
 
 if __name__ == '__main__':

@@ -1,9 +1,10 @@
 """Tests for Voronoi diagram SVG visualization (vormap_viz).
 
 These tests verify region computation, SVG generation, color schemes,
-and the one-call generate_diagram() convenience function.
+the one-call generate_diagram() convenience function, and GeoJSON export.
 """
 
+import json
 import math
 import os
 import sys
@@ -467,3 +468,228 @@ class TestComputeRegionArea:
         """Fewer than 3 vertices should return 0."""
         assert vormap_viz._compute_region_area([(0, 0), (1, 1)]) == 0.0
         assert vormap_viz._compute_region_area([]) == 0.0
+
+
+# ── GeoJSON export tests ─────────────────────────────────────────────
+
+class TestExportGeoJson:
+    def test_creates_valid_geojson(self, sample_regions):
+        """GeoJSON should be valid JSON with FeatureCollection type."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(regions, data, path)
+            assert os.path.exists(path)
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            assert geojson["type"] == "FeatureCollection"
+            assert "features" in geojson
+        finally:
+            os.unlink(path)
+
+    def test_polygon_count(self, sample_regions):
+        """Should contain one Polygon feature per region."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(regions, data, path, include_seeds=False)
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            polygons = [f for f in geojson["features"]
+                        if f["geometry"]["type"] == "Polygon"]
+            assert len(polygons) == len(regions)
+        finally:
+            os.unlink(path)
+
+    def test_seed_points_included_by_default(self, sample_regions):
+        """Seed points should be included as Point features by default."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(regions, data, path)
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            points = [f for f in geojson["features"]
+                      if f["geometry"]["type"] == "Point"]
+            assert len(points) == len(data)
+        finally:
+            os.unlink(path)
+
+    def test_seed_points_excluded(self, sample_regions):
+        """Seed points should be omitted when include_seeds=False."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(regions, data, path, include_seeds=False)
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            points = [f for f in geojson["features"]
+                      if f["geometry"]["type"] == "Point"]
+            assert len(points) == 0
+        finally:
+            os.unlink(path)
+
+    def test_polygon_rings_are_closed(self, sample_regions):
+        """GeoJSON polygon rings must be closed (first == last vertex)."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(regions, data, path, include_seeds=False)
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            for feature in geojson["features"]:
+                ring = feature["geometry"]["coordinates"][0]
+                assert ring[0] == ring[-1], "Polygon ring is not closed"
+        finally:
+            os.unlink(path)
+
+    def test_region_properties(self, sample_regions):
+        """Each region feature should have standard properties."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(regions, data, path, include_seeds=False)
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            for feature in geojson["features"]:
+                props = feature["properties"]
+                assert "region_index" in props
+                assert "seed_x" in props
+                assert "seed_y" in props
+                assert "area" in props
+                assert "vertex_count" in props
+                assert props["area"] > 0
+                assert props["vertex_count"] >= 3
+        finally:
+            os.unlink(path)
+
+    def test_seed_point_properties(self, sample_regions):
+        """Each seed point feature should have type='seed'."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(regions, data, path)
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            points = [f for f in geojson["features"]
+                      if f["geometry"]["type"] == "Point"]
+            for pt in points:
+                assert pt["properties"]["type"] == "seed"
+                assert "point_index" in pt["properties"]
+                assert "has_region" in pt["properties"]
+        finally:
+            os.unlink(path)
+
+    def test_custom_properties_fn(self, sample_regions):
+        """User-supplied properties_fn should merge into feature properties."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            def add_label(seed, verts, idx):
+                return {"label": "Region %d" % (idx + 1), "custom": True}
+
+            vormap_viz.export_geojson(
+                regions, data, path,
+                include_seeds=False,
+                properties_fn=add_label,
+            )
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            for feature in geojson["features"]:
+                assert "label" in feature["properties"]
+                assert feature["properties"]["custom"] is True
+        finally:
+            os.unlink(path)
+
+    def test_crs_included(self, sample_regions):
+        """CRS object should be present when crs_name is provided."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(
+                regions, data, path,
+                crs_name="urn:ogc:def:crs:EPSG::4326",
+            )
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            assert "crs" in geojson
+            assert geojson["crs"]["type"] == "name"
+            assert geojson["crs"]["properties"]["name"] == \
+                "urn:ogc:def:crs:EPSG::4326"
+        finally:
+            os.unlink(path)
+
+    def test_crs_omitted_by_default(self, sample_regions):
+        """CRS should not be present when crs_name is not provided."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(regions, data, path)
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            assert "crs" not in geojson
+        finally:
+            os.unlink(path)
+
+    def test_empty_regions_raises(self):
+        """Should raise ValueError when regions are empty."""
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            with pytest.raises(ValueError, match="No regions"):
+                vormap_viz.export_geojson({}, [], path)
+        finally:
+            if os.path.exists(path):
+                os.unlink(path)
+
+    def test_return_value(self, sample_regions):
+        """export_geojson should return the output path."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            result = vormap_viz.export_geojson(regions, data, path)
+            assert result == path
+        finally:
+            os.unlink(path)
+
+    def test_coordinates_match_seed(self, sample_regions):
+        """Seed coordinates in properties should match the actual data."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".geojson", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_geojson(regions, data, path, include_seeds=False)
+            with open(path, encoding="utf-8") as fh:
+                geojson = json.load(fh)
+            for feature in geojson["features"]:
+                seed_x = feature["properties"]["seed_x"]
+                seed_y = feature["properties"]["seed_y"]
+                assert (seed_x, seed_y) in regions
+        finally:
+            os.unlink(path)
+
+
+class TestGenerateGeoJson:
+    def test_one_call_generates_geojson(self, simple_data_dir):
+        """generate_geojson() should create a valid GeoJSON file."""
+        tmp_path, filename = simple_data_dir
+        output = str(tmp_path / "output.geojson")
+
+        result = vormap_viz.generate_geojson(filename, output)
+        assert result == output
+        assert os.path.exists(output)
+        with open(output, encoding="utf-8") as fh:
+            geojson = json.load(fh)
+        assert geojson["type"] == "FeatureCollection"
+        assert len(geojson["features"]) > 0
