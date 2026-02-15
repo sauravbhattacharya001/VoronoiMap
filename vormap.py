@@ -271,24 +271,18 @@ def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
     tth = 0.5
     th = math.atan(tth)
     for _iter in range(NEW_DIR_MAX_ITER):
-        #print "NewDirection"
         ac1 = a1 + th
         ac2 = ac1 + th
-        ##print "C ANGLES=", ac1, ac2
         tac1 = math.tan(ac1)
         tac2 = math.tan(ac2)
 
         Bc1 = isect_B(dlng, dlat, tac1)
-        ##print "Bc1", Bc1
         Bc2 = isect_B(dlng, dlat, tac2)
-        ##print "Bc2", Bc2
 
         Bc1x, Bc1y = find_CXY(Bc1, aplng, aplat)
         Bc2x, Bc2y = find_CXY(Bc2, aplng, aplat)
-        ##print "C BORDERS=", Bc1x, Bc1y, Bc2x, Bc2y
         c1x, c1y = bin_search(data, Bc1x, Bc1y, dlng, dlat, dlng, dlat)
         c2x, c2y = bin_search(data, Bc2x, Bc2y, dlng, dlat, dlng, dlat)
-        ##print "INT C1, C2", c1x, c1y, c2x, c2y
 
         th /= 2
         if (collinear(alng, alat, c1x, c1y, c2x, c2y) is True):
@@ -296,9 +290,7 @@ def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
 
     if (c1x == alng):
         return math.inf
-    ##print "C1 C2 A = ", c1x, c1y, c2x, c2y, alng, alat
     m = float(c1y - alat) / (c1x - alng)
-    ##print "SLOPE=", m
     # Return the full-precision slope instead of rounding to 2 decimal
     # places.  The old ``round(m, 2)`` caused incorrect polygon tracing:
     # two genuinely different directions could round to the same value
@@ -331,8 +323,8 @@ def isect(x1, y1, x2, y2, x3, y3, x4, y4):
                 return x3, y_test
         return -1, -1
 
-    m1 = (float)(y2 - y1) / (x2 - x1)
-    m2 = (float)(y4 - y3) / (x4 - x3)
+    m1 = float(y2 - y1) / (x2 - x1)
+    m2 = float(y4 - y3) / (x4 - x3)
 
     # Use relative tolerance instead of exact equality to catch
     # near-parallel lines that differ only due to floating-point
@@ -357,6 +349,7 @@ def isect(x1, y1, x2, y2, x3, y3, x4, y4):
 
 
 def isect_B(alng, alat, dirn):
+    """Find two boundary intersection points for a line through (alng, alat)."""
     ret = []
     if math.isinf(dirn):
         ret.append(alng)
@@ -364,33 +357,33 @@ def isect_B(alng, alat, dirn):
         ret.append(alng)
         ret.append(IND_S)
         return ret
-    elif (dirn == 0):
+    elif dirn == 0:
         ret.append(IND_W)
         ret.append(alat)
         ret.append(IND_E)
         ret.append(alat)
         return ret
     else:
-        xt = (float)((IND_N - alat) / dirn) + alng
-        xb = (float)((IND_S - alat) / dirn) + alng
-        yr = (dirn * (IND_E - alng)) + alat
-        yl = (dirn * (IND_W - alng)) + alat
+        xt = float(IND_N - alat) / dirn + alng
+        xb = float(IND_S - alat) / dirn + alng
+        yr = dirn * (IND_E - alng) + alat
+        yl = dirn * (IND_W - alng) + alat
 
-    if (xt <= IND_E and xt >= IND_W):
+    if IND_W <= xt <= IND_E:
         ret.append(xt)
         ret.append(IND_N)
-    if (xb <= IND_E and xb >= IND_W):
+    if IND_W <= xb <= IND_E:
         ret.append(xb)
         ret.append(IND_S)
 
-    if (yl <= IND_N and yl >= IND_S):
+    if IND_S <= yl <= IND_N:
         ret.append(IND_W)
         ret.append(yl)
-    if (yr <= IND_N and yr >= IND_S):
+    if IND_S <= yr <= IND_N:
         ret.append(IND_E)
         ret.append(yr)
 
-    if (len(ret) == 4):
+    if len(ret) == 4:
         return ret
     else:
         raise RuntimeError(
@@ -448,7 +441,7 @@ def bin_search(data, x1, y1, x2, y2, dlng, dlat):
             x1 = xm
             y1 = ym
 
-    if(xm != -1 and ym != -1):
+    if xm != -1 and ym != -1:
         xm = round(xm, 2)
         ym = round(ym, 2)
         if (xm == -0.0):
@@ -480,7 +473,7 @@ def find_CXY(B, dlng, dlat):
     if d < 1e-12:
         return x1, y1
 
-    k = (float)(n) / d
+    k = float(n) / d
     x4 = x3 - k * (y2 - y1)
     y4 = y3 + k * (x2 - x1)
 
@@ -537,7 +530,7 @@ def find_BXY(B, dlng, dlat):
     if d < 1e-12:
         return x1, y1
 
-    k = (float)(n) / d
+    k = float(n) / d
     x4 = x3 - k * (y2 - y1)
     y4 = y3 + k * (x2 - x1)
 
@@ -578,24 +571,16 @@ def find_BXY(B, dlng, dlat):
 
 
 def find_a1(data, alng, alat, dlng, dlat, dirn):
+    """Find the next Voronoi vertex along the boundary from (alng, alat)."""
     B = isect_B(alng, alat, dirn)
-    #print "B VECTOR", B
-    #print alng, alat
-    if ((alng, alat) == (B[0], B[1])):
+    if (alng, alat) == (B[0], B[1]):
         Bx = B[2]
         By = B[3]
-    elif ((alng, alat) == (B[2], B[3])):
+    elif (alng, alat) == (B[2], B[3]):
         Bx = B[0]
         By = B[1]
-    #elif ((B[2], B[3]) is (0, 8.74)):
-        #Bx = 10
-        #By = 8.74
-        #print "HAHAHAHAHAHAHAHAHAHh", Bx, By
     else:
-        t1, t2 = find_BXY(B, dlng, dlat)
-        Bx = t1
-        By = t2
-        #print "B POINTS", Bx, By
+        Bx, By = find_BXY(B, dlng, dlat)
     return bin_search(data, Bx, By, alng, alat, dlng, dlat)
 
 
@@ -607,37 +592,30 @@ def polygon_area(alng, alat):
         area += alat[i] * alng[i + 1] - alat[i + 1] * alng[i]
     # close the polygon: last vertex back to first
     area += alat[n - 1] * alng[0] - alat[0] * alng[n - 1]
-    area = (float)(area / 2)
-    if(area < 0):
+    area = float(area / 2)
+    if area < 0:
         area *= -1
     return round(area, 2)
 
 
 def find_area(data, dlng, dlat):
+    """Compute the area and vertex count of the Voronoi region for a data point.
 
+    Traces the Voronoi region boundary by iteratively finding vertices
+    along the perpendicular bisector edges until the polygon closes.
+    """
     elng, elat = get_NN(data, dlng, dlat)
     alng, alat = mid_point(dlng, dlat, elng, elat)
     dirn = perp_dir(elng, elat, dlng, dlat)
-    #print "E_POINT= ", elng, elat
-    #print "A_POINT= ", alng, alat
 
-    e0g = elng
-    e0t = elat
-
-    ag = []
-    at = []
-    ag.append(alng)
-    at.append(alat)
+    ag = [alng]
+    at = [alat]
     i = 0
-    #print "VERTEX ADDED=", i, ag[i], at[i]
-    d = []
-    while (True):
+    while True:
         ag.append(0)
         at.append(0)
-        #print "COUNTER========================================", i
 
-        a_g, a_t = find_a1(data,
-            ag[i], at[i], dlng, dlat, dirn)
+        a_g, a_t = find_a1(data, ag[i], at[i], dlng, dlat, dirn)
         if get_NN(data, a_g, a_t) == (dlng, dlat):
             ag[i + 1] = a_g
             at[i + 1] = a_t
@@ -650,18 +628,12 @@ def find_area(data, dlng, dlat):
         dirn1 = new_dir(data,
             ag[i], at[i], ag[i + 1], at[i + 1], dlng, dlat)
 
-        d.append(dirn1)
-
-        #print "NEW DIR=", dirn1
-        ##print "NEW E_POINT=", enlng, enlat
-        #elng = enlng
-        #elat = enlat
-        if (i > 2):
+        if i > 2:
             if _slopes_equal(dirn, dirn1):
                 break
 
             fin_isect = isect(
-                ag[i + 1], at[i + 1], ag[i], at[i], e0g, e0t, dlng, dlat)
+                ag[i + 1], at[i + 1], ag[i], at[i], elng, elat, dlng, dlat)
 
             if fin_isect != (-1, -1):
                 break
@@ -676,14 +648,8 @@ def find_area(data, dlng, dlat):
 
         dirn = dirn1
         i += 1
-        #print
-        #print
-    #print ag
-    #print at
+
     area = polygon_area(ag, at)
-    #print "VERTICES= ", len(ag)
-    ##print ag
-    ##print at
     return area, len(ag)
 
 
