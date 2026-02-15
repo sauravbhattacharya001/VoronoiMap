@@ -11,3 +11,7 @@ temp_*
 
 # Node
 node_modules/
+
+# Embedded repos / temp clones
+prompt/
+temp-garden/
