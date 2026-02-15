@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-02-15T21:34:55.247Z",
-  "totalRuns": 224,
+  "lastUpdated": "2026-02-15T21:46:13.578Z",
+  "totalRuns": 226,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 54,
@@ -28,8 +28,8 @@
     },
     "refactor": {
       "weight": 50,
-      "runs": 8,
-      "successes": 8,
+      "runs": 9,
+      "successes": 9,
       "description": "Architecture/code refactor"
     },
     "add_tests": {
@@ -142,8 +142,8 @@
     },
     "repo_topics": {
       "weight": 35,
-      "runs": 5,
-      "successes": 5,
+      "runs": 6,
+      "successes": 6,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
@@ -227,7 +227,9 @@
       "add_ci_cd",
       "setup_copilot_agent",
       "docker_workflow",
-      "auto_labeler"
+      "auto_labeler",
+      "refactor",
+      "repo_topics"
     ],
     "agentlens": [
       "readme_overhaul",
@@ -428,5 +430,5 @@
       "issue_templates"
     ]
   },
-  "notes": "Run 223-224. agenticchat: auto_labeler (PR labeler + stale bot workflows), contributing_md (comprehensive contributor guide with architecture docs)."
+  "notes": "Run 225-226. everything: refactor (extracted EventService to eliminate duplicated persistence logic between HomeScreen and EventDetailScreen), repo_topics (10 topics: flutter, dart, firebase, productivity, events, calendar, mobile-app, provider, sqflite, material-design)."
 }
