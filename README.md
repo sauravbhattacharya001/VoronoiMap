@@ -274,7 +274,9 @@ VoronoiMap includes security hardening in its data loading pipeline:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how to get started:
+Contributions are welcome! See the **[Contributing Guide](CONTRIBUTING.md)** for full details on setup, code style, testing, and submitting PRs.
+
+**Quick start:**
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/my-feature`)
