@@ -1,0 +1,419 @@
+{
+  "lastUpdated": "2026-02-15T08:00:25.250856Z",
+  "totalRuns": 212,
+  "taskTypes": {
+    "setup_copilot_agent": {
+      "weight": 50,
+      "runs": 13,
+      "successes": 13,
+      "description": "Set up GitHub Copilot coding agent"
+    },
+    "bug_fix": {
+      "weight": 54,
+      "runs": 8,
+      "successes": 8,
+      "description": "Fix a real bug"
+    },
+    "security_fix": {
+      "weight": 55,
+      "runs": 11,
+      "successes": 11,
+      "description": "Fix security vulnerability"
+    },
+    "perf_improvement": {
+      "weight": 51,
+      "runs": 4,
+      "successes": 4,
+      "description": "Performance optimization"
+    },
+    "refactor": {
+      "weight": 46,
+      "runs": 8,
+      "successes": 8,
+      "description": "Architecture/code refactor"
+    },
+    "add_tests": {
+      "weight": 53,
+      "runs": 9,
+      "successes": 9,
+      "description": "Add meaningful tests"
+    },
+    "readme_overhaul": {
+      "weight": 38,
+      "runs": 12,
+      "successes": 12,
+      "description": "Overhaul repo README"
+    },
+    "doc_update": {
+      "weight": 47,
+      "runs": 7,
+      "successes": 7,
+      "description": "Improve non-README documentation"
+    },
+    "code_cleanup": {
+      "weight": 43,
+      "runs": 7,
+      "successes": 7,
+      "description": "Remove dead code, unused deps"
+    },
+    "open_issue": {
+      "weight": 47,
+      "runs": 7,
+      "successes": 7,
+      "description": "Open a thoughtful issue"
+    },
+    "fix_issue": {
+      "weight": 50,
+      "runs": 5,
+      "successes": 5,
+      "description": "Fix an existing open issue"
+    },
+    "add_ci_cd": {
+      "weight": 50,
+      "runs": 10,
+      "successes": 10,
+      "description": "Add GitHub Actions CI/CD workflow"
+    },
+    "add_codeql": {
+      "weight": 37,
+      "runs": 10,
+      "successes": 10,
+      "description": "Add CodeQL security scanning"
+    },
+    "add_dependabot": {
+      "weight": 49,
+      "runs": 8,
+      "successes": 8,
+      "description": "Add dependabot config"
+    },
+    "deploy_pages": {
+      "weight": 45,
+      "runs": 12,
+      "successes": 12,
+      "description": "Deploy to GitHub Pages"
+    },
+    "create_release": {
+      "weight": 47,
+      "runs": 12,
+      "successes": 12,
+      "description": "Create GitHub Release with tag + changelog"
+    },
+    "add_dockerfile": {
+      "weight": 46,
+      "runs": 5,
+      "successes": 5,
+      "description": "Add Dockerfile"
+    },
+    "docker_workflow": {
+      "weight": 41,
+      "runs": 10,
+      "successes": 10,
+      "description": "Add Docker build/push workflow"
+    },
+    "package_publish": {
+      "weight": 60,
+      "runs": 7,
+      "successes": 7,
+      "description": "Set up package publishing (PyPI/npm/NuGet)"
+    },
+    "add_badges": {
+      "weight": 35,
+      "runs": 3,
+      "successes": 3,
+      "description": "Add badges to README"
+    },
+    "add_license": {
+      "weight": 47,
+      "runs": 4,
+      "successes": 4,
+      "description": "Add/update LICENSE file"
+    },
+    "issue_templates": {
+      "weight": 40,
+      "runs": 7,
+      "successes": 7,
+      "description": "Add issue/PR templates"
+    },
+    "contributing_md": {
+      "weight": 47,
+      "runs": 3,
+      "successes": 3,
+      "description": "Add CONTRIBUTING.md"
+    },
+    "repo_topics": {
+      "weight": 31,
+      "runs": 5,
+      "successes": 5,
+      "description": "Add repo topics/tags"
+    },
+    "branch_protection": {
+      "weight": 42,
+      "runs": 8,
+      "successes": 8,
+      "description": "Configure branch protection"
+    },
+    "code_coverage": {
+      "weight": 42,
+      "runs": 5,
+      "successes": 5,
+      "description": "Add code coverage reporting"
+    },
+    "docs_site": {
+      "weight": 47,
+      "runs": 7,
+      "successes": 7,
+      "description": "Generate & deploy docs site"
+    },
+    "auto_labeler": {
+      "weight": 38,
+      "runs": 6,
+      "successes": 6,
+      "description": "Add auto-labeler or stale bot"
+    }
+  },
+  "repoState": {
+    "agenticchat": [
+      "add_badges",
+      "fix_issue",
+      "add_codeql",
+      "readme_overhaul",
+      "add_ci_cd",
+      "deploy_pages",
+      "refactor",
+      "add_tests",
+      "docs_site",
+      "add_dockerfile",
+      "security_fix",
+      "setup_copilot_agent",
+      "branch_protection",
+      "code_cleanup",
+      "docker_workflow",
+      "package_publish",
+      "perf_improvement",
+      "create_release"
+    ],
+    "sauravcode": [
+      "refactor",
+      "repo_topics",
+      "auto_labeler",
+      "doc_update",
+      "deploy_pages",
+      "add_codeql",
+      "create_release",
+      "bug_fix",
+      "readme_overhaul",
+      "setup_copilot_agent",
+      "docs_site",
+      "issue_templates",
+      "code_coverage",
+      "contributing_md",
+      "security_fix"
+    ],
+    "everything": [
+      "create_release",
+      "deploy_pages",
+      "add_dockerfile",
+      "bug_fix",
+      "security_fix",
+      "branch_protection",
+      "add_tests",
+      "add_dependabot",
+      "doc_update",
+      "code_cleanup",
+      "add_codeql",
+      "package_publish",
+      "add_ci_cd",
+      "setup_copilot_agent",
+      "docker_workflow",
+      "auto_labeler"
+    ],
+    "agentlens": [
+      "readme_overhaul",
+      "issue_templates",
+      "add_codeql",
+      "add_dependabot",
+      "docs_site",
+      "setup_copilot_agent",
+      "create_release",
+      "deploy_pages",
+      "security_fix",
+      "add_ci_cd",
+      "open_issue",
+      "branch_protection",
+      "refactor",
+      "repo_topics",
+      "fix_issue",
+      "add_badges",
+      "bug_fix"
+    ],
+    "BioBots": [
+      "setup_copilot_agent",
+      "readme_overhaul",
+      "contributing_md",
+      "perf_improvement",
+      "bug_fix",
+      "deploy_pages",
+      "add_dependabot",
+      "add_ci_cd",
+      "repo_topics",
+      "docker_workflow",
+      "add_tests",
+      "create_release",
+      "add_badges",
+      "package_publish",
+      "refactor",
+      "add_license"
+    ],
+    "GraphVisual": [
+      "add_codeql",
+      "add_tests",
+      "open_issue",
+      "fix_issue",
+      "security_fix",
+      "setup_copilot_agent",
+      "add_ci_cd",
+      "readme_overhaul",
+      "create_release",
+      "add_license",
+      "doc_update",
+      "add_dependabot",
+      "issue_templates",
+      "auto_labeler",
+      "deploy_pages"
+    ],
+    "ai": [
+      "add_ci_cd",
+      "add_dockerfile",
+      "create_release",
+      "deploy_pages",
+      "setup_copilot_agent",
+      "branch_protection",
+      "docker_workflow",
+      "readme_overhaul",
+      "refactor",
+      "issue_templates",
+      "auto_labeler",
+      "add_dependabot",
+      "repo_topics",
+      "package_publish",
+      "code_coverage",
+      "security_fix",
+      "docs_site",
+      "bug_fix",
+      "open_issue",
+      "add_codeql",
+      "doc_update",
+      "fix_issue",
+      "add_tests",
+      "perf_improvement",
+      "add_license"
+    ],
+    "VoronoiMap": [
+      "add_ci_cd",
+      "setup_copilot_agent",
+      "deploy_pages",
+      "open_issue",
+      "code_coverage",
+      "security_fix",
+      "readme_overhaul",
+      "package_publish",
+      "branch_protection",
+      "docker_workflow",
+      "refactor",
+      "docs_site",
+      "add_tests",
+      "contributing_md"
+    ],
+    "prompt": [
+      "add_codeql",
+      "readme_overhaul",
+      "docker_workflow",
+      "create_release",
+      "auto_labeler",
+      "bug_fix",
+      "setup_copilot_agent",
+      "code_cleanup",
+      "deploy_pages",
+      "open_issue",
+      "code_coverage",
+      "branch_protection",
+      "package_publish"
+    ],
+    "sauravbhattacharya001": [
+      "code_cleanup",
+      "add_ci_cd",
+      "doc_update"
+    ],
+    "Ocaml-sample-code": [
+      "deploy_pages",
+      "perf_improvement",
+      "code_cleanup",
+      "readme_overhaul",
+      "create_release",
+      "add_dockerfile",
+      "issue_templates",
+      "refactor",
+      "doc_update",
+      "security_fix",
+      "docs_site",
+      "add_codeql",
+      "docker_workflow",
+      "add_tests"
+    ],
+    "Vidly": [
+      "code_coverage",
+      "readme_overhaul",
+      "refactor",
+      "bug_fix",
+      "add_tests",
+      "docs_site",
+      "add_dependabot",
+      "doc_update",
+      "code_cleanup",
+      "branch_protection",
+      "auto_labeler",
+      "setup_copilot_agent",
+      "create_release",
+      "repo_topics",
+      "security_fix",
+      "issue_templates",
+      "add_dockerfile",
+      "docker_workflow",
+      "package_publish",
+      "open_issue",
+      "add_codeql"
+    ],
+    "FeedReader": [
+      "readme_overhaul",
+      "add_license",
+      "add_tests",
+      "docker_workflow",
+      "add_ci_cd",
+      "code_cleanup",
+      "setup_copilot_agent",
+      "create_release",
+      "add_dependabot",
+      "security_fix",
+      "open_issue",
+      "add_codeql",
+      "deploy_pages",
+      "bug_fix"
+    ],
+    "gif-captcha": [
+      "readme_overhaul",
+      "setup_copilot_agent",
+      "docker_workflow",
+      "deploy_pages",
+      "branch_protection",
+      "create_release",
+      "issue_templates",
+      "add_dependabot",
+      "security_fix",
+      "add_ci_cd"
+    ],
+    "getagentbox": [
+      "setup_copilot_agent"
+    ]
+  },
+  "notes": "Run 211-212. sauravbhattacharya001: add_ci_cd (README validation workflow \u2014 lint, link check, badge check, structure validation), doc_update (PROJECTS.md detailed portfolio with technical deep-dives for all 15 repos)."
+}

@@ -41,6 +41,16 @@
 5. **Sauravcode:** Custom programming language + compiler (compiles .srv → C → native executables)
 6. **AgentLens:** Observability & explainability for AI agents — "Datadog for AI agents". Python SDK + Node.js backend + dashboard. LangChain integration first. Per agent seat pricing. Repo: https://github.com/sauravbhattacharya001/agentlens
 
+## Repo Gardener
+- **Self-chaining system:** One-shot cron jobs, 1 min gap, runs forever
+- **Task file:** `gardener-task.md` — single source of truth (self-chain reads from file to prevent text drift)
+- **Quality bar:** Senior engineer standard. No cosmetic/trivial changes. Real bugs, security fixes, architecture improvements.
+- **Three tasks per run:** (1) meaningful improvement commit, (2) open thoughtful issue, (3) fix an existing issue
+- **Reports:** Brief Telegram summary after each run (no links, just repo + description)
+- **Skip:** forks, getagentbox, zalenix-memory
+- **Feb 13 stats:** 50+ runs, ~100+ commits across all 16 repos. Major themes: security (sandbox, SQL injection, XSS, CSP), bugs (Python3 compat, force-unwraps, infinite recursion), perf (KDTree, caching, async), architecture (retry logic, singleton DB, typed exceptions)
+- **Next evolution:** Shubho wants it to go beyond code — add CI/CD (GitHub Actions), deploy to GitHub Pages, publish packages, create releases
+
 ## Capabilities Verified
 - **File creation:** ✅ (Desktop, Downloads)
 - **Browser control:** ✅ (Chrome + extension, managed browser)
@@ -52,7 +62,7 @@
 - **Gateway watchdog**: Runs every 1 min, auto-restarts if down
 - **Tailscale**: Installed, connected (100.72.230.43)
 - **Sleep disabled**: AC & battery, hybrid sleep off
-- **OpenClaw version**: 2026.2.12
+- **OpenClaw version**: 2026.2.14
 - **Hibernate disabled**: timeout set to 0 (was 3hr, caused ~19hr outage on Feb 11)
 - **Docker image**: `agentbox-agent:latest` (1.54GB) — built but not used; per-container OpenClaw too heavy for this machine
 - **Docker lesson**: Full OpenClaw per container needs 300MB+ RAM and host auth tokens; not viable on 12GB Celeron. Use shared API + agent isolation instead.
