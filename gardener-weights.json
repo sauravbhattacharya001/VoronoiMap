@@ -1,171 +1,171 @@
 {
-  "lastUpdated": "2026-02-15T22:42:00.000Z",
-  "totalRuns": 236,
+  "lastUpdated": "2026-02-15T23:29:26.365Z",
+  "totalRuns": 250,
   "taskTypes": {
     "setup_copilot_agent": {
-      "weight": 56,
+      "weight": 60,
       "runs": 13,
       "successes": 13,
       "description": "Set up GitHub Copilot coding agent"
     },
     "bug_fix": {
-      "weight": 60,
-      "runs": 8,
-      "successes": 8,
+      "weight": 64,
+      "runs": 10,
+      "successes": 10,
       "description": "Fix a real bug"
     },
     "security_fix": {
-      "weight": 61,
+      "weight": 65,
       "runs": 11,
       "successes": 11,
       "description": "Fix security vulnerability"
     },
     "perf_improvement": {
-      "weight": 57,
-      "runs": 5,
-      "successes": 5,
+      "weight": 61,
+      "runs": 7,
+      "successes": 7,
       "description": "Performance optimization"
     },
     "refactor": {
-      "weight": 52,
+      "weight": 56,
       "runs": 9,
       "successes": 9,
       "description": "Architecture/code refactor"
     },
     "add_tests": {
-      "weight": 59,
+      "weight": 63,
       "runs": 9,
       "successes": 9,
       "description": "Add meaningful tests"
     },
     "readme_overhaul": {
-      "weight": 44,
+      "weight": 48,
       "runs": 12,
       "successes": 12,
       "description": "Overhaul repo README"
     },
     "doc_update": {
-      "weight": 53,
-      "runs": 8,
-      "successes": 8,
+      "weight": 57,
+      "runs": 9,
+      "successes": 9,
       "description": "Improve non-README documentation"
     },
     "code_cleanup": {
-      "weight": 49,
-      "runs": 8,
-      "successes": 8,
+      "weight": 53,
+      "runs": 10,
+      "successes": 10,
       "description": "Remove dead code, unused deps"
     },
     "open_issue": {
-      "weight": 53,
+      "weight": 57,
       "runs": 8,
       "successes": 8,
       "description": "Open a thoughtful issue"
     },
     "fix_issue": {
-      "weight": 56,
+      "weight": 60,
       "runs": 6,
       "successes": 6,
       "description": "Fix an existing open issue"
     },
     "add_ci_cd": {
-      "weight": 56,
-      "runs": 11,
-      "successes": 11,
+      "weight": 60,
+      "runs": 12,
+      "successes": 12,
       "description": "Add GitHub Actions CI/CD workflow"
     },
     "add_codeql": {
-      "weight": 43,
+      "weight": 47,
       "runs": 11,
       "successes": 11,
       "description": "Add CodeQL security scanning"
     },
     "add_dependabot": {
-      "weight": 55,
-      "runs": 8,
-      "successes": 8,
+      "weight": 59,
+      "runs": 9,
+      "successes": 9,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
-      "weight": 51,
-      "runs": 12,
-      "successes": 12,
+      "weight": 55,
+      "runs": 13,
+      "successes": 13,
       "description": "Deploy to GitHub Pages"
     },
     "create_release": {
-      "weight": 53,
+      "weight": 57,
       "runs": 13,
       "successes": 13,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
-      "weight": 52,
+      "weight": 56,
       "runs": 7,
       "successes": 7,
       "description": "Add Dockerfile"
     },
     "docker_workflow": {
-      "weight": 47,
-      "runs": 11,
-      "successes": 11,
+      "weight": 51,
+      "runs": 12,
+      "successes": 12,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
-      "weight": 66,
+      "weight": 70,
       "runs": 7,
       "successes": 7,
       "description": "Set up package publishing (PyPI/npm/NuGet)"
     },
     "add_badges": {
-      "weight": 41,
-      "runs": 4,
-      "successes": 4,
+      "weight": 45,
+      "runs": 5,
+      "successes": 5,
       "description": "Add badges to README"
     },
     "add_license": {
-      "weight": 53,
+      "weight": 57,
       "runs": 4,
       "successes": 4,
       "description": "Add/update LICENSE file"
     },
     "issue_templates": {
-      "weight": 46,
-      "runs": 8,
-      "successes": 8,
+      "weight": 50,
+      "runs": 9,
+      "successes": 9,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
-      "weight": 53,
-      "runs": 6,
-      "successes": 6,
+      "weight": 57,
+      "runs": 8,
+      "successes": 8,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
-      "weight": 37,
+      "weight": 41,
       "runs": 6,
       "successes": 6,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
-      "weight": 48,
+      "weight": 52,
       "runs": 10,
       "successes": 10,
       "description": "Configure branch protection"
     },
     "code_coverage": {
-      "weight": 48,
+      "weight": 52,
       "runs": 7,
       "successes": 7,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
-      "weight": 53,
+      "weight": 57,
       "runs": 7,
       "successes": 7,
       "description": "Generate & deploy docs site"
     },
     "auto_labeler": {
-      "weight": 44,
+      "weight": 48,
       "runs": 8,
       "successes": 8,
       "description": "Add auto-labeler or stale bot"
@@ -193,7 +193,9 @@
       "create_release",
       "auto_labeler",
       "contributing_md",
-      "open_issue"
+      "open_issue",
+      "add_dependabot",
+      "issue_templates"
     ],
     "sauravcode": [
       "refactor",
@@ -252,7 +254,9 @@
       "add_badges",
       "bug_fix",
       "add_dockerfile",
-      "code_coverage"
+      "code_coverage",
+      "docker_workflow",
+      "perf_improvement"
     ],
     "BioBots": [
       "setup_copilot_agent",
@@ -338,7 +342,9 @@
       "refactor",
       "docs_site",
       "add_tests",
-      "contributing_md"
+      "contributing_md",
+      "bug_fix",
+      "code_cleanup"
     ],
     "prompt": [
       "add_codeql",
@@ -401,7 +407,12 @@
       "package_publish",
       "open_issue",
       "add_codeql",
-      "fix_issue"
+      "fix_issue",
+      "perf_improvement",
+      "contributing_md",
+      "add_ci_cd",
+      "add_badges",
+      "deploy_pages"
     ],
     "FeedReader": [
       "readme_overhaul",
@@ -432,13 +443,17 @@
       "issue_templates",
       "add_dependabot",
       "security_fix",
-      "add_ci_cd"
+      "add_ci_cd",
+      "doc_update",
+      "contributing_md"
     ],
     "getagentbox": [
       "setup_copilot_agent",
       "add_ci_cd",
-      "issue_templates"
+      "issue_templates",
+      "code_cleanup",
+      "bug_fix"
     ]
   },
-  "notes": "Run 235-236. BioBots: branch_protection (required status checks on master, allow force push, no deletions). ai: contributing_md (comprehensive guide with dev setup, testing, code style, PR process, architecture overview)."
+  "notes": "Run 249-250. Vidly: add_badges (added 9 new badges — CodeQL, Pages, NuGet, tests, last commit, repo size, issues, stars; organized into logical groups). Vidly: deploy_pages (enhanced pages workflow with PR validation job, added 404.html themed error page, robots.txt, sitemap.xml, linked live docs site in README). Weight adjustment at run 250."
 }

@@ -1,5 +1,36 @@
 ## 2026-02-15
 
+### Builder Run 39 (3:25 PM PST) — prompt
+- 🆕 **prompt — PromptChain**: Multi-step LLM pipeline class. Fluent builder API (AddStep/WithSystemPrompt/WithMaxRetries). Each step renders a PromptTemplate with accumulated variables, sends to Azure OpenAI, stores response under output variable for downstream steps. ChainResult with FinalResponse, GetOutput(variable), per-step timing. Static Validate() checks variable satisfaction without API calls. Full JSON serialization (ToJson/FromJson/SaveToFileAsync/LoadFromFileAsync). Duplicate output variable detection (case-insensitive). README docs, CHANGELOG, version 3.2.0. 38 new tests. +1,342 lines.
+
+### Run 249-250 (3:25 PM PST) — Vidly
+- 📛 **Vidly — add_badges**: Added 9 new badges to README — CodeQL security analysis, GitHub Pages deployment, NuGet package publish, test count (22 passing), last commit, repo size, open issues, GitHub stars. Organized all 14 badges into logical groups (Build & Security, Package & License, Tech, Repo) with HTML comments.
+- 🌐 **Vidly — deploy_pages**: Enhanced Pages workflow with PR validation job (HTML structure checks before merge), concurrency grouping per ref. Added themed 404.html error page, robots.txt with sitemap reference, sitemap.xml for SEO. Updated README to link live docs site. Weight adjustment performed at run 250 (all task types at 100% success → +2 each).
+
+### Run 247-248 (3:19 PM PST) — gif-captcha
+- 📝 **gif-captcha — doc_update**: Rewrote `.github/copilot-instructions.md` from scratch — now covers all 3 HTML pages (index, demo, analysis), Dockerfile, nginx-security.conf, all workflows, Canvas 2D chart conventions, component patterns (finding cards, badges, tags, filter tabs, expandable cards, difficulty meters), CSP rules, and JavaScript conventions (`var`, vanilla JS, sanitize helper). Updated `copilot-setup-steps.yml` to validate all three HTML files and verify Docker build.
+- 📄 **gif-captcha — contributing_md**: Added comprehensive `CONTRIBUTING.md` with sections for research contributions (new GIF test cases, model benchmarking), development guide (page overview, Docker testing), coding standards (CSS variables, semantic HTML, `var` JS convention, CSP constraints), PR process, commit message guidelines, and research question submission process.
+
+### Run 245-246 (3:16 PM PST) — agentlens
+- 🐳 **agentlens — docker_workflow**: Added `.github/workflows/docker.yml` — multi-arch (amd64/arm64) Docker image build and push to GHCR using docker/build-push-action@v6, docker/metadata-action@v5 for semver/branch/sha tagging, GHA layer caching, and PR validation (build without push).
+- ⚡ **agentlens — perf_improvement**: Added 5 targeted database indexes for analytics aggregation queries (model, event_type, agent_name, started_at) plus composite index on events(session_id, timestamp). Set SQLite pragmas (8MB page cache, mmap, in-memory temp store). Cached all prepared statements at module level across events/sessions/analytics routes (previously re-compiled SQL on every request). Wrapped analytics endpoint's 8 queries in a single transaction for consistent reads and reduced WAL lock churn.
+
+### Run 243-244 (3:16 PM PST) — getagentbox
+- 🧹 **getagentbox — code_cleanup**: Removed dead `currentScenario` variable (set but never read), normalized `const` to `var` for consistency with the rest of the inline JS.
+- 🐛 **getagentbox — bug_fix**: Fixed chat demo animation race condition — rapid scenario switching caused messages from different scenarios to intermix because `isAnimating` boolean couldn't distinguish old vs new animations. Replaced with generation counter pattern. Fixed `chatWindow.removeChild(typing)` crash when typing indicator was already cleared by innerHTML reset. Added `rel="noopener noreferrer"` to `target="_blank"` links (security).
+
+### Run 241-242 (3:08 PM PST) — VoronoiMap
+- 🐛 **VoronoiMap — bug_fix**: Fixed critical precision bug in `bin_search` where `round(d, 2) == round(d, 2)` caused incorrect Voronoi boundary detection (distances differing by <0.005 were falsely equated). Also fixed `new_dir` returning `round(m, 2)` slopes that caused incorrect polygon tracing in `find_area`. Added `_slopes_equal()` helper with proper epsilon tolerance. 15 new tests.
+- 🧹 **VoronoiMap — code_cleanup**: Removed 25 commented-out debug print statements, unused `d` list in `find_area`, dead commented-out elif block in `find_a1`, C-style `(float)(...)` casts → `float(...)`, simplified boundary checks with chained comparisons, added docstrings to 4 core functions. Net: -34 lines.
+
+### Run 239-240 (3:06 PM PST) — agenticchat
+- 📦 **agenticchat — add_dependabot**: Dependabot config with 3 ecosystems — npm (grouped minor/patch for dev & production deps, 10 PR limit), GitHub Actions (5 PR limit), Docker (3 PR limit). Weekly Monday schedule, auto-reviewer, semantic commit prefixes (deps/ci/docker).
+- 📄 **agenticchat — issue_templates**: YAML-form bug report (browser/OS dropdowns, console output, repro steps), feature request (category dropdown, priority, alternatives), config.yml (disabled blank issues, security advisory link), PR template (change type checkboxes, testing checklist, sandbox escape check).
+
+### Run 237-238 (2:52 PM PST) — Vidly
+- ⚡ **Vidly — perf_improvement**: Replaced List<T> with Dictionary<int,T> for O(1) GetById lookups across all 3 repositories, counter-based ID generation instead of O(n) Max() scans, single-pass stats computation (CustomerStats 5→1 passes, RentalStats 6→1 passes), HashSet<int> for O(1) movie availability checks in IsMovieRentedOut/Checkout.
+- 📝 **Vidly — contributing_md**: Comprehensive CONTRIBUTING.md with dev setup (SDK-style test project, dotnet build/test), project structure, coding guidelines (repository pattern, lock discipline, defensive copies), testing standards (MSTest, shared static state cleanup), commit conventions, PR checklist.
+
 ### Run 235-236 (2:39 PM PST) — BioBots, ai
 - 🔐 **BioBots — branch_protection**: Configured master branch protection — required status checks (strict), no deletions, allow force pushes, admin bypass enabled for solo dev workflow.
 - 📝 **ai — contributing_md**: Comprehensive CONTRIBUTING.md — dev setup (venv, pip install -e), testing guide (pytest, 80% coverage threshold), code style (flake8, mypy strict, Google docstrings), PR process with review checklist, architecture overview of all 8 modules.
@@ -11,6 +42,9 @@
 ### Run 231-232 (2:18 PM PST) — ai
 - 📛 **add_badges**: Added CodeQL, GitHub Pages docs, GitHub stars, GitHub issues, PRs Welcome badges to README (5 new badges alongside existing 7)
 - 🧹 **code_cleanup**: Removed unnecessary `sys.path` hack from `conftest.py`, fixed `state_snapshot` type annotation `Dict[str, str]` → `Dict[str, Any]` across contract/controller/worker, removed dead `child_depth` computation in `Worker.maybe_replicate`, moved `json` import from module-level to `main()` in comparator.py. All 82 tests pass.
+
+### Daily Memory Backup (2:48 PM PST)
+- ✅ Committed & pushed 4 changed files (gardener-weights.json, memory/2026-02-15.md, runs.md, status.md) → `a8b7ea6`
 
 ### Daily Memory Backup (2:14 PM PST)
 - ✅ Committed & pushed 4 changed files (gardener-weights.json, memory/2026-02-15.md, runs.md, status.md) → `805d9b2`
