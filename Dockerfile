@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir build \
     && python -m build --wheel --outdir /dist
 
 # ---- Runtime stage ----
-FROM python:3.12-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 LABEL maintainer="Saurav Bhattacharya <online.saurav@gmail.com>"
 LABEL description="VoronoiMap – estimate aggregate statistics via Voronoi partitioning"
