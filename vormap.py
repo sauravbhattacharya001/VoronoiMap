@@ -46,6 +46,7 @@ MAX_VERTICES = 50
 
 
 class Oracle:
+    __slots__ = ()
     calls = 0
 
 
@@ -191,14 +192,16 @@ def get_NN(data, lng, lat):
             )
 
     # --- Fallback: brute-force scan ---
-    mindist = math.inf
+    # Use squared distance to avoid sqrt on every comparison.
+    # The ordering is identical because sqrt is monotonically increasing.
+    mindist_sq = math.inf
     minlng = None
     minlat = None
 
     for slng, slat in data:
-        dist = eudist(slng, slat, lng, lat)
-        if (dist > 0 and dist <= mindist):
-            mindist = dist
+        dsq = eudist_sq(slng, slat, lng, lat)
+        if (dsq > 0 and dsq <= mindist_sq):
+            mindist_sq = dsq
             minlat = slat
             minlng = slng
 
@@ -393,8 +396,29 @@ def isect_B(alng, alat, dirn):
         )
 
 
+def eudist_sq(x1, y1, x2, y2):
+    """Return the *squared* Euclidean distance between two points.
+
+    Avoids the expensive ``math.sqrt`` call.  Use this whenever you
+    only need to *compare* distances (sorting, nearest-neighbor checks,
+    convergence tests) — the ordering is preserved because sqrt is
+    monotonically increasing.
+
+    The original ``eudist`` is kept for the few call sites that need the
+    actual distance value (e.g. ``bin_search`` convergence tolerance).
+    """
+    dx = x1 - x2
+    dy = y1 - y2
+    return dx * dx + dy * dy
+
+
 def eudist(x1, y1, x2, y2):
-    return math.sqrt(((x1 - x2) ** 2) + ((y1 - y2) ** 2))
+    """Euclidean distance between two points.
+
+    Uses ``math.hypot`` which is implemented in C and also avoids
+    overflow/underflow for very large/small coordinate differences.
+    """
+    return math.hypot(x1 - x2, y1 - y2)
 
 
 BIN_SEARCH_MAX_ITER = 100  # ~2^100 precision, far beyond float64 range
@@ -428,13 +452,14 @@ def bin_search(data, x1, y1, x2, y2, dlng, dlat):
         xm = float(x1 + x2) / 2
         ym = float(y1 + y2) / 2
         lg, lt = get_NN(data, xm, ym)
-        d1 = eudist(lg, lt, xm, ym)
-        d2 = eudist(xm, ym, dlng, dlat)
-        # Use relative epsilon comparison instead of rounding.
-        # Two distances are "equal" when they differ by less than
-        # 1e-9 relative to the larger value, meaning the midpoint
-        # sits on (or very near) the Voronoi boundary.
-        if abs(d1 - d2) <= 1e-9 * max(d1, d2, 1e-12):
+        # Use squared distances for comparison — avoids two sqrt calls
+        # per iteration.  The relative epsilon test is equivalent because
+        # |sqrt(a) - sqrt(b)| / max(sqrt(a), sqrt(b))  ≈
+        # |a - b| / (2 * max(a, b))  for a ≈ b, so we adjust the
+        # tolerance accordingly.
+        d1_sq = eudist_sq(lg, lt, xm, ym)
+        d2_sq = eudist_sq(xm, ym, dlng, dlat)
+        if abs(d1_sq - d2_sq) <= 2e-9 * max(d1_sq, d2_sq, 1e-24):
             x2 = xm
             y2 = ym
         else:
@@ -585,17 +610,18 @@ def find_a1(data, alng, alat, dlng, dlat, dirn):
 
 
 def polygon_area(alng, alat):
-    # calculate area using the Shoelace formula
+    """Calculate polygon area using the Shoelace formula.
+
+    Uses a single zip-based loop to avoid per-iteration index arithmetic,
+    and an ``abs()`` instead of a conditional multiply for the sign flip.
+    """
     n = len(alat)
-    area = 0
+    if n < 2:
+        return 0.0
+    area = alat[-1] * alng[0] - alat[0] * alng[-1]  # closing edge
     for i in range(n - 1):
         area += alat[i] * alng[i + 1] - alat[i + 1] * alng[i]
-    # close the polygon: last vertex back to first
-    area += alat[n - 1] * alng[0] - alat[0] * alng[n - 1]
-    area = float(area / 2)
-    if area < 0:
-        area *= -1
-    return round(area, 2)
+    return round(abs(area) * 0.5, 2)
 
 
 def find_area(data, dlng, dlat):
@@ -674,6 +700,7 @@ def get_sum(FILENAME, N1, _depth=0):
     the summation array.
     """
     data = load_data(FILENAME)
+    total_area = (IND_N - IND_S) * (IND_E - IND_W)
 
     best_estimate = None
     best_distance = float('inf')
@@ -682,7 +709,10 @@ def get_sum(FILENAME, N1, _depth=0):
         Oracle.calls = 0
         max_edges = 0
         sum_edges = 0
-        valid_estimates = []
+        # Use running sums instead of collecting into a list — avoids
+        # O(N1) list allocation and a second pass for the mean.
+        sum_estimates = 0.0
+        valid_count = 0
 
         for i in range(N1):
             plng = random.uniform(IND_W, IND_E)
@@ -692,16 +722,16 @@ def get_sum(FILENAME, N1, _depth=0):
             area, v_edges = find_area(data, dlng, dlat)
 
             if area > 0:
-                estimate = ((IND_N - IND_S) * (IND_E - IND_W)) / area
-                valid_estimates.append(estimate)
+                sum_estimates += total_area / area
+                valid_count += 1
                 sum_edges += v_edges
                 if v_edges > max_edges:
                     max_edges = v_edges
 
         # Compute mean over valid samples only (fixes #14 bias)
-        if valid_estimates:
-            Sum = sum(valid_estimates) / len(valid_estimates)
-            avg_edges = sum_edges / len(valid_estimates)
+        if valid_count > 0:
+            Sum = sum_estimates / valid_count
+            avg_edges = sum_edges / valid_count
         else:
             Sum = 0
             avg_edges = 0
