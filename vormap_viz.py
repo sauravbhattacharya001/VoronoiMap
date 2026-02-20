@@ -11,6 +11,10 @@ or consumed by any geospatial pipeline.
 When scipy is available, uses ``scipy.spatial.Voronoi`` for precise region
 computation.  Falls back to the vormap binary-search tracer otherwise.
 
+Lloyd relaxation iteratively moves seed points to their Voronoi cell
+centroids, producing increasingly uniform tessellations — useful for
+mesh optimization, procedural generation, and spatial analysis.
+
 Usage (as module):
     import vormap
     import vormap_viz
@@ -19,6 +23,10 @@ Usage (as module):
     regions = vormap_viz.compute_regions(points)
     vormap_viz.export_svg(regions, points, "diagram.svg")
     vormap_viz.export_geojson(regions, points, "diagram.geojson")
+
+    # Lloyd relaxation for uniform regions
+    result = vormap_viz.lloyd_relaxation(points, iterations=20)
+    vormap_viz.export_svg(result["regions"], result["points"], "relaxed.svg")
 
 Usage (CLI):
     voronoimap datauni5.txt 5 --visualize output.svg
@@ -1157,6 +1165,655 @@ def generate_stats(datafile, output_path=None, *, fmt="table"):
                 f.write(table)
             return output_path
         return table
+
+
+# ── Lloyd relaxation ──────────────────────────────────────────────────
+
+def lloyd_relaxation(data, iterations=10, *, bounds=None, callback=None):
+    """Apply Lloyd relaxation to make Voronoi regions more uniform.
+
+    Lloyd's algorithm iteratively moves each seed point to the centroid
+    of its Voronoi cell, producing increasingly regular tessellations.
+    This is widely used in procedural generation, mesh optimization,
+    texture synthesis, and spatial analysis.
+
+    Parameters
+    ----------
+    data : list of (float, float)
+        Initial seed points (e.g. from ``vormap.load_data()``).
+    iterations : int
+        Number of relaxation iterations (default: 10). More iterations
+        produce more uniform results but take longer.
+    bounds : tuple of (south, north, west, east) or None
+        Bounding box for the Voronoi regions. If None, uses the current
+        ``vormap`` global bounds.
+    callback : callable or None
+        Optional function called after each iteration with signature
+        ``callback(iteration, points, regions, convergence)``.
+        Useful for progress reporting or recording animation frames.
+
+    Returns
+    -------
+    dict
+        A dict with keys:
+
+        - ``points`` (list): final relaxed seed points
+        - ``regions`` (dict): final Voronoi regions
+        - ``history`` (list): list of dicts per iteration, each with:
+            - ``iteration`` (int): 0-based iteration number
+            - ``points`` (list): seed positions at this step
+            - ``regions`` (dict): Voronoi regions at this step
+            - ``convergence`` (float): max displacement of any seed
+        - ``total_iterations`` (int): number of iterations performed
+        - ``converged`` (bool): True if converged early (convergence < threshold)
+
+    Raises
+    ------
+    ValueError
+        If *data* has fewer than 2 points or *iterations* < 1.
+
+    Examples
+    --------
+    >>> import vormap, vormap_viz
+    >>> data = vormap.load_data("datauni5.txt")
+    >>> result = vormap_viz.lloyd_relaxation(data, iterations=20)
+    >>> relaxed_points = result["points"]
+    >>> relaxed_regions = result["regions"]
+    """
+    if len(data) < 2:
+        raise ValueError("Lloyd relaxation requires at least 2 points")
+    if iterations < 1:
+        raise ValueError("iterations must be >= 1, got %d" % iterations)
+
+    if bounds is None:
+        bounds = (vormap.IND_S, vormap.IND_N, vormap.IND_W, vormap.IND_E)
+
+    s, n, w, e = bounds
+    convergence_threshold = 1e-6 * max(e - w, n - s)
+
+    # Work with a mutable copy
+    current_points = [tuple(p) for p in data]
+    history = []
+    converged = False
+
+    for it in range(iterations):
+        # Compute Voronoi regions for current points
+        regions = compute_regions(current_points)
+
+        # Move each point to its region's centroid
+        new_points = []
+        max_displacement = 0.0
+
+        for i, pt in enumerate(current_points):
+            if pt in regions:
+                cx, cy = _compute_centroid(regions[pt])
+                # Clamp to bounds to prevent drift outside the domain
+                cx = max(w, min(e, cx))
+                cy = max(s, min(n, cy))
+                disp = math.sqrt((cx - pt[0]) ** 2 + (cy - pt[1]) ** 2)
+                max_displacement = max(max_displacement, disp)
+                new_points.append((cx, cy))
+            else:
+                # Point has no region (edge case) — keep it in place
+                new_points.append(pt)
+
+        history.append({
+            "iteration": it,
+            "points": list(current_points),
+            "regions": dict(regions),
+            "convergence": max_displacement,
+        })
+
+        if callback is not None:
+            callback(it, current_points, regions, max_displacement)
+
+        current_points = new_points
+
+        if max_displacement < convergence_threshold:
+            converged = True
+            break
+
+    # Final regions with the relaxed points
+    final_regions = compute_regions(current_points)
+
+    # Append final state to history
+    history.append({
+        "iteration": len(history),
+        "points": list(current_points),
+        "regions": dict(final_regions),
+        "convergence": 0.0,
+    })
+
+    return {
+        "points": current_points,
+        "regions": final_regions,
+        "history": history,
+        "total_iterations": len(history) - 1,
+        "converged": converged,
+    }
+
+
+def generate_relaxed_diagram(
+    datafile,
+    output_path="voronoi_relaxed.svg",
+    iterations=10,
+    **kwargs,
+):
+    """Load data, apply Lloyd relaxation, and export SVG in one call.
+
+    Parameters
+    ----------
+    datafile : str
+        Filename inside the data/ directory.
+    output_path : str
+        Where to write the SVG.
+    iterations : int
+        Number of relaxation iterations.
+    **kwargs
+        Passed through to ``export_svg()``.
+
+    Returns
+    -------
+    str
+        Path to the generated SVG file.
+    """
+    data = vormap.load_data(datafile)
+    result = lloyd_relaxation(data, iterations=iterations)
+    return export_svg(
+        result["regions"],
+        result["points"],
+        output_path,
+        **kwargs,
+    )
+
+
+def export_relaxation_html(
+    data,
+    iterations=10,
+    output_path="relaxation.html",
+    *,
+    width=960,
+    height=700,
+    color_scheme=DEFAULT_COLOR_SCHEME,
+    title=None,
+    bounds=None,
+):
+    """Export an animated HTML visualization of Lloyd relaxation.
+
+    Generates a self-contained HTML file that shows the relaxation
+    process step by step with play/pause controls, a step slider,
+    and convergence graph.
+
+    Parameters
+    ----------
+    data : list of (float, float)
+        Initial seed points.
+    iterations : int
+        Number of relaxation iterations to compute.
+    output_path : str
+        Path to write the HTML file.
+    width, height : int
+        Canvas dimensions.
+    color_scheme : str
+        Color scheme for the Voronoi regions.
+    title : str or None
+        Optional title.
+    bounds : tuple or None
+        Bounding box (south, north, west, east). Uses vormap globals if None.
+
+    Returns
+    -------
+    str
+        Path to the generated HTML file.
+    """
+    if len(data) < 2:
+        raise ValueError("Need at least 2 points for relaxation animation")
+
+    # Run the relaxation and collect all frames
+    result = lloyd_relaxation(data, iterations=iterations, bounds=bounds)
+
+    # Serialize frames for JavaScript
+    import json
+
+    frames = []
+    for entry in result["history"]:
+        frame_regions = []
+        sorted_seeds = sorted(entry["regions"].keys())
+        for seed in sorted_seeds:
+            verts = entry["regions"][seed]
+            frame_regions.append({
+                "seed": list(seed),
+                "vertices": [list(v) for v in verts],
+            })
+        frames.append({
+            "iteration": entry["iteration"],
+            "points": [list(p) for p in entry["points"]],
+            "regions": frame_regions,
+            "convergence": round(entry["convergence"], 6),
+        })
+
+    frames_json = json.dumps(frames)
+    title_text = title or (
+        "Lloyd Relaxation — %d points, %d iterations"
+        % (len(data), result["total_iterations"])
+    )
+
+    html = _RELAXATION_HTML_TEMPLATE.replace("{{FRAMES_JSON}}", frames_json)
+    html = html.replace("{{TITLE}}", title_text)
+    html = html.replace("{{INITIAL_SCHEME}}", color_scheme)
+    html = html.replace("{{WIDTH}}", str(width))
+    html = html.replace("{{HEIGHT}}", str(height))
+    html = html.replace("{{TOTAL_ITERATIONS}}", str(result["total_iterations"]))
+    html = html.replace("{{CONVERGED}}", json.dumps(result["converged"]))
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    return output_path
+
+
+_RELAXATION_HTML_TEMPLATE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;overflow:hidden;
+  transition:background .3s,color .3s}
+body.light{background:#f5f5f5;color:#222}
+body.dark{background:#1a1a2e;color:#e0e0e0}
+#header{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;gap:12px;flex-wrap:wrap;z-index:10;position:relative}
+body.light #header{background:#fff;border-bottom:1px solid #ddd}
+body.dark #header{background:#16213e;border-bottom:1px solid #333}
+h1{font-size:15px;font-weight:600;white-space:nowrap}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+select,button,input[type=range]{font-size:13px;padding:4px 10px;border-radius:4px;
+  cursor:pointer;border:1px solid #aaa;background:#fff;color:#222;transition:all .2s}
+body.dark select,body.dark button{background:#0f3460;color:#e0e0e0;border-color:#555}
+button:hover{opacity:0.85}
+.play-btn{min-width:36px;font-size:16px}
+#slider{width:180px;padding:2px}
+#step-label{font-size:12px;font-weight:600;min-width:90px;text-align:center}
+#convergence-label{font-size:11px;opacity:0.7;min-width:120px}
+#canvas-wrap{position:relative;flex:1;display:flex;flex-direction:column}
+canvas{display:block;cursor:grab;flex:1}
+canvas.grabbing{cursor:grabbing}
+#conv-canvas{height:80px;min-height:60px;border-top:1px solid #ddd;flex-shrink:0}
+body.dark #conv-canvas{border-top-color:#333}
+#tooltip{position:fixed;pointer-events:none;padding:8px 12px;border-radius:6px;
+  font-size:12px;line-height:1.5;white-space:nowrap;opacity:0;
+  transition:opacity .15s;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+body.light #tooltip{background:#222;color:#fff}
+body.dark #tooltip{background:#e8e8e8;color:#111}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;
+  font-weight:600;margin-left:6px}
+.badge.converged{background:#2ecc71;color:#fff}
+.badge.running{background:#3498db;color:#fff}
+</style>
+</head>
+<body class="light">
+<div id="header">
+  <h1>{{TITLE}}
+    <span id="status-badge" class="badge running">running</span>
+  </h1>
+  <div class="controls">
+    <button class="play-btn" id="play-btn" title="Play/Pause">▶</button>
+    <input type="range" id="slider" min="0" max="{{TOTAL_ITERATIONS}}" value="0">
+    <span id="step-label">Step 0 / {{TOTAL_ITERATIONS}}</span>
+    <span id="convergence-label">Δ = —</span>
+    <label>Speed: <select id="speed">
+      <option value="2000">Slow</option>
+      <option value="800" selected>Normal</option>
+      <option value="300">Fast</option>
+      <option value="100">Turbo</option>
+    </select></label>
+    <label>Color: <select id="scheme">
+      <option value="pastel">Pastel</option>
+      <option value="warm">Warm</option>
+      <option value="cool">Cool</option>
+      <option value="earth">Earth</option>
+      <option value="mono">Mono</option>
+      <option value="rainbow">Rainbow</option>
+    </select></label>
+    <button id="theme-btn" title="Toggle dark/light">🌙</button>
+  </div>
+</div>
+<div id="canvas-wrap">
+  <canvas id="c"></canvas>
+  <canvas id="conv-canvas"></canvas>
+</div>
+<div id="tooltip"></div>
+
+<script>
+(function(){
+"use strict";
+
+var frames = {{FRAMES_JSON}};
+var converged = {{CONVERGED}};
+var initialScheme = "{{INITIAL_SCHEME}}";
+
+// ── Color schemes ──
+function hslToHex(h,s,l){
+  h%=1;if(h<0)h+=1;
+  var c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h*6)%2-1)),m=l-c/2;
+  var r,g,b;
+  if(h<1/6){r=c;g=x;b=0}else if(h<2/6){r=x;g=c;b=0}
+  else if(h<3/6){r=0;g=c;b=x}else if(h<4/6){r=0;g=x;b=c}
+  else if(h<5/6){r=x;g=0;b=c}else{r=c;g=0;b=x}
+  r=Math.round((r+m)*255);g=Math.round((g+m)*255);b=Math.round((b+m)*255);
+  return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+}
+function grayHex(l){var v=Math.max(0,Math.min(255,Math.round(l*255)));
+  return "#"+((1<<24)+(v<<16)+(v<<8)+v).toString(16).slice(1)}
+
+var schemes={
+  pastel:function(i,n){return hslToHex(i/Math.max(n,1),.65,.82)},
+  warm:function(i,n){return hslToHex((i/Math.max(n,1))*.15,.70,.75)},
+  cool:function(i,n){return hslToHex(.5+(i/Math.max(n,1))*.2,.60,.78)},
+  earth:function(i,n){return hslToHex(.08+(i/Math.max(n,1))*.1,.45,.65)},
+  mono:function(i,n){return grayHex(.88-.35*(i/Math.max(n,1)))},
+  rainbow:function(i,n){return hslToHex(i/Math.max(n,1),.70,.68)}
+};
+
+var curScheme=initialScheme;
+var curFrame=0;
+var playing=false;
+var timer=null;
+var speed=800;
+
+// ── Data bounds from all frames ──
+var allX=[],allY=[];
+frames.forEach(function(f){
+  f.points.forEach(function(p){allX.push(p[0]);allY.push(p[1])});
+  f.regions.forEach(function(r){r.vertices.forEach(function(v){allX.push(v[0]);allY.push(v[1])})});
+});
+var minX=Math.min.apply(null,allX),maxX=Math.max.apply(null,allX);
+var minY=Math.min.apply(null,allY),maxY=Math.max.apply(null,allY);
+var rangeX=Math.max(maxX-minX,1e-6),rangeY=Math.max(maxY-minY,1e-6);
+
+// ── Canvas setup ──
+var canvas=document.getElementById("c"),ctx=canvas.getContext("2d");
+var convCanvas=document.getElementById("conv-canvas"),convCtx=convCanvas.getContext("2d");
+var wrap=document.getElementById("canvas-wrap");
+var tooltip=document.getElementById("tooltip");
+
+function resize(){
+  canvas.width=wrap.clientWidth;
+  canvas.height=wrap.clientHeight-convCanvas.offsetHeight;
+  convCanvas.width=wrap.clientWidth;
+  fitView();
+  draw();
+  drawConvergence();
+}
+window.addEventListener("resize",resize);
+
+// ── Transform ──
+var panX=0,panY=0,zoom=1;
+function fitView(){
+  var cw=canvas.width,ch=canvas.height,margin=50;
+  var dw=cw-2*margin,dh=ch-2*margin;
+  zoom=Math.min(dw/rangeX,dh/rangeY);
+  panX=margin+(dw-rangeX*zoom)/2;
+  panY=margin+(dh-rangeY*zoom)/2;
+}
+function tx(x){return panX+(x-minX)*zoom}
+function ty(y){return panY+(maxY-y)*zoom}
+
+// ── Hit test ──
+var hoverIdx=-1;
+function pointInPoly(px,py,verts){
+  var inside=false,n=verts.length;
+  for(var i=0,j=n-1;i<n;j=i++){
+    var xi=tx(verts[i][0]),yi=ty(verts[i][1]);
+    var xj=tx(verts[j][0]),yj=ty(verts[j][1]);
+    if(((yi>py)!==(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi))inside=!inside;
+  }
+  return inside;
+}
+function findRegion(mx,my){
+  var f=frames[curFrame];
+  for(var i=0;i<f.regions.length;i++){
+    if(pointInPoly(mx,my,f.regions[i].vertices))return i;
+  }
+  return -1;
+}
+
+// ── Draw main canvas ──
+function draw(){
+  var cw=canvas.width,ch=canvas.height;
+  var isDark=document.body.classList.contains("dark");
+  ctx.clearRect(0,0,cw,ch);
+  ctx.fillStyle=isDark?"#1a1a2e":"#f5f5f5";
+  ctx.fillRect(0,0,cw,ch);
+
+  var f=frames[curFrame];
+  var colorFn=schemes[curScheme]||schemes.pastel;
+  var n=f.regions.length;
+
+  // Regions
+  for(var i=0;i<n;i++){
+    var r=f.regions[i],verts=r.vertices;
+    ctx.beginPath();
+    ctx.moveTo(tx(verts[0][0]),ty(verts[0][1]));
+    for(var j=1;j<verts.length;j++)ctx.lineTo(tx(verts[j][0]),ty(verts[j][1]));
+    ctx.closePath();
+    ctx.fillStyle=colorFn(i,n);
+    if(i===hoverIdx){ctx.globalAlpha=0.85;ctx.fill();ctx.globalAlpha=1;
+      ctx.strokeStyle=isDark?"#fff":"#000";ctx.lineWidth=2.5;
+    }else{ctx.fill();ctx.strokeStyle=isDark?"#555":"#444";ctx.lineWidth=1;}
+    ctx.stroke();
+  }
+
+  // Seed points
+  var pts=f.points;
+  ctx.fillStyle=isDark?"#e0e0e0":"#222";
+  ctx.strokeStyle=isDark?"#1a1a2e":"#fff";
+  ctx.lineWidth=1;
+  for(var i=0;i<pts.length;i++){
+    ctx.beginPath();
+    ctx.arc(tx(pts[i][0]),ty(pts[i][1]),3.5*Math.min(zoom/5+.5,1.5),0,Math.PI*2);
+    ctx.fill();ctx.stroke();
+  }
+
+  // Draw previous positions as ghost dots (faded)
+  if(curFrame>0){
+    var prev=frames[curFrame-1].points;
+    ctx.globalAlpha=0.25;
+    ctx.fillStyle=isDark?"#e74c3c":"#c0392b";
+    for(var i=0;i<prev.length;i++){
+      ctx.beginPath();
+      ctx.arc(tx(prev[i][0]),ty(prev[i][1]),2.5,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }
+}
+
+// ── Draw convergence chart ──
+function drawConvergence(){
+  var cw=convCanvas.width,ch=convCanvas.height;
+  var isDark=document.body.classList.contains("dark");
+  convCtx.clearRect(0,0,cw,ch);
+  convCtx.fillStyle=isDark?"#16213e":"#fff";
+  convCtx.fillRect(0,0,cw,ch);
+
+  var convs=frames.map(function(f){return f.convergence});
+  var maxConv=Math.max.apply(null,convs.filter(function(c){return c>0}));
+  if(!maxConv||maxConv<=0)maxConv=1;
+
+  var pad=40,gw=cw-2*pad,gh=ch-25;
+  var n=convs.length;
+  if(n<2)return;
+
+  // Axes
+  convCtx.strokeStyle=isDark?"#555":"#ccc";
+  convCtx.lineWidth=1;
+  convCtx.beginPath();
+  convCtx.moveTo(pad,5);convCtx.lineTo(pad,gh);convCtx.lineTo(pad+gw,gh);
+  convCtx.stroke();
+
+  // Label
+  convCtx.fillStyle=isDark?"#aaa":"#666";
+  convCtx.font="10px sans-serif";
+  convCtx.textAlign="center";
+  convCtx.fillText("Convergence (max displacement per step)",cw/2,ch-3);
+  convCtx.textAlign="right";
+  convCtx.fillText(maxConv.toFixed(2),pad-4,12);
+  convCtx.fillText("0",pad-4,gh);
+
+  // Line
+  convCtx.beginPath();
+  convCtx.strokeStyle="#3498db";
+  convCtx.lineWidth=2;
+  for(var i=0;i<n;i++){
+    var x=pad+(i/(n-1))*gw;
+    var y=gh-(convs[i]/maxConv)*(gh-10);
+    if(i===0)convCtx.moveTo(x,y);else convCtx.lineTo(x,y);
+  }
+  convCtx.stroke();
+
+  // Dots
+  for(var i=0;i<n;i++){
+    var x=pad+(i/(n-1))*gw;
+    var y=gh-(convs[i]/maxConv)*(gh-10);
+    convCtx.beginPath();
+    convCtx.arc(x,y,3,0,Math.PI*2);
+    convCtx.fillStyle=i===curFrame?"#e74c3c":"#3498db";
+    convCtx.fill();
+  }
+
+  // Current step marker
+  var cx=pad+(curFrame/(n-1))*gw;
+  convCtx.strokeStyle="#e74c3c";
+  convCtx.lineWidth=1;
+  convCtx.setLineDash([4,3]);
+  convCtx.beginPath();
+  convCtx.moveTo(cx,5);convCtx.lineTo(cx,gh);
+  convCtx.stroke();
+  convCtx.setLineDash([]);
+}
+
+// ── Controls ──
+var slider=document.getElementById("slider");
+var stepLabel=document.getElementById("step-label");
+var convLabel=document.getElementById("convergence-label");
+var playBtn=document.getElementById("play-btn");
+var statusBadge=document.getElementById("status-badge");
+
+function updateUI(){
+  var f=frames[curFrame];
+  slider.value=curFrame;
+  stepLabel.textContent="Step "+f.iteration+" / "+frames[frames.length-1].iteration;
+  if(f.convergence>0)convLabel.textContent="\u0394 = "+f.convergence.toFixed(4);
+  else convLabel.textContent="\u0394 = 0 (done)";
+
+  if(converged){statusBadge.textContent="converged";statusBadge.className="badge converged";}
+  else{statusBadge.textContent="complete";statusBadge.className="badge running";}
+
+  draw();
+  drawConvergence();
+}
+
+slider.addEventListener("input",function(){
+  curFrame=parseInt(this.value);
+  updateUI();
+});
+
+playBtn.addEventListener("click",function(){
+  if(playing){stopPlay();}else{startPlay();}
+});
+
+function startPlay(){
+  playing=true;
+  playBtn.textContent="\u23F8";
+  if(curFrame>=frames.length-1)curFrame=0;
+  tick();
+}
+function stopPlay(){
+  playing=false;
+  playBtn.textContent="\u25B6";
+  if(timer){clearTimeout(timer);timer=null;}
+}
+function tick(){
+  if(!playing)return;
+  curFrame++;
+  if(curFrame>=frames.length){curFrame=frames.length-1;stopPlay();return;}
+  updateUI();
+  timer=setTimeout(tick,speed);
+}
+
+document.getElementById("speed").addEventListener("change",function(){
+  speed=parseInt(this.value);
+});
+document.getElementById("scheme").value=initialScheme;
+document.getElementById("scheme").addEventListener("change",function(){
+  curScheme=this.value;draw();
+});
+
+// Theme
+var themeBtn=document.getElementById("theme-btn");
+themeBtn.addEventListener("click",function(){
+  var isDark=document.body.classList.toggle("dark");
+  document.body.classList.toggle("light",!isDark);
+  themeBtn.textContent=isDark?"\u2600\uFE0F":"\uD83C\uDF19";
+  draw();drawConvergence();
+});
+
+// Pan & zoom
+var dragging=false,dragStartX=0,dragStartY=0,panStartX=0,panStartY=0;
+canvas.addEventListener("mousedown",function(e){
+  if(e.button===0){dragging=true;dragStartX=e.clientX;dragStartY=e.clientY;
+    panStartX=panX;panStartY=panY;canvas.classList.add("grabbing");}
+});
+window.addEventListener("mousemove",function(e){
+  if(dragging){panX=panStartX+(e.clientX-dragStartX);panY=panStartY+(e.clientY-dragStartY);draw();}
+});
+window.addEventListener("mouseup",function(){dragging=false;canvas.classList.remove("grabbing");});
+canvas.addEventListener("wheel",function(e){
+  e.preventDefault();
+  var rect=canvas.getBoundingClientRect();
+  var mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  var factor=e.deltaY<0?1.15:1/1.15;
+  panX=mx-factor*(mx-panX);panY=my-factor*(my-panY);
+  zoom*=factor;draw();
+},{passive:false});
+
+// Hover
+canvas.addEventListener("mousemove",function(e){
+  if(dragging)return;
+  var rect=canvas.getBoundingClientRect();
+  var mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  var idx=findRegion(mx,my);
+  if(idx!==hoverIdx){hoverIdx=idx;draw();}
+  if(idx>=0){
+    var r=frames[curFrame].regions[idx];
+    tooltip.innerHTML="<b>Region</b><br>Seed: ("+r.seed[0].toFixed(2)+", "+r.seed[1].toFixed(2)+")";
+    tooltip.style.opacity="1";
+    tooltip.style.left=(e.clientX+14)+"px";
+    tooltip.style.top=(e.clientY+14)+"px";
+  }else{tooltip.style.opacity="0";}
+});
+canvas.addEventListener("mouseleave",function(){hoverIdx=-1;tooltip.style.opacity="0";draw();});
+
+// Keyboard
+document.addEventListener("keydown",function(e){
+  if(e.key===" "||e.key==="k"){e.preventDefault();if(playing)stopPlay();else startPlay();}
+  if(e.key==="ArrowRight"&&curFrame<frames.length-1){curFrame++;updateUI();}
+  if(e.key==="ArrowLeft"&&curFrame>0){curFrame--;updateUI();}
+  if(e.key==="Home"){curFrame=0;updateUI();}
+  if(e.key==="End"){curFrame=frames.length-1;updateUI();}
+});
+
+// Init
+resize();
+updateUI();
+})();
+</script>
+</body>
+</html>"""
 
 
 _INTERACTIVE_HTML_TEMPLATE = r"""<!DOCTYPE html>

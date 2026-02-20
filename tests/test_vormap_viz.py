@@ -1121,3 +1121,436 @@ class TestGenerateStats:
         _, filename = simple_data_dir
         with pytest.raises(ValueError, match="requires"):
             vormap_viz.generate_stats(filename, fmt="csv")
+
+
+# ── Lloyd relaxation tests ───────────────────────────────────────────
+
+@pytest.fixture
+def relaxation_data():
+    """A set of well-separated points for relaxation tests."""
+    return [
+        (100.0, 100.0),
+        (300.0, 100.0),
+        (500.0, 100.0),
+        (100.0, 300.0),
+        (300.0, 300.0),
+        (500.0, 300.0),
+        (100.0, 500.0),
+        (300.0, 500.0),
+        (500.0, 500.0),
+    ]
+
+
+class TestLloydRelaxation:
+    def test_returns_dict_with_expected_keys(self, relaxation_data):
+        """lloyd_relaxation should return a dict with all expected keys."""
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=2,
+            bounds=(0, 600, 0, 600),
+        )
+        assert isinstance(result, dict)
+        assert "points" in result
+        assert "regions" in result
+        assert "history" in result
+        assert "total_iterations" in result
+        assert "converged" in result
+
+    def test_returns_same_number_of_points(self, relaxation_data):
+        """Relaxed output should have the same number of points."""
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=3,
+            bounds=(0, 600, 0, 600),
+        )
+        assert len(result["points"]) == len(relaxation_data)
+
+    def test_history_records_all_iterations(self, relaxation_data):
+        """History should contain entries for each iteration + final."""
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=3,
+            bounds=(0, 600, 0, 600),
+        )
+        # History has initial + each iteration up to convergence + final
+        assert len(result["history"]) >= 2
+        assert len(result["history"]) <= 5  # 3 iterations + final + possible early stop
+
+    def test_convergence_decreases(self, relaxation_data):
+        """Convergence (max displacement) should generally decrease."""
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=10,
+            bounds=(0, 600, 0, 600),
+        )
+        convergences = [h["convergence"] for h in result["history"]
+                        if h["convergence"] > 0]
+        if len(convergences) >= 3:
+            # First convergence should be >= last (trend downward)
+            assert convergences[0] >= convergences[-1]
+
+    def test_points_stay_in_bounds(self, relaxation_data):
+        """Relaxed points should remain within the bounding box."""
+        bounds = (0, 600, 0, 600)
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=5, bounds=bounds,
+        )
+        s, n, w, e = bounds
+        for px, py in result["points"]:
+            assert w <= px <= e, f"Point x={px} outside bounds [{w}, {e}]"
+            assert s <= py <= n, f"Point y={py} outside bounds [{s}, {n}]"
+
+    def test_regions_are_valid(self, relaxation_data):
+        """Final regions should have at least 3 vertices each."""
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=3,
+            bounds=(0, 600, 0, 600),
+        )
+        assert len(result["regions"]) > 0
+        for seed, verts in result["regions"].items():
+            assert len(verts) >= 3
+
+    def test_single_iteration(self, relaxation_data):
+        """Single iteration should work correctly."""
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=1,
+            bounds=(0, 600, 0, 600),
+        )
+        assert result["total_iterations"] >= 1
+        assert len(result["points"]) == len(relaxation_data)
+
+    def test_callback_called(self, relaxation_data):
+        """Callback should be called once per iteration."""
+        calls = []
+        def cb(it, pts, regions, conv):
+            calls.append((it, conv))
+
+        vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=3,
+            bounds=(0, 600, 0, 600),
+            callback=cb,
+        )
+        assert len(calls) >= 1
+        # Iterations should be numbered sequentially
+        for i, (it, _) in enumerate(calls):
+            assert it == i
+
+    def test_too_few_points_raises(self):
+        """Should raise ValueError with fewer than 2 points."""
+        with pytest.raises(ValueError, match="at least 2"):
+            vormap_viz.lloyd_relaxation([(1.0, 1.0)], iterations=3)
+
+    def test_zero_iterations_raises(self, relaxation_data):
+        """Should raise ValueError with iterations < 1."""
+        with pytest.raises(ValueError, match="iterations must be"):
+            vormap_viz.lloyd_relaxation(relaxation_data, iterations=0)
+
+    def test_negative_iterations_raises(self, relaxation_data):
+        """Should raise ValueError with negative iterations."""
+        with pytest.raises(ValueError, match="iterations must be"):
+            vormap_viz.lloyd_relaxation(relaxation_data, iterations=-5)
+
+    def test_uses_vormap_bounds_by_default(self, relaxation_data):
+        """Should use vormap global bounds when bounds=None."""
+        # Set bounds explicitly via vormap
+        vormap.set_bounds(0, 600, 0, 600)
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=2,
+        )
+        assert len(result["points"]) == len(relaxation_data)
+
+    def test_history_contains_points_and_regions(self, relaxation_data):
+        """Each history entry should have points and regions."""
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=2,
+            bounds=(0, 600, 0, 600),
+        )
+        for entry in result["history"]:
+            assert "iteration" in entry
+            assert "points" in entry
+            assert "regions" in entry
+            assert "convergence" in entry
+            assert len(entry["points"]) == len(relaxation_data)
+
+    def test_points_move_during_relaxation(self, relaxation_data):
+        """Points should actually move (not stay in place)."""
+        # Use uneven distribution to guarantee movement
+        uneven = [
+            (10.0, 10.0),
+            (11.0, 10.0),
+            (10.0, 11.0),
+            (490.0, 490.0),
+        ]
+        vormap.set_bounds(0, 500, 0, 500)
+        result = vormap_viz.lloyd_relaxation(
+            uneven, iterations=3,
+            bounds=(0, 500, 0, 500),
+        )
+        # At least one point should have moved
+        moved = False
+        for orig, relaxed in zip(uneven, result["points"]):
+            if abs(orig[0] - relaxed[0]) > 0.01 or abs(orig[1] - relaxed[1]) > 0.01:
+                moved = True
+                break
+        assert moved, "No points moved during relaxation"
+
+    def test_two_points(self):
+        """Minimum case: 2 points should work."""
+        data = [(100.0, 200.0), (400.0, 200.0)]
+        vormap.set_bounds(0, 400, 0, 500)
+        result = vormap_viz.lloyd_relaxation(
+            data, iterations=2,
+            bounds=(0, 400, 0, 500),
+        )
+        assert len(result["points"]) == 2
+
+    def test_converged_flag(self, relaxation_data):
+        """converged flag should be a boolean."""
+        result = vormap_viz.lloyd_relaxation(
+            relaxation_data, iterations=3,
+            bounds=(0, 600, 0, 600),
+        )
+        assert isinstance(result["converged"], bool)
+
+    def test_many_iterations_converges(self):
+        """Many iterations on a grid should converge or complete."""
+        grid = [(x, y) for x in range(100, 500, 100)
+                        for y in range(100, 500, 100)]
+        vormap.set_bounds(0, 600, 0, 600)
+        result = vormap_viz.lloyd_relaxation(
+            grid, iterations=50,
+            bounds=(0, 600, 0, 600),
+        )
+        # Should either converge or complete all iterations
+        assert result["total_iterations"] <= 50
+        assert len(result["points"]) == len(grid)
+
+
+class TestGenerateRelaxedDiagram:
+    def test_one_call_generates_svg(self, simple_data_dir):
+        """generate_relaxed_diagram should create a valid SVG file."""
+        tmp_path, filename = simple_data_dir
+        output = str(tmp_path / "relaxed.svg")
+        result = vormap_viz.generate_relaxed_diagram(
+            filename, output, iterations=2,
+        )
+        assert result == output
+        assert os.path.exists(output)
+        assert os.path.getsize(output) > 0
+        ET.parse(output)  # should be valid XML
+
+    def test_custom_iterations(self, simple_data_dir):
+        """Should accept custom iteration count."""
+        tmp_path, filename = simple_data_dir
+        output = str(tmp_path / "relaxed5.svg")
+        vormap_viz.generate_relaxed_diagram(
+            filename, output, iterations=5,
+        )
+        assert os.path.exists(output)
+
+    def test_passes_svg_kwargs(self, simple_data_dir):
+        """SVG kwargs should be passed through."""
+        tmp_path, filename = simple_data_dir
+        output = str(tmp_path / "relaxed_warm.svg")
+        vormap_viz.generate_relaxed_diagram(
+            filename, output, iterations=2,
+            color_scheme="warm",
+            show_labels=True,
+        )
+        content = open(output).read()
+        assert 'class="label"' in content
+
+
+class TestExportRelaxationHtml:
+    @pytest.fixture
+    def relax_data(self):
+        """Simple data for relaxation HTML tests."""
+        return [
+            (100.0, 100.0),
+            (300.0, 100.0),
+            (200.0, 300.0),
+            (400.0, 300.0),
+            (100.0, 500.0),
+        ]
+
+    def test_creates_html_file(self, relax_data):
+        """export_relaxation_html should create a non-empty HTML file."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            result = vormap_viz.export_relaxation_html(
+                relax_data, iterations=3, output_path=path,
+                bounds=(0, 600, 0, 500),
+            )
+            assert result == path
+            assert os.path.exists(path)
+            assert os.path.getsize(path) > 0
+        finally:
+            os.unlink(path)
+
+    def test_html_contains_doctype(self, relax_data):
+        """HTML should start with DOCTYPE."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500),
+            )
+            content = open(path, encoding="utf-8").read()
+            assert content.strip().startswith("<!DOCTYPE html>")
+        finally:
+            os.unlink(path)
+
+    def test_html_contains_canvas(self, relax_data):
+        """HTML should include main and convergence canvases."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500),
+            )
+            content = open(path, encoding="utf-8").read()
+            assert "<canvas" in content
+            assert "conv-canvas" in content
+        finally:
+            os.unlink(path)
+
+    def test_html_contains_controls(self, relax_data):
+        """HTML should include play button and slider."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500),
+            )
+            content = open(path, encoding="utf-8").read()
+            assert "play-btn" in content
+            assert "slider" in content
+            assert "speed" in content
+        finally:
+            os.unlink(path)
+
+    def test_html_contains_frame_data(self, relax_data):
+        """HTML should embed frame data as JSON."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500),
+            )
+            content = open(path, encoding="utf-8").read()
+            # Should contain iteration and convergence data
+            assert "iteration" in content
+            assert "convergence" in content
+        finally:
+            os.unlink(path)
+
+    def test_html_custom_title(self, relax_data):
+        """Custom title should appear in HTML."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                title="My Relaxation Demo",
+                bounds=(0, 600, 0, 500),
+            )
+            content = open(path, encoding="utf-8").read()
+            assert "My Relaxation Demo" in content
+        finally:
+            os.unlink(path)
+
+    def test_html_color_scheme(self, relax_data):
+        """Color scheme should be embedded in JS."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                color_scheme="rainbow",
+                bounds=(0, 600, 0, 500),
+            )
+            content = open(path, encoding="utf-8").read()
+            assert '"rainbow"' in content
+        finally:
+            os.unlink(path)
+
+    def test_html_has_theme_toggle(self, relax_data):
+        """HTML should include dark/light theme toggle."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500),
+            )
+            content = open(path, encoding="utf-8").read()
+            assert "theme-btn" in content
+        finally:
+            os.unlink(path)
+
+    def test_html_has_keyboard_support(self, relax_data):
+        """HTML should include keyboard navigation (space, arrows)."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500),
+            )
+            content = open(path, encoding="utf-8").read()
+            assert "keydown" in content
+            assert "ArrowRight" in content
+        finally:
+            os.unlink(path)
+
+    def test_too_few_points_raises(self):
+        """Should raise ValueError with fewer than 2 points."""
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            with pytest.raises(ValueError, match="at least 2"):
+                vormap_viz.export_relaxation_html(
+                    [(1.0, 1.0)], iterations=3, output_path=path,
+                )
+        finally:
+            if os.path.exists(path):
+                os.unlink(path)
+
+    def test_html_file_size_reasonable(self, relax_data):
+        """Generated HTML should be a reasonable size (> 1KB)."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=3, output_path=path,
+                bounds=(0, 600, 0, 500),
+            )
+            assert os.path.getsize(path) > 1000
+        finally:
+            os.unlink(path)
+
+    def test_html_converged_badge(self, relax_data):
+        """HTML should contain convergence status badge."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500),
+            )
+            content = open(path, encoding="utf-8").read()
+            assert "status-badge" in content
+        finally:
+            os.unlink(path)

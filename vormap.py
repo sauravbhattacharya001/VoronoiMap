@@ -865,6 +865,22 @@ def main():
         help='Export per-region statistics as a JSON file with both '
              'per-region data and aggregate summary.',
     )
+    parser.add_argument(
+        '--relax',
+        type=int,
+        metavar='N',
+        help='Apply N iterations of Lloyd relaxation before visualization. '
+             'Moves seed points to Voronoi cell centroids, producing '
+             'more uniform regions.',
+    )
+    parser.add_argument(
+        '--relax-animate',
+        metavar='OUTPUT',
+        help='Generate an animated HTML visualization of the Lloyd '
+             'relaxation process with play/pause controls, step slider, '
+             'and convergence graph. Provide the output file path '
+             '(e.g. relaxation.html).',
+    )
 
     args = parser.parse_args()
 
@@ -884,8 +900,20 @@ def main():
         import vormap_viz
 
         data = load_data(args.datafile)
-        print('Computing Voronoi regions for visualization...')
-        regions = vormap_viz.compute_regions(data)
+
+        # Apply Lloyd relaxation if requested
+        if args.relax:
+            print('Applying %d iterations of Lloyd relaxation...' % args.relax)
+            result = vormap_viz.lloyd_relaxation(data, iterations=args.relax)
+            data = result['points']
+            regions = result['regions']
+            print('Relaxation %s after %d iterations (converged=%s)'
+                  % ('complete', result['total_iterations'],
+                     result['converged']))
+        else:
+            print('Computing Voronoi regions for visualization...')
+            regions = vormap_viz.compute_regions(data)
+
         print('Traced %d of %d regions' % (len(regions), len(data)))
 
         vormap_viz.export_svg(
@@ -962,6 +990,26 @@ def main():
         if args.stats_json:
             vormap_viz.export_stats_json(region_stats, args.stats_json)
             print('Statistics JSON saved to %s' % args.stats_json)
+
+    # Lloyd relaxation animation
+    if args.relax_animate:
+        import vormap_viz
+
+        data = load_data(args.datafile)
+        iters = args.relax if args.relax else 10
+        print('Generating relaxation animation (%d iterations)...' % iters)
+
+        vormap_viz.export_relaxation_html(
+            data,
+            iterations=iters,
+            output_path=args.relax_animate,
+            width=args.svg_width,
+            height=args.svg_height,
+            color_scheme=args.color_scheme,
+            title='Lloyd Relaxation — %s (%d points)'
+                  % (args.datafile, len(data)),
+        )
+        print('Relaxation animation saved to %s' % args.relax_animate)
 
 
 if __name__ == '__main__':
