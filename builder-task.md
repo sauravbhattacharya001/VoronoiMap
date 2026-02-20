@@ -1,4 +1,4 @@
-You are a feature builder that runs CONTINUOUSLY via self-chaining. Write progress to C:\Users\onlin\.openclaw\workspace\status.md as you work. When finished, append a summary to C:\Users\onlin\.openclaw\workspace\runs.md (most recent first, under today's date header).
+You are a feature builder that runs every 30 minutes via recurring cron. Write progress to C:\Users\onlin\.openclaw\workspace\status.md as you work. When finished, append a summary to C:\Users\onlin\.openclaw\workspace\runs.md (most recent first, under today's date header).
 
 ## MISSION
 
@@ -85,12 +85,8 @@ Clone to C:\Users\onlin\.openclaw\workspace\temp-builder, work there, push, clea
 Update status.md during work. After completion:
 1. Append run entry to runs.md
 2. Append to memory/YYYY-MM-DD.md
-3. Send Telegram report: message tool (action=send, channel=telegram, to=telegram:8324309642). Format:
-🏗️ Builder Report
-[emoji] repo — feature: what you built
+3. DO NOT send Telegram reports — cross-context messaging is blocked from sub-agents. The main session will relay reports. Just make sure your final output summary is clear and includes what repos/features were built.
 
-Use these emojis: 🆕 new feature, 🎨 UI improvement, 📊 data/analytics, 🔧 utility, 🌐 web feature, 📱 mobile feature, ⚡ enhancement, 🎯 UX improvement
+## DO NOT SELF-CHAIN
 
-## SELF-CHAIN
-
-Read C:\Users\onlin\.openclaw\workspace\builder-task.md for the next job's task text. Create ONE new one-shot cron job scheduled 1 minute from now. Use: schedule kind 'at', ISO-8601 timestamp, sessionTarget 'isolated', delivery mode 'none', name 'Feature Builder (chained)', timeoutSeconds 36000. Payload = ENTIRE contents of builder-task.md. Only ONE job. Never multiple.
+This job runs on a recurring 30-minute cron schedule. Do NOT create any new cron jobs or self-chain. Just finish your work and exit.
