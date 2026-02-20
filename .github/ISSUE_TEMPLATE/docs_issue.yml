@@ -1,0 +1,56 @@
+---
+name: 📚 Documentation Issue
+description: Report inaccurate, missing, or confusing documentation
+title: "[Docs]: "
+labels: ["documentation"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve the VoronoiMap documentation! Let us know what's wrong or missing.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      options:
+        - README.md
+        - API Reference (docs site)
+        - CLI Help (--help output)
+        - Code Comments / Docstrings
+        - Installation / Setup Guide
+        - Examples / Tutorials
+    validations:
+      required: true
+
+  - type: input
+    id: doc-url
+    attributes:
+      label: Page URL or File Path
+      description: Link to the page or file with the issue
+      placeholder: "https://sauravbhattacharya001.github.io/VoronoiMap/guide/api/"
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's Wrong
+      description: Describe what's inaccurate, missing, or confusing.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Fix
+      description: How should it read? Provide corrected text or a description of what should be added.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have checked the latest version of the docs
+          required: true

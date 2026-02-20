@@ -1,0 +1,48 @@
+---
+name: ❓ Question / Help
+description: Ask a question about using VoronoiMap
+title: "[Question]: "
+labels: ["question"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help using VoronoiMap? Ask here! For general discussion, consider using [Discussions](https://github.com/sauravbhattacharya001/VoronoiMap/discussions) instead.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What do you need help with?
+      placeholder: "How do I configure the search boundary when my points are clustered in one region?"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic
+      options:
+        - Installation / Setup
+        - CLI Usage
+        - Python API Usage
+        - Algorithm / Theory
+        - Visualization / Export
+        - Integration with other tools
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What I've Tried
+      description: Describe what you've already tried or researched.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Include your environment details, code snippets, or data format if relevant.
+      render: text

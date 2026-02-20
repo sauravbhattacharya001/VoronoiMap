@@ -1,0 +1,104 @@
+---
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior in VoronoiMap
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the sections below so we can reproduce and fix it.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "When I run vormap.py with a large dataset, the Voronoi estimation returns NaN values..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Provide the exact steps, CLI commands, or Python code to reproduce the issue.
+      placeholder: |
+        1. Prepare a CSV file with 1000 points
+        2. Run `python vormap.py data.csv --samples 500`
+        3. Observe NaN in the output
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? Include error messages, tracebacks, or screenshots.
+    validations:
+      required: true
+
+  - type: textarea
+    id: data-sample
+    attributes:
+      label: Sample Data (if applicable)
+      description: Paste a minimal dataset (CSV/JSON) that triggers the bug. Redact sensitive data.
+      render: text
+
+  - type: dropdown
+    id: interface
+    attributes:
+      label: Interface Used
+      options:
+        - CLI (vormap.py)
+        - Python API (import voronoimap)
+        - Visualization (vormap_viz.py)
+        - GitHub Pages demo
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version
+      description: "Output of `python --version`"
+      placeholder: "Python 3.11.4"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: "Ubuntu 22.04 / macOS 14.2 / Windows 11"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: "Output of `pip list` or relevant package versions (scipy, numpy, etc.)"
+      render: text
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues for duplicates
+          required: true
+        - label: I am using the latest version of VoronoiMap
+          required: false
+        - label: I can reproduce this with minimal data
+          required: false

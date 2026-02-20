@@ -1,0 +1,8 @@
+blank_issues: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/sauravbhattacharya001/VoronoiMap/discussions
+    about: Ask questions or share ideas in Discussions
+  - name: 📖 Documentation
+    url: https://sauravbhattacharya001.github.io/VoronoiMap/
+    about: Check the documentation before opening an issue
