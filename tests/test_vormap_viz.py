@@ -693,3 +693,431 @@ class TestGenerateGeoJson:
             geojson = json.load(fh)
         assert geojson["type"] == "FeatureCollection"
         assert len(geojson["features"]) > 0
+
+
+# ── Region statistics tests ──────────────────────────────────────────
+
+class TestComputePerimeter:
+    def test_triangle_perimeter(self):
+        """Perimeter of a right triangle (3-4-5)."""
+        verts = [(0, 0), (3, 0), (0, 4)]
+        p = vormap_viz._compute_perimeter(verts)
+        assert abs(p - 12.0) < 1e-6
+
+    def test_square_perimeter(self):
+        """Perimeter of a unit square should be 4.0."""
+        verts = [(0, 0), (1, 0), (1, 1), (0, 1)]
+        p = vormap_viz._compute_perimeter(verts)
+        assert abs(p - 4.0) < 1e-6
+
+    def test_degenerate_perimeter(self):
+        """Fewer than 2 vertices → perimeter 0."""
+        assert vormap_viz._compute_perimeter([(0, 0)]) == 0.0
+        assert vormap_viz._compute_perimeter([]) == 0.0
+
+
+class TestComputeCentroid:
+    def test_square_centroid(self):
+        """Centroid of a unit square at origin should be (0.5, 0.5)."""
+        verts = [(0, 0), (1, 0), (1, 1), (0, 1)]
+        cx, cy = vormap_viz._compute_centroid(verts)
+        assert abs(cx - 0.5) < 1e-4
+        assert abs(cy - 0.5) < 1e-4
+
+    def test_triangle_centroid(self):
+        """Centroid of triangle (0,0), (6,0), (0,6) → (2, 2)."""
+        verts = [(0, 0), (6, 0), (0, 6)]
+        cx, cy = vormap_viz._compute_centroid(verts)
+        assert abs(cx - 2.0) < 1e-3
+        assert abs(cy - 2.0) < 1e-3
+
+    def test_empty(self):
+        """Empty list → (0, 0)."""
+        assert vormap_viz._compute_centroid([]) == (0.0, 0.0)
+
+    def test_single_point(self):
+        """Single point returns itself."""
+        cx, cy = vormap_viz._compute_centroid([(5.0, 3.0)])
+        assert abs(cx - 5.0) < 1e-4
+        assert abs(cy - 3.0) < 1e-4
+
+
+class TestIsoperimetricQuotient:
+    def test_circle_approximation(self):
+        """A regular polygon with many sides should approach 1.0."""
+        # 100-sided regular polygon with radius 1
+        n = 100
+        verts = [(math.cos(2 * math.pi * i / n),
+                  math.sin(2 * math.pi * i / n)) for i in range(n)]
+        area = vormap_viz._compute_region_area(verts)
+        perimeter = vormap_viz._compute_perimeter(verts)
+        iq = vormap_viz._isoperimetric_quotient(area, perimeter)
+        assert 0.99 < iq <= 1.0
+
+    def test_square_compactness(self):
+        """A square has IQ = π/4 ≈ 0.7854."""
+        area = 1.0
+        perimeter = 4.0
+        iq = vormap_viz._isoperimetric_quotient(area, perimeter)
+        assert abs(iq - math.pi / 4) < 1e-6
+
+    def test_zero_perimeter(self):
+        """Zero perimeter → 0.0."""
+        assert vormap_viz._isoperimetric_quotient(1.0, 0.0) == 0.0
+
+
+class TestComputeRegionStats:
+    def test_returns_list_of_dicts(self, sample_regions):
+        """compute_region_stats should return a list of dicts."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        assert isinstance(stats, list)
+        assert len(stats) == len(regions)
+        for s in stats:
+            assert isinstance(s, dict)
+
+    def test_required_keys(self, sample_regions):
+        """Each stat dict should have all required keys."""
+        regions, data = sample_regions
+        expected_keys = {
+            "region_index", "seed_x", "seed_y", "area", "perimeter",
+            "centroid_x", "centroid_y", "vertex_count", "compactness",
+            "avg_edge_length",
+        }
+        stats = vormap_viz.compute_region_stats(regions, data)
+        for s in stats:
+            assert set(s.keys()) == expected_keys
+
+    def test_areas_positive(self, sample_regions):
+        """All region areas should be positive."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        for s in stats:
+            assert s["area"] > 0
+
+    def test_perimeters_positive(self, sample_regions):
+        """All perimeters should be positive."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        for s in stats:
+            assert s["perimeter"] > 0
+
+    def test_compactness_in_range(self, sample_regions):
+        """Compactness should be between 0 and 1."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        for s in stats:
+            assert 0 < s["compactness"] <= 1.0
+
+    def test_sorted_by_index(self, sample_regions):
+        """Stats should be sorted by region_index."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        indices = [s["region_index"] for s in stats]
+        assert indices == sorted(indices)
+
+    def test_vertex_count_matches(self, sample_regions):
+        """Vertex count should match actual region vertices."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        for s in stats:
+            seed = (s["seed_x"], s["seed_y"])
+            assert s["vertex_count"] == len(regions[seed])
+
+
+class TestComputeSummaryStats:
+    def test_returns_dict(self, sample_regions):
+        """compute_summary_stats should return a dict."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        summary = vormap_viz.compute_summary_stats(stats)
+        assert isinstance(summary, dict)
+
+    def test_required_keys(self, sample_regions):
+        """Summary should have all required keys."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        summary = vormap_viz.compute_summary_stats(stats)
+        expected = {
+            "region_count", "total_area", "mean_area", "median_area",
+            "min_area", "max_area", "std_area", "mean_perimeter",
+            "min_perimeter", "max_perimeter", "mean_vertices",
+            "mean_compactness", "area_range", "coefficient_of_variation",
+        }
+        assert set(summary.keys()) == expected
+
+    def test_region_count(self, sample_regions):
+        """Region count should match input length."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        summary = vormap_viz.compute_summary_stats(stats)
+        assert summary["region_count"] == len(regions)
+
+    def test_total_area_is_sum(self, sample_regions):
+        """Total area should be sum of individual areas."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        summary = vormap_viz.compute_summary_stats(stats)
+        expected = sum(s["area"] for s in stats)
+        assert abs(summary["total_area"] - expected) < 0.01
+
+    def test_empty_input(self):
+        """Empty input should return zeros."""
+        summary = vormap_viz.compute_summary_stats([])
+        assert summary["region_count"] == 0
+        assert summary["total_area"] == 0.0
+
+    def test_min_max_area(self, sample_regions):
+        """Min/max area should match extremes of individual areas."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        summary = vormap_viz.compute_summary_stats(stats)
+        areas = [s["area"] for s in stats]
+        assert summary["min_area"] == round(min(areas), 4)
+        assert summary["max_area"] == round(max(areas), 4)
+
+    def test_area_range(self, sample_regions):
+        """area_range should be max − min."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        summary = vormap_viz.compute_summary_stats(stats)
+        expected = summary["max_area"] - summary["min_area"]
+        assert abs(summary["area_range"] - expected) < 0.01
+
+
+class TestExportStatsCsv:
+    def test_creates_csv_file(self, sample_regions):
+        """export_stats_csv should create a non-empty CSV file."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
+            path = f.name
+        try:
+            result = vormap_viz.export_stats_csv(stats, path)
+            assert result == path
+            assert os.path.exists(path)
+            assert os.path.getsize(path) > 0
+        finally:
+            os.unlink(path)
+
+    def test_csv_has_header(self, sample_regions):
+        """CSV should start with a header row."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_stats_csv(stats, path)
+            with open(path, encoding="utf-8") as fh:
+                header = fh.readline().strip()
+            assert "region_index" in header
+            assert "area" in header
+            assert "perimeter" in header
+            assert "compactness" in header
+        finally:
+            os.unlink(path)
+
+    def test_csv_row_count(self, sample_regions):
+        """CSV should have one row per region (plus header)."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_stats_csv(stats, path, include_summary=False)
+            with open(path, encoding="utf-8") as fh:
+                lines = [l for l in fh.readlines() if l.strip()]
+            # header + data rows
+            assert len(lines) == 1 + len(stats)
+        finally:
+            os.unlink(path)
+
+    def test_csv_includes_summary(self, sample_regions):
+        """CSV should include commented summary when enabled."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_stats_csv(stats, path, include_summary=True)
+            with open(path, encoding="utf-8") as fh:
+                content = fh.read()
+            assert "# Summary Statistics" in content
+            assert "# mean_area:" in content
+        finally:
+            os.unlink(path)
+
+    def test_csv_parseable(self, sample_regions):
+        """CSV should be parseable with csv module."""
+        import csv
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_stats_csv(stats, path, include_summary=False)
+            with open(path, encoding="utf-8") as fh:
+                reader = csv.DictReader(fh)
+                rows = list(reader)
+            assert len(rows) == len(stats)
+            for row in rows:
+                assert float(row["area"]) > 0
+        finally:
+            os.unlink(path)
+
+    def test_empty_raises(self):
+        """Empty stats should raise ValueError."""
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
+            path = f.name
+        try:
+            with pytest.raises(ValueError, match="No region"):
+                vormap_viz.export_stats_csv([], path)
+        finally:
+            if os.path.exists(path):
+                os.unlink(path)
+
+
+class TestExportStatsJson:
+    def test_creates_json_file(self, sample_regions):
+        """export_stats_json should create a valid JSON file."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            path = f.name
+        try:
+            result = vormap_viz.export_stats_json(stats, path)
+            assert result == path
+            with open(path, encoding="utf-8") as fh:
+                output = json.load(fh)
+            assert "regions" in output
+            assert len(output["regions"]) == len(stats)
+        finally:
+            os.unlink(path)
+
+    def test_json_includes_summary(self, sample_regions):
+        """JSON should include summary by default."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_stats_json(stats, path)
+            with open(path, encoding="utf-8") as fh:
+                output = json.load(fh)
+            assert "summary" in output
+            assert output["summary"]["region_count"] == len(stats)
+        finally:
+            os.unlink(path)
+
+    def test_json_without_summary(self, sample_regions):
+        """JSON should omit summary when disabled."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_stats_json(stats, path, include_summary=False)
+            with open(path, encoding="utf-8") as fh:
+                output = json.load(fh)
+            assert "summary" not in output
+        finally:
+            os.unlink(path)
+
+    def test_empty_raises(self):
+        """Empty stats should raise ValueError."""
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            path = f.name
+        try:
+            with pytest.raises(ValueError, match="No region"):
+                vormap_viz.export_stats_json([], path)
+        finally:
+            if os.path.exists(path):
+                os.unlink(path)
+
+
+class TestFormatStatsTable:
+    def test_returns_string(self, sample_regions):
+        """format_stats_table should return a string."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        result = vormap_viz.format_stats_table(stats)
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_table_has_header(self, sample_regions):
+        """Table should include column headers."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        result = vormap_viz.format_stats_table(stats)
+        assert "Area" in result
+        assert "Perimeter" in result
+        assert "Compact" in result
+
+    def test_table_has_data_rows(self, sample_regions):
+        """Table should include one data row per region."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        result = vormap_viz.format_stats_table(stats, summary=False)
+        lines = [l for l in result.split("\n") if l.strip() and not l.startswith("-")]
+        # header + data rows
+        assert len(lines) == 1 + len(stats)
+
+    def test_table_has_summary(self, sample_regions):
+        """Table should include summary when enabled."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        result = vormap_viz.format_stats_table(stats, summary=True)
+        assert "Summary:" in result
+        assert "Total area:" in result
+        assert "Mean compactness:" in result
+
+    def test_table_without_summary(self, sample_regions):
+        """Table should not include summary when disabled."""
+        regions, data = sample_regions
+        stats = vormap_viz.compute_region_stats(regions, data)
+        result = vormap_viz.format_stats_table(stats, summary=False)
+        assert "Summary:" not in result
+
+    def test_empty_message(self):
+        """Empty stats should return a message."""
+        result = vormap_viz.format_stats_table([])
+        assert "No regions" in result
+
+
+class TestGenerateStats:
+    def test_table_format(self, simple_data_dir):
+        """generate_stats with table format returns a string."""
+        _, filename = simple_data_dir
+        result = vormap_viz.generate_stats(filename, fmt="table")
+        assert isinstance(result, str)
+        assert "Area" in result
+
+    def test_json_format_no_path(self, simple_data_dir):
+        """generate_stats with json format and no path returns a dict."""
+        _, filename = simple_data_dir
+        result = vormap_viz.generate_stats(filename, fmt="json")
+        assert isinstance(result, dict)
+        assert "regions" in result
+        assert "summary" in result
+
+    def test_csv_format_with_path(self, simple_data_dir):
+        """generate_stats with csv format exports to file."""
+        tmp_path, filename = simple_data_dir
+        output = str(tmp_path / "stats.csv")
+        result = vormap_viz.generate_stats(filename, output, fmt="csv")
+        assert result == output
+        assert os.path.exists(output)
+
+    def test_json_format_with_path(self, simple_data_dir):
+        """generate_stats with json format exports to file."""
+        tmp_path, filename = simple_data_dir
+        output = str(tmp_path / "stats.json")
+        result = vormap_viz.generate_stats(filename, output, fmt="json")
+        assert result == output
+        assert os.path.exists(output)
+
+    def test_csv_requires_path(self, simple_data_dir):
+        """CSV format without output_path should raise ValueError."""
+        _, filename = simple_data_dir
+        with pytest.raises(ValueError, match="requires"):
+            vormap_viz.generate_stats(filename, fmt="csv")

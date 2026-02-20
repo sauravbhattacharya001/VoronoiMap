@@ -847,6 +847,24 @@ def main():
         help='CRS identifier for GeoJSON export (e.g. '
              '"urn:ogc:def:crs:EPSG::4326"). Omitted by default per RFC 7946.',
     )
+    parser.add_argument(
+        '--stats',
+        action='store_true',
+        help='Print a table of per-region statistics (area, perimeter, '
+             'centroid, compactness, vertex count) to stdout.',
+    )
+    parser.add_argument(
+        '--stats-csv',
+        metavar='OUTPUT',
+        help='Export per-region statistics as a CSV file. Includes a '
+             'commented summary section at the bottom.',
+    )
+    parser.add_argument(
+        '--stats-json',
+        metavar='OUTPUT',
+        help='Export per-region statistics as a JSON file with both '
+             'per-region data and aggregate summary.',
+    )
 
     args = parser.parse_args()
 
@@ -921,6 +939,29 @@ def main():
             crs_name=args.crs,
         )
         print('GeoJSON saved to %s' % args.geojson)
+
+    # Region statistics
+    if args.stats or args.stats_csv or args.stats_json:
+        import vormap_viz
+
+        data = load_data(args.datafile)
+        print('Computing Voronoi regions for statistics...')
+        regions = vormap_viz.compute_regions(data)
+        print('Traced %d of %d regions' % (len(regions), len(data)))
+
+        region_stats = vormap_viz.compute_region_stats(regions, data)
+
+        if args.stats:
+            print()
+            print(vormap_viz.format_stats_table(region_stats))
+
+        if args.stats_csv:
+            vormap_viz.export_stats_csv(region_stats, args.stats_csv)
+            print('Statistics CSV saved to %s' % args.stats_csv)
+
+        if args.stats_json:
+            vormap_viz.export_stats_json(region_stats, args.stats_json)
+            print('Statistics JSON saved to %s' % args.stats_json)
 
 
 if __name__ == '__main__':

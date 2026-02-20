@@ -759,6 +759,406 @@ def generate_geojson(
     return export_geojson(regions, data, output_path, **kwargs)
 
 
+# ── Region statistics & CSV/JSON export ──────────────────────────────
+
+def _compute_perimeter(vertices):
+    """Compute the perimeter of a polygon from its vertex list."""
+    n = len(vertices)
+    if n < 2:
+        return 0.0
+    perimeter = 0.0
+    for i in range(n):
+        j = (i + 1) % n
+        dx = vertices[j][0] - vertices[i][0]
+        dy = vertices[j][1] - vertices[i][1]
+        perimeter += math.sqrt(dx * dx + dy * dy)
+    return perimeter
+
+
+def _compute_centroid(vertices):
+    """Compute the centroid of a polygon using the standard formula.
+
+    Returns (cx, cy).  For a simple polygon with signed area A, the
+    centroid is:
+        cx = 1/(6A) * Σ (xi + xi+1)(xi*yi+1 - xi+1*yi)
+        cy = 1/(6A) * Σ (yi + yi+1)(xi*yi+1 - xi+1*yi)
+    """
+    n = len(vertices)
+    if n == 0:
+        return (0.0, 0.0)
+    if n < 3:
+        # Degenerate: just average the points
+        cx = sum(v[0] for v in vertices) / n
+        cy = sum(v[1] for v in vertices) / n
+        return (round(cx, 4), round(cy, 4))
+
+    signed_area = 0.0
+    cx = 0.0
+    cy = 0.0
+    for i in range(n):
+        j = (i + 1) % n
+        cross = vertices[i][0] * vertices[j][1] - vertices[j][0] * vertices[i][1]
+        signed_area += cross
+        cx += (vertices[i][0] + vertices[j][0]) * cross
+        cy += (vertices[i][1] + vertices[j][1]) * cross
+
+    signed_area *= 0.5
+    if abs(signed_area) < 1e-12:
+        # Degenerate polygon — fall back to simple average
+        cx = sum(v[0] for v in vertices) / n
+        cy = sum(v[1] for v in vertices) / n
+        return (round(cx, 4), round(cy, 4))
+
+    cx /= (6.0 * signed_area)
+    cy /= (6.0 * signed_area)
+    return (round(cx, 4), round(cy, 4))
+
+
+def _isoperimetric_quotient(area, perimeter):
+    """Compute the isoperimetric quotient (compactness / circularity).
+
+    IQ = 4π·A / P²   —   equals 1.0 for a perfect circle, less for
+    irregular shapes.  Returns 0.0 if the perimeter is zero.
+    """
+    if perimeter <= 0:
+        return 0.0
+    return 4.0 * math.pi * area / (perimeter * perimeter)
+
+
+def compute_region_stats(regions, data):
+    """Compute detailed statistics for each Voronoi region.
+
+    Parameters
+    ----------
+    regions : dict
+        Output of ``compute_regions()`` — maps seed → vertex list.
+    data : list of (float, float)
+        All seed points.
+
+    Returns
+    -------
+    list of dict
+        One dict per region (sorted by data index) with keys:
+
+        - ``region_index`` (int): 1-based index in the original data
+        - ``seed_x``, ``seed_y`` (float): seed coordinates
+        - ``area`` (float): polygon area (Shoelace formula)
+        - ``perimeter`` (float): polygon perimeter
+        - ``centroid_x``, ``centroid_y`` (float): polygon centroid
+        - ``vertex_count`` (int): number of polygon vertices
+        - ``compactness`` (float): isoperimetric quotient (4πA/P²)
+        - ``avg_edge_length`` (float): perimeter / vertex_count
+    """
+    stats = []
+    sorted_seeds = sorted(regions.keys())
+
+    for seed in sorted_seeds:
+        verts = regions[seed]
+        try:
+            data_idx = data.index(seed)
+        except ValueError:
+            data_idx = len(stats)
+
+        area = _compute_region_area(verts)
+        perimeter = _compute_perimeter(verts)
+        centroid = _compute_centroid(verts)
+        compactness = _isoperimetric_quotient(area, perimeter)
+        n_verts = len(verts)
+        avg_edge = perimeter / n_verts if n_verts > 0 else 0.0
+
+        stats.append({
+            "region_index": data_idx + 1,
+            "seed_x": seed[0],
+            "seed_y": seed[1],
+            "area": round(area, 4),
+            "perimeter": round(perimeter, 4),
+            "centroid_x": centroid[0],
+            "centroid_y": centroid[1],
+            "vertex_count": n_verts,
+            "compactness": round(compactness, 4),
+            "avg_edge_length": round(avg_edge, 4),
+        })
+
+    # Sort by region_index for consistent output
+    stats.sort(key=lambda s: s["region_index"])
+    return stats
+
+
+def compute_summary_stats(region_stats):
+    """Compute aggregate summary statistics across all regions.
+
+    Parameters
+    ----------
+    region_stats : list of dict
+        Output of ``compute_region_stats()``.
+
+    Returns
+    -------
+    dict
+        Summary with keys:
+
+        - ``region_count`` (int)
+        - ``total_area`` (float)
+        - ``mean_area``, ``median_area``, ``min_area``, ``max_area`` (float)
+        - ``std_area`` (float): standard deviation of areas
+        - ``mean_perimeter``, ``min_perimeter``, ``max_perimeter`` (float)
+        - ``mean_vertices`` (float)
+        - ``mean_compactness`` (float)
+        - ``area_range`` (float): max_area − min_area
+        - ``coefficient_of_variation`` (float): std_area / mean_area
+    """
+    if not region_stats:
+        return {
+            "region_count": 0,
+            "total_area": 0.0,
+            "mean_area": 0.0,
+            "median_area": 0.0,
+            "min_area": 0.0,
+            "max_area": 0.0,
+            "std_area": 0.0,
+            "mean_perimeter": 0.0,
+            "min_perimeter": 0.0,
+            "max_perimeter": 0.0,
+            "mean_vertices": 0.0,
+            "mean_compactness": 0.0,
+            "area_range": 0.0,
+            "coefficient_of_variation": 0.0,
+        }
+
+    areas = [s["area"] for s in region_stats]
+    perimeters = [s["perimeter"] for s in region_stats]
+    vertices = [s["vertex_count"] for s in region_stats]
+    compactnesses = [s["compactness"] for s in region_stats]
+
+    n = len(areas)
+    total_area = sum(areas)
+    mean_area = total_area / n
+    sorted_areas = sorted(areas)
+    if n % 2 == 1:
+        median_area = sorted_areas[n // 2]
+    else:
+        median_area = (sorted_areas[n // 2 - 1] + sorted_areas[n // 2]) / 2.0
+
+    variance = sum((a - mean_area) ** 2 for a in areas) / n
+    std_area = math.sqrt(variance)
+    cv = std_area / mean_area if mean_area > 0 else 0.0
+
+    return {
+        "region_count": n,
+        "total_area": round(total_area, 4),
+        "mean_area": round(mean_area, 4),
+        "median_area": round(median_area, 4),
+        "min_area": round(min(areas), 4),
+        "max_area": round(max(areas), 4),
+        "std_area": round(std_area, 4),
+        "mean_perimeter": round(sum(perimeters) / n, 4),
+        "min_perimeter": round(min(perimeters), 4),
+        "max_perimeter": round(max(perimeters), 4),
+        "mean_vertices": round(sum(vertices) / n, 2),
+        "mean_compactness": round(sum(compactnesses) / n, 4),
+        "area_range": round(max(areas) - min(areas), 4),
+        "coefficient_of_variation": round(cv, 4),
+    }
+
+
+def export_stats_csv(region_stats, output_path, *, include_summary=True):
+    """Export per-region statistics as a CSV file.
+
+    Parameters
+    ----------
+    region_stats : list of dict
+        Output of ``compute_region_stats()``.
+    output_path : str
+        Path to write the CSV file.
+    include_summary : bool
+        If True (default), append a summary row at the bottom with
+        aggregate statistics (prefixed with ``#`` as a comment).
+
+    Returns
+    -------
+    str
+        Path to the generated CSV file.
+    """
+    import csv
+
+    if not region_stats:
+        raise ValueError("No region statistics to export")
+
+    fieldnames = [
+        "region_index", "seed_x", "seed_y", "area", "perimeter",
+        "centroid_x", "centroid_y", "vertex_count", "compactness",
+        "avg_edge_length",
+    ]
+
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in region_stats:
+            writer.writerow(row)
+
+        if include_summary:
+            summary = compute_summary_stats(region_stats)
+            f.write("\n# Summary Statistics\n")
+            f.write("# regions: %d\n" % summary["region_count"])
+            f.write("# total_area: %.4f\n" % summary["total_area"])
+            f.write("# mean_area: %.4f\n" % summary["mean_area"])
+            f.write("# median_area: %.4f\n" % summary["median_area"])
+            f.write("# min_area: %.4f\n" % summary["min_area"])
+            f.write("# max_area: %.4f\n" % summary["max_area"])
+            f.write("# std_area: %.4f\n" % summary["std_area"])
+            f.write("# mean_perimeter: %.4f\n" % summary["mean_perimeter"])
+            f.write("# mean_vertices: %.2f\n" % summary["mean_vertices"])
+            f.write("# mean_compactness: %.4f\n" % summary["mean_compactness"])
+            f.write("# coefficient_of_variation: %.4f\n"
+                    % summary["coefficient_of_variation"])
+
+    return output_path
+
+
+def export_stats_json(region_stats, output_path, *, include_summary=True):
+    """Export per-region statistics as a JSON file.
+
+    Parameters
+    ----------
+    region_stats : list of dict
+        Output of ``compute_region_stats()``.
+    output_path : str
+        Path to write the JSON file.
+    include_summary : bool
+        If True (default), include an aggregate summary alongside
+        the per-region data.
+
+    Returns
+    -------
+    str
+        Path to the generated JSON file.
+    """
+    import json
+
+    if not region_stats:
+        raise ValueError("No region statistics to export")
+
+    output = {"regions": region_stats}
+    if include_summary:
+        output["summary"] = compute_summary_stats(region_stats)
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(output, f, indent=2, ensure_ascii=False)
+
+    return output_path
+
+
+def format_stats_table(region_stats, *, summary=True):
+    """Format region statistics as a human-readable text table.
+
+    Parameters
+    ----------
+    region_stats : list of dict
+        Output of ``compute_region_stats()``.
+    summary : bool
+        If True (default), append summary statistics below the table.
+
+    Returns
+    -------
+    str
+        Formatted table string ready for printing.
+    """
+    if not region_stats:
+        return "No regions to display."
+
+    # Column definitions: (header, key, width, format)
+    columns = [
+        ("#", "region_index", 5, "%d"),
+        ("Seed X", "seed_x", 10, "%.2f"),
+        ("Seed Y", "seed_y", 10, "%.2f"),
+        ("Area", "area", 12, "%.2f"),
+        ("Perimeter", "perimeter", 12, "%.2f"),
+        ("Centroid X", "centroid_x", 11, "%.2f"),
+        ("Centroid Y", "centroid_y", 11, "%.2f"),
+        ("Verts", "vertex_count", 6, "%d"),
+        ("Compact", "compactness", 9, "%.4f"),
+        ("Avg Edge", "avg_edge_length", 10, "%.2f"),
+    ]
+
+    # Header
+    header = " | ".join(h.ljust(w) for h, _, w, _ in columns)
+    separator = "-+-".join("-" * w for _, _, w, _ in columns)
+
+    lines = [header, separator]
+
+    for row in region_stats:
+        cells = []
+        for _, key, width, fmt in columns:
+            val = fmt % row[key]
+            cells.append(val.ljust(width))
+        lines.append(" | ".join(cells))
+
+    if summary:
+        s = compute_summary_stats(region_stats)
+        lines.append(separator)
+        lines.append("")
+        lines.append("Summary:")
+        lines.append("  Regions: %d" % s["region_count"])
+        lines.append("  Total area: %.2f" % s["total_area"])
+        lines.append("  Area — mean: %.2f, median: %.2f, "
+                      "min: %.2f, max: %.2f, std: %.2f"
+                      % (s["mean_area"], s["median_area"],
+                         s["min_area"], s["max_area"], s["std_area"]))
+        lines.append("  Perimeter — mean: %.2f, min: %.2f, max: %.2f"
+                      % (s["mean_perimeter"], s["min_perimeter"],
+                         s["max_perimeter"]))
+        lines.append("  Mean vertices: %.1f" % s["mean_vertices"])
+        lines.append("  Mean compactness: %.4f  (1.0 = perfect circle)"
+                      % s["mean_compactness"])
+        lines.append("  Coefficient of variation: %.4f"
+                      % s["coefficient_of_variation"])
+
+    return "\n".join(lines)
+
+
+def generate_stats(datafile, output_path=None, *, fmt="table"):
+    """Load data, compute regions, and export statistics in one call.
+
+    Parameters
+    ----------
+    datafile : str
+        Filename inside the data/ directory.
+    output_path : str or None
+        Where to write the output. If None, returns the formatted
+        string (for "table" format) or the stats dict (for "json").
+    fmt : str
+        Output format: "table", "csv", or "json".
+
+    Returns
+    -------
+    str or dict
+        File path (if output_path given), formatted string (table),
+        or dict (json without output_path).
+    """
+    data = vormap.load_data(datafile)
+    regions = compute_regions(data)
+    region_stats = compute_region_stats(regions, data)
+
+    if fmt == "csv":
+        if output_path is None:
+            raise ValueError("CSV format requires an output_path")
+        return export_stats_csv(region_stats, output_path)
+    elif fmt == "json":
+        if output_path is None:
+            return {
+                "regions": region_stats,
+                "summary": compute_summary_stats(region_stats),
+            }
+        return export_stats_json(region_stats, output_path)
+    else:  # table
+        table = format_stats_table(region_stats)
+        if output_path:
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(table)
+            return output_path
+        return table
+
+
 _INTERACTIVE_HTML_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
