@@ -881,6 +881,36 @@ def main():
              'and convergence graph. Provide the output file path '
              '(e.g. relaxation.html).',
     )
+    parser.add_argument(
+        '--graph',
+        action='store_true',
+        help='Print the neighbourhood graph statistics to stdout. '
+             'Shows degree distribution, clustering coefficient, '
+             'diameter, connected components, and more.',
+    )
+    parser.add_argument(
+        '--graph-json',
+        metavar='OUTPUT',
+        help='Export the neighbourhood graph as a JSON file with '
+             'nodes, edges (with lengths), and graph statistics.',
+    )
+    parser.add_argument(
+        '--graph-csv',
+        metavar='OUTPUT',
+        help='Export the neighbourhood graph as a CSV edge list.',
+    )
+    parser.add_argument(
+        '--graph-svg',
+        metavar='OUTPUT',
+        help='Export an SVG showing the Voronoi diagram with the '
+             'neighbourhood graph (Delaunay dual) overlaid. Red edges '
+             'connect seed points that share a Voronoi boundary.',
+    )
+    parser.add_argument(
+        '--graph-labels',
+        action='store_true',
+        help='Show node degree labels in the graph SVG overlay.',
+    )
 
     args = parser.parse_args()
 
@@ -1010,6 +1040,45 @@ def main():
                   % (args.datafile, len(data)),
         )
         print('Relaxation animation saved to %s' % args.relax_animate)
+
+    # Neighbourhood graph
+    if args.graph or args.graph_json or args.graph_csv or args.graph_svg:
+        import vormap_viz
+
+        data = load_data(args.datafile)
+        print('Computing Voronoi regions for neighbourhood graph...')
+        regions = vormap_viz.compute_regions(data)
+        print('Traced %d of %d regions' % (len(regions), len(data)))
+
+        graph = vormap_viz.extract_neighborhood_graph(regions, data)
+        print('Graph: %d nodes, %d edges' % (graph['num_nodes'], graph['num_edges']))
+
+        if args.graph:
+            print()
+            print(vormap_viz.format_graph_stats_table(graph))
+
+        if args.graph_json:
+            vormap_viz.export_graph_json(graph, args.graph_json)
+            print('Graph JSON saved to %s' % args.graph_json)
+
+        if args.graph_csv:
+            vormap_viz.export_graph_csv(graph, args.graph_csv)
+            print('Graph CSV saved to %s' % args.graph_csv)
+
+        if args.graph_svg:
+            vormap_viz.export_graph_svg(
+                regions,
+                data,
+                graph,
+                args.graph_svg,
+                width=args.svg_width,
+                height=args.svg_height,
+                color_scheme=args.color_scheme,
+                show_degree_labels=args.graph_labels,
+                title='Neighbourhood Graph — %s (%d points, %d edges)'
+                      % (args.datafile, len(data), graph['num_edges']),
+            )
+            print('Graph SVG saved to %s' % args.graph_svg)
 
 
 if __name__ == '__main__':
