@@ -5,10 +5,16 @@
   </p>
   <p align="center">
     <a href="https://pypi.org/project/voronoimap/"><img src="https://img.shields.io/pypi/v/voronoimap?color=blue&logo=pypi&logoColor=white" alt="PyPI"></a>
+    <a href="https://pepy.tech/project/voronoimap"><img src="https://img.shields.io/pepy/dt/voronoimap?color=blue&logo=pypi&logoColor=white" alt="PyPI Downloads"></a>
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/ci.yml"><img src="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+    <a href="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/docker.yml"><img src="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/docker.yml/badge.svg" alt="Docker"></a>
     <a href="https://codecov.io/gh/sauravbhattacharya001/VoronoiMap"><img src="https://codecov.io/gh/sauravbhattacharya001/VoronoiMap/graph/badge.svg" alt="codecov"></a>
+    <a href="https://github.com/sauravbhattacharya001/VoronoiMap/releases/latest"><img src="https://img.shields.io/github/v/release/sauravbhattacharya001/VoronoiMap?logo=github&color=green" alt="GitHub Release"></a>
     <a href="LICENSE"><img src="https://img.shields.io/github/license/sauravbhattacharya001/VoronoiMap?color=blue" alt="License"></a>
     <img src="https://img.shields.io/badge/python-3.6%2B-3776ab?logo=python&logoColor=white" alt="Python 3.6+">
+    <a href="https://sauravbhattacharya001.github.io/VoronoiMap/"><img src="https://img.shields.io/badge/demo-live-brightgreen?logo=github-pages&logoColor=white" alt="Live Demo"></a>
+    <a href="https://github.com/sauravbhattacharya001/VoronoiMap/pkgs/container/voronoimap"><img src="https://img.shields.io/badge/ghcr.io-container-blue?logo=docker&logoColor=white" alt="GHCR"></a>
+    <a href="https://github.com/sauravbhattacharya001/VoronoiMap/stargazers"><img src="https://img.shields.io/github/stars/sauravbhattacharya001/VoronoiMap?style=flat&logo=github" alt="Stars"></a>
     <img src="https://img.shields.io/github/repo-size/sauravbhattacharya001/VoronoiMap" alt="Repo size">
   </p>
 </p>
