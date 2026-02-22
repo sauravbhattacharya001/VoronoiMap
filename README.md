@@ -43,6 +43,9 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Interactive HTML Export** — Pan/zoom, hover tooltips, live color switching, dark/light theme toggle
 - **GeoJSON Export** — Standard FeatureCollection for GIS tools (QGIS, Mapbox, Leaflet, Google Earth, ArcGIS)
 - **CLI & API** — Full-featured command-line interface and importable Python API
+- **Region Statistics** — Per-region metrics (area, perimeter, centroid, compactness), aggregate summary, CSV/JSON export
+- **Lloyd Relaxation** — Iterative centroid smoothing for uniform tessellations with animated HTML visualization
+- **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
 ## 🔧 Installation
 
@@ -117,6 +120,27 @@ voronoimap datauni5.txt 5 --geojson voronoi.geojson --no-seeds
 
 # GeoJSON with explicit CRS
 voronoimap datauni5.txt 5 --geojson voronoi.geojson --crs "urn:ogc:def:crs:EPSG::4326"
+
+# Compute per-region statistics (area, perimeter, centroid, compactness)
+voronoimap datauni5.txt 5 --stats
+
+# Export statistics as CSV or JSON
+voronoimap datauni5.txt 5 --stats-csv stats.csv
+voronoimap datauni5.txt 5 --stats-json stats.json
+
+# Lloyd relaxation — smooth Voronoi regions toward uniformity
+voronoimap datauni5.txt 5 --relax 10
+
+# Animated relaxation visualization (play/pause, step slider, convergence graph)
+voronoimap datauni5.txt 5 --relax-animate relaxation.html
+
+# Neighbourhood graph analysis
+voronoimap datauni5.txt 5 --graph
+
+# Export graph as JSON, CSV, or SVG overlay
+voronoimap datauni5.txt 5 --graph-json graph.json
+voronoimap datauni5.txt 5 --graph-csv graph.csv
+voronoimap datauni5.txt 5 --graph-svg graph.svg --graph-labels
 ```
 
 ### Python API
@@ -173,6 +197,93 @@ vormap_viz.generate_geojson("datauni5.txt", "quick.geojson")
 vormap_viz.generate_diagram("datauni5.txt", "quick.svg")
 ```
 
+### Region Statistics
+
+```python
+import vormap
+import vormap_viz
+
+data = vormap.load_data("datauni5.txt")
+regions = vormap_viz.compute_regions(data)
+
+# Per-region metrics: area, perimeter, centroid, compactness, vertex count
+region_stats = vormap_viz.compute_region_stats(regions, data)
+for stat in region_stats:
+    print(f"Seed ({stat['seed_x']:.1f}, {stat['seed_y']:.1f}): "
+          f"area={stat['area']:.2f}, compactness={stat['compactness']:.3f}")
+
+# Aggregate summary (mean/median/min/max/std area, coefficient of variation)
+summary = vormap_viz.compute_summary_stats(region_stats)
+print(f"Mean area: {summary['mean_area']:.2f}, CV: {summary['cv']:.3f}")
+
+# Export as CSV, JSON, or formatted table
+vormap_viz.export_stats_csv(region_stats, "stats.csv")
+vormap_viz.export_stats_json(region_stats, "stats.json")
+print(vormap_viz.format_stats_table(region_stats))
+
+# One-call convenience
+vormap_viz.generate_stats("datauni5.txt", "stats.csv", fmt="csv")
+```
+
+### Lloyd Relaxation
+
+```python
+import vormap
+import vormap_viz
+
+data = vormap.load_data("datauni5.txt")
+
+# Iterative centroid-based smoothing (Lloyd's algorithm)
+# Moves seeds toward region centroids for more uniform tessellations
+result = vormap_viz.lloyd_relaxation(data, iterations=10)
+print(f"Converged: {result['converged']}, final movement: {result['movements'][-1]:.6f}")
+
+# Access full history of seed positions at each iteration
+for i, step in enumerate(result['history']):
+    print(f"Iteration {i}: max_movement={result['movements'][i]:.6f}")
+
+# One-call: generate relaxed SVG diagram
+vormap_viz.generate_relaxed_diagram("datauni5.txt", "relaxed.svg", iterations=15)
+
+# Animated HTML visualization with play/pause, speed control, step slider,
+# convergence graph, ghost dots, color schemes, keyboard shortcuts
+vormap_viz.export_relaxation_html(data, result, "relaxation.html")
+```
+
+### Neighbourhood Graph
+
+```python
+import vormap
+import vormap_viz
+
+data = vormap.load_data("datauni5.txt")
+regions = vormap_viz.compute_regions(data)
+
+# Extract adjacency graph (Delaunay dual via shared Voronoi edges)
+graph = vormap_viz.extract_neighborhood_graph(regions, data)
+
+# 14 graph metrics: density, clustering coefficient, diameter, avg path length,
+# degree distribution, connected components, isolated/leaf nodes, etc.
+stats = vormap_viz.compute_graph_stats(graph)
+print(f"Density: {stats['density']:.3f}, Clustering: {stats['clustering_coefficient']:.3f}")
+print(f"Components: {stats['num_components']}, Diameter: {stats['diameter']}")
+
+# Export as JSON (nodes with degree/neighbors, edges with lengths, stats)
+vormap_viz.export_graph_json(graph, "graph.json")
+
+# Export as CSV edge list
+vormap_viz.export_graph_csv(graph, "graph.csv")
+
+# SVG overlay: Voronoi regions + red graph edges + node markers
+vormap_viz.export_graph_svg(regions, data, graph, "graph.svg", show_labels=True)
+
+# Formatted stats table with degree histogram
+print(vormap_viz.format_graph_stats_table(graph))
+
+# One-call convenience
+vormap_viz.generate_graph("datauni5.txt", "graph.json", fmt="json")
+```
+
 ## 📚 API Reference
 
 ### Core Functions
@@ -197,6 +308,37 @@ vormap_viz.generate_diagram("datauni5.txt", "quick.svg")
 | `generate_diagram` | `(datafile, path, **opts) → path` | One-call convenience: load → compute → export SVG. |
 | `generate_geojson` | `(datafile, path, **opts) → path` | One-call convenience: load → compute → export GeoJSON. |
 | `list_color_schemes` | `() → [str, ...]` | List available color schemes (pastel, warm, cool, earth, mono, rainbow). |
+
+### Statistics Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `compute_region_stats` | `(regions, data) → [dict, ...]` | Per-region metrics: area, perimeter, centroid, compactness (isoperimetric quotient), vertex count, avg edge length. |
+| `compute_summary_stats` | `(region_stats) → dict` | Aggregate summary: mean/median/min/max/std area, coefficient of variation, coverage ratio. |
+| `export_stats_csv` | `(region_stats, path, **opts) → None` | Export region statistics as CSV with optional summary section. |
+| `export_stats_json` | `(region_stats, path, **opts) → None` | Export region statistics as JSON with optional summary. |
+| `format_stats_table` | `(region_stats, **opts) → str` | Format statistics as a human-readable text table. |
+| `generate_stats` | `(datafile, path, **opts) → dict` | One-call convenience: load → compute → export stats (table/csv/json). |
+
+### Lloyd Relaxation Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `lloyd_relaxation` | `(data, iterations, **opts) → dict` | Iterative centroid smoothing. Returns history, movements, convergence flag. Supports bounds clamping, early termination, callbacks. |
+| `generate_relaxed_diagram` | `(datafile, path, **opts) → path` | One-call: load → relax → export SVG of the relaxed diagram. |
+| `export_relaxation_html` | `(data, result, path, **opts) → path` | Animated HTML: play/pause, speed control, step slider, convergence graph, ghost dots, color schemes, dark/light theme, keyboard shortcuts. |
+
+### Neighbourhood Graph Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `extract_neighborhood_graph` | `(regions, data, **opts) → dict` | Extract adjacency graph from Voronoi regions (Delaunay dual via shared edges). |
+| `compute_graph_stats` | `(graph) → dict` | 14 graph metrics: density, clustering coefficient, diameter, avg path length, degree distribution, connected components, isolated/leaf nodes. |
+| `export_graph_json` | `(graph, path, **opts) → None` | Export graph as JSON (nodes with degree/neighbors, edges with lengths, stats). |
+| `export_graph_csv` | `(graph, path) → None` | Export graph as CSV edge list with summary. |
+| `export_graph_svg` | `(regions, data, graph, path, **opts) → path` | SVG overlay: Voronoi regions + red graph edges + node markers + optional degree labels. |
+| `format_graph_stats_table` | `(graph) → str` | Formatted stats table with degree histogram. |
+| `generate_graph` | `(datafile, path, **opts) → dict` | One-call convenience: load → compute → export graph (table/json/csv). |
 
 ### Geometry Helpers
 
