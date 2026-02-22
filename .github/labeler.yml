@@ -1,0 +1,44 @@
+# Auto-label PRs based on file paths
+# https://github.com/actions/labeler
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - 'docs-src/**'
+          - '*.md'
+          - 'mkdocs.yml'
+          - '.github/copilot-instructions.md'
+
+ci/cd:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/**'
+          - '.github/dependabot.yml'
+          - '.github/labeler.yml'
+
+testing:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/**'
+          - '.coveragerc'
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'requirements.txt'
+          - 'pyproject.toml'
+          - 'MANIFEST.in'
+          - 'Dockerfile'
+          - '.dockerignore'
+
+bug:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'vormap.py'
+
+enhancement:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'vormap.py'
+          - 'vormap_viz.py'
