@@ -925,26 +925,48 @@ def main():
         print('Run %d: regions=%d  max_edges=%d  avg_edges=%.1f'
               % (run + 1, result, max_e, avg_e))
 
-    # SVG visualization
-    if args.visualize:
+    # ── Shared data + region computation ─────────────────────────────
+    # Load data and compute regions once, shared across all output
+    # formats.  Previously each output section loaded and computed
+    # independently, which (a) wasted work and (b) caused --relax to
+    # only apply to --visualize, silently ignoring relaxation for
+    # --interactive, --geojson, --stats, and --graph outputs.
+    needs_regions = any([
+        args.visualize, args.interactive, args.geojson,
+        args.stats, args.stats_csv, args.stats_json,
+        args.relax_animate,
+        args.graph, args.graph_json, args.graph_csv, args.graph_svg,
+    ])
+
+    data = None
+    regions = None
+
+    if needs_regions:
         import vormap_viz
 
         data = load_data(args.datafile)
 
-        # Apply Lloyd relaxation if requested
+        # Apply Lloyd relaxation if requested — this now applies to
+        # ALL output formats, not just --visualize.
         if args.relax:
             print('Applying %d iterations of Lloyd relaxation...' % args.relax)
-            result = vormap_viz.lloyd_relaxation(data, iterations=args.relax)
-            data = result['points']
-            regions = result['regions']
-            print('Relaxation %s after %d iterations (converged=%s)'
-                  % ('complete', result['total_iterations'],
-                     result['converged']))
+            relax_result = vormap_viz.lloyd_relaxation(
+                data, iterations=args.relax
+            )
+            data = relax_result['points']
+            regions = relax_result['regions']
+            print('Relaxation complete after %d iterations (converged=%s)'
+                  % (relax_result['total_iterations'],
+                     relax_result['converged']))
         else:
-            print('Computing Voronoi regions for visualization...')
+            print('Computing Voronoi regions...')
             regions = vormap_viz.compute_regions(data)
 
         print('Traced %d of %d regions' % (len(regions), len(data)))
+
+    # SVG visualization
+    if args.visualize:
+        import vormap_viz
 
         vormap_viz.export_svg(
             regions,
@@ -963,11 +985,6 @@ def main():
     if args.interactive:
         import vormap_viz
 
-        data = load_data(args.datafile)
-        print('Computing Voronoi regions for interactive visualization...')
-        regions = vormap_viz.compute_regions(data)
-        print('Traced %d of %d regions' % (len(regions), len(data)))
-
         vormap_viz.export_html(
             regions,
             data,
@@ -984,11 +1001,6 @@ def main():
     if args.geojson:
         import vormap_viz
 
-        data = load_data(args.datafile)
-        print('Computing Voronoi regions for GeoJSON export...')
-        regions = vormap_viz.compute_regions(data)
-        print('Traced %d of %d regions' % (len(regions), len(data)))
-
         vormap_viz.export_geojson(
             regions,
             data,
@@ -1001,11 +1013,6 @@ def main():
     # Region statistics
     if args.stats or args.stats_csv or args.stats_json:
         import vormap_viz
-
-        data = load_data(args.datafile)
-        print('Computing Voronoi regions for statistics...')
-        regions = vormap_viz.compute_regions(data)
-        print('Traced %d of %d regions' % (len(regions), len(data)))
 
         region_stats = vormap_viz.compute_region_stats(regions, data)
 
@@ -1025,30 +1032,27 @@ def main():
     if args.relax_animate:
         import vormap_viz
 
-        data = load_data(args.datafile)
+        # Animation always starts from original (unrelaxed) data to
+        # show the full relaxation process.
+        original_data = load_data(args.datafile)
         iters = args.relax if args.relax else 10
         print('Generating relaxation animation (%d iterations)...' % iters)
 
         vormap_viz.export_relaxation_html(
-            data,
+            original_data,
             iterations=iters,
             output_path=args.relax_animate,
             width=args.svg_width,
             height=args.svg_height,
             color_scheme=args.color_scheme,
             title='Lloyd Relaxation — %s (%d points)'
-                  % (args.datafile, len(data)),
+                  % (args.datafile, len(original_data)),
         )
         print('Relaxation animation saved to %s' % args.relax_animate)
 
     # Neighbourhood graph
     if args.graph or args.graph_json or args.graph_csv or args.graph_svg:
         import vormap_viz
-
-        data = load_data(args.datafile)
-        print('Computing Voronoi regions for neighbourhood graph...')
-        regions = vormap_viz.compute_regions(data)
-        print('Traced %d of %d regions' % (len(regions), len(data)))
 
         graph = vormap_viz.extract_neighborhood_graph(regions, data)
         print('Graph: %d nodes, %d edges' % (graph['num_nodes'], graph['num_edges']))
