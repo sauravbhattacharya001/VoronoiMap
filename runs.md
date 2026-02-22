@@ -1,3 +1,41 @@
+## 2026-02-21
+
+### Builder Run #85 (10:48 PM PST)
+- **sauravcode — foreach_higher_order:** Added for-each iteration (`for item in list/string/map`) and 4 higher-order functions (`map`, `filter`, `reduce`, `each`). For-each supports lists (elements), strings (characters), and maps (keys) — backward compatible with existing `for i 0 10` range syntax. Higher-order functions work with both user-defined and built-in functions via `_call_function_with_args` helper. Removed unused `map` keyword from tokenizer (map literals use `{}`, not `map` keyword). 62 new tests (482 total), demo script. Commit `d3ae846`. +821 lines.
+
+### Gardener Run #385-386 (10:35 PM PST)
+- **Task 1 (readme_overhaul) — WinSentinel:** Major README overhaul. Updated test count 192→1,172 (948 methods × InlineData). Added LOC stats (27k source + 11k tests). Added CodeQL badge, dynamic release badge. New sections: "Why WinSentinel?", Compliance Profiles (Home/Enterprise/HIPAA/PCI-DSS/CIS L1), Finding Suppression, Input Sanitization, Releases table (v1.0.0 + v1.1.0). Streamlined layout (-308/+240 lines net). Commit `04f5131`.
+- **Task 2 (auto_labeler) — VoronoiMap:** Auto-labeler (actions/labeler@v5) with path-based rules for 7 categories (docs, ci/cd, testing, dependencies, bug, enhancement). Stale bot (actions/stale@v9) — 60-day stale, 14-day close, security/good-first-issue exempt. Created 8 new GitHub labels. Commit `ce99f7c`. +93 lines.
+
+### Builder Run #84 (10:18 PM PST)
+- **Feature (trend_analysis) — BioBots:** Time-series trend analysis dashboard. Trend chart with configurable metric/range/MA window/regression/sigma bands. DPR-aware Canvas rendering with hover tooltips. Metric summary table (last-10 avg, overall mean, change%, trend direction, CV% volatility). 9x9 Pearson correlation matrix (color-coded). Smart insights engine (viability trends, volatility alerts, strong correlations, crosslinking-elasticity, pressure imbalance, overall trend). Updated all 9 page navbars. 56 Jest tests. Commit `4863aeb`. +1,530 lines.
+
+### Builder Run #83 (9:48 PM PST)
+- **Feature (minimum_spanning_tree) — GraphVisual:** Full MST implementation using Kruskal's algorithm + Union-Find (path compression + union by rank). Rich result API: total weight, edge/vertex/component counts, connectivity check, heaviest/lightest edge (bottleneck), average weight, edge type distribution, per-component breakdown. UI panel with compute/clear buttons, green edge highlighting (non-MST dimmed), thicker stroke for MST edges. 42 JUnit tests. Commit `c297a0f`. +1,346 lines.
+
+### Gardener Run #383-384 (9:35 PM PST)
+- **Task 1 (perf_improvement) — sauravcode:** Pre-compiled tokenizer regex (`re.compile()` instead of raw string) and eliminated O(n) string slicing in both interpreter and compiler. `code[line_start:]` → `re.match(pattern, code, pos=line_start)` — zero-copy. For 1000-line file: eliminates ~500 string allocs totaling O(n²) bytes. All 420 tests pass. Commit `fc7792e`. +8/-6 lines.
+- **Task 2 (fix_issue #11) — WinSentinel:** Fixed timezone bug in `GetToday()` — `DateTimeOffset.Date` returns `Kind=Unspecified`, causing implicit conversion to use local timezone offset (PST = UTC-8). Filter was 8 hours ahead of midnight UTC, excluding entries created in that window. Fix: explicit `new DateTimeOffset(date, TimeSpan.Zero)`. All 5 failing tests now pass (1172/1172 total). Commit `a084e49`. Closes #11.
+
+### Gardener Run #381-382 (9:05 PM PST)
+**Repo:** WinSentinel
+- **Task 1 (add_tests):** Added 100 tests for InputSanitizer (69 tests — IP address, username, drive letter, firewall rule, dangerous command detection with injection/boundary/null cases) and IPC DTOs (31 tests — UptimeFormatted, GetPayload, default values for all DTO types). Added InternalsVisibleTo for test project. Commit `ac2cc86`. +472 lines.
+- **Task 2 (perf_improvement):** 3 optimizations — (1) IgnoreRuleService regex caching via ConcurrentDictionary (avoids recompiling regex per match), (2) AuditHistoryService prepared statement reuse (63 SqliteCommand objects → 2), (3) ReportGenerator HtmlEncode using WebUtility (eliminates 4 intermediate string allocations per call). Commit `539a7af`. +69/-35 lines.
+- **Issue opened:** #11 — Fix pre-existing AgentBrain/AgentJournal test failures (5 tests failing on main)
+
+### Builder Run #82 (9:18 PM PST)
+**Repo:** Ocaml-sample-code
+**Feature:** Lazy Streams — infinite/lazy sequences with on-demand evaluation
+- 46 functions: 11 constructors (unfold, iterate, repeat, cycle, from, range), 12 observers (take/take_while/drop/drop_while/nth/nth_opt), 7 transforms (map/mapi/filter/filter_map/flat_map/scan), 5 combiners (append/interleave/zip/zip_with/unzip), 4 searchers (find/exists/fold/iter)
+- 7 classic infinite streams: nats, fibs, primes (lazy sieve), powers_of_2, factorials, triangulars, naturals
+- Pretty printing: show, show_ints, show_pairs with truncation
+- Key concepts: lazy/memoized thunks, coinductive data, fair interleaving, demand-driven evaluation
+- 65 new tests, +780 lines, commit 00285eb
+
+### Builder Run #81 (8:30 PM PST)
+- Committed and pushed 4 files (workspace-state.json, WinSentinel, agentlens, memory/2026-02-21.md)
+- Push to zalenix-memory.git successful
+
 ## 2026-02-20
 
 ### Gardener Run 377-378 (10:05 AM PST)

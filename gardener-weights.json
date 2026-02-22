@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-02-20T18:17:58.413Z",
-  "totalRuns": 378,
+  "totalRuns": 386,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 54,
@@ -24,7 +24,9 @@
       "weight": 85,
       "runs": 13,
       "successes": 13,
-      "description": "Performance optimization"
+      "description": "Performance optimization",
+      "runCount": 1,
+      "successCount": 1
     },
     "refactor": {
       "weight": 80,
@@ -36,12 +38,14 @@
       "weight": 87,
       "runs": 14,
       "successes": 14,
-      "description": "Add meaningful tests"
+      "description": "Add meaningful tests",
+      "runCount": null,
+      "successCount": null
     },
     "readme_overhaul": {
       "weight": 69,
-      "runs": 15,
-      "successes": 15,
+      "runs": 16,
+      "successes": 16,
       "description": "Overhaul repo README"
     },
     "doc_update": {
@@ -66,7 +70,9 @@
       "weight": 84,
       "runs": 12,
       "successes": 12,
-      "description": "Fix an existing open issue"
+      "description": "Fix an existing open issue",
+      "runCount": null,
+      "successCount": null
     },
     "merge_dependabot": {
       "weight": 104,
@@ -172,8 +178,8 @@
     },
     "auto_labeler": {
       "weight": 72,
-      "runs": 13,
-      "successes": 13,
+      "runs": 14,
+      "successes": 14,
       "description": "Add auto-labeler or stale bot"
     }
   },
@@ -231,7 +237,8 @@
       "code_cleanup",
       "add_license",
       "fix_issue",
-      "open_issue"
+      "open_issue",
+      "perf_improvement"
     ],
     "everything": [
       "create_release",
@@ -404,7 +411,8 @@
       "create_release",
       "issue_templates",
       "merge_dependabot",
-      "add_badges"
+      "add_badges",
+      "auto_labeler"
     ],
     "prompt": [
       "add_codeql",
@@ -599,8 +607,13 @@
       "merge_dependabot",
       "add_codeql",
       "create_release",
-      "issue_templates"
+      "issue_templates",
+      "add_tests",
+      "perf_improvement",
+      "fix_issue",
+      "readme_overhaul"
     ]
   },
-  "notes": "Run 377-378. gif-captcha: code_cleanup — fixed Dockerfile missing 3 HTML files, added .dockerignore, fixed 6 non-existent GitHub Action versions across 5 workflows, fixed stale bot trigger. gif-captcha: refactor — extracted shared.css (251 lines) and shared.js (100 lines) from ~800 lines of duplicated CSS/JS across 6 HTML files, removed dead sanitizeText() function."
+  "notes": "Run 385-386. WinSentinel: major README overhaul (192→1172 tests, +compliance profiles, +release table, +LOC badges, streamlined). VoronoiMap: auto-labeler + stale bot + 8 new labels.",
+  "lastRepo": "VoronoiMap"
 }

@@ -64,8 +64,12 @@
 - **Gateway watchdog**: Runs every 1 min, auto-restarts if down
 - **Tailscale**: Installed, connected (100.72.230.43)
 - **Sleep disabled**: AC & battery, hybrid sleep off
-- **OpenClaw version**: 2026.2.14 (updated from 2026.2.12 on Feb 15)
+- **OpenClaw version**: 2026.2.21-2 (updated from 2026.2.14 on Feb 15, then 2026.2.19 → 2026.2.21-2 on Feb 21)
+- **Known bug**: After `pnpm update -g openclaw`, `gateway.cmd` keeps old path — must manually update or re-run `openclaw gateway stop/start` to regenerate
 - **Known bug**: WhatsApp plugin entry (even disabled) causes sub-agents to bind to dead WhatsApp channel. Removed entirely from config on Feb 20.
+- **Known bug**: Sub-agent pairing needs `operator.write` scope — if paired device only has `operator.admin/approvals/pairing`, sub-agents get scope-upgrade rejection. Fix: add `operator.write` to `devices/paired.json` scopes+approvedScopes, restart gateway.
+- **Gateway logs**: `\tmp\openclaw\openclaw-YYYY-MM-DD.log` — check here FIRST for pairing/auth issues. Look for `security audit: device access upgrade requested reason=` lines.
+- **Scope auto-approval**: Only `reason=not-paired` gets auto-approved for local clients. Scope/role upgrades always require manual approval or file edits.
 - **Gardener/Builder scheduling**: **Windows Task Scheduler** (every 30 min). Scripts: `scripts/run-gardener.ps1` and `scripts/run-builder.ps1` using `--agent main` (NO phone numbers). Task names: "OpenClaw Repo Gardener" and "OpenClaw Feature Builder".
 - **Gardener/Builder stats**: Gardener ~378 runs, Builder ~80 runs (as of Feb 20).
 - **Gardener/Builder paused**: Paused Feb 15 per Shubho to free API for WinSentinel. Unpaused Feb 18.
