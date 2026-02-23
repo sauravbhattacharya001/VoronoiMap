@@ -912,6 +912,20 @@ def main():
         help='Show node degree labels in the graph SVG overlay.',
     )
 
+    # ── Point pattern analysis arguments ──
+    parser.add_argument(
+        '--pattern',
+        action='store_true',
+        help='Run point pattern analysis on the seed points and print '
+             'a text report (Clark-Evans NNI, quadrat analysis, '
+             "Ripley's K/L function).",
+    )
+    parser.add_argument(
+        '--pattern-json',
+        metavar='OUTPUT',
+        help='Export point pattern analysis as a JSON file.',
+    )
+
     args = parser.parse_args()
 
     # Apply explicit bounds if given (disables auto-detection)
@@ -1083,6 +1097,28 @@ def main():
                       % (args.datafile, len(data), graph['num_edges']),
             )
             print('Graph SVG saved to %s' % args.graph_svg)
+
+    # ── Point pattern analysis ──
+    if args.pattern or args.pattern_json:
+        import vormap_pattern as vp
+        bounds_tuple = None
+        if args.bounds:
+            s, n, w, e = args.bounds
+            bounds_tuple = (w, e, s, n)
+        else:
+            bounds_tuple = None  # auto-derive from points
+
+        summary = vp.analyze_pattern(data, bounds=bounds_tuple)
+
+        if args.pattern:
+            print(vp.format_pattern_report(summary))
+
+        if args.pattern_json:
+            import json
+            result = vp.generate_pattern_json(summary)
+            with open(args.pattern_json, 'w') as f:
+                json.dump(result, f, indent=2)
+            print('Pattern analysis JSON saved to %s' % args.pattern_json)
 
 
 if __name__ == '__main__':

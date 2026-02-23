@@ -26,9 +26,9 @@ jobs:
       - name: Run flake8
         run: |
           # Stop on syntax errors or undefined names (real bugs)
-          flake8 vormap.py --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 vormap.py vormap_pattern.py --count --select=E9,F63,F7,F82 --show-source --statistics
           # Warn on style issues (non-blocking)
-          flake8 vormap.py --count --exit-zero --max-complexity=15 --max-line-length=120 --statistics
+          flake8 vormap.py vormap_pattern.py --count --exit-zero --max-complexity=15 --max-line-length=120 --statistics
 
   test:
     name: Test (Python ${{ matrix.python-version }})
@@ -83,7 +83,9 @@ jobs:
           python-version: "3.12"
 
       - name: Verify module imports cleanly
-        run: python -c "import vormap; print('Module imported successfully')"
+        run: |
+          python -c "import vormap; print('Module imported successfully')"
+          python -c "import vormap_pattern; print('Pattern module imported successfully')"
 
       - name: Install optional deps and re-check
         run: |
