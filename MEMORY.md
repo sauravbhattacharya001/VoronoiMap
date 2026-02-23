@@ -51,6 +51,7 @@
 - **Skip:** forks, getagentbox, zalenix-memory
 - **Feb 13 stats:** 50+ runs, ~100+ commits across all 16 repos. Major themes: security (sandbox, SQL injection, XSS, CSP), bugs (Python3 compat, force-unwraps, infinite recursion), perf (KDTree, caching, async), architecture (retry logic, singleton DB, typed exceptions)
 - **Feb 19-20 stats:** Gardener 323→378, Builder 53→80 in one overnight session. ~50+ Dependabot PRs merged. Repos fully gardened: Vidly, ai, agenticchat.
+- **Feb 22 stats:** Gardener 409→414, Builder 102→107. 6 builder features (FeedReader offline, gif-captcha cognitive load, OCaml hashmap+bloom, sauravcode imports, everything reminders). 4 issues fixed. Profile repo 11→17/29.
 - **Next evolution:** Shubho wants it to go beyond code — add CI/CD (GitHub Actions), deploy to GitHub Pages, publish packages, create releases
 
 ## Capabilities Verified
@@ -71,7 +72,7 @@
 - **Gateway logs**: `\tmp\openclaw\openclaw-YYYY-MM-DD.log` — check here FIRST for pairing/auth issues. Look for `security audit: device access upgrade requested reason=` lines.
 - **Scope auto-approval**: Only `reason=not-paired` gets auto-approved for local clients. Scope/role upgrades always require manual approval or file edits.
 - **Gardener/Builder scheduling**: **Windows Task Scheduler** (every 30 min). Scripts: `scripts/run-gardener.ps1` and `scripts/run-builder.ps1` using `--agent main` (NO phone numbers). Task names: "OpenClaw Repo Gardener" and "OpenClaw Feature Builder".
-- **Gardener/Builder stats**: Gardener ~378 runs, Builder ~80 runs (as of Feb 20).
+- **Gardener/Builder stats**: Gardener ~414 runs, Builder ~107 runs (as of Feb 22).
 - **Gardener/Builder paused**: Paused Feb 15 per Shubho to free API for WinSentinel. Unpaused Feb 18.
 - **GitHub Profile Refresh**: zalenix-memory is PRIVATE — never include in profile README. CSA AI Safety Working Group also removed.
 - **Hibernate disabled**: timeout set to 0 (was 3hr, caused ~19hr outage on Feb 11)

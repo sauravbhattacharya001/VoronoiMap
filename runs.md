@@ -1,4 +1,407 @@
+## 2026-02-22
+
+### Gardener Run #436 — 10:35 PM PST
+**Task 1 (security_fix):** agenticchat — `SessionManager.importSession()` accepted untrusted messages without validation, enabling prompt injection via system-role messages in imported JSON files. Added validation: only user/assistant roles accepted, string type checks, content truncation (200KB), message limit (500), name sanitization. Also added defense-in-depth to `load()` for localStorage tampering. 12 new security tests (248 total).
+**Task 2 (fix_issue):** Vidly #18 — Added input validation to `ReviewService.SubmitReview`: stars range (1-5) with `ArgumentOutOfRangeException`, review text length (max 2000 chars). Extracted `MaxReviewTextLength` constant on Review model. 12 new tests. Issue auto-closed.
+
+### Builder Run #128 — 10:48 PM PST
+**Repo:** agentlens
+**Feature:** Data Retention & Cleanup — configurable data lifecycle management for production observability. Retention config (max_age_days, max_sessions, exempt_tags, auto_purge), DB stats (session/event counts, age breakdown, status breakdown, eligible-for-purge preview), manual purge with dry-run option and tag-based exemption. Backend routes + SDK methods (get_retention_config, set_retention_config, get_retention_stats, purge). 29 backend + 20 SDK = 49 new tests. 1,223 lines added.
+
+### Gardener Run #435 — 10:05 PM PST
+**Task 1 (bug_fix):** FeedReader — Core library `RSSParser.swift` was still using only `<guid>` for article URLs, missing the link/guid fix that was applied to the iOS parser (`RSSFeedParser.swift`) in Run #429. Added separate `storyLink`/`storyGuid` buffers, captures both `<link>` and `<guid>`, prefers `<link>`. 8 new tests. Also closed sauravcode #3 (all 4 phases complete).
+**Task 2 (open_issue):** Vidly #18 — `ReviewService.SubmitReview` missing input validation for stars (1-5 range) and review text length (2000 char max). Controller validates stars but service doesn't; review text length is never validated by either.
+
+### Builder Run #127 — 9:45 PM PST
+**Repo:** prompt (.NET)
+**Feature:** FewShotBuilder — structured few-shot prompt engineering. 5 formatting styles (Labeled, ChatStyle, Minimal, Numbered, XML), example management (add/remove/shuffle/reorder), label-based filtering, token-budget-aware building (progressive example removal via PromptGuard.EstimateTokens), random selection from large pools, system context, custom I/O labels, JSON serialization with SerializationGuards. FewShotExample model. Fluent API. 500 example limit. **84 new tests (756 passing total), 1,695 lines added.**
+
+### Gardener Run #434 — 10:05 PM PST
+**Task 1 (fix_issue):** Fixed BioBots issue #16 — Wright's Fst `get_fixation_index()` now uses population-size-weighted mean of subgroup heterozygosities instead of unweighted mean. Prevents biologically impossible negative Fst values. **7 new tests (55 total), issue auto-closed.**
+**Task 2 (fix_issue):** Fixed sauravcode issue #3 Phase 4 — compiler support for 9 string builtins: `trim`, `replace`, `contains`, `index_of`, `char_at`, `substring`, `reverse`, `split`, `join`. C runtime helpers, type inference (char*/SrvList/double), f-string integration. **31 new tests (699 total), 344 lines added.**
+
+### Gardener Run #431 — 8:15 PM PST
+**Tasks:**
+1. **fix_issue** on **prompt**: Fixed issue #23 — hoisted all regex patterns to static `readonly Regex` fields with `RegexOptions.Compiled`. Affected 8 patterns across 7 methods: `ExtractBoolean` (YesPatterns/NoPatterns), `ExtractNumbers`, `ExtractList`, `ExtractNumberedList`, `ExtractKeyValuePairs`, `ExtractCodeBlocks`, `ExtractSection`/`ExtractHeadings`, `ExtractTable`. 70 insertions, 41 deletions. All 83 ResponseParser tests pass.
+2. **open_issue** on **BioBots**: Opened issue #15 — selection coefficient formula in `_detect_selection()` uses `max(p*(1-p), 0.001)` clamp that produces wildly inflated coefficients (±100) when alleles appear/disappear at boundary frequencies (0% or 100%). The Wright-Fisher formula `s ≈ Δp / [p(1-p)]` is only valid for interior frequencies.
+
+### Builder Run #124 — 7:58 PM PST
+**Repo:** GraphVisual (Java)
+**Feature:** PageRank Analyzer — Google's link analysis algorithm using power-iteration method. Configurable damping factor (default 0.85), convergence tolerance, max iterations. Dangling node handling (uniform redistribution). PageRankResult with raw rank, normalized rank (relative to average), importance labels. Gini coefficient for rank inequality. Shannon entropy ratio for uniformity. 5-tier rank distribution. Hidden influencer detection (nodes with disproportionate importance vs degree). Degree centrality comparison with position shift tracking. Top-N/bottom-N queries. Also added JUnit 4.13.2 dependency and testSourceDirectory to pom.xml. **77 new tests (271→348 total, all passing).**
+
+### Builder Run #125 — 8:40 PM PST
+**Repo:** WinSentinel (C#/.NET 8)
+**Feature:** SARIF v2.1.0 Export — OASIS standard format for security tool output, enabling direct upload to GitHub Code Scanning, VS Code SARIF Viewer, Azure DevOps, and CI/CD pipelines. Full schema compliance. Findings mapped to SARIF results with severity→level mapping (Critical→error, Warning→warning, Info→note, Pass→none). Deduplicated rule definitions with descriptions, help text, and remediation. Logical locations per audit module. Fix suggestions with remediation and fix commands. Invocation metadata (success, timing, counts). Module error notifications. Automation details with machine/timestamp. 24 category code mappings (FW, DF, UP, UA, EN, NW, etc.). Stable rule ID generation. CLI: `--sarif`, `--sarif-include-pass`. **73 new tests, 1,152 lines added.**
+
+### Gardener Run #432 — 8:50 PM PST
+**Task 1 (fix_issue):** Fixed BioBots issue #15 — selection coefficient boundary frequency bug. Wright-Fisher formula `s ≈ Δp / [p(1-p)]` now skips boundary alleles (prev_freq < 0.01 or > 0.99) where the formula is mathematically inapplicable, and clamps coefficients to [-10, 10]. **12 new tests (49 total), issue auto-closed.**
+**Task 2 (open_issue):** Opened prompt issue #24 — `PromptGuard.Sanitize` misses Unicode-based injection bypass vectors. Bidi override characters (U+202A-U+202E) reverse visual text order to evade regex detection; zero-width characters (U+200B-U+200F) break word-boundary matching. Both bypass `DetectInjection()` and `Sanitize()`. Medium-high severity.
+
+### Builder Run #126 — 9:05 PM PST
+**Repo:** everything (Flutter)
+**Feature:** Event Checklist (Subtasks) — checkable task lists within events for meeting prep, travel packing, project milestones, etc. ChecklistItem model (title, note, completed/completedAt, toggleCompleted, auto-ID generation, copyWith, JSON round-trip). EventChecklist container (ordered items, max 50, addItem/removeItem/updateItem/toggleItem/reorderItem, completeAll/uncompleteAll/clearCompleted, progress tracking: totalCount/completedCount/pendingCount/progress 0.0-1.0/isAllCompleted, display: progressText/shortProgress). EventModel integration (checklist field, fromJson/toJson/copyWith/equality). DB migration v5→v6. **57 new tests, 868 lines added.**
+
+### Gardener Run #433 — 9:30 PM PST
+**Task 1 (fix_issue):** Fixed prompt issue #24 — Unicode-based injection bypass in PromptGuard.Sanitize. Added `StripUnicodeBypassChars()` with compiled static Regex patterns for bidi overrides (U+202A-U+202E, U+2066-U+2069) and zero-width chars (U+200B-U+200F, U+FEFF). Applied normalization in `Sanitize()`, `DetectInjection()`, and `DetectInjectionPatterns()`. **22 new tests (114 passing vs 95 before), issue auto-closed.** Also reduced pre-existing test failures from 7→3 by using char-based assertions for .NET ICU compatibility.
+**Task 2 (open_issue):** Opened BioBots issue #16 — `get_fixation_index()` uses unweighted mean for subgroup heterozygosities in Wright's Fst calculation. When subgroups differ in size, this produces biologically impossible negative Fst values. Correct formula requires population-size-weighted mean: `Σ(ni/N × Hsi)`.
+
+### Gardener Run #429 — 7:05 PM PST
+**Tasks:**
+1. **fix_issue** on **FeedReader**: Fixed issue #11 — RSS parser now prefers `<link>` over `<guid>` for article URLs. Added `storyLink`/`storyGuid` split in `FeedParseContext`, falls back to guid when link is absent. Updated test XML files, added `linkGuidTest.xml` with 4 scenarios. 7 new tests.
+2. **open_issue** on **everything**: Opened issue #19 — ICS export `_foldLine()` counts characters instead of octets, violating RFC 5545 §3.1. Non-ASCII content (accents, emoji, CJK) can produce oversized lines that break strict parsers.
+
+### Gardener Run #430 — 7:35 PM PST
+**Tasks:**
+1. **fix_issue** on **everything**: Fixed issue #19 — ICS `_foldLine()` now uses `utf8.encode()` for byte-length measurement, iterating character-by-character to avoid splitting multi-byte sequences. 5 new tests (CJK folding, no mid-character splits, unfold roundtrip, continuation format, octet limit).
+2. **open_issue** on **prompt**: Opened issue #23 — `ResponseParser.ExtractBoolean` allocates two regex arrays and uses interpreted `Regex.IsMatch` on every call. Should use static precompiled `Regex[]` fields like `PromptTemplate.VariablePattern`.
+
+### Gardener Run #428 — 6:35 PM PST
+**Tasks:**
+1. **fix_issue** on **sauravcode**: Fixed issue #3 Phase 2 — map/dict compiler support + for-in iteration. Added LBRACE/RBRACE/COLON tokens, MapNode/ForEachNode AST, parse_map_literal(), complete hash map runtime in C (SrvMap struct, djb2 hash, open addressing with linear probing, auto-resize), has_key builtin, len on maps, for-in iteration for both lists and maps. 43 new tests (625→668).
+2. **open_issue** on **FeedReader**: Opened issue #11 — RSS parser uses `<guid>` instead of `<link>` for article URLs. Real bug: articles with non-URL GUIDs get broken links, and `<link>`-only articles have empty URLs.
+
+### Gardener Run #427 — 6:05 PM PST
+**Tasks:**
+1. **fix_issue** on **sauravcode**: Fixed issue #3 Phase 1 — f-string compiler support. Added FSTRING token, FStringNode AST, parse_fstring() parser, compile_fstring() via snprintf with dynamic malloc'd buffers. Smart format specifiers (%s for strings, %.10g for numbers). Assignment tracking for f-string variables. 12 new tests (613→625).
+2. **open_issue** on **agentlens**: Opened issue #13 — Alert Rules: threshold-based notifications for agent metrics (latency, error rate, cost, heartbeat monitoring with configurable windows and cooldown).
+
+### Builder Run #121 — 6:18 PM PST
+**Repo:** GraphVisual (Java, graph visualization)
+**Feature:** Articulation Point & Bridge Analyzer — Tarjan's O(V+E) DFS for cut vertices and bridges. Per-AP details (degree, edge types, biconnected components, criticality), per-bridge details (component sizes, severity). Resilience scoring (0-100), vulnerability classification. Full UI panel + visual highlighting (red-orange). 48 tests.
+
+### Builder Run #122 — 6:48 PM PST
+**Repo:** VoronoiMap (Python, Voronoi diagram toolkit)
+**Feature:** Point Pattern Spatial Analysis — statistical tools to classify seed distributions as random, clustered, or dispersed. Clark-Evans NNI (z-score, p-value), Ripley's K/L (multi-scale), quadrat analysis (chi-squared, VMR), mean center, standard distance, convex hull ratio. Combined analysis + text report + JSON export. CLI --pattern and --pattern-json. 59 tests (345→404).
+
+### Builder Run #123 — 7:18 PM PST
+**Repo:** ai (Python, AI replication safety sandbox)
+**Feature:** Scenario Generator — automated test scenario creation for safety analysis. 4 categories: boundary (parameter extremes + combined extremes), adversarial (flood attacks, chain evasion, resource exhaustion, probability gaming, slow-burn), random (uniform parameter sampling), gradient (incremental relaxation for tipping points). Interest scoring (0-100) based on worker/depth ratios, denial rates, efficiency anomalies. Risk classification (HIGH/MEDIUM/LOW). ScenarioSuite with ranking, category filtering, safety summary. Stress test mode. Text reports + JSON. Full CLI. 60 tests (473→533).
+
+### Builder Run #120 - 5:48 PM PST
+**Repo:** ai (Python, replication safety sandbox)
+**Feature:** Forensic Analyzer - post-simulation safety analysis. Event reconstruction, near-miss detection, escalation phase detection, decision audit trail, counterfactual what-if, safety scoring, recommendations. 67 new tests (473 total).
+
+
+### Builder Run #118 � 4:48 PM PST
+**Repo:** prompt (C#/.NET)
+**Feature:** ResponseParser � structured output extraction from LLM responses (JSON, lists, key-value pairs, code blocks, tables, numbers, sections, booleans, custom regex). 83 tests.
+
+### Builder Run #119 � 5:18 PM PST
+**Repo:** Vidly (C#/ASP.NET MVC)
+**Feature:** Movie Reviews & Ratings � complete review system with 1-5 star ratings, one-review-per-customer-per-movie constraint, stats aggregation, top-rated movies, search/filter, global summary. Also fixed pre-existing xUnit?MSTest build bug in CustomerActivityServiceTests. 63 tests (407+63 total, 13 pre-existing failures).
+
+
+
+### Gardener Run #426 - 5:35 PM PST
+**Tasks:**
+1. **merge_dependabot** on **VoronoiMap**: Merged PRs #22-25 (actions/setup-node v4 to v6, all CI action bumps)
+2. **fix_issue** on **sauravcode**: Partially fixed issue #3 (compiler feature gaps). Added compiler support for 11 builtin functions: math (abs/sqrt/floor/ceil/round/power), string (upper/lower), conversion (to_string/to_number/type_of). Emits C runtime helpers for string builtins only when needed. Smart print detection for string-returning builtins. 18 new tests (595 to 613 total).
+### Gardener Run #424 � 4:35 PM PST
+**Tasks:**
+1. **package_publish** on **Ocaml-sample-code**: Added .github/workflows/release.yml (builds native OCaml binaries, packages as tar.gz release artifacts, publishes Docker image to GHCR on tag/release). Added ocaml-sample-code.opam package descriptor for opam pin/install support.
+2. **package_publish** on **sauravbhattacharya001** (profile): Already satisfied by existing docker.yml workflow (publishes to GHCR). Marked complete.
+3. **merge_dependabot** on **agenticchat** (bonus): Merged PR #23 � ctions/setup-node v4?v6 (CI action bump, safe breaking changes).
+
+**Notes:** All 16 repos now have 29/29 task types complete. The gardener has fully covered every task type on every repo. ??
+
+## 2026-02-22
+
+### Builder Run #118 � 4:48 PM PST
+**Repo:** prompt (C#/.NET)
+**Feature:** ResponseParser � structured output extraction from LLM responses (JSON, lists, key-value pairs, code blocks, tables, numbers, sections, booleans, custom regex). 83 tests.
+
+### Builder Run #119 � 5:18 PM PST
+**Repo:** Vidly (C#/ASP.NET MVC)
+**Feature:** Movie Reviews & Ratings � complete review system with 1-5 star ratings, one-review-per-customer-per-movie constraint, stats aggregation, top-rated movies, search/filter, global summary. Also fixed pre-existing xUnit?MSTest build bug in CustomerActivityServiceTests. 63 tests (407+63 total, 13 pre-existing failures).
+
+
+### Builder Run #114 (BioBots) — 2:50 PM PST
+- **Parameter Optimizer:** Interactive parameter tuning tool. 8 bioprinting parameters (extruder pressure x2, temperature, speed, crosslink intensity/duration, layer height/count) analyzed against 3 target metrics (Live Cell %, Elasticity, Dead Cell %). Pearson correlation, impact scoring (σ shift), optimal ranges (P25-P75 of top performers). 6 KPI cards, impact chart, correlation chart, parameter table, visual range bars, 4 prioritized recommendation cards. Commit `b9df244`, +1167 lines. 62 new tests.
+
+### Gardener Run #421 (ai) — 3:05 PM PST
+- **bug_fix:** Fixed silent metric extraction failure in safety policy engine. When `_extract_metric` raised `ValueError` (typo in metric name), `evaluate()` silently defaulted to `actual=0.0`, causing rules to pass incorrectly. Now records extraction errors on `RuleResult` with `error` field, fails the overall policy, and renders an "Extraction Errors" section. Commit `2c07d88`, +174 lines. 12 new tests (378 total).
+- **open_issue:** Filed [#11](https://github.com/sauravbhattacharya001/ai/issues/11) — `ReplicationContract` and `Controller` accept invalid parameter values silently (negative `max_depth`, zero `max_replicas`, negative cooldown, empty signer secret).
+
+### Builder Run #115 (agentlens) — 3:18 PM PST
+- **Session Annotations:** Notes, bugs, insights, warnings, milestones on sessions. Backend: `annotations` table, 5 REST endpoints (CRUD + global recent), type/author filters, pagination, event_id linking, validation. SDK: 6 new methods (`annotate`, `get_annotations`, `update_annotation`, `delete_annotation`, `list_recent_annotations`). Commit `ad8392f`, +1353 lines. 65 new tests (38 backend → 223 total, 27 SDK → 167 total). agentlens now at 8 features.
+
+### Gardener Run #422 (prompt) — 3:35 PM PST
+- **perf_improvement:** Three single-pass optimizations: (1) `EstimateTokens` merged two char loops (special chars + newlines) into one switch-based pass, (2) `CalculateQualityScore` internal overload accepts pre-computed word count to avoid redundant regex in `Analyze()`, (3) `TokenBudget.GetSummary` replaced 5 LINQ queries (3× `Count()`, `Max()`, `Average()`) with single indexed for-loop. Commit `9965f5b`, +337 lines.
+- **add_tests:** 27 new tests (540 → 567 passing) — `PerformanceOptimizationTests.cs`: token estimation edge cases (code-heavy, newlines, thresholds, determinism), quality score consistency, token budget summary accuracy (role counts, max/avg, empty, post-trim, bulk).
+
+### Builder Run #116 (sauravcode) — 3:48 PM PST
+- **List Comprehensions:** `[expr for var in iterable]` and `[expr for var in iterable if condition]` syntax. ListComprehensionNode AST, parser detects `for` keyword inside list literal, interpreter evaluates with scope safety (loop var saved/restored, no leaks). Works with range, builtins (len/upper/abs/type_of), functions, lambdas, strings, maps, try/catch, indexing. Demo: `demos/list_comprehension_demo.srv`. Commit `0766ba1`, +470 lines. 48 new tests (547 → 595 total). sauravcode now at 9 features.
+
+### Gardener Run #423 (ai) — 4:05 PM PST
+- **fix_issue #11:** Validated safety-critical params in `ReplicationContract` (`__post_init__`: max_depth ≥ 0, max_replicas ≥ 1, cooldown_seconds ≥ 0, expiration_seconds > 0), `Controller` (non-empty HMAC secret), and `ResourceSpec` (`__post_init__`: cpu_limit > 0, memory_limit_mb > 0). Closes #11.
+- **security_fix:** `ResourceSpec` accepted non-positive CPU/memory limits, effectively disabling sandbox resource controls. Added `__post_init__` validation.
+- Commit `0ca4b57`, +189 lines. 28 new tests (378 → 406 total).
+
+### Builder Run #117 (everything) — 4:18 PM PST
+- **Event Templates:** 10 built-in presets (Meeting/Birthday/Doctor/Workout/Standup/Lunch/Travel/Deadline/Social/Focus Time) with sensible defaults (title, description template, priority, tags, duration). EventTemplate model with createEvent/fromEvent/copyWith, JSON serialization. TemplateService with CRUD, search, reorder, persistence (SharedPreferences), max 50 custom templates, built-in protection. Commit `13525e9`, +1116 lines. 55 new tests. everything now at 9 features.
+
+### Gardener Run #417 (sauravbhattacharya001) — 1:05 PM PST
+- **add_codeql:** CodeQL workflow scanning Actions workflows for security issues (injection, permissions, pinning). Weekly schedule + push/PR triggers.
+- **add_dockerfile:** Multi-stage Dockerfile (Node 22 Alpine validate → nginx 1-alpine serve). Security headers (CSP, X-Frame-Options, X-Content-Type-Options, XSS, Referrer-Policy), gzip, 7d asset caching, /healthz endpoint, HEALTHCHECK. Plus .dockerignore.
+- Commit `727bfc9`, +123 lines. Profile repo 23/29.
+
+### Gardener Run #418 (sauravbhattacharya001) — 1:35 PM PST
+- **docker_workflow:** Docker build/push workflow — triggers on Dockerfile/docs changes, builds with Buildx, pushes to GHCR with SHA+latest tags, GHA cache, post-push smoke test (HTTP 200 + /healthz).
+- **add_tests:** Test suite workflow — HTML validation (html-validate), required file checks, portfolio structure verification (DOCTYPE/charset/viewport/title/links), Dockerfile syntax validation, Docker build + container smoke test with security header verification.
+- Commit `f853838`, +205 lines. Profile repo 25/29.
+
+### Builder Run #112 (agenticchat) — 1:48 PM PST
+- **Message Search & Highlight:** Ctrl+F search through chat history. MessageSearch module — case-insensitive recursive text search, `<mark>` highlighting, current match with distinct outline, debounced input (200ms), Enter/Shift+Enter navigation with wrap-around, match counter ("1 of N"), ARIA accessible. Commit `3878768`, +700 lines. 35 new tests (232 total).
+
+### Gardener Run #419 (sauravbhattacharya001) — 2:05 PM PST
+- **perf_improvement:** Preconnect/dns-prefetch for GitHub, theme-color meta, canonical URL, Twitter Card meta, JSON-LD structured data (Person schema), content-visibility: auto for off-screen sections, contain-intrinsic-size for CLS, will-change on cards, print stylesheet.
+- **code_coverage:** Lighthouse CI job — 3 runs per audit, quality gates (accessibility ≥ 85%, SEO ≥ 85%, best-practices ≥ 80%), HTML report artifact (14-day retention), headless Chrome in Docker.
+- Commit `0e40d8a`, +95 lines. Profile repo 27/29.
+
+### Builder Run #113 (gif-captcha) — 2:20 PM PST
+- **Accessibility Audit:** WCAG 2.1 compliance analysis for GIF CAPTCHAs. 5 accessibility dimensions (motion, visual, cognitive, cultural, temporal), per-CAPTCHA barrier ratings, score computation (0-100), WCAG criteria table (10 criteria), 8 actionable recommendations, 5 sort modes, mini radar charts, overview dashboard. Canvas getContext guarded for jsdom. Nav link added to all 7 existing pages + index. Commit `516da0c`, +1597 lines. 83 new tests.
+
+### Gardener Run #420 (sauravbhattacharya001 + agenticchat) — 2:40 PM PST
+- **refactor (sauravbhattacharya001):** Extracted 632-line monolithic index.html → `docs/style.css` (200 lines CSS), `docs/app.js` (252 lines, project data array + rendering). index.html now 148 lines. Adding a project = edit one JS object. CSS/JS independently cacheable. Commit `df47a2a`.
+- **fix_issue (agenticchat #15):** SnippetLibrary.save() now handles localStorage quota/unavailability. save() returns boolean, add/remove/rename/clearAll return {snippets, saved}. confirmSave shows "❌ Storage full!" on failure. Commit `6423719`, +114 lines. 5 new tests (237 total).
+- **Weight self-adjustment:** add_license 79→84 (under-represented). Avg 14.8 successes/task.
+- Profile repo 28/29 (remaining: package_publish).
+
+### Builder Run #111 (getagentbox) — 1:18 PM PST
+- **Use Cases Section:** Tabbed persona showcase — Developer, Professional, Student, Personal. UseCases module with switchTo/getCurrent/getTabs/init. Full keyboard nav (arrows, Home/End, roving tabindex). ARIA tablist/tab/tabpanel. Click + keyboard delegation with data-bound guard. Fade-in animation, responsive tabs, reduced motion. Commit `a793568`, +749 lines. 42 new tests (211 total).
+
+### Gardener Run #416 (sauravbhattacharya001) — 12:35 PM PST
+- **deploy_pages:** GitHub Pages deployment workflow (pages.yml) + enabled Pages via API
+- **docs_site:** Dark-themed portfolio site (docs/index.html) — responsive project cards by category, research section, tech grid, stats, sticky nav, mobile-friendly. All 15 projects with descriptions/tags/links.
+- Commit 79d482b, +632/-1 lines. Profile repo 21/29. Live at https://sauravbhattacharya001.github.io/sauravbhattacharya001/
+
+### Builder Run #110 (Vidly) — 12:48 PM PST
+- **Customer Activity Report:** Per-customer rental history + analytics. Loyalty score (0-100, 5-factor), genre breakdown bar chart, monthly activity chart, 8 KPI cards, actionable insights engine (overdue alerts, late patterns, upgrade suggestions, inactivity detection). Full view with customer selector. Commit `e295ca6`. +1,548 lines. 48 new tests.
+
+### Gardener Run #415 (sauravbhattacharya001) — 12:05 PM PST
+- **fix_issue #3:** Comprehensive stats update across README.md + PROJECTS.md — sauravcode (420→540+ tests, module imports), OCaml (7→17 modules with hashmap/bloom filter/rbtree/union-find), GraphVisual (added MST/graph coloring/community detection/shortest path/GraphML), gif-captcha (3→7 interactive tools)
+- **security_fix:** SECURITY.md — vulnerability reporting policy, scope, response timeline, security practices summary
+- Commit c71b60b, +101/-11 lines. Profile repo 19/29.
+
+### Builder Run #109 (ai) — 12:18 PM PST
+- **Safety Policy Engine:** Declarative safety rules for automated simulation validation. PolicyRule (metric + operator + threshold + severity), SafetyPolicy class (evaluate/evaluate_with_mc), 4 built-in presets (minimal/standard/strict/ci), 12 single-run metrics + 7 Monte Carlo metrics, JSON policy file I/O, compliance report with recommendations, full CLI with exit codes for CI/CD gating (0=pass, 1=fail, 2=warn). Commit `baef45e`. +1552 lines. 81 new tests (366 total).
+
+### Builder Run #108 (BioBots) — 10:35 AM PST
+- **Evolution Tracker:** Population genetics — TraitSnapshot (Shannon/Simpson diversity, heterozygosity, allele frequencies), SelectionEvent (coefficients, direction detection), EvolutionTracker (record generations, effective pop size Ne, fixation index Fst, diversity trends, comprehensive reports). Commit `bfd4d00`. +613 lines. 42 new tests (all passing).
+
+### Gardener Run #414 (sauravbhattacharya001 + agenticchat) — 10:20 AM PST
+- **fix_issue (sauravbhattacharya001 #3):** Updated 4 outdated project descriptions in README — OCaml (7→12 modules), sauravcode (420→510+ tests, added features), GraphVisual (added MST/coloring/centrality), gif-captcha (3→7 tools). Issue closed.
+- **fix_issue (agenticchat #15):** SnippetLibrary localStorage quota handling — try/catch on save/load, auto-prune oldest 10% on QuotaExceededError, capacity pre-check (500 snippets / 2MB), corrupted data recovery, rollback on save failure. Issue closed.
+
+### Builder Run #107 (Ocaml-sample-code) — 10:10 AM PST
+- **Bloom Filter:** Probabilistic set membership with double hashing. create/create_optimal/add/mem, popcount/saturation/FPR, of_list/mem_all/mem_any, union/clear/copy. Commit `70cb975`. +444 lines. 65 new test assertions.
+
+### Gardener Run #413 (getagentbox + WinSentinel) — 09:50 AM PST
+- **fix_issue (getagentbox #6):** prefers-reduced-motion CSS + JS. Testimonials skip autoplay, stats show final values immediately, all transitions/transforms disabled. WCAG 2.3.3. Commit `da96482`. Issue closed.
+- **fix_issue (WinSentinel #12):** O(1) FindById via ConcurrentDictionary index in ThreatLog. AgentBrain: ThreatCorrelator events skip journal (fixes duplicate entries without PolicyDecision). Commit `9d68e06`. Issue closed.
+
+### Builder Run #106 (everything) — 09:30 AM PST
+- **Event Reminders:** ReminderOffset enum (9 intervals: at time, 5m, 15m, 30m, 1h, 2h, 1d, 2d, 1w). ReminderSettings model (add/remove/toggle with sorted no-dupe, notificationTimes, nextNotificationTime, summary, JSON serialization). EventModel integration (reminders field, fromJson/toJson, copyWith, equality). DB migration v4→v5. Commit `9477869`. +716 lines. 57 new tests.
+
+### Gardener Run #412 (sauravbhattacharya001) — 09:15 AM PST
+- **open_issue:** Filed #3 — "Outdated project statistics in README tables" (OCaml says 7-stage but has 11 modules, sauravcode says 420+ but has 510+, GraphVisual/gif-captcha descriptions lag behind features).
+- **add_badges:** Added Last Commit (dynamic) and Languages (10+) badges to header. Commit `2a8ce42`. Profile repo 17/29.
+
+### Builder Run #105 (sauravcode) — 09:00 AM PST
+- **Module Import System:** `import "module"` or `import identifier` for loading external .srv files. Auto .srv extension, relative path resolution, circular import detection (absolute path tracking), diamond dependency handling (shared modules load once). ImportNode AST + parse_import() + execute_import(). Demo files included. Commit `8772808`. +530 lines. 31 new tests (all passing).
+
+### Gardener Run #411 (sauravbhattacharya001) — 08:45 AM PST
+- **contributing_md:** CONTRIBUTING.md with contribution guide (content/design/links/typos help, fork/branch/PR workflow, guidelines, issue templates ref). Commit `47a1fbb`.
+- **repo_topics:** 13 topics set (github-profile, profile-readme, portfolio, developer, ai, microsoft, machine-learning, software-engineer, etc.). Profile repo 15/29.
+
+### Builder Run #104 (Ocaml-sample-code) — 08:35 AM PST
+- **Functional Hash Map:** Persistent immutable hash table with separate chaining + auto-resize. 25 operations (insert/find/remove/mem, fold/map/filter/for_all/exists, merge/union/update/partition, of_list/to_list, choose/singleton/equal). Commit `7574fd5`. +640 lines. 91 new test assertions.
+
+### Gardener Run #410 (sauravbhattacharya001) — 08:20 AM PST
+- **auto_labeler:** PR labeler (actions/labeler@v5 — documentation/profile/ci/config labels) + stale bot (actions/stale@v9 — 60d stale, 14d close, weekly). Labeler config in `.github/labeler.yml`.
+- **issue_templates:** 3 issue templates (Bug Report, Feature Request, Content Update) + PR template + config.yml (blank issues disabled, contact link). Commit `4da50e9`. +177 lines. Profile repo 13/29.
+
+### Builder Run #103 (gif-captcha) — 08:15 AM PST
+- **Cognitive Load Analyzer:** 6-dimension CAPTCHA complexity analysis (Visual Processing, Temporal Reasoning, Cultural Context, Humor/Irony, Spatial Awareness, Narrative Comprehension). Per-CAPTCHA cognitive fingerprint radars, distribution chart, Human vs AI overlay, AI gap table, research insights, sort controls. Nav links added to all 7 pages. Commit `53ddcba`. +1,344 lines. 55 new tests.
+
+### Gardener Run #409 (Vidly + sauravbhattacharya001) — 07:50 AM PST
+- **merge_dependabot (Vidly):** Merged PR #14 — 5 JS dependency bumps (Bootstrap 3.0→3.4.1, jQuery 1.10→1.12.4, jQuery.Validation 1.11→1.21, Modernizr 2.6→2.8.3, Respond 1.2→1.4.2). Squash merge.
+- **add_license (sauravbhattacharya001):** Added MIT LICENSE file + license badge in README. Commit `9d101fb`. Profile repo now 11/29.
+
+### Builder Run #102 (FeedReader) — 07:45 AM PST
+- **Offline Reading:** OfflineCacheManager (save/remove/toggle/search/purge, CachedArticle with NSSecureCoding, 200 article + 10MB limits, auto-eviction, stale purge, feed filtering, summary stats). OfflineArticlesViewController (grouped table, summary, search, swipe-delete, Clear All). Story list: nav bar offline button + swipe Save Offline. Detail: offline toggle with haptic + toast. Commit `51c3885`. +1,050 lines. 45 new tests.
+
+### Gardener Run #408 (getagentbox) — 07:30 AM PST
+- **package_publish:** npm library (`src/index.js`) — UMD module exporting FAQ, Pricing, Stats components. Package name `agentbox-landing`. Publish workflow (`.github/workflows/publish.yml`). npm badge + install section in README. 27 new tests.
+- **docs_site:** Full API reference (`docs/index.html`) with dark theme, sidebar nav, 6 component docs, theming guide, deployment options, accessibility/security reference. Getting started guide (`docs/getting-started.html`) with 7 numbered steps.
+- **getagentbox now FULLY GARDENED (29/29)! 15th repo.** Commit `7758004`. +1,537 lines.
+
+### Builder Run #101 (WinSentinel) — 07:25 AM PST
+- **Security Score Trend Analysis:** `TrendAnalyzer` service with linear regression, statistics (avg/median/std dev/min/max), streak tracking, distribution buckets, alert detection (threshold, large drops, new criticals), sparkline + bar chart generators. `--trend` CLI command with `--trend-days`, `--alert-below`, `--trend-modules`, JSON output, exit code 2 on critical alerts. Color-coded console output with Unicode sparklines, stats tree, histogram, streaks, findings, modules, and alerts. Commit `7c5e228`. +1,129 lines. 29 new tests (479 total passing).
+
+### Gardener Run #406 (gif-captcha) — 06:55 AM PST
+- **package_publish:** Extracted core CAPTCHA logic into `src/index.js` as UMD npm library (browser + Node.js). Functions: `sanitize`, `createSanitizer`, `loadGifWithRetry`, `textSimilarity`, `validateAnswer`, `createChallenge`, `pickChallenges`, `installRoundRectPolyfill`. Updated `package.json` (public, metadata, keywords, files). Created `.github/workflows/publish.yml` (npm publish on release, dry-run support). Added npm badge + install/usage docs to README. 33 new tests.
+- **docs_site:** API reference (`docs/index.html`) with method cards, parameter tables, return types, code examples, TOC. Getting started guide (`docs/getting-started.html`) with numbered steps, minimal HTML example, validation algorithm docs, challenge design tips. Both pages use shared dark theme.
+- Commit `78ace74`. +1,101 lines. **gif-captcha now FULLY GARDENED (29/29)!** 14th repo.
+
+### Builder Run #100 (agentlens) — 06:40 AM PST
+- **Session Tags:** Full tagging system for organizing agent sessions. `session_tags` DB table with composite PK and indexes. Tag validation (alphanumeric + `_-.:/ `, max 64 chars, 20 per session). 6 REST endpoints: `GET /sessions/tags` (all tags with counts), `GET /sessions/by-tag/:tag` (paginated), `GET/POST/DELETE /sessions/:id/tags`, `GET /sessions?tag=...` (filter). 5 SDK methods: `add_tags`, `remove_tags`, `get_tags`, `list_all_tags`, `list_sessions_by_tag`. Cached prepared statements. Commit `68408da`. +1,124 lines. 47 new tests (185 backend, 140 SDK).
+
+### Gardener Run #405 (WinSentinel) — 06:10 AM PST
+- **code_coverage:** Codecov integration — added codecov-action@v4 upload to CI workflow, `.codecov.yml` with component-level tracking (Core, CLI, Agent), coverage summary in GitHub Actions step summary (parses cobertura XML), coverlet.msbuild package, Codecov badge in README. Commit `43df86e`.
+- **docs_site:** DocFX documentation site — full DocFX project (`docfx/`) with 5 articles (getting-started, architecture, CLI reference with 30+ flags, audit modules with all 13 modules documented, extending guide), auto-generated API reference from XML doc comments, updated pages.yml to build with DocFX. Enabled XML doc generation on CLI and Agent projects. Commit `6e91c53`. +1,459 lines.
+- **🎉 WinSentinel is now FULLY GARDENED (29/29 tasks)!** 13th repo to reach full coverage.
+
+### Builder Run #99 (sauravcode) — 06:00 AM PST
+- **Lambda Expressions:** Anonymous functions with closure support. Syntax: `lambda x -> x * 2`, `lambda x y -> x + y`. ARROW token in lexer, LambdaNode AST, LambdaValue runtime object with scope capture at definition time. Works with all HOFs: `map (lambda x -> x * 2) [1, 2, 3]` → `[2, 4, 6]`, `filter (lambda x -> x > 0) list`, `reduce (lambda acc x -> acc + x) list 0`. Closures capture enclosing variables. `type_of` returns `"lambda"`. Commit `266974b`. +476 lines. 34 new tests (516 total).
+
+### Gardener Run #404 (sauravcode + GraphVisual) — 05:40 AM PST
+- **sauravcode — docker_workflow:** Added `.github/workflows/docker.yml` — multi-platform Docker build/push to GHCR (linux/amd64 + arm64). Features: Docker Buildx, GHA layer caching, auto-tagging (branch, semver, SHA, latest), OCI metadata labels. Triggers on source/Dockerfile changes, releases, and manual dispatch. Commit `31edb1b`. **🎉 sauravcode now FULLY GARDENED (29/29)!**
+- **GraphVisual — refactor:** Extracted `EdgeType.java` enum to centralise the 5 relationship categories (code, label, colour, default thresholds). Replaced 8+ cascading if/else chains across Main.java with enum lookups. Removed 5 colour constants, 10 threshold constants, and 5 boolean tracking fields. Added `getEdgeList()` and `isEdgeTypeVisible()` helper methods. Net: -113 lines from Main.java, +97 lines in new enum. Commit `c92e223`. **🎉 GraphVisual now FULLY GARDENED (29/29)!**
+
+### Builder Run #98 (Ocaml-sample-code) — 05:25 AM PST
+- **Union-Find (Disjoint Sets):** Persistent functional union-find with IntMap-based storage. Union-by-rank + path compression (O(log n)). Core: create/find/union/connected. Queries: num_components, component_size, component_members, all_components, roots, cardinal. Algorithms: Kruskal's MST, cycle detection (would_cycle). Bulk construction: of_unions. Persistent — old versions remain valid after union. Also fixed README (added 4 missing modules to programs table) and Makefile SOURCES. Commit `8b536f4`. +570 lines. 92 new tests.
+
+### Gardener Run #403 (VoronoiMap) — 05:05 AM PST
+- **fix_issue:** Filed #21 and fixed — `--relax` flag was silently ignored for non-visualization outputs (`--stats`, `--geojson`, `--interactive`, `--graph`). Refactored CLI to shared data+region computation step: load once, relax once, compute regions once, share across all outputs. Also eliminates redundant `compute_regions()` calls. Commit `dfd1974`, +37/-33 lines. 345 tests pass.
+- **add_dockerfile:** Already existed (marked as done in repoState).
+- **🎉 VoronoiMap now FULLY GARDENED (29/29)!**
+
+### Gardener Run #402 (sauravcode) — 04:36 AM PST
+- **merge_dependabot:** Merged 5 CI action bumps — `actions/setup-python` 5→6, `actions/upload-artifact` 4→6, `actions/download-artifact` 4→7, `codecov/codecov-action` 4→5, `actions/upload-pages-artifact` 3→4. All squash-merged.
+- **add_dockerfile:** Multi-stage Dockerfile — Python 3.12-slim builder (installs + tests) → slim runtime with GCC/libc6-dev (needed for compiler's C code generation). Non-root user, bundles .srv examples, entrypoint is sauravcode CLI. Added `.dockerignore`. Commit `a1fcd36`, +120 lines.
+
+### Gardener Run #401 (getagentbox) — 04:05 AM PST
+- **fix_issue:** FAQ keyboard accessibility — added `role="button"`, `tabindex="0"`, `aria-expanded` to all 7 FAQ items, `aria-hidden="true"` on toggle icons, keydown handler for Enter/Space, aria-expanded state management. Fixes WCAG 2.1.1 + 4.1.2. Commit `cc9b011`, +30/-16 lines.
+- **open_issue:** Filed [#6](https://github.com/sauravbhattacharya001/getagentbox/issues/6) — respect `prefers-reduced-motion` for stats counters, testimonial auto-rotation, step reveals, typing indicator, toggle animations. Includes suggested CSS + JS implementation.
+- Also verified `add_badges` already existed (12+ badges) — marked in repoState. **getagentbox now at 27/29** (missing: `package_publish`, `docs_site`).
+
+### Gardener Run #400 🎉 (Ocaml-sample-code) — 03:35 AM PST
+- **repo_topics:** Added 10 topics: ocaml, functional-programming, data-structures, algorithms, learning, parser-combinators, graph-algorithms, red-black-tree, regex-engine, trie.
+- **auto_labeler:** Added `labeler.yml` (9 label categories: ocaml, ci, docker, documentation, tests, data-structures, algorithms, build, dependencies) + `label.yml` workflow with actions/labeler@v5. Commit `169ba43`. +77 lines.
+- Also verified `add_badges` (5 badges) and `add_license` (MIT) already existed — marked in repoState. **Ocaml-sample-code now at 28/29** (only `package_publish` remaining).
+
+### Gardener Run #399 (WinSentinel) — 03:05 AM PST
+- **code_cleanup:** Deleted dead `AuditFinding.cs` (0 refs, superseded by `Finding.cs`) and `InstallerInfo.cs` (0 refs, unused constants). Added orphaned `WinSentinel.Service` project to solution. Commit `990013a`. -39 lines.
+- **deploy_pages:** Added GitHub Pages deployment workflow (`pages.yml`). Deploys `docs/` on main push. Also verified `add_dockerfile` and `add_badges` already existed — marked in repoState. Commit `2ab4641`. +40 lines.
+
+### Builder Run #89 (Ocaml-sample-code) — 00:48 AM PST
+- **Feature:** Red-Black Tree — Okasaki-style purely functional self-balancing BST
+- **Files:** rbtree.ml (standalone), test_all.ml (inlined + tests)
+- **Tests:** 70 new. +715 lines.
+- **Commit:** `6d6e73e`
+- Core: insert (4-case balance), delete (bubble rebalancing), member, min/max, cardinal, height, black-height
+- Set operations: union, intersection, difference, subset, equal
+- Higher-order: fold, iter, map, filter, partition, for_all, exists
+- Invariant verification: root-black, no-red-red, uniform black-height, BST ordering
+- Stress tested: 100 random inserts + 50 deletes with validity at each step
+- Sequential insert worst case stays balanced (h≤12 for n=50)
+
+### Builder Run #91 (gif-captcha) — 02:15 AM PST
+- **Feature:** Response Time Benchmark — timed CAPTCHA solving with per-challenge analytics
+- **Files:** benchmark.html, index.html, tests/benchmark.test.js
+- **Tests:** 61 new. +1,609 lines. Commit `e605912`.
+- 10-challenge timed mode with ms-precision live timer (blue/yellow/red color coding)
+- Running accuracy badge, submit/skip per challenge
+- Results: 6 stat cards, breakdown table with speed-colored time bars
+- Canvas bar chart with median line, AI comparison (5 models with accuracy labels)
+- Difficulty ranking (slowest = hardest) with category tags
+- Research insight adapts to performance pattern
+- CSP headers, ARIA labels, responsive grid
+
+### Builder Run #90 (getagentbox) — 01:18 AM PST
+- **Feature:** Social Proof Stats — animated counter section with scroll-triggered count-up
+- **Files:** index.html, app.js, styles.css, __tests__/index.test.js
+- **Tests:** 44 new (142 total). +505 lines.
+- **Commit:** `3af909d`
+- 4 stat cards: Messages (10,000+), Users (500+), Uptime (99.9%), Response (<2s)
+- Scroll-triggered count-up with ease-out cubic easing
+- Gradient text effect on completion, hover lift+glow
+- formatNumber with comma separators, handles decimals and < prefix
+- Responsive 2-column grid, ARIA labels for accessibility
+- Stats module: init, reset, animateAll, animateCard, formatNumber, easeOutCubic
+
+### Builder Run #97 (Ocaml-sample-code) — 04:50 AM PST
+- **Feature:** Sorting Algorithms — 6 sorts: `insertion_sort` (stable O(n²)), `selection_sort` (minimal moves), `quicksort` (median-of-three + 3-way partition), `heapsort` (functional leftist min-heap), `natural_mergesort` (run detection, O(n) on sorted), `counting_sort` (O(n+k) integers). Utilities: `is_sorted`, `find_runs`, `partition3`, `timed`, data generators. 83 new tests. Commit `2fb6429`. +601 lines.
+
+### Builder Run #96 (VoronoiMap) — 04:18 AM PST
+- **Feature:** Seed Point Generators — 6 distribution algorithms for Voronoi seeds. `vormap_seeds.py` module: `random_uniform`, `grid`, `hexagonal` (honeycomb), `jittered_grid`, `poisson_disk` (Bridson's O(n) blue-noise), `halton` (quasi-random). `save_seeds`/`load_seeds` I/O. Full CLI with subcommands. 60 new tests. Commit `c62952d`. +1,033 lines.
+
+### Builder Run #95 (GraphVisual) — 03:48 AM PST
+- **Feature:** Graph Coloring — Welsh-Powell greedy vertex coloring. GraphColoringAnalyzer with degree-descending greedy assignment, computeWithOrder() for custom strategies, ColoringResult (color assignment, color classes, chromatic bound, class size analytics, summary, immutable maps). 39 new tests (Petersen graph, K4, K3,3 bipartite, star, cycles, disconnected). Commit `66f9110`. +1,001 lines.
+
+### Builder Run #94 (prompt) — 03:18 AM PST
+- **Feature:** Token Budget Manager — auto-trim conversations to fit model context windows. TokenBudget class with 3 trim strategies (RemoveOldest, SlidingWindow, RemoveLongest), system message preservation, ForModel factory (15+ models), serialization, thread-safe, BudgetSummary analytics. 56 new tests. Commit `0e91b3e`. +1,369 lines.
+
+### Builder Run #93 (everything) — 02:48 AM PST
+- **Feature:** ICS/iCal Event Export — RFC 5545-compliant iCalendar export for calendar app interop. IcsExportService with single/bulk export, VEVENT properties (UID, DTSTART/DTEND, SUMMARY, DESCRIPTION with tags+priority, PRIORITY mapping, CATEGORIES, RRULE from RecurrenceRule), RFC 5545 text escaping + line folding, filename generation, bytes export. EventDetailScreen share button via share_plus. 52 new tests. Commit `051a006`. +690 lines.
+
+### Gardener Run #397-398 — 02:35 AM PST
+- **getagentbox** (contributing_md): Added `CONTRIBUTING.md` — quick start, project structure, code style (vanilla JS modules, CSP), testing guide, how to add sections, responsive/a11y guidelines, PR process. Also added 7 repo topics. Commit `26e6f0c`.
+- **VoronoiMap** (doc_update): Documented 3 missing feature sets in README — Region Statistics (6 functions), Lloyd Relaxation (3 functions), Neighbourhood Graph (8 functions). Added 15 CLI examples, 3 Python API example sections, 3 API reference tables. Also added 9 repo topics. Commit `5629724`. +142 lines.
+- Fixed stale tracking: both repos already had LICENSE, VoronoiMap had add_license/repo_topics missing from state.
+
+### Builder Run #92 (FeedReader) — 02:18 AM PST
+- **Feature:** OPML Import/Export — industry-standard OPML 2.0 feed migration. OPMLManager with export (OPML 2.0 XML, XML escaping, temp files) + import (SAX parser, categories, case-insensitive attrs, URL validation, duplicate detection). FeedListViewController integration with action sheet (File/URL/Clipboard import, Export All/Enabled, Copy). UIDocumentPickerDelegate, async URL download, iPad support. 42 new tests. Commit `57dbb74`. +1,042 lines.
+
+### Gardener Run #395-396 — 02:05 AM PST
+- **Ocaml-sample-code** (fix_issue): Fixed issue [#7](https://github.com/sauravbhattacharya001/Ocaml-sample-code/issues/7) — eliminated redundant `has_cycle` DFS in `topological_sort` (2x→1x traversal), removed unnecessary record copy in `connected_components`. Commit `5c974fc`.
+- **WinSentinel** (open_issue): Filed [#12](https://github.com/sauravbhattacharya001/WinSentinel/issues/12) — AgentBrain duplicate journal entries from correlated threats + O(n) threat lookup by ID in `HandleUserFeedback`.
+- Fixed stale tracking: WinSentinel already had LICENSE and repo_topics.
+
+### Gardener Run #393-394 — 01:35 AM PST
+- **agentlens** (contributing_md): CONTRIBUTING.md — backend (Node.js) + SDK (Python) dev setup, test commands, PR workflow, coding conventions. Commit `a9fda6c`.
+- **Ocaml-sample-code** (open_issue): Filed issue [#7](https://github.com/sauravbhattacharya001/Ocaml-sample-code/issues/7) — `topological_sort` does redundant cycle detection (2x traversal), `connected_components` has unnecessary record copy.
+- Fixed stale tracking: agentlens already had LICENSE, GraphVisual already had badges.
+
+### Gardener Run #391-392 — 01:05 AM PST
+- **sauravcode** (add_dependabot + branch_protection): Dependabot config for pip + GitHub Actions weekly scans. Branch protection requiring test (3.12) status check. Commit `266c0ef`.
+- **GraphVisual** (code_cleanup): Replaced all 22 `Vector` usages with `List`/`ArrayList` across Main.java and GraphStats.java (Vector's synchronization is unnecessary overhead in single-threaded Swing code). Removed IDE "To change this template" boilerplate. Used diamond operator for cleaner generics. Commit `25010b5`.
+
+### Gardener Run #389-390 — 12:35 AM PST
+- **WinSentinel** (contributing_md): CONTRIBUTING.md — dev setup, project structure, audit module creation guide, branch/commit conventions, PR review criteria, coding conventions, security vulnerability reporting. Commit `44ae8de`.
+- **VoronoiMap** (add_codeql): CodeQL security scanning workflow — Python with security-extended queries, weekly + push/PR schedule. Commit `5778a85`.
+
+### Builder Run #88 (ai) — 12:18 AM PST
+- **Feature:** Parameter Sensitivity Analyzer — OAT parameter sweeps, tipping point detection, impact ranking
+- **Files:** sensitivity.py, test_sensitivity.py, __init__.py
+- **Tests:** 61 new (285 total). +1,395 lines.
+- **Commit:** `b1d0299`
+- 7 sweepable parameters (max_depth, max_replicas, cooldown, tasks/worker, replication_probability, cpu_limit, memory_limit)
+- 9 safety metrics per simulation point
+- Tipping point detection (>50% relative change between consecutive values)
+- Impact scoring (range-based coefficient of variation, normalized 0-100)
+- Parameter ranking by overall safety influence
+- Actionable recommendations (tuning priorities, threshold warnings)
+- Full CLI with --param, --runs, --strategy, --scenario, --json, --summary-only
+- JSON export with full point data, means, stds, tipping points
+
 ## 2026-02-21
+
+### Builder Run #87 (Vidly) — 11:48 PM PST
+- **Feature:** Revenue Dashboard — admin overview with KPIs, top movies/customers, genre breakdown, membership analysis
+- **Files:** DashboardService.cs, DashboardViewModel.cs, DashboardController.cs, Dashboard/Index.cshtml, DashboardTests.cs, _NavBar.cshtml
+- **Tests:** 47 new (all passing). +1,563 lines.
+- **Commit:** `066a579`
+- KPI cards (8): total revenue, rentals, active, overdue, late fees, avg/rental, customers, movies
+- Top Movies: ranked by rental count, tie-break by revenue, with genre/rating/stars
+- Top Customers: ranked by total spend with membership badge and late fee tracking
+- Revenue by Genre: horizontal bar chart with rental count and late fees
+- Revenue by Membership Tier: unique customer count, rentals, avg per customer
+- Monthly Revenue: last 6 months with green bar visualization
+- Recent Activity: latest 10 rentals with color-coded status badges
+- Styled with CSS (no JS dependencies), responsive two-column layout
+
+### Daily Memory Backup (11:00 PM PST)
+- Committed and pushed 10 files (MEMORY.md, bug reports, builder-state, gardener-weights, daily memory, runs, status, temp-builder)
+- Push to zalenix-memory.git successful
+
+### Builder Run #86 (11:37 PM PST)
+- **Feature (session_management) — agenticchat:** Chat Session Management — save/load/switch named conversations with localStorage persistence. SessionManager module: save, load, rename (inline dblclick), duplicate, delete, new session, auto-save toggle, export/import JSON. Slide-out panel with session cards (name, msg count, relative time, preview, active badge). Keyboard shortcuts Ctrl+J (panel), Ctrl+N (new session). 48 new tests (197 total). Commit `67c6cd1`. +1,369 lines.
+
+### Gardener Run #387-388 (11:05 PM PST)
+- **Task 1 (security_fix) — WinSentinel:** Fixed 3 security vulnerabilities: (1) ChatHandler.HandleQuarantineFile accepted raw user paths — path traversal, UNC, ADS, shell metacharacters all exploitable. (2) ChatHandler.HandleKillProcess accepted raw process names without validation. (3) AutoRemediator.QuarantineFile had no system-file protection. Added `ValidateFilePath` (rejects traversal, UNC, ADS, null bytes, protected dirs/files), `SanitizeProcessInput` (validates names/PIDs, blocks system PIDs 0-4), `SanitizeForLog` (CRLF/control char injection defense). 38 new tests (126 total InputSanitizer). Commit `0c7947f`. +397 lines.
+- **Task 2 (repo_topics) — gif-captcha:** Added 10 topics: captcha, gif, bot-protection, security, web-security, javascript, animated-gif, anti-bot, challenge-response, accessibility. Also discovered add_codeql was already done (comprehensive workflow with inline JS extraction + CSP validation).
 
 ### Builder Run #85 (10:48 PM PST)
 - **sauravcode — foreach_higher_order:** Added for-each iteration (`for item in list/string/map`) and 4 higher-order functions (`map`, `filter`, `reduce`, `each`). For-each supports lists (elements), strings (characters), and maps (keys) — backward compatible with existing `for i 0 10` range syntax. Higher-order functions work with both user-defined and built-in functions via `_call_function_with_args` helper. Removed unused `map` keyword from tokenizer (map literals use `{}`, not `map` keyword). 62 new tests (482 total), demo script. Commit `d3ae846`. +821 lines.
