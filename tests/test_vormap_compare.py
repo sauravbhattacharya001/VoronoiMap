@@ -38,7 +38,7 @@ def _make_snapshot(seeds, regions=None, region_stats=None, bounds=None):
 
 def _make_stats(areas):
     """Build minimal region_stats list from a list of areas."""
-    return [{"area": a} for a in areas]
+    return [{"area": a, "region_index": i + 1} for i, a in enumerate(areas)]
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -723,3 +723,106 @@ class TestSimilarityScoreEdgeCases:
             mapping, area, topo, 1, 1, (0, 10, 0, 10)
         )
         assert score < 1.0
+
+
+class TestCompareAreasIndexMismatch:
+    """Regression tests for issue #27: compare_areas index mismatch."""
+
+    def test_compare_areas_with_contiguous_stats(self):
+        """Normal case: all seeds have regions, stats indices match."""
+        stats_a = [
+            {"region_index": 1, "area": 10.0},
+            {"region_index": 2, "area": 20.0},
+            {"region_index": 3, "area": 30.0},
+        ]
+        stats_b = [
+            {"region_index": 1, "area": 12.0},
+            {"region_index": 2, "area": 18.0},
+            {"region_index": 3, "area": 33.0},
+        ]
+        mapping = SeedMapping(
+            pairs=[(0, 0, 0.1), (1, 1, 0.2), (2, 2, 0.3)],
+            mean_displacement=0.2,
+            max_displacement=0.3,
+        )
+        result = compare_areas(stats_a, stats_b, mapping)
+        assert len(result.changes) == 3
+        # First pair: area_a=10, area_b=12 → abs_change=2
+        assert result.changes[0][2] == 10.0  # area_a
+        assert result.changes[0][3] == 12.0  # area_b
+
+    def test_compare_areas_with_gap_in_stats(self):
+        """Issue #27: seed #1 has no region, stats_a has a gap."""
+        # Seeds: [0, 1, 2] but seed #1 didn't produce a region
+        stats_a = [
+            {"region_index": 1, "area": 10.0},   # seed index 0
+            # seed index 1 is MISSING — no region
+            {"region_index": 3, "area": 30.0},   # seed index 2
+        ]
+        stats_b = [
+            {"region_index": 1, "area": 12.0},
+            {"region_index": 2, "area": 22.0},
+            {"region_index": 3, "area": 33.0},
+        ]
+        mapping = SeedMapping(
+            pairs=[(0, 0, 0.1), (1, 1, 0.2), (2, 2, 0.3)],
+            mean_displacement=0.2,
+            max_displacement=0.3,
+        )
+        result = compare_areas(stats_a, stats_b, mapping)
+        # Pair (1,1) should be skipped (seed index 1 has no stats in A)
+        assert len(result.changes) == 2
+        # Pair (0,0): area_a=10, area_b=12
+        assert result.changes[0][2] == 10.0
+        assert result.changes[0][3] == 12.0
+        # Pair (2,2): area_a=30, area_b=33 — NOT stats_a[2] which would be wrong
+        assert result.changes[1][2] == 30.0
+        assert result.changes[1][3] == 33.0
+
+    def test_compare_areas_with_gap_in_both_stats(self):
+        """Both diagrams have missing regions at different indices."""
+        stats_a = [
+            {"region_index": 1, "area": 10.0},   # seed index 0
+            {"region_index": 3, "area": 30.0},   # seed index 2 (gap at 1)
+        ]
+        stats_b = [
+            {"region_index": 2, "area": 22.0},   # seed index 1 (gap at 0)
+            {"region_index": 3, "area": 33.0},   # seed index 2
+        ]
+        mapping = SeedMapping(
+            pairs=[(0, 0, 0.1), (1, 1, 0.2), (2, 2, 0.3)],
+            mean_displacement=0.2,
+            max_displacement=0.3,
+        )
+        result = compare_areas(stats_a, stats_b, mapping)
+        # Pair (0,0): A has stats but B doesn't → skipped
+        # Pair (1,1): A doesn't have stats → skipped
+        # Pair (2,2): both have stats → included
+        assert len(result.changes) == 1
+        assert result.changes[0][2] == 30.0  # area_a for seed index 2
+        assert result.changes[0][3] == 33.0  # area_b for seed index 2
+
+    def test_compare_areas_no_pairs_still_works(self):
+        """No matched pairs returns empty comparison with totals."""
+        stats_a = [{"region_index": 1, "area": 10.0}]
+        stats_b = [{"region_index": 1, "area": 20.0}]
+        mapping = SeedMapping()
+        result = compare_areas(stats_a, stats_b, mapping)
+        assert len(result.changes) == 0
+        assert result.total_area_a == 10.0
+        assert result.total_area_b == 20.0
+
+    def test_compare_areas_all_missing_stats_returns_totals(self):
+        """All matched seeds have no stats → no changes but totals computed."""
+        stats_a = [{"region_index": 5, "area": 50.0}]
+        stats_b = [{"region_index": 5, "area": 60.0}]
+        # Pairs reference indices 0,1 — neither exists in stats
+        mapping = SeedMapping(
+            pairs=[(0, 0, 0.1), (1, 1, 0.2)],
+            mean_displacement=0.15,
+            max_displacement=0.2,
+        )
+        result = compare_areas(stats_a, stats_b, mapping)
+        assert len(result.changes) == 0
+        assert result.total_area_a == 50.0
+        assert result.total_area_b == 60.0

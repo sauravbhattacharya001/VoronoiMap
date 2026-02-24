@@ -374,15 +374,23 @@ def compare_areas(stats_a, stats_b, mapping):
         return AreaComparison(total_area_a=total_a, total_area_b=total_b)
 
     changes = []
+    # Build lookup by region_index (1-based in stats) → stats dict.
+    # This correctly handles gaps when some seeds fail to produce regions.
+    stats_lookup_a = {s["region_index"] - 1: s for s in stats_a}
+    stats_lookup_b = {s["region_index"] - 1: s for s in stats_b}
+
     for idx_a, idx_b, _ in mapping.pairs:
-        if idx_a < len(stats_a) and idx_b < len(stats_b):
-            area_a = stats_a[idx_a]["area"]
-            area_b = stats_b[idx_b]["area"]
-            abs_change = abs(area_b - area_a)
-            pct_change = (abs_change / area_a * 100) if area_a > 0 else 0.0
-            changes.append(
-                (idx_a, idx_b, area_a, area_b, abs_change, pct_change)
-            )
+        sa = stats_lookup_a.get(idx_a)
+        sb = stats_lookup_b.get(idx_b)
+        if sa is None or sb is None:
+            continue
+        area_a = sa["area"]
+        area_b = sb["area"]
+        abs_change = abs(area_b - area_a)
+        pct_change = (abs_change / area_a * 100) if area_a > 0 else 0.0
+        changes.append(
+            (idx_a, idx_b, area_a, area_b, abs_change, pct_change)
+        )
 
     total_a = sum(s["area"] for s in stats_a)
     total_b = sum(s["area"] for s in stats_b)
