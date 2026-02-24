@@ -31,6 +31,7 @@ Usage (CLI):
 """
 
 import argparse
+import heapq
 import math
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
@@ -173,12 +174,30 @@ def dsatur_color(graph, num_colors=4):
     saturation = {node: set() for node in graph}
     uncolored = set(graph.keys())
 
+    # Max-heap using negated values: (-saturation_size, -degree, idx, node)
+    # Nodes may be tuples (seeds), so use an int index for deterministic ordering
+    node_list = sorted(graph.keys())
+    node_to_idx = {n: i for i, n in enumerate(node_list)}
+
+    heap = []
+    for node in graph:
+        heapq.heappush(heap, (0, -len(graph[node]), node_to_idx[node], node))
+
     while uncolored:
-        # Pick node with highest saturation; tie-break by highest degree
-        best = max(
-            uncolored,
-            key=lambda n: (len(saturation[n]), len(graph[n])),
-        )
+        # Pop highest priority (most saturated, then highest degree)
+        while heap:
+            neg_sat, neg_deg, _idx, best = heapq.heappop(heap)
+            if best in uncolored:
+                # Verify priority is current (lazy deletion)
+                current_sat = len(saturation[best])
+                if -neg_sat == current_sat:
+                    break
+                else:
+                    # Re-push with updated priority
+                    heapq.heappush(heap, (-current_sat, neg_deg, _idx, best))
+            # else: already colored, skip
+        else:
+            break
 
         # Find smallest available color
         neighbor_colors = set()
@@ -196,7 +215,12 @@ def dsatur_color(graph, num_colors=4):
         # Update saturation of uncolored neighbours
         for neighbor in graph[best]:
             if neighbor in uncolored:
+                old_sat = len(saturation[neighbor])
                 saturation[neighbor].add(color)
+                new_sat = len(saturation[neighbor])
+                if new_sat > old_sat:
+                    heapq.heappush(heap, (-new_sat, -len(graph[neighbor]),
+                                          node_to_idx[neighbor], neighbor))
 
     return coloring
 
