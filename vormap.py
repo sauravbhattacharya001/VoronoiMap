@@ -481,8 +481,16 @@ def bin_search(data, x1, y1, x2, y2, dlng, dlat):
         )
 
 
-def find_CXY(B, dlng, dlat):
-    """Find the clockwise boundary endpoint for a Voronoi edge ray."""
+def _find_boundary_endpoint(B, dlng, dlat, clockwise=True):
+    """Find the boundary endpoint for a Voronoi edge ray.
+
+    Args:
+        B: Boundary segment (x1, y1, x2, y2).
+        dlng: Query point x-coordinate.
+        dlat: Query point y-coordinate.
+        clockwise: If True, find clockwise endpoint (CXY behavior).
+                   If False, find counter-clockwise endpoint (BXY behavior).
+    """
     x1 = B[0]
     y1 = B[1]
     x2 = B[2]
@@ -502,97 +510,90 @@ def find_CXY(B, dlng, dlat):
     x4 = x3 - k * (y2 - y1)
     y4 = y3 + k * (x2 - x1)
 
-    if (x4 > x3):
-        if (y2 < y1):
-            By = y2
-            Bx = x2
-        else:
-            By = y1
-            Bx = x1
-    elif (x4 < x3):
-        if (y2 > y1):
-            By = y2
-            Bx = x2
-        else:
-            By = y1
-            Bx = x1
-    elif (x4 == x3):
-        if (y4 > y3):
-            if (x1 > x2):
+    # The clockwise/counter-clockwise logic differs only in which
+    # comparisons select endpoint 1 vs endpoint 2. Rather than
+    # duplicating the entire if-tree, we branch on the direction flag.
+    if clockwise:
+        # CXY behavior
+        if (x4 > x3):
+            if (y2 < y1):
+                By = y2
+                Bx = x2
+            else:
+                By = y1
+                Bx = x1
+        elif (x4 < x3):
+            if (y2 > y1):
+                By = y2
+                Bx = x2
+            else:
+                By = y1
+                Bx = x1
+        elif (x4 == x3):
+            if (y4 > y3):
+                if (x1 > x2):
+                    Bx = x1
+                    By = y1
+                else:
+                    Bx = x2
+                    By = y2
+            elif (y4 < y3):
+                if (x1 < x2):
+                    Bx = x1
+                    By = y1
+                else:
+                    Bx = x2
+                    By = y2
+            else:
+                # Degenerate case: projection coincides with query point
                 Bx = x1
                 By = y1
-            else:
-                Bx = x2
+    else:
+        # BXY behavior — comparisons flipped
+        if (x4 > x3):
+            if (y2 > y1):
                 By = y2
-        elif (y4 < y3):
-            if (x1 < x2):
+                Bx = x2
+            else:
+                By = y1
+                Bx = x1
+        elif (x4 < x3):
+            if (y2 < y1):
+                By = y2
+                Bx = x2
+            else:
+                By = y1
+                Bx = x1
+        elif (x4 == x3):
+            if (y4 > y3):
+                if (x1 < x2):
+                    Bx = x1
+                    By = y1
+                else:
+                    Bx = x2
+                    By = y2
+            elif (y4 < y3):
+                if (x1 > x2):
+                    Bx = x1
+                    By = y1
+                else:
+                    Bx = x2
+                    By = y2
+            else:
+                # Degenerate case: projection coincides with query point
                 Bx = x1
                 By = y1
-            else:
-                Bx = x2
-                By = y2
-        else:
-            # Degenerate case: projection coincides with query point
-            Bx = x1
-            By = y1
     return Bx, By
+
+
+def find_CXY(B, dlng, dlat):
+    """Find the clockwise boundary endpoint for a Voronoi edge ray."""
+    return _find_boundary_endpoint(B, dlng, dlat, clockwise=True)
 
 
 def find_BXY(B, dlng, dlat):
     """Find the counter-clockwise boundary endpoint for a Voronoi edge ray."""
-    x1 = B[0]
-    y1 = B[1]
-    x2 = B[2]
-    y2 = B[3]
-    x3 = dlng
-    y3 = dlat
-
-    n = ((y2 - y1) * (x3 - x1) - (x2 - x1) * (y3 - y1))
-    d = ((y2 - y1) ** 2 + (x2 - x1) ** 2)
-
-    # Guard against division by zero when both boundary endpoints coincide
-    # (e.g. when the line passes through a corner of the search region).
-    if d < 1e-12:
-        return x1, y1
-
-    k = float(n) / d
-    x4 = x3 - k * (y2 - y1)
-    y4 = y3 + k * (x2 - x1)
-
-    if (x4 > x3):
-        if (y2 > y1):
-            By = y2
-            Bx = x2
-        else:
-            By = y1
-            Bx = x1
-    elif (x4 < x3):
-        if (y2 < y1):
-            By = y2
-            Bx = x2
-        else:
-            By = y1
-            Bx = x1
-    elif (x4 == x3):
-        if (y4 > y3):
-            if (x1 < x2):
-                Bx = x1
-                By = y1
-            else:
-                Bx = x2
-                By = y2
-        elif (y4 < y3):
-            if (x1 > x2):
-                Bx = x1
-                By = y1
-            else:
-                Bx = x2
-                By = y2
-        else:
-            # Degenerate case: projection coincides with query point
-            Bx = x1
-            By = y1
-    return Bx, By
+    return _find_boundary_endpoint(B, dlng, dlat, clockwise=False)
 
 
 def find_a1(data, alng, alat, dlng, dlat, dirn):
