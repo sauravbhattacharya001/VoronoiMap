@@ -333,3 +333,291 @@ class TestGetSumBiasFix:
             vormap._data_cache.pop("kdtest.txt", None)
             vormap._kdtree_cache.pop("kdtest.txt", None)
             vormap._kdtree_by_id.pop(id(points), None)
+
+
+# ── isect (line-segment intersection) ────────────────────────────
+
+class TestIsect:
+    """Tests for the isect() line-segment intersection function."""
+
+    def test_crossing_segments(self):
+        """Two segments that cross → intersection point."""
+        x, y = vormap.isect(0, 0, 10, 10, 0, 10, 10, 0)
+        assert abs(x - 5.0) < 0.01
+        assert abs(y - 5.0) < 0.01
+
+    def test_parallel_horizontal(self):
+        """Two parallel horizontal segments → (-1, -1)."""
+        assert vormap.isect(0, 0, 10, 0, 0, 5, 10, 5) == (-1, -1)
+
+    def test_parallel_vertical(self):
+        """Two parallel vertical segments → (-1, -1)."""
+        assert vormap.isect(0, 0, 0, 10, 5, 0, 5, 10) == (-1, -1)
+
+    def test_t_intersection(self):
+        """One segment endpoint touches the other segment."""
+        # Horizontal seg (0,5)→(10,5), vertical seg (5,0)→(5,5)
+        x, y = vormap.isect(0, 5, 10, 5, 5, 0, 5, 5)
+        assert abs(x - 5.0) < 0.01
+        assert abs(y - 5.0) < 0.01
+
+    def test_non_intersecting(self):
+        """Segments that don't intersect → (-1, -1)."""
+        assert vormap.isect(0, 0, 1, 1, 5, 5, 6, 6) == (-1, -1)
+
+    def test_vertical_crosses_horizontal(self):
+        """Vertical segment crosses horizontal segment."""
+        x, y = vormap.isect(5, 0, 5, 10, 0, 5, 10, 5)
+        assert abs(x - 5.0) < 0.01
+        assert abs(y - 5.0) < 0.01
+
+    def test_shared_endpoint(self):
+        """Two segments share an endpoint."""
+        x, y = vormap.isect(0, 0, 5, 5, 5, 5, 10, 0)
+        assert abs(x - 5.0) < 0.01
+        assert abs(y - 5.0) < 0.01
+
+    def test_collinear_overlapping(self):
+        """Collinear overlapping segments → (-1, -1) (near-parallel)."""
+        assert vormap.isect(0, 0, 10, 10, 5, 5, 15, 15) == (-1, -1)
+
+    def test_diagonal_crossing(self):
+        """Two diagonal segments crossing."""
+        x, y = vormap.isect(0, 0, 10, 10, 10, 0, 0, 10)
+        assert abs(x - 5.0) < 0.01
+        assert abs(y - 5.0) < 0.01
+
+    def test_first_vertical_second_general(self):
+        """First segment vertical, second at an angle."""
+        x, y = vormap.isect(3, 0, 3, 10, 0, 2, 6, 8)
+        assert abs(x - 3.0) < 0.01
+        assert abs(y - 5.0) < 0.01
+
+    def test_non_intersecting_far_apart(self):
+        """Two segments that are far apart → (-1, -1)."""
+        assert vormap.isect(0, 0, 1, 1, 10, 10, 11, 11) == (-1, -1)
+
+
+# ── _slopes_equal ────────────────────────────────────────────────
+
+class TestSlopesEqual:
+    """Tests for _slopes_equal() slope comparison."""
+
+    def test_identical_finite(self):
+        assert vormap._slopes_equal(2.5, 2.5) is True
+
+    def test_different_slopes(self):
+        assert vormap._slopes_equal(1.0, 2.0) is False
+
+    def test_both_infinite(self):
+        assert vormap._slopes_equal(math.inf, math.inf) is True
+
+    def test_one_infinite_one_finite(self):
+        assert vormap._slopes_equal(math.inf, 1.0) is False
+
+    def test_nearly_equal_within_tolerance(self):
+        assert vormap._slopes_equal(1.0, 1.0 + 1e-7) is True
+
+    def test_zero_slopes(self):
+        assert vormap._slopes_equal(0.0, 0.0) is True
+
+    def test_negative_infinite(self):
+        assert vormap._slopes_equal(-math.inf, -math.inf) is True
+
+    def test_negative_slopes(self):
+        assert vormap._slopes_equal(-3.0, -3.0) is True
+
+
+# ── eudist_sq ────────────────────────────────────────────────────
+
+class TestEudistSq:
+    """Tests for eudist_sq() squared Euclidean distance."""
+
+    def test_same_point(self):
+        assert vormap.eudist_sq(5, 5, 5, 5) == 0
+
+    def test_unit_distance(self):
+        assert vormap.eudist_sq(0, 0, 1, 0) == 1
+
+    def test_345_triangle(self):
+        assert vormap.eudist_sq(0, 0, 3, 4) == 25
+
+    def test_negative_coordinates(self):
+        assert vormap.eudist_sq(-1, -2, -4, -6) == 25
+
+
+# ── eudist_pts ───────────────────────────────────────────────────
+
+class TestEudistPts:
+    """Tests for eudist_pts() Euclidean distance between point tuples."""
+
+    def test_same_point(self):
+        assert vormap.eudist_pts((3, 4), (3, 4)) == 0.0
+
+    def test_known_distance(self):
+        d = vormap.eudist_pts((0, 0), (3, 4))
+        assert abs(d - 5.0) < 1e-9
+
+    def test_negative_coordinates(self):
+        d = vormap.eudist_pts((-1, -1), (2, 3))
+        expected = math.hypot(3, 4)  # 5.0
+        assert abs(d - expected) < 1e-9
+
+
+# ── isect_B (boundary intersection) ─────────────────────────────
+
+class TestIsectB:
+    """Tests for isect_B() boundary intersection.
+
+    Requires vormap.set_bounds() to be called first.
+    """
+
+    def setup_method(self):
+        self.old_bounds = (vormap.IND_S, vormap.IND_N, vormap.IND_W, vormap.IND_E)
+        vormap.set_bounds(0, 100, 0, 100)
+
+    def teardown_method(self):
+        vormap.set_bounds(*self.old_bounds)
+
+    def test_vertical_line(self):
+        """Vertical line (dirn=inf) → north and south boundary."""
+        B = vormap.isect_B(50, 50, math.inf)
+        assert len(B) == 4
+        assert B[0] == 50
+        assert B[1] == 100  # north
+        assert B[2] == 50
+        assert B[3] == 0    # south
+
+    def test_horizontal_line(self):
+        """Horizontal line (dirn=0) → west and east boundary."""
+        B = vormap.isect_B(50, 50, 0)
+        assert len(B) == 4
+        assert B[0] == 0    # west
+        assert B[1] == 50
+        assert B[2] == 100  # east
+        assert B[3] == 50
+
+    def test_diagonal_through_center(self):
+        """Diagonal through near-center (slope=1)."""
+        B = vormap.isect_B(50, 40, 1.0)
+        assert len(B) == 4
+
+    def test_steep_positive_slope(self):
+        """Steep positive slope."""
+        B = vormap.isect_B(50, 50, 5.0)
+        assert len(B) == 4
+
+    def test_result_always_4_elements(self):
+        """Various slopes all return exactly 4 elements."""
+        for slope in [0.5, -0.5, 2.0, -2.0, 0.1, -0.1]:
+            B = vormap.isect_B(50, 50, slope)
+            assert len(B) == 4, f"slope={slope} returned {len(B)} elements"
+
+
+# ── find_CXY / find_BXY ─────────────────────────────────────────
+
+class TestFindCXYBXY:
+    """Tests for find_CXY() and find_BXY() boundary endpoint selection."""
+
+    def setup_method(self):
+        self.old_bounds = (vormap.IND_S, vormap.IND_N, vormap.IND_W, vormap.IND_E)
+        vormap.set_bounds(0, 100, 0, 100)
+
+    def teardown_method(self):
+        vormap.set_bounds(*self.old_bounds)
+
+    def test_cxy_returns_point(self):
+        """CXY returns a valid (x, y) tuple."""
+        B = vormap.isect_B(50, 40, 1.0)
+        cx, cy = vormap.find_CXY(B, 50, 40)
+        assert isinstance(cx, (int, float))
+        assert isinstance(cy, (int, float))
+
+    def test_bxy_returns_point(self):
+        """BXY returns a valid (x, y) tuple."""
+        B = vormap.isect_B(50, 40, 1.0)
+        bx, by = vormap.find_BXY(B, 50, 40)
+        assert isinstance(bx, (int, float))
+        assert isinstance(by, (int, float))
+
+    def test_cxy_bxy_are_different(self):
+        """CXY and BXY should return different boundary endpoints."""
+        B = vormap.isect_B(50, 50, 0)  # horizontal line
+        cx, cy = vormap.find_CXY(B, 60, 30)  # query point off-line
+        bx, by = vormap.find_BXY(B, 60, 30)
+        assert (cx, cy) != (bx, by)
+
+    def test_endpoints_are_from_boundary(self):
+        """Both CXY and BXY endpoints come from the B array."""
+        B = vormap.isect_B(50, 50, 0)  # horizontal line
+        cx, cy = vormap.find_CXY(B, 60, 30)
+        bx, by = vormap.find_BXY(B, 60, 30)
+        # Each result should be one of the two boundary points
+        p1 = (B[0], B[1])
+        p2 = (B[2], B[3])
+        assert (cx, cy) in (p1, p2)
+        assert (bx, by) in (p1, p2)
+
+
+# ── polygon_area (additional tests) ─────────────────────────────
+
+class TestPolygonAreaExtended:
+    """Extended tests for polygon_area() shoelace formula."""
+
+    def test_unit_square(self):
+        lngs = [0, 1, 1, 0]
+        lats = [0, 0, 1, 1]
+        area = vormap.polygon_area(lngs, lats)
+        assert abs(area - 1.0) < 0.01
+
+    def test_triangle_345(self):
+        lngs = [0, 4, 0]
+        lats = [0, 0, 3]
+        area = vormap.polygon_area(lngs, lats)
+        assert abs(area - 6.0) < 0.01
+
+    def test_degenerate_line(self):
+        """Degenerate polygon (all points on a line) → area 0."""
+        lngs = [0, 5, 10]
+        lats = [0, 5, 10]
+        area = vormap.polygon_area(lngs, lats)
+        assert abs(area) < 0.01
+
+    def test_irregular_polygon(self):
+        """Irregular quadrilateral with known area."""
+        # Rectangle 2×3 = area 6
+        lngs = [0, 2, 2, 0]
+        lats = [0, 0, 3, 3]
+        area = vormap.polygon_area(lngs, lats)
+        assert abs(area - 6.0) < 0.01
+
+
+# ── Oracle ───────────────────────────────────────────────────────
+
+class TestOracle:
+    """Tests for the Oracle class (nearest-neighbor queries)."""
+
+    def test_single_data_point(self):
+        """With one data point, get_NN always returns it (if query differs)."""
+        data = [(5, 5)]
+        lng, lat = vormap.get_NN(data, 1, 1)
+        assert (lng, lat) == (5, 5)
+
+    def test_nearest_of_two(self):
+        """Returns the closest of two data points."""
+        data = [(0, 0), (100, 100)]
+        lng, lat = vormap.get_NN(data, 1, 1)
+        assert (lng, lat) == (0, 0)
+
+    def test_negative_coordinates(self):
+        """Works with negative coordinates."""
+        data = [(-10, -10), (10, 10)]
+        lng, lat = vormap.get_NN(data, -9, -9)
+        assert (lng, lat) == (-10, -10)
+
+    def test_oracle_calls_counter(self):
+        """Oracle.calls counter increments on each get_NN call."""
+        data = [(0, 0), (10, 10)]
+        before = vormap.Oracle.calls
+        vormap.get_NN(data, 5, 5)
+        assert vormap.Oracle.calls == before + 1
