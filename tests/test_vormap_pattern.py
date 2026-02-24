@@ -4,6 +4,7 @@ import math
 import random
 import unittest
 
+from vormap import eudist_pts
 from vormap_pattern import (
     clark_evans_nni,
     ripleys_k,
@@ -15,7 +16,6 @@ from vormap_pattern import (
     format_pattern_report,
     generate_pattern_json,
     _validate_points,
-    _euclidean,
     _compute_nn_distances,
     _bounding_area,
     _convex_hull_area,
@@ -54,13 +54,13 @@ class TestEuclidean(unittest.TestCase):
     """Distance calculation tests."""
 
     def test_same_point(self):
-        self.assertAlmostEqual(_euclidean((0, 0), (0, 0)), 0.0)
+        self.assertAlmostEqual(eudist_pts((0, 0), (0, 0)), 0.0)
 
     def test_unit_distance(self):
-        self.assertAlmostEqual(_euclidean((0, 0), (1, 0)), 1.0)
+        self.assertAlmostEqual(eudist_pts((0, 0), (1, 0)), 1.0)
 
     def test_diagonal(self):
-        self.assertAlmostEqual(_euclidean((0, 0), (3, 4)), 5.0)
+        self.assertAlmostEqual(eudist_pts((0, 0), (3, 4)), 5.0)
 
 
 class TestNNDistances(unittest.TestCase):

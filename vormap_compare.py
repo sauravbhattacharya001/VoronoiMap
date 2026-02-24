@@ -19,6 +19,8 @@ Usage
 import math
 from dataclasses import dataclass, field
 
+from vormap import eudist_pts
+
 
 @dataclass
 class DiagramSnapshot:
@@ -273,11 +275,6 @@ class ComparisonResult:
 # ── helpers ──────────────────────────────────────────────────────────
 
 
-def _euclidean_distance(p1, p2):
-    """Euclidean distance between two 2D points."""
-    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
-
-
 # ── seed matching ────────────────────────────────────────────────────
 
 
@@ -312,7 +309,7 @@ def match_seeds(seeds_a, seeds_b, max_distance=None):
     distances = []
     for i in range(n_a):
         for j in range(n_b):
-            d = _euclidean_distance(seeds_a[i], seeds_b[j])
+            d = eudist_pts(seeds_a[i], seeds_b[j])
             distances.append((d, i, j))
 
     distances.sort()
@@ -505,7 +502,7 @@ def _compute_similarity_score(
     """
     # Seed displacement score (0-1, 1 = no displacement)
     if bounds and mapping.pairs:
-        diagonal = _euclidean_distance(
+        diagonal = eudist_pts(
             (bounds[2], bounds[0]),  # (west, south)
             (bounds[3], bounds[1]),  # (east, north)
         )

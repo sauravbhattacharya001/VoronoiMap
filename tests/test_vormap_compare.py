@@ -7,6 +7,7 @@ import tempfile
 
 import pytest
 
+from vormap import eudist_pts
 from vormap_compare import (
     AreaComparison,
     ComparisonResult,
@@ -14,7 +15,6 @@ from vormap_compare import (
     SeedMapping,
     TopologyDiff,
     _compute_similarity_score,
-    _euclidean_distance,
     _get_verdict,
     compare_areas,
     compare_diagrams,
@@ -48,21 +48,21 @@ def _make_stats(areas):
 
 class TestEuclideanDistance:
     def test_zero_distance_same_point(self):
-        assert _euclidean_distance((1, 2), (1, 2)) == 0.0
+        assert eudist_pts((1, 2), (1, 2)) == 0.0
 
     def test_known_distance_345(self):
-        assert _euclidean_distance((0, 0), (3, 4)) == pytest.approx(5.0)
+        assert eudist_pts((0, 0), (3, 4)) == pytest.approx(5.0)
 
     def test_symmetry(self):
-        d1 = _euclidean_distance((1, 2), (4, 6))
-        d2 = _euclidean_distance((4, 6), (1, 2))
+        d1 = eudist_pts((1, 2), (4, 6))
+        d2 = eudist_pts((4, 6), (1, 2))
         assert d1 == pytest.approx(d2)
 
     def test_negative_coordinates(self):
-        assert _euclidean_distance((-1, -1), (2, 3)) == pytest.approx(5.0)
+        assert eudist_pts((-1, -1), (2, 3)) == pytest.approx(5.0)
 
     def test_float_coordinates(self):
-        d = _euclidean_distance((0.0, 0.0), (1.0, 1.0))
+        d = eudist_pts((0.0, 0.0), (1.0, 1.0))
         assert d == pytest.approx(math.sqrt(2))
 
 

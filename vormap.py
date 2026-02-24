@@ -421,6 +421,15 @@ def eudist(x1, y1, x2, y2):
     return math.hypot(x1 - x2, y1 - y2)
 
 
+def eudist_pts(p1, p2):
+    """Euclidean distance between two points given as (x, y) tuples.
+
+    Convenience wrapper around ``eudist`` for code that works with
+    point tuples rather than separate coordinates.
+    """
+    return math.hypot(p1[0] - p2[0], p1[1] - p2[1])
+
+
 BIN_SEARCH_MAX_ITER = 100  # ~2^100 precision, far beyond float64 range
 
 

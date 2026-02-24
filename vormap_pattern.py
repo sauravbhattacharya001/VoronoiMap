@@ -37,6 +37,8 @@ import math
 import random as _random
 from collections import namedtuple
 
+from vormap import eudist_pts
+
 
 # -- Result types ----------------------------------------------------
 
@@ -96,11 +98,6 @@ def _validate_points(points):
     return pts
 
 
-def _euclidean(p1, p2):
-    """Euclidean distance between two points."""
-    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
-
-
 def _compute_nn_distances(points):
     """Compute nearest-neighbor distance for each point.
 
@@ -123,7 +120,7 @@ def _compute_nn_distances(points):
         for j in range(n):
             if i == j:
                 continue
-            d = _euclidean(points[i], points[j])
+            d = eudist_pts(points[i], points[j])
             if d < min_d:
                 min_d = d
         nn_dists.append(min_d)
