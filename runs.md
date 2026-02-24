@@ -1,5 +1,34 @@
 ## 2026-02-22
 
+### Daily Memory Backup — 11:00 PM PST
+Committed and pushed 9 changed files (1519 insertions, 745 deletions). Includes MEMORY.md updates, daily notes for 2/21 and 2/22, runs, status, and vormap_pattern.py.
+
+### Builder Run #131 — 10:18 PM PST
+**BioBots:** Added **Batch Statistics API** — 3 new REST endpoints. `GET api/prints/stats` returns descriptive stats (mean, std, min, max, median, Q1, Q3, IQR, CV, skewness) for all 11 metrics in one call. `GET api/prints/stats/{metric}` adds extended percentiles (P5–P99) and 10-bin histogram. `GET api/prints/correlations` returns Pearson r correlation matrix. Linear interpolation percentiles, adjusted Fisher-Pearson skewness, sample std dev. 55 new tests (376 total), 883 lines added.
+
+### Builder Run #130 — 11:48 PM PST
+**FeedReader:** Added **Feed Health Monitor** — FeedHealthManager singleton tracking per-feed reliability metrics. FetchRecord model, FeedHealthStatus classification (healthy ≥90% / degraded 50-89% / unhealthy <50% / stale 7+ days no new content / unknown <3 fetches). FeedHealthReport with success rate, response times (avg/min/max/P95), consecutive failures, error history, staleness detection via story count changes. HealthSummary with weighted aggregates. Per-feed (100) and global (2000) record limits. 55 new tests, 1,638 lines added.
+
+### Gardener Run #440 — 10:35 PM PST
+**Task 1 (fix_issue):** agenticchat #24 — VoiceInput language preference now persists to localStorage across page reloads. Added `_loadLanguage()`/`_saveLanguage()` helpers, input validation (2-10 chars, trimming, type checks). `_ensureRecognition()` loads saved language instead of hardcoded 'en-US'. 10 new tests, 269 total passing.
+**Task 2 (security_fix):** gif-captcha — `loadGifWithRetry()` and `createChallenge()` accepted untrusted URLs without scheme validation. `sourceUrl` was rendered as `<a href>` in the error fallback — direct XSS vector via `javascript:` URLs. Added `isSafeUrl()` validator (rejects javascript/data/vbscript/blob/file/ftp, strips leading control chars). Validates URLs in `loadGifWithRetry`, error fallback, and `createChallenge`. 33 new tests, 66 total passing. Opened gif-captcha #13 (attempt tracking/rate limiting).
+
+### Gardener Run #439 — 10:05 PM PST
+**Task 1 (merge_dependabot):** Merged **47 Dependabot PRs** across 12 repos — everything (4), sauravcode (4), agentlens (5), BioBots (2), sauravbhattacharya001 (7), gif-captcha (5), getagentbox (5), Vidly (2), Ocaml-sample-code (2), GraphVisual (5), WinSentinel (6). Mostly GitHub Actions version bumps (checkout, setup-node, setup-python, setup-java, stale, labeler, upload-artifact, codeql-action, codecov, cache, deploy-pages) plus NuGet coverlet.msbuild 8.0.0.
+**Task 2 (fix_issue):** BioBots #17 — Extracted shared utility functions from 5 duplicated HTML dashboard pages into `docs/shared/constants.js` and `docs/shared/utils.js`. Removed ~292 lines of duplicated code across anomaly, trends, compare, quality, and explorer pages. Fixed std dev inconsistency (anomaly used population ÷n, trends used sample ÷(n-1) — standardized on sample). Added METRIC_DESCRIPTORS for richer metadata. 49 new tests. 707 insertions, 292 deletions.
+
+### Gardener Run #438 — 11:35 PM PST
+**Task 1 (bug_fix):** BioBots — `QueryMetric` aggregation keywords (`Maximum`, `Minimum`, `Average`) used case-sensitive `==` comparison while arithmetic operators (`greater`, `lesser`, `equal`) used `OrdinalIgnoreCase`. URLs like `/api/prints/serial/greater/maximum` returned misleading "Invalid numeric parameter" 400 error. Fixed to use `string.Equals(..., OrdinalIgnoreCase)` for all three keywords.
+**Task 2 (open_issue):** BioBots #17 — Shared utility functions (`getMetricValue`, `formatNum`, `escapeHtml`, `computeStats`, `METRICS`, `metricLabels`, `metricColors`) duplicated across 4 HTML dashboard pages. Also found std dev inconsistency: anomaly.html uses population std dev (n), trends.html uses sample std dev (n-1).
+
+### Gardener Run #437 — 11:05 PM PST
+**Task 1 (security_fix):** agenticchat — `sanitizeKeyForCodeInjection` missing Unicode line terminators (U+2028/U+2029) and null bytes. These are valid JS line terminators per ECMA-262 §12.3 that break string literals and enable code injection via malicious API keys. Also fixed `SandboxRunner.run()` race condition — concurrent calls leaked promises, timers, and event listeners. 12 new tests (260 total).
+**Task 2 (open_issue):** agenticchat #24 — VoiceInput language preference not persisted across page reloads.
+
+### Builder Run #129 — 11:22 PM PST
+**Repo:** GraphVisual
+**Feature:** K-Core Decomposition — Batagelj-Zaversnik O(V+E) algorithm for dense subgraph identification. Per-vertex coreness, degeneracy number, core shells, k-core extraction, core density profile, cohesion score (0-100), average coreness, coreness distribution, structure classification (6 categories), KCoreResult object, formatted summary. 44 new tests (392 total).
+
 ### Gardener Run #436 — 10:35 PM PST
 **Task 1 (security_fix):** agenticchat — `SessionManager.importSession()` accepted untrusted messages without validation, enabling prompt injection via system-role messages in imported JSON files. Added validation: only user/assistant roles accepted, string type checks, content truncation (200KB), message limit (500), name sanitization. Also added defense-in-depth to `load()` for localStorage tampering. 12 new security tests (248 total).
 **Task 2 (fix_issue):** Vidly #18 — Added input validation to `ReviewService.SubmitReview`: stars range (1-5) with `ArgumentOutOfRangeException`, review text length (max 2000 chars). Extracted `MaxReviewTextLength` constant on Review model. 12 new tests. Issue auto-closed.
