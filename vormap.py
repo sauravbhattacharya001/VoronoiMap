@@ -254,11 +254,14 @@ def _slopes_equal(m1, m2, rtol=1e-6):
     """Test whether two slopes are effectively equal.
 
     Handles the special case where both slopes are infinite (vertical
-    lines).  For finite slopes, uses a relative tolerance comparison
-    to avoid the fragility of exact float equality or rounding.
+    lines).  ``+inf`` and ``-inf`` are treated as *different* slopes
+    because they represent opposite directions.  For finite slopes,
+    uses a relative tolerance comparison to avoid the fragility of
+    exact float equality or rounding.
     """
     if math.isinf(m1) and math.isinf(m2):
-        return True
+        # +inf vs -inf are different directions; only match same sign
+        return (m1 > 0) == (m2 > 0)
     if math.isinf(m1) or math.isinf(m2):
         return False
     return abs(m1 - m2) <= rtol * max(abs(m1), abs(m2), 1.0)
