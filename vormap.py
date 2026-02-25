@@ -936,6 +936,41 @@ def main():
         help='Export point pattern analysis as a JSON file.',
     )
 
+    # ── Point location & nearest-neighbor query arguments ──
+    parser.add_argument(
+        '--query',
+        metavar='X,Y',
+        help='Query a single point (e.g. --query 300,400).',
+    )
+    parser.add_argument(
+        '--query-k',
+        type=int,
+        default=1,
+        metavar='K',
+        help='Number of nearest seeds to return (default: 1).',
+    )
+    parser.add_argument(
+        '--query-batch',
+        metavar='FILE',
+        help='Batch query from a CSV or JSON file of points.',
+    )
+    parser.add_argument(
+        '--query-radius',
+        type=float,
+        metavar='R',
+        help='Return all seeds within radius R of the query point.',
+    )
+    parser.add_argument(
+        '--query-json',
+        metavar='PATH',
+        help='Export query results as JSON.',
+    )
+    parser.add_argument(
+        '--query-svg',
+        metavar='PATH',
+        help='Export an SVG showing query points and nearest-seed connections.',
+    )
+
     args = parser.parse_args()
 
     # Apply explicit bounds if given (disables auto-detection)
@@ -960,6 +995,7 @@ def main():
         args.stats, args.stats_csv, args.stats_json,
         args.relax_animate,
         args.graph, args.graph_json, args.graph_csv, args.graph_svg,
+        args.query, args.query_batch,
     ])
 
     data = None
@@ -1129,6 +1165,11 @@ def main():
             with open(args.pattern_json, 'w') as f:
                 json.dump(result, f, indent=2)
             print('Pattern analysis JSON saved to %s' % args.pattern_json)
+
+    # ── Point location & nearest-neighbor query ──
+    if args.query or args.query_batch:
+        import vormap_query
+        vormap_query.run_query_cli(args, data, regions)
 
 
 if __name__ == '__main__':
