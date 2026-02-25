@@ -1,6 +1,6 @@
 {
-    "lastUpdated":  "2026-02-23T02:12:13.9220667Z",
-    "totalRuns":  440,
+    "lastUpdated":  "2026-02-25T06:41:45Z",
+    "totalRuns":  487,
     "taskTypes":  {
                       "setup_copilot_agent":  {
                                                   "weight":  50,
@@ -10,66 +10,66 @@
                                               },
                       "bug_fix":  {
                                       "weight":  75,
-                                      "runs":  18,
-                                      "successes":  18,
+                                      "runs":  23,
+                                      "successes":  23,
                                       "description":  "Fix a real bug"
                                   },
                       "security_fix":  {
                                            "weight":  84,
-                                           "runs":  17,
-                                           "successes":  17,
+                                           "runs":  26,
+                                           "successes":  26,
                                            "description":  "Fix security vulnerability"
                                        },
                       "perf_improvement":  {
                                                "weight":  80,
-                                               "runs":  15,
-                                               "successes":  15,
+                                               "runs":  29,
+                                               "successes":  29,
                                                "description":  "Performance optimization",
                                                "runCount":  1,
                                                "successCount":  1
                                            },
                       "refactor":  {
                                        "weight":  75,
-                                       "runs":  16,
-                                       "successes":  16,
+                                       "runs":  22,
+                                       "successes":  22,
                                        "description":  "Architecture/code refactor"
                                    },
                       "add_tests":  {
                                         "weight":  82,
-                                        "runs":  16,
-                                        "successes":  16,
+                                        "runs":  26,
+                                        "successes":  26,
                                         "description":  "Add meaningful tests",
                                         "runCount":  null,
                                         "successCount":  null
                                     },
                       "readme_overhaul":  {
                                               "weight":  64,
-                                              "runs":  16,
-                                              "successes":  16,
+                                              "runs":  17,
+                                              "successes":  17,
                                               "description":  "Overhaul repo README"
                                           },
                       "doc_update":  {
                                          "weight":  76,
-                                         "runs":  16,
-                                         "successes":  16,
+                                         "runs":  21,
+                                         "successes":  21,
                                          "description":  "Improve non-README documentation"
                                      },
                       "code_cleanup":  {
                                            "weight":  72,
-                                           "runs":  15,
-                                           "successes":  15,
+                                           "runs":  23,
+                                           "successes":  23,
                                            "description":  "Remove dead code, unused deps"
                                        },
                       "open_issue":  {
                                          "weight":  76,
-                                         "runs":  18,
-                                         "successes":  18,
+                                         "runs":  34,
+                                         "successes":  33,
                                          "description":  "Open a thoughtful issue"
                                      },
                       "fix_issue":  {
                                         "weight":  79,
-                                        "runs":  18,
-                                        "successes":  18,
+                                        "runs":  30,
+                                        "successes":  30,
                                         "description":  "Fix an existing open issue",
                                         "runCount":  null,
                                         "successCount":  null
@@ -312,7 +312,6 @@
                                       "setup_copilot_agent",
                                       "readme_overhaul",
                                       "contributing_md",
-                                      "perf_improvement",
                                       "bug_fix",
                                       "deploy_pages",
                                       "add_dependabot",
@@ -367,8 +366,7 @@
                                           "merge_dependabot",
                                           "docs_site",
                                           "code_cleanup",
-                                          "add_badges",
-                                          "refactor"
+                                          "add_badges"
                                       ],
                       "ai":  [
                                  "add_ci_cd",
@@ -405,7 +403,6 @@
                                          "add_ci_cd",
                                          "setup_copilot_agent",
                                          "deploy_pages",
-                                         "open_issue",
                                          "code_coverage",
                                          "security_fix",
                                          "readme_overhaul",
@@ -429,8 +426,7 @@
                                          "doc_update",
                                          "repo_topics",
                                          "add_license",
-                                         "add_dockerfile",
-                                         "fix_issue"
+                                         "add_dockerfile"
                                      ],
                       "prompt":  [
                                      "add_codeql",
@@ -496,7 +492,6 @@
                                                 ],
                       "Ocaml-sample-code":  [
                                                 "deploy_pages",
-                                                "perf_improvement",
                                                 "code_cleanup",
                                                 "readme_overhaul",
                                                 "create_release",
@@ -574,7 +569,6 @@
                                          "doc_update",
                                          "branch_protection",
                                          "add_dockerfile",
-                                         "perf_improvement",
                                          "refactor",
                                          "issue_templates",
                                          "contributing_md",
@@ -681,6 +675,6 @@
                                           "docs_site"
                                       ]
                   },
-    "notes":  "Run 431. Fixed prompt issue #23: hoisted all regex patterns to static compiled fields (8 patterns, 7 methods affected). 70 insertions, 41 deletions. Opened BioBots issue #15: selection coefficient formula produces extreme values at boundary frequencies.",
-    "lastRepo":  "BioBots"
+    "notes":  "Run 487. readme_overhaul on BioBots: added 4 missing tool sections (Cluster Analysis, Parameter Optimizer, Trend Analysis, Developer Guide), Live Demo table, fixed test badge 216-\u003e630. add_tests on Ocaml-sample-code: +73 assertions (graph bfs_path/connected_components/topological_sort/add_vertex/dfs_collect, list_last edge cases, fibonacci properties).",
+    "lastRepo":  "Ocaml-sample-code"
 }
