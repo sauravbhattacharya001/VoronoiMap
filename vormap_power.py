@@ -1024,8 +1024,10 @@ def main():
 
     # Load or generate seeds
     if args.input:
+        from vormap import validate_input_path
+        resolved_input = validate_input_path(args.input, allow_absolute=True)
         seeds = []
-        with open(args.input) as f:
+        with open(resolved_input) as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith('#'):

@@ -411,11 +411,14 @@ def export_clip_svg(result: ClipResult, output_path: str, *,
 def load_boundary(filepath: str) -> Polygon:
     """Load boundary polygon from a file (one 'x y' per line)."""
     import os
-    if not os.path.exists(filepath):
+    from vormap import validate_input_path
+
+    resolved = validate_input_path(filepath, allow_absolute=True)
+    if not os.path.exists(resolved):
         raise FileNotFoundError(f"Boundary file not found: {filepath}")
 
     points: Polygon = []
-    with open(filepath) as f:
+    with open(resolved) as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith('#'):

@@ -2,6 +2,7 @@
 import random
 import sys
 import math
+import os
 import warnings
 
 try:
@@ -19,6 +20,66 @@ IND_N = 1000.0
 IND_W = 0.0
 IND_E = 2000.0
 BIN_PREC = 1e-6
+
+
+def validate_input_path(filepath, *, base_dir=None, allow_absolute=False):
+    """Validate a file path against path traversal attacks.
+
+    Ensures *filepath* resolves to a location inside *base_dir* (default:
+    current working directory).  Rejects absolute paths and ``..``
+    traversals that escape the boundary.
+
+    When *allow_absolute* is True **and** *filepath* is already absolute,
+    the containment check is skipped — the caller is trusted to provide
+    an explicit path (e.g. from CLI ``argparse``).  Relative paths with
+    ``..`` segments are still validated against *base_dir* even when
+    *allow_absolute* is True.
+
+    Parameters
+    ----------
+    filepath : str
+        The path to validate.
+    base_dir : str or None
+        Directory the path must resolve within.  Defaults to ``os.getcwd()``.
+    allow_absolute : bool
+        If True, accept absolute paths without containment check.
+
+    Returns
+    -------
+    str
+        The resolved absolute path, safe to open.
+
+    Raises
+    ------
+    ValueError
+        If the path escapes *base_dir* or is absolute when not allowed.
+    """
+    if not filepath:
+        raise ValueError("File path must not be empty")
+
+    if os.path.isabs(filepath):
+        if not allow_absolute:
+            raise ValueError(
+                "Absolute paths are not allowed: '%s'" % filepath
+            )
+        # Absolute path explicitly provided — trust the caller
+        return os.path.abspath(filepath)
+
+    # Relative path — validate it stays inside base_dir
+    if base_dir is None:
+        base_dir = os.getcwd()
+
+    abs_base = os.path.abspath(base_dir)
+    resolved = os.path.abspath(os.path.join(abs_base, filepath))
+
+    # The resolved path must start with the base directory
+    if not resolved.startswith(abs_base + os.sep) and resolved != abs_base:
+        raise ValueError(
+            "Path traversal detected — '%s' resolves outside '%s'"
+            % (filepath, base_dir)
+        )
+
+    return resolved
 
 
 def compute_bounds(points, padding=0.1):
@@ -173,23 +234,8 @@ def load_data(filename, auto_bounds=True):
     if filename in _file_cache:
         return _file_cache[filename]['points']
 
-    # --- Path traversal protection ---
-    # Reject filenames that attempt to escape the data/ directory.
-    # This prevents reading arbitrary files on the filesystem via crafted
-    # filenames like "../../etc/passwd" or "/etc/shadow".
-    import os
-    if os.path.isabs(filename):
-        raise ValueError(
-            "Absolute paths are not allowed: '%s'" % filename
-        )
-    # Normalise and check that the resolved path stays inside data/
-    data_dir = os.path.abspath("data")
-    resolved = os.path.abspath(os.path.join("data", filename))
-    if not resolved.startswith(data_dir + os.sep) and resolved != data_dir:
-        raise ValueError(
-            "Path traversal detected — filename '%s' resolves outside "
-            "the data/ directory" % filename
-        )
+    # Validate path stays inside data/ directory
+    resolved = validate_input_path(filename, base_dir="data")
 
     points = []
     with open(resolved, "r") as objf:

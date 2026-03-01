@@ -448,8 +448,11 @@ def load_seeds(filename):
     if not filename:
         raise ValueError("filename must not be empty")
 
+    from vormap import validate_input_path
+    resolved = validate_input_path(filename, allow_absolute=True)
+
     points = []
-    with open(filename, 'r') as f:
+    with open(resolved, 'r') as f:
         for line in f:
             parts = line.strip().split()
             if len(parts) == 2:

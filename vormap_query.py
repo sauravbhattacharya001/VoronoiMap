@@ -385,13 +385,16 @@ def _parse_query_point(s: str) -> Point:
 
 def _load_batch_file(path: str) -> List[Point]:
     """Load query points from a CSV or JSON file."""
+    from vormap import validate_input_path
+    resolved = validate_input_path(path, allow_absolute=True)
+
     if path.endswith('.json'):
-        with open(path) as f:
+        with open(resolved) as f:
             data = json.load(f)
         return [(p[0], p[1]) for p in data]
     # CSV: each line is X,Y
     points = []
-    with open(path) as f:
+    with open(resolved) as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith('#'):
