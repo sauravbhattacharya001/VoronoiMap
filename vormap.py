@@ -1195,6 +1195,33 @@ def main():
         help='Color ramp for surface SVG (default: viridis).',
     )
 
+    # ── Edge network arguments ──
+    parser.add_argument(
+        '--edge-network',
+        action='store_true',
+        help='Print edge network statistics (vertices, edges, lengths, '
+             'connectivity, orientation entropy) to stdout.',
+    )
+    parser.add_argument(
+        '--edge-csv',
+        metavar='OUTPUT',
+        help='Export the Voronoi edge network as a CSV edge list with '
+             'vertex coordinates, lengths, angles, and boundary flags.',
+    )
+    parser.add_argument(
+        '--edge-json',
+        metavar='OUTPUT',
+        help='Export the Voronoi edge network as a JSON file with '
+             'vertices, edges, and aggregate statistics.',
+    )
+    parser.add_argument(
+        '--edge-svg',
+        metavar='OUTPUT',
+        help='Export an SVG visualization of the Voronoi edge network '
+             'with interior/boundary edges, junctions, and dead ends '
+             'color-coded.',
+    )
+
     args = parser.parse_args()
 
     # Apply explicit bounds if given (disables auto-detection)
@@ -1222,6 +1249,7 @@ def main():
         args.query, args.query_batch,
         args.heatmap, args.heatmap_html,
         args.interp_values,
+        args.edge_network, args.edge_csv, args.edge_json, args.edge_svg,
     ])
 
     data = None
@@ -1429,6 +1457,40 @@ def main():
     if args.interp_values:
         import vormap_interp
         vormap_interp.run_interp_cli(args, data)
+
+    # ── Edge network analysis ──
+    if args.edge_network or args.edge_csv or args.edge_json or args.edge_svg:
+        import vormap_edge
+
+        network = vormap_edge.extract_edge_network(regions)
+        stats = vormap_edge.compute_edge_stats(network)
+        print('Edge network: %d vertices, %d edges (%.0f total length)'
+              % (stats['num_vertices'], stats['num_edges'],
+                 stats['total_length']))
+
+        if args.edge_network:
+            print()
+            print(vormap_edge.format_edge_stats(stats))
+
+        if args.edge_csv:
+            vormap_edge.export_edge_csv(network, args.edge_csv)
+            print('Edge CSV saved to %s' % args.edge_csv)
+
+        if args.edge_json:
+            vormap_edge.export_edge_json(network, args.edge_json)
+            print('Edge JSON saved to %s' % args.edge_json)
+
+        if args.edge_svg:
+            vormap_edge.export_edge_svg(
+                network,
+                args.edge_svg,
+                width=args.svg_width,
+                height=args.svg_height,
+                title='Edge Network — %s (%d vertices, %d edges)'
+                      % (args.datafile, stats['num_vertices'],
+                         stats['num_edges']),
+            )
+            print('Edge network SVG saved to %s' % args.edge_svg)
 
 
 if __name__ == '__main__':
