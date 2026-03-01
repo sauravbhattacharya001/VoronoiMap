@@ -1554,3 +1554,164 @@ class TestExportRelaxationHtml:
             assert "status-badge" in content
         finally:
             os.unlink(path)
+
+
+# -- HTML injection / XSS prevention tests ----------------------------------
+
+class TestHtmlEscaping:
+    """Verify that user-supplied values are HTML-escaped in generated files."""
+
+    @pytest.fixture
+    def sample_regions(self):
+        vormap.set_bounds(0, 600, 0, 500)
+        data = [(100, 200), (300, 400), (500, 100)]
+        regions = vormap_viz.compute_regions(data)
+        return regions, data
+
+    @pytest.fixture
+    def relax_data(self):
+        return [(100, 200), (300, 400), (500, 100)]
+
+    # -- export_html --
+
+    def test_html_title_xss_script_tag(self, sample_regions):
+        """Script tags in title should be escaped, not executable."""
+        regions, data = sample_regions
+        xss_title = '<script>alert("xss")</script>'
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_html(regions, data, path, title=xss_title)
+            content = open(path, encoding="utf-8").read()
+            assert '<script>alert("xss")</script>' not in content
+            assert '&lt;script&gt;' in content
+        finally:
+            os.unlink(path)
+
+    def test_html_title_xss_img_onerror(self, sample_regions):
+        """img onerror in title should be escaped."""
+        regions, data = sample_regions
+        xss_title = '<img src=x onerror=alert(1)>'
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_html(regions, data, path, title=xss_title)
+            content = open(path, encoding="utf-8").read()
+            assert '<img src=x' not in content
+            assert '&lt;img' in content
+        finally:
+            os.unlink(path)
+
+    def test_html_title_ampersand_escaped(self, sample_regions):
+        """Ampersands in title should be escaped."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_html(regions, data, path, title="A & B < C")
+            content = open(path, encoding="utf-8").read()
+            assert "A &amp; B &lt; C" in content
+        finally:
+            os.unlink(path)
+
+    def test_html_title_quotes_escaped(self, sample_regions):
+        """Quotes in title should be escaped."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_html(regions, data, path, title='He said "hello"')
+            content = open(path, encoding="utf-8").read()
+            assert '&quot;hello&quot;' in content
+        finally:
+            os.unlink(path)
+
+    def test_html_color_scheme_xss(self, sample_regions):
+        """XSS in color_scheme parameter should be escaped."""
+        regions, data = sample_regions
+        xss_scheme = '";alert(1);//'
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_html(regions, data, path, color_scheme=xss_scheme)
+            content = open(path, encoding="utf-8").read()
+            assert 'alert(1)' not in content or '&quot;' in content
+        finally:
+            os.unlink(path)
+
+    def test_html_normal_title_still_works(self, sample_regions):
+        """Normal titles (no special chars) should render unchanged."""
+        regions, data = sample_regions
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_html(regions, data, path, title="My Voronoi Map")
+            content = open(path, encoding="utf-8").read()
+            assert "My Voronoi Map" in content
+        finally:
+            os.unlink(path)
+
+    # -- export_relaxation_html --
+
+    def test_relaxation_title_xss(self, relax_data):
+        """Script tags in relaxation title should be escaped."""
+        vormap.set_bounds(0, 600, 0, 500)
+        xss_title = '<script>document.cookie</script>'
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500), title=xss_title,
+            )
+            content = open(path, encoding="utf-8").read()
+            assert '<script>document.cookie</script>' not in content
+            assert '&lt;script&gt;' in content
+        finally:
+            os.unlink(path)
+
+    def test_relaxation_color_scheme_xss(self, relax_data):
+        """XSS in relaxation color_scheme should be escaped."""
+        vormap.set_bounds(0, 600, 0, 500)
+        xss_scheme = '</script><script>alert(1)</script>'
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500), color_scheme=xss_scheme,
+            )
+            content = open(path, encoding="utf-8").read()
+            assert '&lt;/script&gt;' in content
+        finally:
+            os.unlink(path)
+
+    def test_relaxation_normal_title_works(self, relax_data):
+        """Normal relaxation titles should render correctly."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500), title="Lloyd Relaxation",
+            )
+            content = open(path, encoding="utf-8").read()
+            assert "Lloyd Relaxation" in content
+        finally:
+            os.unlink(path)
+
+    def test_relaxation_ampersand_escaped(self, relax_data):
+        """Ampersands in relaxation title should be escaped."""
+        vormap.set_bounds(0, 600, 0, 500)
+        with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as f:
+            path = f.name
+        try:
+            vormap_viz.export_relaxation_html(
+                relax_data, iterations=2, output_path=path,
+                bounds=(0, 600, 0, 500), title="X & Y",
+            )
+            content = open(path, encoding="utf-8").read()
+            assert "X &amp; Y" in content
+        finally:
+            os.unlink(path)

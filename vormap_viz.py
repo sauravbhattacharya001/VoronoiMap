@@ -35,6 +35,7 @@ Usage (CLI):
 """
 
 import colorsys
+import html as _html_mod
 import math
 import random
 import xml.etree.ElementTree as ET
@@ -620,8 +621,8 @@ def export_html(
 
     html = _INTERACTIVE_HTML_TEMPLATE.replace("{{REGIONS_JSON}}", regions_json)
     html = html.replace("{{POINTS_JSON}}", points_json)
-    html = html.replace("{{TITLE}}", title_text)
-    html = html.replace("{{INITIAL_SCHEME}}", color_scheme)
+    html = html.replace("{{TITLE}}", _html_mod.escape(title_text))
+    html = html.replace("{{INITIAL_SCHEME}}", _html_mod.escape(color_scheme))
     html = html.replace("{{WIDTH}}", str(width))
     html = html.replace("{{HEIGHT}}", str(height))
 
@@ -1432,8 +1433,8 @@ def export_relaxation_html(
     )
 
     html = _RELAXATION_HTML_TEMPLATE.replace("{{FRAMES_JSON}}", frames_json)
-    html = html.replace("{{TITLE}}", title_text)
-    html = html.replace("{{INITIAL_SCHEME}}", color_scheme)
+    html = html.replace("{{TITLE}}", _html_mod.escape(title_text))
+    html = html.replace("{{INITIAL_SCHEME}}", _html_mod.escape(color_scheme))
     html = html.replace("{{WIDTH}}", str(width))
     html = html.replace("{{HEIGHT}}", str(height))
     html = html.replace("{{TOTAL_ITERATIONS}}", str(result["total_iterations"]))
