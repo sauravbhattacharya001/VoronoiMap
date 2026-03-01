@@ -41,8 +41,6 @@ import math
 import csv
 import xml.etree.ElementTree as ET
 
-from vormap import eudist_pts
-
 try:
     from scipy.spatial import Voronoi as ScipyVoronoi
     _HAS_SCIPY = True
