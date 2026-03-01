@@ -1,6 +1,6 @@
 {
-    "lastUpdated":  "2026-02-25T06:41:45Z",
-    "totalRuns":  487,
+    "lastUpdated":  "2026-02-25T07:09:37Z",
+    "totalRuns":  488,
     "taskTypes":  {
                       "setup_copilot_agent":  {
                                                   "weight":  50,
@@ -44,8 +44,8 @@
                                     },
                       "readme_overhaul":  {
                                               "weight":  64,
-                                              "runs":  17,
-                                              "successes":  17,
+                                              "runs":  18,
+                                              "successes":  18,
                                               "description":  "Overhaul repo README"
                                           },
                       "doc_update":  {
@@ -106,8 +106,8 @@
                                        },
                       "create_release":  {
                                              "weight":  76,
-                                             "runs":  16,
-                                             "successes":  16,
+                                             "runs":  17,
+                                             "successes":  17,
                                              "description":  "Create GitHub Release with tag + changelog"
                                          },
                       "add_dockerfile":  {
@@ -675,6 +675,6 @@
                                           "docs_site"
                                       ]
                   },
-    "notes":  "Run 487. readme_overhaul on BioBots: added 4 missing tool sections (Cluster Analysis, Parameter Optimizer, Trend Analysis, Developer Guide), Live Demo table, fixed test badge 216-\u003e630. add_tests on Ocaml-sample-code: +73 assertions (graph bfs_path/connected_components/topological_sort/add_vertex/dfs_collect, list_last edge cases, fibonacci properties).",
-    "lastRepo":  "Ocaml-sample-code"
+    "notes":  "Run 488. create_release on gif-captcha: v1.1.0 with 8 new features, security hardening, 812 tests. readme_overhaul on prompt: documented all 14 classes (was 5), added test badge (1011), updated architecture diagram.",
+    "lastRepo":  "prompt"
 }

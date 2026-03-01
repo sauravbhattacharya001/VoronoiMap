@@ -1,5 +1,5 @@
 {
-    "totalRuns":  176,
+    "totalRuns":  178,
     "repoFeatures":  {
                          "VoronoiMap":  [
                                             "SVG visualization export with 6 color schemes, CLI integration, scipy+fallback region computation",
@@ -68,7 +68,8 @@
                                          "Parameter Optimizer",
                                          "Batch Statistics API — 3 new REST endpoints: GET api/prints/stats (all-metric descriptive stats in one call), GET api/prints/stats/{metric} (detailed single-metric stats with P5-P99 percentiles + 10-bin histogram), GET api/prints/correlations (Pearson correlation matrix). Linear interpolation percentiles, adjusted Fisher-Pearson skewness, coefficient of variation, sample std dev, equal-width histograms. 55 new tests (376 total).",
                                          "Data Export Manager — createDataExporter() factory in docs/shared/export.js. CSV export with UTF-8 BOM for Excel, RFC 4180 double-quote escaping, nested property resolution (dot notation), custom column mapping with format functions. JSON export with field filtering and nested structure preservation. Timestamp-based filename generation with sanitization. Browser download triggering (Blob + anchor). BioBots metric descriptor integration (columnsFromDescriptors). Export summary metadata. 76 new tests (452 total).",
-                                         "Cluster Analysis — k-means clustering dashboard (docs/cluster.html) across all 9 bioprint metrics. K-means++ initialization with seeded PRNG (mulberry32) for reproducibility. Min-max normalization. Silhouette coefficients for cluster quality assessment. Elbow method + silhouette analysis for automatic k selection. Per-cluster metric profiles (mean, std, min, max). Canvas-drawn radar chart (centroid comparison) and scatter plot (2D projection with cluster coloring). Cluster summary cards, quality indicator, profiles table. 69 new tests (521 total)."
+                                         "Cluster Analysis — k-means clustering dashboard (docs/cluster.html) across all 9 bioprint metrics. K-means++ initialization with seeded PRNG (mulberry32) for reproducibility. Min-max normalization. Silhouette coefficients for cluster quality assessment. Elbow method + silhouette analysis for automatic k selection. Per-cluster metric profiles (mean, std, min, max). Canvas-drawn radar chart (centroid comparison) and scatter plot (2D projection with cluster coloring). Cluster summary cards, quality indicator, profiles table. 69 new tests (521 total).",
+                                         "Print Profile Card � individual print record deep-dive page (docs/profile.html). Search by serial/email/index with autocomplete, quality grade (A-F, weighted: viability 40%, elasticity 25%, layers 20%, crosslinking 15%), 10 metric cards with population percentile bars, anomaly flags (\u003e2s), trend arrows. Canvas radar chart with population average overlay. Auto-generated strengths/weaknesses (top/bottom 3 percentile metrics). Similar prints finder (Euclidean distance on normalized metrics). Copy report + print export. 70 new tests. Commit 5f4632f."
                                      ],
                          "agenticchat":  [
                                              "Conversation history panel — slide-out sidebar showing full chat with user/assistant formatting, code block rendering, export as Markdown or JSON",
@@ -136,7 +137,8 @@
                                                    "Sorting Algorithms — 6 sorts: insertion_sort (stable O(n²)), selection_sort (O(n²) minimal moves), quicksort (median-of-three pivot, 3-way partition), heapsort (functional leftist min-heap), natural_mergesort (run detection + pairwise merge, O(n) on sorted data), counting_sort (O(n+k) integer sort with bounds). Utilities: is_sorted/is_strictly_sorted predicates, partition3, find_runs, timed benchmarking, data generators. 83 new tests",
                                                    "Union-Find (Disjoint Sets) — persistent functional union-find using IntMap with union-by-rank and path compression. create/find/find_root/union/connected (O(log n)), num_components/component_size/component_members/all_components, roots/cardinal/is_single_component, of_unions (bulk construction), kruskal (MST algorithm), would_cycle (cycle detection), to_string. Persistent: old versions remain valid after union. 92 new tests",
                                                    "Functional Hash Map — persistent immutable hash table using separate chaining with auto-resizing. FunMap module: create/insert/find/remove/mem (O(1) amortized), fold/iter/map/mapi/filter/for_all/exists, keys/values/bindings/of_list/to_list, merge/union with conflict resolution, update (Option-based), equal, partition, choose, singleton. Auto-resize at 75% load. Array.copy persistence. Polymorphic keys via Hashtbl.hash. 219-line module, 91 new test assertions.",
-                                                   "Bloom Filter — probabilistic set membership with double hashing. create/create_optimal/add/mem (no false negatives), popcount/saturation/false_positive_rate, of_list/mem_all/mem_any, union/clear/copy/to_string. 156-line module, 65 new test assertions."
+                                                   "Bloom Filter — probabilistic set membership with double hashing. create/create_optimal/add/mem (no false negatives), popcount/saturation/false_positive_rate, of_list/mem_all/mem_any, union/clear/copy/to_string. 156-line module, 65 new test assertions.",
+                                                   "Interval Tree � purely functional augmented AVL interval tree. Stores intervals [lo, hi] with subtree max augmentation for O(log n) overlap queries. Core ops (insert, remove, mem, cardinal), query ops (overlaps, any_overlap, find_containing, find_min/max, span), set ops (union, inter, diff), higher-order (fold, iter, map, filter, for_all, exists, partition), utilities (of_list, to_list, validate, to_string). 129 assertions across 40 test suites. Commit 97c8a6c."
                                                ],
                          "prompt":  [
                                         "Multi-turn Conversation class — persistent message history, configurable per-conversation parameters (temperature/maxTokens/topP/penalties), SendAsync with full context, replay via AddUserMessage/AddAssistantMessage, Clear preserving system prompt, GetHistory export, thread-safe, 28 tests",
@@ -203,8 +205,8 @@
                                              "HTML Dashboard Report — self-contained HTML dashboard with CSS-only score gauge (conic-gradient), severity badges, module breakdown table, collapsible findings, light/dark mode, responsive layout, print styles. HtmlDashboardGenerator, HtmlDashboardOptions. CLI: --html-dark, --html-include-pass, --html-title. 80 new tests."
                                          ]
                      },
-    "lastRepo":  "agentlens",
-    "lastFeature":  "SessionTimelineRenderer",
+    "lastRepo":  "BioBots",
+    "lastFeature":  "PrintProfileCard",
     "completedFeatures":  {
                               "agenticchat":  [
                                                   "session_management"
