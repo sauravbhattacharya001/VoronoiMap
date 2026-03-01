@@ -1142,6 +1142,59 @@ def main():
         help='Export an SVG showing query points and nearest-seed connections.',
     )
 
+    # ── Interpolation arguments ──
+    parser.add_argument(
+        '--interp-values',
+        metavar='FILE',
+        help='File with one scalar value per line (matching seed point order). '
+             'Enables spatial interpolation commands.',
+    )
+    parser.add_argument(
+        '--interp-query',
+        metavar='X,Y',
+        help='Interpolate value at a single point (e.g. --interp-query 300,400). '
+             'Requires --interp-values.',
+    )
+    parser.add_argument(
+        '--interp-method',
+        default='natural',
+        choices=['natural', 'idw', 'nearest'],
+        help='Interpolation method (default: natural). '
+             'natural=Sibson natural neighbor, idw=inverse distance weighting, '
+             'nearest=nearest seed value.',
+    )
+    parser.add_argument(
+        '--interp-surface-svg',
+        metavar='OUTPUT',
+        help='Export interpolated surface as an SVG heatmap grid.',
+    )
+    parser.add_argument(
+        '--interp-surface-csv',
+        metavar='OUTPUT',
+        help='Export interpolated surface as a CSV grid.',
+    )
+    parser.add_argument(
+        '--interp-nx',
+        type=int, default=50,
+        help='Grid columns for surface interpolation (default: 50).',
+    )
+    parser.add_argument(
+        '--interp-ny',
+        type=int, default=50,
+        help='Grid rows for surface interpolation (default: 50).',
+    )
+    parser.add_argument(
+        '--interp-power',
+        type=float, default=2.0,
+        help='Power parameter for IDW interpolation (default: 2.0).',
+    )
+    parser.add_argument(
+        '--interp-ramp',
+        default='viridis',
+        choices=['viridis', 'plasma', 'hot_cold'],
+        help='Color ramp for surface SVG (default: viridis).',
+    )
+
     args = parser.parse_args()
 
     # Apply explicit bounds if given (disables auto-detection)
@@ -1168,6 +1221,7 @@ def main():
         args.graph, args.graph_json, args.graph_csv, args.graph_svg,
         args.query, args.query_batch,
         args.heatmap, args.heatmap_html,
+        args.interp_values,
     ])
 
     data = None
@@ -1370,6 +1424,11 @@ def main():
     if args.query or args.query_batch:
         import vormap_query
         vormap_query.run_query_cli(args, data, regions)
+
+    # ── Spatial interpolation ──
+    if args.interp_values:
+        import vormap_interp
+        vormap_interp.run_interp_cli(args, data)
 
 
 if __name__ == '__main__':
