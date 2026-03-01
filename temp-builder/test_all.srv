@@ -1,0 +1,142 @@
+# ==========================================
+# sauravcode full feature test
+# ==========================================
+
+# --- 1. Basic functions ---
+function add x y
+    return x + y
+
+function multiply x y
+    return x * y
+
+# --- 2. Print ---
+print "=== sauravcode compiler test ==="
+
+# --- 3. Variables & arithmetic ---
+a = 10
+b = 3
+print a + b
+print a - b
+print a * b
+print a / b
+print a % b
+
+# --- 4. Booleans & logical operators ---
+x = true
+y = false
+print "Booleans:"
+if x and not y
+    print "x is true and y is false"
+
+if x or y
+    print "at least one is true"
+
+# --- 5. If / else if / else ---
+score = 85
+if score >= 90
+    print "A grade"
+else if score >= 80
+    print "B grade"
+else if score >= 70
+    print "C grade"
+else
+    print "below C"
+
+# --- 6. While loop ---
+print "While loop:"
+counter = 0
+while counter < 5
+    print counter
+    counter = counter + 1
+
+# --- 7. For loop ---
+print "For loop:"
+for i 1 6
+    print i
+
+# --- 8. Nested functions ---
+function square x
+    return x * x
+
+function hypotenuse a b
+    return square a + square b
+
+print "Hypotenuse squared:"
+print hypotenuse 3 4
+
+# --- 9. Recursion (with parens for disambiguation) ---
+function factorial n
+    if n <= 1
+        return 1
+    return n * factorial (n - 1)
+
+print "Factorial 10:"
+print factorial 10
+
+function fib n
+    if n <= 1
+        return n
+    return fib (n - 1) + fib (n - 2)
+
+print "Fibonacci 10:"
+print fib 10
+
+# --- 10. Strings ---
+name = "sauravcode"
+print name
+print "Hello from sauravcode!"
+
+# --- 11. Lists ---
+nums = [10, 20, 30]
+print "List element 0:"
+print nums[0]
+print "List element 2:"
+print nums[2]
+print "List length:"
+print len nums
+
+append nums 40
+print "After append, length:"
+print len nums
+print "New element:"
+print nums[3]
+
+# --- 12. Negative numbers ---
+neg = -42
+print neg
+
+# --- 13. Modulo ---
+print "15 mod 4:"
+print 15 % 4
+
+# --- 14. Comparisons ---
+if 5 != 3
+    print "5 != 3: true"
+if 3 <= 5
+    print "3 <= 5: true"
+if 5 >= 5
+    print "5 >= 5: true"
+
+# --- 15. Nested expressions with parens ---
+result = (2 + 3) * (4 - 1)
+print "result: (2+3)*(4-1) ="
+print result
+
+# --- 16. Complex function ---
+function max a b
+    if a > b
+        return a
+    return b
+
+function min a b
+    if a < b
+        return a
+    return b
+
+print "max(7, 3):"
+print max 7 3
+print "min(7, 3):"
+print min 7 3
+
+# --- Done ---
+print "=== all tests passed ==="

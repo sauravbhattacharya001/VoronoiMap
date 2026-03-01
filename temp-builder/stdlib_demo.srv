@@ -1,0 +1,112 @@
+# ==========================================
+# sauravcode standard library demo
+# ==========================================
+
+print "=== String Functions ==="
+
+# upper / lower
+print upper "hello world"
+print lower "HELLO WORLD"
+
+# trim
+print trim "  spaces  "
+
+# replace
+print replace "hello world" "world" "sauravcode"
+
+# split + join
+words = split "one-two-three" "-"
+print words[0]
+print words[1]
+print words[2]
+print join ", " words
+
+# contains
+print contains "hello" "ell"
+print contains "hello" "xyz"
+
+# starts_with / ends_with
+print starts_with "sauravcode" "saurav"
+print ends_with "sauravcode" "code"
+
+# substring
+print substring "hello world" 0 5
+
+# index_of
+print index_of "hello" "ll"
+
+# char_at
+print char_at "hello" 0
+print char_at "hello" 4
+
+print ""
+print "=== Math Functions ==="
+
+# abs (use parens for negative literals)
+print abs (-42)
+print abs 42
+
+# round
+print round 3.7
+print round 3.14159 2
+
+# floor / ceil
+print floor 3.7
+print ceil 3.2
+
+# sqrt
+print sqrt 16
+print sqrt 2
+
+# power
+print power 2 10
+
+print ""
+print "=== Utility Functions ==="
+
+# type_of
+print type_of 42
+print type_of "hello"
+print type_of true
+items = [1, 2, 3]
+print type_of items
+
+# to_string / to_number
+x = to_string 42
+print x
+y = to_number "3.14"
+print y
+
+# range — generate lists of numbers
+nums = range 5
+print nums
+nums2 = range 1 6
+print nums2
+evens = range 0 10 2
+print evens
+
+# reverse
+print reverse "hello"
+backwards = [5, 4, 3, 2, 1]
+reversed_list = reverse backwards
+print reversed_list
+
+# sort
+unsorted = [5, 3, 1, 4, 2]
+sorted_list = sort unsorted
+print sorted_list
+
+# contains — with strings (two string args work naturally)
+print contains "hello world" "world"
+print contains "hello world" "xyz"
+
+print ""
+print "=== Practical Example: Word Counter ==="
+
+words = split "the quick brown fox jumps over the lazy dog" " "
+print join " | " words
+print "Word count:"
+print len words
+
+print ""
+print "=== all stdlib tests passed ==="

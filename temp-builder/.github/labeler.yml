@@ -1,0 +1,34 @@
+# Auto-labeler configuration for PR labeling based on changed files
+# Used by actions/labeler@v5
+
+compiler:
+  - changed-files:
+      - any-glob-to-any-file: 'sauravcc.py'
+
+interpreter:
+  - changed-files:
+      - any-glob-to-any-file: 'saurav.py'
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'test*.srv'
+          - 'tests/**'
+
+examples:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '*.srv'
+          - '!test*.srv'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'README.md'
+          - 'docs/**'
+          - '*.md'
+
+ci/cd:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'

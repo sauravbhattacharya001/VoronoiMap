@@ -1,3 +1,53 @@
+## 2026-02-28
+
+### Gardener Run #496 — 10:40 PM PST
+**Task 1 (open_issue):** GraphVisual — Filed issue #18: Dijkstra's `PriorityQueue` comparator reads from mutable `dist` map. Java's PQ doesn't re-heapify on external changes, so `poll()` may not return the true minimum-distance vertex. Can produce incorrect shortest paths on certain graph topologies.
+**Task 2 (open_issue):** agentlens — Filed issue #21: `AnomalyDetector._compute_baseline()` uses population variance (`/ n`) instead of sample variance (`/ (n-1)`). With `min_samples=3`, std dev is ~18% too small, making 2σ threshold effectively ~1.63σ. False positive rate roughly doubles for warnings.
+
+### Builder Run #182 — 10:35 PM PST
+**Repo:** WinSentinel
+**Feature:** Finding Age Tracker — persistence analysis across audit runs. Tracks finding lifecycles (first seen, last seen, resolved, consecutive runs, frequency), calculates MTTR (mean/median), priority scoring (severity × log2(age) × frequency), health grading (A-F), classifications (New/Chronic/Recurring/Intermittent/Resolved). Full CLI with `--age report/priority/chronic/new/resolved` and filters (`--age-days`, `--age-severity`, `--age-module`, `--age-class`, `--age-top`). JSON output support. 86 new tests. Commit `42e511b`.
+
+---
+
+### Builder Run #181 — 10:25 PM PST
+- **Repo:** getagentbox
+- **Feature:** Integrations Showcase — 9 platform/tool integrations (Telegram, WhatsApp, Google Calendar, Gmail, GitHub, Web Search, Slack, Notion, Webhooks) with live/coming-soon badges and category filtering (All/Messaging/Productivity/Developer). Integrations module, ARIA tablist, responsive CSS grid, event delegation. 27 new tests (258 total).
+- **Commit:** 92322e9
+
+### Gardener Run #495 — 10:05 PM PST
+**Task 1 (security_fix):** everything — Added table name whitelist (`_allowedTables`) to `LocalStorage`. SQL table names can't be parameterized, so sqflite interpolates them directly — whitelist prevents injection via identifier. Validated `insert()`, `getAll()`, `delete()`. Commit `796d99e`.
+**Task 2 (readme_overhaul):** FeedReader — Documented 8 undocumented features (Article Notes, Content Filters, Feed Health Monitor, Offline Cache, OPML, Reading History, Smart Feeds, Security Hardening), added 12 missing source files and 9 missing test files to architecture, updated test counts (614 total), added test badge, added 16 new test scenario rows. Commit `2a88f85`.
+
+### Builder Run #180 — 9:31 PM PST
+**Feature (Vidly):** Rental History & Analytics Service — IRentalHistoryService with GetRentalHistory, GetCustomerTimeline, GetPopularTimes, GetRetentionMetrics, GetInventoryForecast, GetLoyaltyScore, GetSeasonalTrends, GenerateReport. 68 new tests. Commit `0436dbb`.
+
+### Gardener Run #494 — 10:05 PM PST
+**Task 1 (code_cleanup):** agenticchat — Extracted shared `formatRelativeTime()` and `downloadBlob()` utilities, replacing 3 duplicate implementations. Removed unused `--error`/`--warning` CSS vars. Net -15 lines. 584 tests pass. Commit `539a17f`.
+**Task 2 (doc_update):** prompt — Added 159 lines of XML doc comments to `PromptTestSuite.cs` (was 0 docs on 58 public members). 1091 tests pass. Commit `c922c4f`.
+
+### Gardener Run #492-493 — 10:00 PM PST
+- **Task 1:** BioBots — `perf_improvement` → Optimized hot paths in the bioprint dashboard: hoisted `_metricAccessors` out of `getMetricValue()` (called 310K×9 per load), replaced two-pass mean/std in `computeStats()` with Welford's single-pass algorithm + in-place sort (avoids 300K+ array copy), replaced `Math.min/max(...spread)` patterns in cluster.html and anomaly.html with iterative loops to prevent stack overflow on large datasets. 638 tests pass. Pushed to master.
+- **Task 2:** GraphVisual — `refactor` → Extracted `createCategoryRow()` helper and `createGraphRefreshListener()` in Main.java, collapsing 5 near-identical 70-line blocks into a single parameterised method. Introduced `CategoryRow` inner class. Net: -504 lines, +176 lines (−328 net). Pushed to master.
+
+### Gardener Run #490-491 — 9:46 PM PST
+- **Task 1:** VoronoiMap — `open_issue` → Opened #28: `_kdtree_by_id` cache uses `id()` which is unsafe after GC (Python reuses object IDs, leading to stale cache hits with wrong KDTrees)
+- **Task 2:** VoronoiMap — `fix_issue` → Fixed #28: replaced fragile `id()`-based `_kdtree_by_id` with unified `_file_cache` dict keyed by filename. Added backward-compat dict views so 747 existing tests pass unchanged. Pushed to master (ff69b5e).
+
+### Gardener Run #489 — 9:25 PM PST
+**Task 1 (add_tests):** sauravcode — +81 tests (867→948) in new `tests/test_builtin_errors.py`. 37 error path tests covering type validation for all string builtins (upper/lower/trim/replace/split/join/contains/starts_with/ends_with/substring/index_of/char_at), math builtins (sqrt negative, round args, abs type, power args), utility builtins (reverse/sort type, range args, to_number). 44 edge case tests for boundary values. Commit `dee1513`.
+**Task 2 (open_issue):** getagentbox — Filed [#13](https://github.com/sauravbhattacharya001/getagentbox/issues/13): Stats counter animation stalls on small targets (Math.round non-monotonic display) and can stack setInterval timers when called twice on same element.
+
+### Profile README Refresh (9:02 PM PST)
+- ✅ Refreshed `sauravbhattacharya001/sauravbhattacharya001` profile README
+- Added `zalenix-memory` repo to AI & Agents table
+- Updated commit count badge (878 → 900+)
+- All other repos, releases, and live sites were already current
+- Commit: `50208f6` pushed to master
+
+### Daily Memory Backup — 9:02 PM PST
+**Task:** Automated backup. 5 files changed (new daily memory, status, runs, builder-state, gardener-weights). Pushed to `zalenix-memory` repo.
+
 ## 2026-02-24
 
 ### Effectiveness Dashboard — 11:19 PM PST

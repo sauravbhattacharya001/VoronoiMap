@@ -1,0 +1,8 @@
+name = "World"
+x = 42
+msg = f"Hello {name}! The answer is {x}."
+print msg
+print f"Sum: {x + 8}"
+print f"Name is {name}"
+y = x * 2
+print f"Double: {y}"

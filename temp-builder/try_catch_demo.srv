@@ -1,0 +1,117 @@
+# try_catch_demo.srv — Error handling in sauravcode
+# Demonstrates try/catch/throw for robust error handling
+
+# ---- Basic try/catch: catching runtime errors ----
+print "=== Basic try/catch ==="
+try
+    x = 10 / 0
+catch err
+    print f"Caught error: {err}"
+
+# ---- Throwing custom errors ----
+print ""
+print "=== Custom throw ==="
+
+function validate_age age
+    if age < 0
+        throw "Age cannot be negative"
+    if age > 150
+        throw f"Unrealistic age: {age}"
+    return age
+
+try
+    neg = 0 - 5
+    result = validate_age neg
+    print f"Age: {result}"
+catch err
+    print f"Validation failed: {err}"
+
+try
+    result = validate_age 25
+    print f"Age: {result}"
+catch err
+    print f"Validation failed: {err}"
+
+# ---- Catching index out of bounds ----
+print ""
+print "=== Index errors ==="
+items = ["apple", "banana", "cherry"]
+try
+    bad = items[10]
+    print bad
+catch err
+    print f"Array error: {err}"
+
+# ---- Throwing from nested functions ----
+print ""
+print "=== Nested function throws ==="
+
+function safe_divide a b
+    if b == 0
+        throw "Cannot divide by zero!"
+    return a / b
+
+try
+    answer = safe_divide 10 0
+    print f"Answer: {answer}"
+catch err
+    print f"Calculation error: {err}"
+
+# Normal case works fine
+answer = safe_divide 10 5
+print f"10 / 5 = {answer}"
+
+# ---- Error recovery: program continues after catch ----
+print ""
+print "=== Error recovery in loops ==="
+total = 0
+for i 0 5
+    try
+        divisor = i - 2
+        val = safe_divide 100 divisor
+        total = total + val
+        print f"  100 / {divisor} = {val}"
+    catch err
+        print f"  Skipped i={i}: {err}"
+print f"Total (skipping errors): {total}"
+
+# ---- Throw with dynamic messages ----
+print ""
+print "=== Dynamic error messages ==="
+function check_positive val name
+    if val < 0
+        throw f"{name} must be positive, got {val}"
+    return val
+
+try
+    check_positive (0 - 42) "temperature"
+catch err
+    print err
+
+result = check_positive 100 "pressure"
+print f"Pressure OK: {result}"
+
+# ---- Re-checking after catch ----
+print ""
+print "=== Life goes on after errors ==="
+status = "ok"
+try
+    throw "something broke"
+catch err
+    status = "recovered"
+    print f"Error handled: {err}"
+print f"Status: {status}"
+
+# ---- Throw different types ----
+print ""
+print "=== Throw expressions ==="
+try
+    throw 404
+catch err
+    print f"Error code: {err}"
+
+try
+    code = 500
+    throw f"HTTP {code}: Internal Server Error"
+catch err
+    print err

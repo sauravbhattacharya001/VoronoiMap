@@ -1,0 +1,30 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install GCC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc
+
+      - name: Verify interpreter
+        run: python saurav.py test_all.srv
+
+      - name: Verify compiler
+        run: |
+          python sauravcc.py test_all.srv
+          python sauravcc.py hello.srv
+          python sauravcc.py a.srv

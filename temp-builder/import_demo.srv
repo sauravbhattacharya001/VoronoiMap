@@ -1,0 +1,19 @@
+# import_demo.srv — Demonstrates the import system
+# Run: python saurav.py import_demo.srv
+
+# Import a utility module
+import "import_utils"
+
+# Use functions from the imported module
+x = square 5
+print f"Square of 5: {x}"
+
+y = double 7
+print f"Double of 7: {y}"
+
+# Use variables from the imported module
+print f"PI is approximately {PI}"
+print f"App name: {APP_NAME}"
+
+# Can also import using bare identifier syntax
+# import import_utils

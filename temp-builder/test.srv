@@ -1,0 +1,25 @@
+# Test: basic functions
+function add x y
+    return x + y
+
+function multiply x y
+    return x * y
+
+function square x
+    return x * x
+
+# Test: nested calls
+function hypotenuse a b
+    sa = square a
+    sb = square b
+    return sa + sb
+
+# Test: print keyword
+function greet name
+    print name
+    return 0
+
+add 3 5
+multiply 4 6
+square 7
+hypotenuse 3 4

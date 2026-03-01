@@ -1,0 +1,87 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sauravcode"
+version = "2.2.0"
+description = "A programming language designed for clarity — no parentheses, commas, or semicolons"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Saurav Bhattacharya", email = "online.saurav@gmail.com"},
+]
+keywords = [
+    "programming-language",
+    "interpreter",
+    "compiler",
+    "language-design",
+    "sauravcode",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Compilers",
+    "Topic :: Software Development :: Interpreters",
+    "Topic :: Software Development :: Libraries",
+]
+
+[project.urls]
+Homepage = "https://github.com/sauravbhattacharya001/sauravcode"
+Documentation = "https://sauravbhattacharya001.github.io/sauravcode/"
+Repository = "https://github.com/sauravbhattacharya001/sauravcode"
+Changelog = "https://github.com/sauravbhattacharya001/sauravcode/blob/main/CHANGELOG.md"
+Issues = "https://github.com/sauravbhattacharya001/sauravcode/issues"
+
+[project.scripts]
+sauravcode = "sauravcode.cli:main_interpret"
+sauravcode-compile = "sauravcode.cli:main_compile"
+
+[tool.setuptools.packages.find]
+include = ["sauravcode*"]
+
+[tool.setuptools.package-data]
+sauravcode = ["*.srv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "-v",
+    "--tb=short",
+]
+
+[tool.coverage.run]
+source = ["sauravcode"]
+omit = [
+    "tests/*",
+    "docs/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__",
+    "def __repr__",
+    "raise NotImplementedError",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"

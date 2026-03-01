@@ -1,0 +1,47 @@
+# List Comprehension Demo
+# Syntax: [expr for var in iterable]
+#         [expr for var in iterable if condition]
+
+# Basic: double each number
+doubles = [x * 2 for x in [1, 2, 3, 4, 5]]
+print doubles
+
+# Squares of first 6 numbers using range
+squares = [n * n for n in range 6]
+print squares
+
+# Filter: only even numbers
+evens = [x for x in range 10 if x % 2 == 0]
+print evens
+
+# Transform + filter: squares of odd numbers
+odd_squares = [x * x for x in range 10 if x % 2 != 0]
+print odd_squares
+
+# With strings
+greeting = "hello world"
+caps = [upper c for c in "abc"]
+print caps
+
+# Filter characters
+vowels = [c for c in "sauravcode" if contains "aeiou" c]
+print vowels
+
+# With variables
+prices = [10, 25, 5, 50, 15, 30]
+expensive = [p for p in prices if p > 20]
+print expensive
+
+# In a function
+function positives nums
+    return [x for x in nums if x > 0]
+
+data = [-3, 5, -1, 8, 0, -2, 7]
+result = positives data
+print result
+
+# Comprehension vs map+lambda equivalence
+a = [x * 2 for x in [1, 2, 3]]
+b = map (lambda x -> x * 2) [1, 2, 3]
+print a
+print b

@@ -1,0 +1,15 @@
+# Hello World in sauravcode
+# Run: python saurav.py hello.srv
+# Compile: python sauravcc.py hello.srv
+
+print "Hello, World!"
+
+name = "sauravcode"
+print "Welcome to"
+print name
+
+# Simple arithmetic
+x = 7
+y = 3
+print x + y
+print x * y

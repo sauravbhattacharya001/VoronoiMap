@@ -1,0 +1,12 @@
+x = -42.7
+print abs x
+print floor x
+print ceil x
+print sqrt 144
+print round 3.7
+print power 2 10
+n = 42
+print to_string n
+name = "hello world"
+print upper name
+print lower "HELLO"

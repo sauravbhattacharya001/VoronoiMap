@@ -1,0 +1,68 @@
+# Pipe Operator Demo
+# The |> operator passes a value as the last argument to a function
+# Enables clean functional composition chains
+
+# --- Basic piping ---
+print "=== Basic Pipe ==="
+print "hello" |> upper
+print "  hello  " |> trim
+print [3, 1, 2] |> sort
+print [1, 2, 3] |> reverse
+print "HELLO" |> lower
+
+# --- Pipe with lambdas ---
+print ""
+print "=== Pipe with Lambdas ==="
+print 5 |> lambda x -> x * 2
+print 10 |> lambda x -> x + 5
+print 4 |> lambda x -> x * x
+
+# --- Chaining ---
+print ""
+print "=== Chaining ==="
+print "  Hello World  " |> trim |> upper
+print "  Hello World  " |> trim |> lower
+print [5, 3, 1, 4, 2] |> sort |> reverse
+
+# --- Lambda chaining ---
+print ""
+print "=== Lambda Chaining ==="
+print 5 |> lambda x -> x + 1 |> lambda x -> x * 2
+
+# --- With higher-order functions ---
+print ""
+print "=== Higher-Order Functions ==="
+print [1, 2, 3, 4, 5] |> filter (lambda x -> x > 2)
+print [1, 2, 3] |> map (lambda x -> x * 10)
+
+# --- Functional pipeline ---
+print ""
+print "=== Full Pipeline ==="
+result = range 1 6 |> map (lambda x -> x * x) |> filter (lambda x -> x > 10)
+print result
+
+# --- User-defined functions ---
+print ""
+print "=== User-Defined Functions ==="
+function double x
+    return x * 2
+
+function increment x
+    return x + 1
+
+print 5 |> double
+print 5 |> increment
+print 3 |> increment |> double
+
+# --- Variables in pipes ---
+print ""
+print "=== Variables ==="
+data = [10, 5, 8, 3, 7]
+sorted_data = data |> sort
+print sorted_data
+print data |> sort |> reverse
+
+# --- Pipe with join ---
+print ""
+print "=== Join ==="
+print ["hello", "world"] |> join " "

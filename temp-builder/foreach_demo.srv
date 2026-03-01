@@ -1,0 +1,128 @@
+# ==========================================
+# For-Each & Higher-Order Functions Demo
+# ==========================================
+
+print "=== For-Each Loops ==="
+
+# Iterate over a list
+fruits = ["apple", "banana", "cherry"]
+print "Fruits:"
+for fruit in fruits
+    print f"  - {fruit}"
+
+# Iterate over a string
+print "Characters in 'hello':"
+for ch in "hello"
+    print ch
+
+# Iterate over map keys
+config = {"host": "localhost", "port": 8080}
+print "Config keys:"
+for key in config
+    print key
+
+# For-each with accumulation
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+total = 0
+for n in numbers
+    total = total + n
+print f"Sum of 1-10: {total}"
+
+# Nested for-each
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+print "Matrix flat:"
+for row in matrix
+    for val in row
+        print val
+
+# For-each with filtering logic
+ages = [15, 22, 17, 30, 12, 45]
+print "Adults (18+):"
+for age in ages
+    if age >= 18
+        print age
+
+print ""
+print "=== Higher-Order Functions ==="
+
+# Note: Use parens around function name to prevent greedy parsing.
+# map (double) nums  →  map(double, nums)  ✓
+# map double nums    →  map(double(nums))  ✗ (ambiguity)
+
+# map — transform each element
+function double x
+    return x * 2
+
+function square x
+    return x * x
+
+nums = [1, 2, 3, 4, 5]
+print f"Original: {nums}"
+doubled = map (double) nums
+squared = map (square) nums
+print f"Doubled:  {doubled}"
+print f"Squared:  {squared}"
+
+# filter — keep matching elements
+function is_even x
+    return x % 2 == 0
+
+function is_positive x
+    return x > 0
+
+mixed = [-3, -1, 0, 2, 4, -5, 7]
+print f"Mixed:    {mixed}"
+evens = filter (is_even) mixed
+positives = filter (is_positive) mixed
+print f"Evens:    {evens}"
+print f"Positive: {positives}"
+
+# reduce — fold into single value
+function add a b
+    return a + b
+
+function multiply a b
+    return a * b
+
+function max_of a b
+    if b > a
+        return b
+    return a
+
+sum_result = reduce (add) (nums) 0
+product = reduce (multiply) (nums) 1
+maximum = reduce (max_of) (nums) 0
+print f"Sum:     {sum_result}"
+print f"Product: {product}"
+print f"Max:     {maximum}"
+
+# each — apply for side effects
+function greet name
+    print f"Hello, {name}!"
+
+names = ["Alice", "Bob", "Charlie"]
+_ = each (greet) names
+
+# Chaining: filter then map
+scores = [45, 78, 92, 35, 88, 67, 95]
+function passed x
+    return x >= 60
+
+function add_bonus x
+    return x + 5
+
+passing = filter (passed) scores
+boosted = map (add_bonus) passing
+print f"Original scores: {scores}"
+print f"Passing (>=60):  {passing}"
+print f"With +5 bonus:   {boosted}"
+
+# Works with builtins too
+words = ["hello", "WORLD", "Foo"]
+upper_words = map (upper) words
+lower_words = map (lower) words
+print f"Uppercased: {upper_words}"
+print f"Lowercased: {lower_words}"
+
+print ""
+print "=== all for-each tests passed ==="

@@ -1,0 +1,37 @@
+# Build artifacts
+*.exe
+*.o
+*.pyc
+*.pyo
+__pycache__/
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation build
+docs/_build/
+htmlcov/
+
+# CI/CD
+.github/
+
+# Docker (don't include Dockerfile in the build context sent to Docker)
+Dockerfile
+.dockerignore
+docker-compose*.yml

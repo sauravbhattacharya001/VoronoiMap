@@ -1,0 +1,118 @@
+# fstring_demo.srv — String Interpolation (f-strings) Demo
+# Run: python saurav.py fstring_demo.srv
+
+print "=== F-String (String Interpolation) Demo ==="
+print ""
+
+# --- Basic variable interpolation ---
+print "--- Basic Interpolation ---"
+name = "Alice"
+print f"Hello, {name}!"
+
+age = 30
+print f"{name} is {age} years old"
+
+# --- Expression interpolation ---
+print ""
+print "--- Expressions in F-Strings ---"
+x = 10
+y = 3
+print f"{x} + {y} = {x + y}"
+print f"{x} * {y} = {x * y}"
+print f"{x} - {y} = {x - y}"
+
+# --- Boolean and type interpolation ---
+print ""
+print "--- Types in F-Strings ---"
+active = true
+print f"active: {active}"
+print f"type of name: {type_of name}"
+print f"type of age: {type_of age}"
+
+# --- Function results in f-strings ---
+print ""
+print "--- Functions in F-Strings ---"
+greeting = "hello world"
+print f"upper: {upper greeting}"
+print f"length: {len greeting}"
+print f"reversed: {reverse greeting}"
+
+# --- Collections in f-strings ---
+print ""
+print "--- Collections in F-Strings ---"
+nums = [1, 2, 3, 4, 5]
+print f"list: {nums}"
+print f"first item: {nums[0]}"
+print f"list has {len nums} items"
+
+data = {"name": "Bob", "score": 95}
+print f"map: {data}"
+
+# --- F-strings in functions ---
+print ""
+print "--- F-Strings in Functions ---"
+function describe_person name age
+    return f"{name} is {age} years old"
+
+print describe_person "Charlie" 25
+
+function format_calc a op b result
+    return f"{a} {op} {b} = {result}"
+
+print format_calc 10 "+" 5 15
+print format_calc 8 "*" 7 56
+
+# --- F-strings in loops ---
+print ""
+print "--- F-Strings in Loops ---"
+for i 1 6
+    sq = i * i
+    print f"{i} squared = {sq}"
+
+# --- F-strings with escaped braces ---
+print ""
+print "--- Escaped Braces ---"
+x = 42
+print f"literal braces: {{x}}"
+print f"value of x: {x}"
+print f"combined: {{x}} = {x}"
+
+# --- Practical examples ---
+print ""
+print "--- Practical Examples ---"
+
+# Temperature conversion
+function celsius_to_fahrenheit c
+    f = c * 9 / 5 + 32
+    return f"{c}C = {f}F"
+
+print celsius_to_fahrenheit 0
+print celsius_to_fahrenheit 100
+print celsius_to_fahrenheit 37
+
+# Greeting generator
+function make_greeting time name
+    if time == "morning"
+        return f"Good morning, {name}! Rise and shine!"
+    else if time == "evening"
+        return f"Good evening, {name}! How was your day?"
+    else
+        return f"Hello, {name}!"
+
+print make_greeting "morning" "Alice"
+print make_greeting "evening" "Bob"
+print make_greeting "afternoon" "Charlie"
+
+# Simple report
+print ""
+print "--- Report ---"
+total = 0
+for i 1 6
+    total = total + i
+avg = total / 5
+print f"Sum of 1-5: {total}"
+print f"Average: {avg}"
+print f"Items counted: 5"
+
+print ""
+print "=== all f-string tests passed ==="

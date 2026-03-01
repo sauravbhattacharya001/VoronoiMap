@@ -1,0 +1,99 @@
+# ==========================================
+# sauravcode map/dictionary demo
+# ==========================================
+
+print "=== Map Basics ==="
+
+# Create a map with { key: value } syntax
+person = {"name": "Saurav", "age": 36, "city": "Seattle"}
+print person
+
+# Access values by key
+print person["name"]
+print person["age"]
+print person["city"]
+
+# Modify a value
+person["age"] = 37
+print person["age"]
+
+# Add new key
+person["language"] = "sauravcode"
+print person
+
+# Map length
+print len person
+
+print ""
+print "=== Map Functions ==="
+
+# keys — get all keys as a list
+k = keys person
+print k
+
+# values — get all values as a list
+v = values person
+print v
+
+# has_key — check if map contains key (use parens for variable args)
+print has_key (person) "name"
+print has_key (person) "email"
+
+# contains — also works for maps (checks keys)
+print contains (person) "city"
+print contains (person) "zipcode"
+
+print ""
+print "=== Map with Different Value Types ==="
+
+config = {"debug": true, "max_retries": 3, "timeout": 30.5, "name": "app"}
+print config
+print type_of config
+
+# Nested structures: map with list values
+scores = {"math": [95, 87, 92], "english": [88, 91, 85]}
+print scores
+math_scores = scores["math"]
+print math_scores
+print math_scores[0]
+
+print ""
+print "=== Practical Example: Word Frequency ==="
+
+# Count word frequencies using maps
+words = split "the quick brown fox jumps over the lazy fox" " "
+freq = {}
+for i 0 len words
+    word = words[i]
+    if contains (freq) word
+        freq[word] = freq[word] + 1
+    else
+        freq[word] = 1
+print freq
+
+# Check specific words
+print freq["the"]
+print freq["fox"]
+
+print ""
+print "=== Empty Map ==="
+empty = {}
+print empty
+print len empty
+
+print ""
+print "=== Map to String ==="
+info = {"tool": "sauravcode", "version": 2}
+s = to_string info
+print s
+
+print ""
+print "=== Nested Maps ==="
+db = {"host": "localhost", "port": 5432}
+app = {"name": "myapp", "db": db}
+print app
+inner = app["db"]
+print inner["host"]
+
+print ""
+print "=== all map tests passed ==="

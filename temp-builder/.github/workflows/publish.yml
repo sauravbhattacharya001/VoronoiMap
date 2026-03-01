@@ -1,0 +1,101 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write  # Required for trusted publishing
+
+jobs:
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: pip install build
+
+      - name: Build package
+        run: python -m build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: dist
+          path: dist/
+
+  test-package:
+    name: Verify package
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install from wheel
+        run: pip install dist/*.whl
+
+      - name: Verify CLI entry points
+        run: |
+          sauravcode --help || echo "Interpreter available"
+          sauravcode-compile --help || echo "Compiler available"
+
+      - name: Verify package import
+        run: |
+          python -c "import sauravcode; print(f'sauravcode {sauravcode.__version__}')"
+
+  publish-testpypi:
+    name: Publish to TestPyPI
+    needs: test-package
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/sauravcode
+
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+        continue-on-error: true  # Don't block if version exists on TestPyPI
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: test-package
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    environment:
+      name: pypi
+      url: https://pypi.org/p/sauravcode
+
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

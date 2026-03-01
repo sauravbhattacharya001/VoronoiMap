@@ -1,0 +1,16 @@
+# import_utils.srv — A utility module for import_demo.srv
+# This file is imported, not run directly.
+
+# Variables
+PI = 3.14159
+APP_NAME = "SauravCode"
+
+# Functions
+function square n
+    return n * n
+
+function double n
+    return n * 2
+
+function greet name
+    return f"Hello, {name}!"
