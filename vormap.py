@@ -50,13 +50,105 @@ class Oracle:
     calls = 0
 
 
-# Cache loaded data files so each file is read from disk exactly once.
-# When scipy is available, a KDTree is stored alongside the point list.
-_data_cache = {}
+# Unified cache: filename → { 'points': list, 'tree': KDTree | None }
+# Eliminates the old _kdtree_by_id dict that used id() as keys,
+# which was unsafe — Python can reuse object ids after GC, leading
+# to stale cache hits returning wrong KDTrees.  (Fixes #28)
+_file_cache = {}
 
-# Maps id(data_list) → KDTree for O(1) lookup in get_NN.
-# This replaces the old O(n) identity scan over _data_cache.
-_kdtree_by_id = {}
+
+# ---------------------------------------------------------------------------
+# Backward-compatible cache views
+# ---------------------------------------------------------------------------
+# Tests and external code may reference the old cache dicts directly
+# (e.g. ``vormap._data_cache.pop(...)``).  These thin wrappers proxy
+# reads/writes into the unified ``_file_cache`` so existing code keeps
+# working without modification.
+
+class _DataCacheView(dict):
+    """Dict-like view over _file_cache that exposes filename → points."""
+
+    def __contains__(self, key):
+        return key in _file_cache
+
+    def __getitem__(self, key):
+        return _file_cache[key]['points']
+
+    def get(self, key, default=None):
+        entry = _file_cache.get(key)
+        return entry['points'] if entry else default
+
+    def pop(self, key, *args):
+        entry = _file_cache.pop(key, *args)
+        if isinstance(entry, dict):
+            return entry['points']
+        return entry
+
+    def clear(self):
+        _file_cache.clear()
+
+
+class _KDTreeCacheView(dict):
+    """Dict-like view over _file_cache that exposes filename → KDTree."""
+
+    def __contains__(self, key):
+        return key in _file_cache and _file_cache[key].get('tree') is not None
+
+    def __getitem__(self, key):
+        return _file_cache[key]['tree']
+
+    def get(self, key, default=None):
+        entry = _file_cache.get(key)
+        return entry['tree'] if entry else default
+
+    def pop(self, key, *args):
+        entry = _file_cache.get(key)
+        if entry is not None:
+            tree = entry.get('tree')
+            entry['tree'] = None
+            return tree
+        if args:
+            return args[0]
+        raise KeyError(key)
+
+    def clear(self):
+        for entry in _file_cache.values():
+            entry['tree'] = None
+
+
+class _KDTreeByIdView(dict):
+    """Backward-compat view for the removed _kdtree_by_id dict.
+
+    Supports ``id(points) in vormap._kdtree_by_id`` and
+    ``vormap._kdtree_by_id.pop(id(points), None)`` used in tests.
+    """
+
+    def __contains__(self, obj_id):
+        for entry in _file_cache.values():
+            if id(entry['points']) == obj_id and entry.get('tree') is not None:
+                return True
+        return False
+
+    def get(self, obj_id, default=None):
+        for entry in _file_cache.values():
+            if id(entry['points']) == obj_id:
+                return entry.get('tree', default)
+        return default
+
+    def pop(self, obj_id, *args):
+        for entry in _file_cache.values():
+            if id(entry['points']) == obj_id:
+                tree = entry.get('tree')
+                entry['tree'] = None
+                return tree
+        if args:
+            return args[0]
+        raise KeyError(obj_id)
+
+
+_data_cache = _DataCacheView()
+_kdtree_cache = _KDTreeCacheView()
+_kdtree_by_id = _KDTreeByIdView()
 
 
 def load_data(filename, auto_bounds=True):
@@ -78,8 +170,8 @@ def load_data(filename, auto_bounds=True):
     """
     global IND_S, IND_N, IND_W, IND_E
 
-    if filename in _data_cache:
-        return _data_cache[filename]
+    if filename in _file_cache:
+        return _file_cache[filename]['points']
 
     # --- Path traversal protection ---
     # Reject filenames that attempt to escape the data/ directory.
@@ -140,19 +232,13 @@ def load_data(filename, auto_bounds=True):
     if auto_bounds:
         IND_S, IND_N, IND_W, IND_E = compute_bounds(points)
 
-    _data_cache[filename] = points
-
-    # Pre-build a KDTree for fast nearest-neighbor queries
+    tree = None
     if _HAS_SCIPY:
         tree = KDTree(np.array(points))
-        _kdtree_cache[filename] = tree
-        _kdtree_by_id[id(points)] = tree
+
+    _file_cache[filename] = {'points': points, 'tree': tree}
 
     return points
-
-
-# Separate cache for KDTree objects (keyed by filename like _data_cache).
-_kdtree_cache = {}
 
 
 def get_NN(data, lng, lat):
@@ -171,9 +257,14 @@ def get_NN(data, lng, lat):
 
     # --- Fast path: KDTree lookup ---
     if _HAS_SCIPY:
-        # O(1) lookup by list identity — replaces the old O(n) scan
-        # over _data_cache that ran on every single NN query.
-        tree = _kdtree_by_id.get(id(data))
+        # Look up tree from unified cache by finding the entry whose
+        # points list matches.  Since load_data() always returns the
+        # cached list object, identity comparison (`is`) is O(1).
+        tree = None
+        for entry in _file_cache.values():
+            if entry['points'] is data:
+                tree = entry['tree']
+                break
 
         if tree is not None:
             # Query the 2 closest points — if the nearest is the query point
