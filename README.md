@@ -44,6 +44,7 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **GeoJSON Export** — Standard FeatureCollection for GIS tools (QGIS, Mapbox, Leaflet, Google Earth, ArcGIS)
 - **CLI & API** — Full-featured command-line interface and importable Python API
 - **Region Statistics** — Per-region metrics (area, perimeter, centroid, compactness), aggregate summary, CSV/JSON export
+- **Density Heatmap** — Color Voronoi cells by density, area, compactness, or vertex count with 3 color ramps (hot/cold, viridis, plasma); SVG and interactive HTML export
 - **Lloyd Relaxation** — Iterative centroid smoothing for uniform tessellations with animated HTML visualization
 - **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
@@ -198,6 +199,38 @@ vormap_viz.generate_diagram("datauni5.txt", "quick.svg")
 ```
 
 ### Region Statistics
+
+### Density Heatmap
+
+Color Voronoi cells by spatial metrics to visualize clustering and uniformity:
+
+```bash
+# SVG heatmap colored by point density (inverse area)
+voronoimap datauni5.txt 5 --heatmap heatmap.svg
+
+# Interactive HTML with metric/ramp switching and hover tooltips
+voronoimap datauni5.txt 5 --heatmap-html heatmap.html
+
+# Color by compactness instead of density
+voronoimap datauni5.txt 5 --heatmap heatmap.svg --heatmap-metric compactness
+
+# Use viridis color ramp and show values in cells
+voronoimap datauni5.txt 5 --heatmap heatmap.svg --heatmap-ramp viridis --heatmap-values
+```
+
+**Available metrics:** `density` (default — inverse area, hot = clustered), `area`, `compactness` (isoperimetric quotient), `vertices`
+
+**Available color ramps:** `hot_cold` (default — blue → white → red), `viridis`, `plasma`
+
+```python
+# Python API
+import vormap, vormap_viz, vormap_heatmap
+
+data = vormap.load_data("datauni5.txt")
+regions = vormap_viz.compute_regions(data)
+vormap_heatmap.export_heatmap_svg(regions, data, "heatmap.svg", metric="density")
+vormap_heatmap.export_heatmap_html(regions, data, "heatmap.html")
+```
 
 ```python
 import vormap

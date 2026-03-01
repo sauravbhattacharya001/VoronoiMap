@@ -1030,6 +1030,37 @@ def main():
         help='Export point pattern analysis as a JSON file.',
     )
 
+    # ── Heatmap arguments ──
+    parser.add_argument(
+        '--heatmap',
+        metavar='OUTPUT',
+        help='Export a density heatmap SVG — Voronoi cells colored by '
+             'a spatial metric (density, area, compactness, vertices).',
+    )
+    parser.add_argument(
+        '--heatmap-html',
+        metavar='OUTPUT',
+        help='Export an interactive HTML density heatmap with tooltips, '
+             'metric switching, and color ramp controls.',
+    )
+    parser.add_argument(
+        '--heatmap-metric',
+        default='density',
+        choices=['density', 'area', 'compactness', 'vertices'],
+        help='Metric to visualize in the heatmap (default: density).',
+    )
+    parser.add_argument(
+        '--heatmap-ramp',
+        default='hot_cold',
+        choices=['hot_cold', 'viridis', 'plasma'],
+        help='Color ramp for the heatmap (default: hot_cold).',
+    )
+    parser.add_argument(
+        '--heatmap-values',
+        action='store_true',
+        help='Show metric values as text labels inside each heatmap cell.',
+    )
+
     # ── Point location & nearest-neighbor query arguments ──
     parser.add_argument(
         '--query',
@@ -1090,6 +1121,7 @@ def main():
         args.relax_animate,
         args.graph, args.graph_json, args.graph_csv, args.graph_svg,
         args.query, args.query_batch,
+        args.heatmap, args.heatmap_html,
     ])
 
     data = None
@@ -1237,6 +1269,34 @@ def main():
                       % (args.datafile, len(data), graph['num_edges']),
             )
             print('Graph SVG saved to %s' % args.graph_svg)
+
+    # ── Density heatmap ──
+    if args.heatmap or args.heatmap_html:
+        import vormap_heatmap
+
+        heatmap_title = ('Voronoi Heatmap (%s) — %s (%d points)'
+                         % (args.heatmap_metric, args.datafile, len(data)))
+
+        if args.heatmap:
+            vormap_heatmap.export_heatmap_svg(
+                regions, data, args.heatmap,
+                width=args.svg_width, height=args.svg_height,
+                color_ramp=args.heatmap_ramp,
+                metric=args.heatmap_metric,
+                show_values=args.heatmap_values,
+                title=heatmap_title,
+            )
+            print('Heatmap SVG saved to %s' % args.heatmap)
+
+        if args.heatmap_html:
+            vormap_heatmap.export_heatmap_html(
+                regions, data, args.heatmap_html,
+                width=args.svg_width, height=args.svg_height,
+                color_ramp=args.heatmap_ramp,
+                metric=args.heatmap_metric,
+                title=heatmap_title,
+            )
+            print('Interactive heatmap HTML saved to %s' % args.heatmap_html)
 
     # ── Point pattern analysis ──
     if args.pattern or args.pattern_json:
