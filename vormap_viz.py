@@ -81,6 +81,75 @@ def _gray_color(lightness):
     return "#%02x%02x%02x" % (v, v, v)
 
 
+# ── Common helpers ───────────────────────────────────────────────────
+
+
+def _data_index(seed, data, fallback):
+    """Find the index of *seed* in *data*, returning *fallback* on miss.
+
+    This pattern was duplicated in export_html, export_geojson, and
+    compute_region_stats.  Centralising it avoids repeated try/except
+    blocks and keeps seed-lookup semantics consistent.
+    """
+    try:
+        return data.index(seed)
+    except ValueError:
+        return fallback
+
+
+class _CoordinateTransform:
+    """Map data-space coordinates to pixel-space for SVG/canvas rendering.
+
+    Computes uniform (aspect-preserving) scaling from data bounds to a
+    ``(width × height)`` canvas with *margin* pixels of padding.  The
+    diagram is centred within the available space and the Y-axis is
+    flipped so that *north is up*.
+
+    Previously this logic lived inline in ``export_svg``.  Extracting
+    it makes the transform reusable for any future pixel-based export
+    and keeps ``export_svg`` focused on SVG construction.
+    """
+
+    __slots__ = ("_min_x", "_max_y", "_scale", "_offset_x", "_offset_y")
+
+    def __init__(self, regions, data, *, width, height, margin):
+        all_xs = [pt[0] for pt in data]
+        all_ys = [pt[1] for pt in data]
+
+        for verts in regions.values():
+            for vx, vy in verts:
+                all_xs.append(vx)
+                all_ys.append(vy)
+
+        if not all_xs or not all_ys:
+            raise ValueError("No data to visualize")
+
+        min_x, max_x = min(all_xs), max(all_xs)
+        min_y, max_y = min(all_ys), max(all_ys)
+
+        range_x = max(max_x - min_x, 1e-6)
+        range_y = max(max_y - min_y, 1e-6)
+
+        draw_w = width - 2 * margin
+        draw_h = height - 2 * margin
+
+        scale = min(draw_w / range_x, draw_h / range_y)
+
+        self._min_x = min_x
+        self._max_y = max_y
+        self._scale = scale
+        self._offset_x = margin + (draw_w - range_x * scale) / 2
+        self._offset_y = margin + (draw_h - range_y * scale) / 2
+
+    def tx(self, x):
+        """Transform a data-space X coordinate to pixel-space."""
+        return self._offset_x + (x - self._min_x) * self._scale
+
+    def ty(self, y):
+        """Transform a data-space Y coordinate to pixel-space (Y-flipped)."""
+        return self._offset_y + (self._max_y - y) * self._scale
+
+
 # ── Region computation ───────────────────────────────────────────────
 
 def _clip_infinite_voronoi(vor, bounds):
@@ -332,42 +401,12 @@ def export_svg(
 
     color_fn = _COLOR_SCHEMES[color_scheme]
 
-    # Compute coordinate transform: data space → SVG pixel space
-    all_xs = [x for pt in data for x in [pt[0]]]
-    all_ys = [y for pt in data for y in [pt[1]]]
-
-    # Include region vertices in bounds calculation
-    for verts in regions.values():
-        for vx, vy in verts:
-            all_xs.append(vx)
-            all_ys.append(vy)
-
-    if not all_xs or not all_ys:
-        raise ValueError("No data to visualize")
-
-    min_x, max_x = min(all_xs), max(all_xs)
-    min_y, max_y = min(all_ys), max(all_ys)
-
-    # Avoid division by zero for degenerate datasets
-    range_x = max(max_x - min_x, 1e-6)
-    range_y = max(max_y - min_y, 1e-6)
-
-    draw_w = width - 2 * margin
-    draw_h = height - 2 * margin
-
-    # Uniform scaling to preserve aspect ratio
-    scale = min(draw_w / range_x, draw_h / range_y)
-
-    # Center the diagram
-    offset_x = margin + (draw_w - range_x * scale) / 2
-    offset_y = margin + (draw_h - range_y * scale) / 2
-
-    def tx(x):
-        return offset_x + (x - min_x) * scale
-
-    def ty(y):
-        # Flip Y axis so north is up
-        return offset_y + (max_y - y) * scale
+    # Build coordinate transform
+    transform = _CoordinateTransform(
+        regions, data, width=width, height=height, margin=margin,
+    )
+    tx = transform.tx
+    ty = transform.ty
 
     # Build SVG
     svg = ET.Element("svg", {
@@ -564,11 +603,7 @@ def export_html(
     for idx, seed in enumerate(sorted_seeds):
         verts = regions[seed]
         area = _compute_region_area(verts)
-        # Find seed index in original data
-        try:
-            data_idx = data.index(seed)
-        except ValueError:
-            data_idx = idx
+        data_idx = _data_index(seed, data, idx)
 
         region_list.append({
             "seed": list(seed),
@@ -671,12 +706,7 @@ def export_geojson(
 
     for idx, seed in enumerate(sorted_seeds):
         verts = regions[seed]
-
-        # Find the seed index in the original data list
-        try:
-            data_idx = data.index(seed)
-        except ValueError:
-            data_idx = idx
+        data_idx = _data_index(seed, data, idx)
 
         area = _compute_region_area(verts)
 
@@ -868,10 +898,7 @@ def compute_region_stats(regions, data):
 
     for seed in sorted_seeds:
         verts = regions[seed]
-        try:
-            data_idx = data.index(seed)
-        except ValueError:
-            data_idx = len(stats)
+        data_idx = _data_index(seed, data, len(stats))
 
         area = _compute_region_area(verts)
         perimeter = _compute_perimeter(verts)
