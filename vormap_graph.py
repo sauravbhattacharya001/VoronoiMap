@@ -18,6 +18,7 @@ compatibility.
 """
 
 import math
+from collections import deque
 import xml.etree.ElementTree as ET
 
 import vormap
@@ -287,10 +288,10 @@ def compute_graph_stats(graph):
         if start in visited:
             continue
         components += 1
-        queue = [start]
+        queue = deque([start])
         visited.add(start)
         while queue:
-            node = queue.pop(0)
+            node = queue.popleft()
             for neigh in adjacency[node]:
                 if neigh not in visited:
                     visited.add(neigh)
@@ -309,9 +310,9 @@ def compute_graph_stats(graph):
 
         for start in seeds_list:
             dist = {start: 0}
-            queue = [start]
+            queue = deque([start])
             while queue:
-                node = queue.pop(0)
+                node = queue.popleft()
                 for neigh in adjacency[node]:
                     if neigh not in dist:
                         dist[neigh] = dist[node] + 1
