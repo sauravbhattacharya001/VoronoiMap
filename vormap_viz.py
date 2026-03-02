@@ -85,21 +85,7 @@ def _gray_color(lightness):
 # ── Common helpers ───────────────────────────────────────────────────
 
 
-def _build_data_index(data):
-    """Build a dictionary mapping seed (tuple) → index for O(1) lookups.
-
-    Only records the *first* occurrence of each seed coordinate, matching
-    the semantics of the previous ``list.index()`` approach.  Building
-    the dict is O(n); each subsequent lookup is O(1).  Functions that
-    previously called ``_data_index()`` in a loop (O(n) per call → O(n²)
-    total) now call this once and use dict.get() for O(n) total.
-    """
-    lookup = {}
-    for i, pt in enumerate(data):
-        key = tuple(pt)
-        if key not in lookup:
-            lookup[key] = i
-    return lookup
+from vormap_geometry import build_data_index as _build_data_index
 
 
 def _data_index(seed, data, fallback):
@@ -560,17 +546,7 @@ def list_color_schemes():
 
 # ── Interactive HTML export ──────────────────────────────────────────
 
-def _compute_region_area(vertices):
-    """Compute polygon area using the Shoelace formula."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
+from vormap_geometry import polygon_area as _compute_region_area
 
 
 def export_html(
@@ -832,68 +808,17 @@ def generate_geojson(
 
 # ── Region statistics & CSV/JSON export ──────────────────────────────
 
-def _compute_perimeter(vertices):
-    """Compute the perimeter of a polygon from its vertex list."""
-    n = len(vertices)
-    if n < 2:
-        return 0.0
-    perimeter = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        dx = vertices[j][0] - vertices[i][0]
-        dy = vertices[j][1] - vertices[i][1]
-        perimeter += math.sqrt(dx * dx + dy * dy)
-    return perimeter
+from vormap_geometry import (                               # noqa: E402
+    polygon_perimeter as _compute_perimeter,
+    polygon_centroid as _raw_centroid,
+    isoperimetric_quotient as _isoperimetric_quotient,
+)
 
 
 def _compute_centroid(vertices):
-    """Compute the centroid of a polygon using the standard formula.
-
-    Returns (cx, cy).  For a simple polygon with signed area A, the
-    centroid is:
-        cx = 1/(6A) * Σ (xi + xi+1)(xi*yi+1 - xi+1*yi)
-        cy = 1/(6A) * Σ (yi + yi+1)(xi*yi+1 - xi+1*yi)
-    """
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n < 3:
-        # Degenerate: just average the points
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (round(cx, 4), round(cy, 4))
-
-    signed_area = 0.0
-    cx = 0.0
-    cy = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = vertices[i][0] * vertices[j][1] - vertices[j][0] * vertices[i][1]
-        signed_area += cross
-        cx += (vertices[i][0] + vertices[j][0]) * cross
-        cy += (vertices[i][1] + vertices[j][1]) * cross
-
-    signed_area *= 0.5
-    if abs(signed_area) < 1e-12:
-        # Degenerate polygon — fall back to simple average
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (round(cx, 4), round(cy, 4))
-
-    cx /= (6.0 * signed_area)
-    cy /= (6.0 * signed_area)
+    """Compute polygon centroid, rounded to 4 decimal places."""
+    cx, cy = _raw_centroid(vertices)
     return (round(cx, 4), round(cy, 4))
-
-
-def _isoperimetric_quotient(area, perimeter):
-    """Compute the isoperimetric quotient (compactness / circularity).
-
-    IQ = 4π·A / P²   —   equals 1.0 for a perfect circle, less for
-    irregular shapes.  Returns 0.0 if the perimeter is zero.
-    """
-    if perimeter <= 0:
-        return 0.0
-    return 4.0 * math.pi * area / (perimeter * perimeter)
 
 
 def compute_region_stats(regions, data):

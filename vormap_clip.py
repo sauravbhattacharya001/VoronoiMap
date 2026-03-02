@@ -77,17 +77,7 @@ def make_regular_polygon(center: Point, radius: float, sides: int, rotation: flo
 # Geometry helpers
 # ---------------------------------------------------------------------------
 
-def _polygon_area(vertices: Polygon) -> float:
-    """Compute polygon area using the shoelace formula."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
+from vormap_geometry import polygon_area as _polygon_area
 
 
 def _line_intersection(p1: Point, p2: Point, p3: Point, p4: Point) -> Point:

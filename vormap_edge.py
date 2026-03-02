@@ -40,9 +40,7 @@ def _round_vertex(v, tol=0.5):
     return (round(v[0] / tol) * tol, round(v[1] / tol) * tol)
 
 
-def _edge_length(v1, v2):
-    """Euclidean distance between two 2D points."""
-    return math.sqrt((v1[0] - v2[0]) ** 2 + (v1[1] - v2[1]) ** 2)
+from vormap_geometry import edge_length as _edge_length
 
 
 def _edge_angle(v1, v2):

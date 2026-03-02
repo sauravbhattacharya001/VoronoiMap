@@ -40,62 +40,12 @@ import vormap_viz
 # Geometry helpers
 # ---------------------------------------------------------------------------
 
-def _polygon_area(vertices: List[Tuple[float, float]]) -> float:
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        x1, y1 = vertices[i]
-        x2, y2 = vertices[(i + 1) % n]
-        area += x1 * y2 - x2 * y1
-    return abs(area) / 2.0
-
-
-def _polygon_perimeter(vertices: List[Tuple[float, float]]) -> float:
-    """Compute polygon perimeter."""
-    n = len(vertices)
-    if n < 2:
-        return 0.0
-    perim = 0.0
-    for i in range(n):
-        x1, y1 = vertices[i]
-        x2, y2 = vertices[(i + 1) % n]
-        perim += math.hypot(x2 - x1, y2 - y1)
-    return perim
-
-
-def _polygon_centroid(vertices: List[Tuple[float, float]]) -> Tuple[float, float]:
-    """Compute polygon centroid via signed-area weighting."""
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n <= 2:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    cx = cy = 0.0
-    signed_area = 0.0
-    for i in range(n):
-        x0, y0 = vertices[i]
-        x1, y1 = vertices[(i + 1) % n]
-        cross = x0 * y1 - x1 * y0
-        signed_area += cross
-        cx += (x0 + x1) * cross
-        cy += (y0 + y1) * cross
-    signed_area *= 0.5
-    if abs(signed_area) < 1e-12:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    cx /= (6.0 * signed_area)
-    cy /= (6.0 * signed_area)
-    return (cx, cy)
-
-
-def _edge_length(v1: Tuple[float, float], v2: Tuple[float, float]) -> float:
-    return math.hypot(v2[0] - v1[0], v2[1] - v1[1])
+from vormap_geometry import (
+    polygon_area as _polygon_area,
+    polygon_perimeter as _polygon_perimeter,
+    polygon_centroid as _polygon_centroid,
+    edge_length as _edge_length,
+)
 
 
 def _point_near_boundary(

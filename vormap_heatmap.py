@@ -70,37 +70,11 @@ DEFAULT_HEATMAP_RAMP = "hot_cold"
 
 # ── Metrics ──────────────────────────────────────────────────────────
 
-def _compute_region_area(verts):
-    """Shoelace formula for polygon area."""
-    n = len(verts)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += verts[i][0] * verts[j][1]
-        area -= verts[j][0] * verts[i][1]
-    return abs(area) * 0.5
-
-
-def _compute_perimeter(verts):
-    """Compute polygon perimeter."""
-    n = len(verts)
-    if n < 2:
-        return 0.0
-    perim = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        perim += math.hypot(verts[j][0] - verts[i][0],
-                            verts[j][1] - verts[i][1])
-    return perim
-
-
-def _isoperimetric_quotient(area, perimeter):
-    """4*pi*area / perimeter^2 — 1.0 for a perfect circle."""
-    if perimeter < 1e-12:
-        return 0.0
-    return 4.0 * math.pi * area / (perimeter * perimeter)
+from vormap_geometry import (
+    polygon_area as _compute_region_area,
+    polygon_perimeter as _compute_perimeter,
+    isoperimetric_quotient as _isoperimetric_quotient,
+)
 
 
 def _compute_metric(verts, metric):

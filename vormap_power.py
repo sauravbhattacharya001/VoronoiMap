@@ -266,56 +266,11 @@ def batch_weighted_nn(points, seeds, weights, mode='power'):
 # Power Voronoi region computation
 # ---------------------------------------------------------------------------
 
-def _polygon_area(vertices):
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
-
-
-def _polygon_centroid(vertices):
-    """Centroid of a simple polygon."""
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n == 1:
-        return vertices[0]
-    if n == 2:
-        return ((vertices[0][0] + vertices[1][0]) / 2,
-                (vertices[0][1] + vertices[1][1]) / 2)
-    cx, cy, a6 = 0.0, 0.0, 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = vertices[i][0] * vertices[j][1] - \
-                vertices[j][0] * vertices[i][1]
-        cx += (vertices[i][0] + vertices[j][0]) * cross
-        cy += (vertices[i][1] + vertices[j][1]) * cross
-        a6 += cross
-    if abs(a6) < 1e-12:
-        return (sum(v[0] for v in vertices) / n,
-                sum(v[1] for v in vertices) / n)
-    cx /= (3.0 * a6)
-    cy /= (3.0 * a6)
-    return (cx, cy)
-
-
-def _polygon_perimeter(vertices):
-    """Perimeter of a polygon."""
-    n = len(vertices)
-    if n < 2:
-        return 0.0
-    p = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        p += math.sqrt((vertices[j][0] - vertices[i][0]) ** 2 +
-                       (vertices[j][1] - vertices[i][1]) ** 2)
-    return p
+from vormap_geometry import (
+    polygon_area as _polygon_area,
+    polygon_centroid as _polygon_centroid,
+    polygon_perimeter as _polygon_perimeter,
+)
 
 
 def _clip_to_bounds(vertices, x_min, x_max, y_min, y_max):

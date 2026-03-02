@@ -84,17 +84,7 @@ def idw_interp(points, values, query, power=2.0, epsilon=1e-12):
     return sum(w * v / w_sum for w, v in weights)
 
 
-def _polygon_area(vertices):
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
+from vormap_geometry import polygon_area as _polygon_area
 
 
 def _voronoi_cell_areas(points_array):

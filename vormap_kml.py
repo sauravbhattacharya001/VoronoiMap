@@ -40,22 +40,10 @@ _KML_COLORS = {
 }
 
 
-def _build_data_index(data):
-    """Map (x, y) tuples to their index in the data list."""
-    return {(p[0], p[1]): i for i, p in enumerate(data)}
-
-
-def _compute_region_area(vertices):
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        x1, y1 = vertices[i]
-        x2, y2 = vertices[(i + 1) % n]
-        area += x1 * y2 - x2 * y1
-    return abs(area) / 2.0
+from vormap_geometry import (
+    build_data_index as _build_data_index,
+    polygon_area as _compute_region_area,
+)
 
 
 def export_kml(
