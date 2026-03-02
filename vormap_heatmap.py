@@ -22,6 +22,8 @@ CLI::
 """
 
 import colorsys
+import html as _html_mod
+import json
 import math
 import xml.etree.ElementTree as ET
 
@@ -327,7 +329,6 @@ def export_heatmap_html(
     title=None,
 ):
     """Export an interactive HTML heatmap with tooltips and ramp switching."""
-    import json
     from vormap_viz import _CoordinateTransform
 
     sorted_seeds = sorted(regions.keys())
@@ -478,8 +479,21 @@ rampSel.addEventListener('change', render);
 render();
 </script>
 </body>
-</html>""" % (html_title, html_title, width, height, width, height,
-              json.dumps(cell_data), metric, color_ramp)
+</html>"""
+
+    # Escape user-supplied strings to prevent XSS injection.
+    # html_title goes into HTML context (<title>, <h1>), metric and
+    # color_ramp go into JavaScript string literals inside <script>.
+    safe_title = _html_mod.escape(html_title)
+    # Allowlist metric and color_ramp to prevent JS injection via %s
+    # inside <script>.  Fall back to safe defaults.
+    _VALID_METRICS = {"density", "area", "compactness", "vertices"}
+    _VALID_RAMPS = {"hot_cold", "viridis", "plasma"}
+    safe_metric = metric if metric in _VALID_METRICS else "density"
+    safe_ramp = color_ramp if color_ramp in _VALID_RAMPS else "hot_cold"
+
+    html = html % (safe_title, safe_title, width, height, width, height,
+                   json.dumps(cell_data), safe_metric, safe_ramp)
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)

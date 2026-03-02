@@ -608,3 +608,39 @@ class TestHTMLExport:
             assert "charset=\"UTF-8\"" in content.replace("charset=UTF-8", "charset=\"UTF-8\"")
         finally:
             os.unlink(path)
+
+
+class TestHTMLXSSPrevention:
+    """Verify that user-supplied strings are escaped in HTML output."""
+
+    def _export_html_with_title(self, regions, data, title):
+        with tempfile.NamedTemporaryFile(
+            suffix=".html", delete=False, mode="w"
+        ) as f:
+            path = f.name
+        vormap_heatmap.export_heatmap_html(regions, data, path, title=title)
+        with open(path, encoding="utf-8") as fh:
+            content = fh.read()
+        os.unlink(path)
+        return content
+
+    def test_html_title_escapes_angle_brackets(self):
+        regions, data = _sample_regions()
+        content = self._export_html_with_title(
+            regions, data, "<script>alert('xss')</script>"
+        )
+        assert "<script>alert" not in content
+        assert "&lt;script&gt;" in content
+
+    def test_html_title_escapes_ampersand(self):
+        regions, data = _sample_regions()
+        content = self._export_html_with_title(regions, data, "A & B")
+        assert "A &amp; B" in content
+
+    def test_html_title_escapes_quotes(self):
+        regions, data = _sample_regions()
+        content = self._export_html_with_title(
+            regions, data, 'title"with"quotes'
+        )
+        assert 'title"with"quotes' not in content
+        assert "title&quot;with&quot;quotes" in content
