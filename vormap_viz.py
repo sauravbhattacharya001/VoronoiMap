@@ -85,12 +85,33 @@ def _gray_color(lightness):
 # ── Common helpers ───────────────────────────────────────────────────
 
 
+def _build_data_index(data):
+    """Build a dictionary mapping seed (tuple) → index for O(1) lookups.
+
+    Only records the *first* occurrence of each seed coordinate, matching
+    the semantics of the previous ``list.index()`` approach.  Building
+    the dict is O(n); each subsequent lookup is O(1).  Functions that
+    previously called ``_data_index()`` in a loop (O(n) per call → O(n²)
+    total) now call this once and use dict.get() for O(n) total.
+    """
+    lookup = {}
+    for i, pt in enumerate(data):
+        key = tuple(pt)
+        if key not in lookup:
+            lookup[key] = i
+    return lookup
+
+
 def _data_index(seed, data, fallback):
     """Find the index of *seed* in *data*, returning *fallback* on miss.
 
     This pattern was duplicated in export_html, export_geojson, and
     compute_region_stats.  Centralising it avoids repeated try/except
     blocks and keeps seed-lookup semantics consistent.
+
+    .. note::
+        For batch lookups, prefer :func:`_build_data_index` + ``dict.get()``
+        to avoid O(n) per call.
     """
     try:
         return data.index(seed)
@@ -600,11 +621,12 @@ def export_html(
 
     # Prepare region data as JSON-serializable structures
     sorted_seeds = sorted(regions.keys())
+    data_lookup = _build_data_index(data)
     region_list = []
     for idx, seed in enumerate(sorted_seeds):
         verts = regions[seed]
         area = _compute_region_area(verts)
-        data_idx = _data_index(seed, data, idx)
+        data_idx = data_lookup.get(tuple(seed), idx)
 
         region_list.append({
             "seed": list(seed),
@@ -703,11 +725,12 @@ def export_geojson(
         raise ValueError("No regions to export")
 
     sorted_seeds = sorted(regions.keys())
+    data_lookup = _build_data_index(data)
     features = []
 
     for idx, seed in enumerate(sorted_seeds):
         verts = regions[seed]
-        data_idx = _data_index(seed, data, idx)
+        data_idx = data_lookup.get(tuple(seed), idx)
 
         area = _compute_region_area(verts)
 
@@ -896,10 +919,11 @@ def compute_region_stats(regions, data):
     """
     stats = []
     sorted_seeds = sorted(regions.keys())
+    data_lookup = _build_data_index(data)
 
     for seed in sorted_seeds:
         verts = regions[seed]
-        data_idx = _data_index(seed, data, len(stats))
+        data_idx = data_lookup.get(tuple(seed), len(stats))
 
         area = _compute_region_area(verts)
         perimeter = _compute_perimeter(verts)
