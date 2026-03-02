@@ -327,6 +327,8 @@ def export_outlier_json(result, path):
             for o in result.outliers
         ],
     }
+    from vormap import validate_output_path
+    path = validate_output_path(path, allow_absolute=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
@@ -498,5 +500,7 @@ def export_outlier_csv(result, path):
             row.append(r["flags"].get(m, ""))
         lines.append(",".join(row))
 
+    from vormap import validate_output_path
+    path = validate_output_path(path, allow_absolute=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")

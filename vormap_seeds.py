@@ -421,6 +421,8 @@ def save_seeds(points, filename, header=True):
     if not filename:
         raise ValueError("filename must not be empty")
 
+    from vormap import validate_output_path
+    filename = validate_output_path(filename, allow_absolute=True)
     with open(filename, 'w') as f:
         if header:
             f.write(f"{len(points)}\n")

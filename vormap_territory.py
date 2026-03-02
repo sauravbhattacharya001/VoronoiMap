@@ -549,6 +549,7 @@ def export_territory_json(
         entry["seed_b"] = _serialize_seed(entry["seed_b"])
         export["shared_borders"].append(entry)
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w") as f:
         json.dump(export, f, indent=indent)
 
@@ -594,5 +595,6 @@ def export_territory_csv(
             )
         )
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w") as f:
         f.write("\n".join(lines) + "\n")

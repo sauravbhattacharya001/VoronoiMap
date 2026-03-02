@@ -496,5 +496,7 @@ render();
     html = html % (safe_title, safe_title, width, height, width, height,
                    json.dumps(cell_data), safe_metric, safe_ramp)
 
+    from vormap import validate_output_path
+    output_path = validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)

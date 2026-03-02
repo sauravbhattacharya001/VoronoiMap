@@ -307,6 +307,8 @@ def coverage_analysis(points: Sequence[Point],
 def export_query_json(results: Sequence[QueryResult], path: str) -> None:
     """Write query results to a JSON file."""
     data = [asdict(r) for r in results]
+    from vormap import validate_output_path
+    path = validate_output_path(path, allow_absolute=True)
     with open(path, 'w') as f:
         json.dump(data, f, indent=2)
 
@@ -367,6 +369,8 @@ def export_query_svg(seeds: Sequence[Point],
                      f'fill="#F44336"/>')
 
     lines.append('</svg>')
+    from vormap import validate_output_path
+    path = validate_output_path(path, allow_absolute=True)
     with open(path, 'w') as f:
         f.write('\n'.join(lines))
 

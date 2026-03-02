@@ -409,6 +409,7 @@ def export_graph_json(graph, output_path, *, include_stats=True):
     if include_stats:
         output["stats"] = compute_graph_stats(graph)
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
 
@@ -447,6 +448,7 @@ def export_graph_csv(graph, output_path):
         "length",
     ]
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()

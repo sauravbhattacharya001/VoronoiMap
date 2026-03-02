@@ -648,6 +648,7 @@ def export_html(
     html = html.replace("{{WIDTH}}", str(width))
     html = html.replace("{{HEIGHT}}", str(height))
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
 
@@ -795,6 +796,7 @@ def export_geojson(
             },
         }
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(collection, f, indent=2, ensure_ascii=False)
 
@@ -1056,6 +1058,7 @@ def export_stats_csv(region_stats, output_path, *, include_summary=True):
         "avg_edge_length",
     ]
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -1108,6 +1111,7 @@ def export_stats_json(region_stats, output_path, *, include_summary=True):
     if include_summary:
         output["summary"] = compute_summary_stats(region_stats)
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
 
@@ -1219,6 +1223,7 @@ def generate_stats(datafile, output_path=None, *, fmt="table"):
     else:  # table
         table = format_stats_table(region_stats)
         if output_path:
+            output_path = vormap.validate_output_path(output_path, allow_absolute=True)
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(table)
             return output_path
@@ -1464,6 +1469,7 @@ def export_relaxation_html(
     html = html.replace("{{TOTAL_ITERATIONS}}", str(result["total_iterations"]))
     html = html.replace("{{CONVERGED}}", json.dumps(result["converged"]))
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
 

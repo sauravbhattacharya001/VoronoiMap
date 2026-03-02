@@ -82,6 +82,64 @@ def validate_input_path(filepath, *, base_dir=None, allow_absolute=False):
     return resolved
 
 
+def validate_output_path(filepath, *, base_dir=None, allow_absolute=False):
+    """Validate an output file path against path traversal attacks.
+
+    Works like :func:`validate_input_path` but for write operations.
+    Ensures *filepath* resolves inside *base_dir* (default: current
+    working directory) so that CLI arguments like ``--svg ../../etc/passwd``
+    cannot overwrite files outside the project tree.
+
+    When *allow_absolute* is True **and** *filepath* is already absolute,
+    the containment check is skipped — the caller is trusted to provide
+    an explicit path (e.g. from a known-safe CLI ``argparse`` value).
+    Relative paths with ``..`` segments are still validated against
+    *base_dir* even when *allow_absolute* is True.
+
+    Parameters
+    ----------
+    filepath : str
+        The output path to validate.
+    base_dir : str or None
+        Directory the path must resolve within.  Defaults to ``os.getcwd()``.
+    allow_absolute : bool
+        If True, accept absolute paths without containment check.
+
+    Returns
+    -------
+    str
+        The resolved absolute path, safe to open for writing.
+
+    Raises
+    ------
+    ValueError
+        If the path escapes *base_dir* or is absolute when not allowed.
+    """
+    if not filepath:
+        raise ValueError("Output file path must not be empty")
+
+    if os.path.isabs(filepath):
+        if not allow_absolute:
+            raise ValueError(
+                "Absolute output paths are not allowed: '%s'" % filepath
+            )
+        return os.path.abspath(filepath)
+
+    if base_dir is None:
+        base_dir = os.getcwd()
+
+    abs_base = os.path.abspath(base_dir)
+    resolved = os.path.abspath(os.path.join(abs_base, filepath))
+
+    if not resolved.startswith(abs_base + os.sep) and resolved != abs_base:
+        raise ValueError(
+            "Output path traversal detected — '%s' resolves outside '%s'"
+            % (filepath, base_dir)
+        )
+
+    return resolved
+
+
 def compute_bounds(points, padding=0.1):
     """Compute search space boundaries from a set of points.
 

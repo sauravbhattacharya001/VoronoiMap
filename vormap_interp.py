@@ -41,7 +41,7 @@ import math
 import csv
 import xml.etree.ElementTree as ET
 
-from vormap import eudist_pts
+from vormap import eudist_pts, validate_output_path
 
 try:
     from scipy.spatial import Voronoi as ScipyVoronoi
@@ -275,6 +275,7 @@ def export_surface_csv(grid_result, output_path):
     """Export interpolated surface as a CSV grid."""
     grid = grid_result['grid']
     xs, ys = grid_result['xs'], grid_result['ys']
+    output_path = validate_output_path(output_path, allow_absolute=True)
     with open(output_path, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['y\\x'] + [f'{x:.4f}' for x in xs])

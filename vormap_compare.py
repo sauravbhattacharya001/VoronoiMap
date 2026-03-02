@@ -19,7 +19,7 @@ Usage
 import math
 from dataclasses import dataclass, field
 
-from vormap import eudist_pts
+from vormap import eudist_pts, validate_output_path
 
 
 @dataclass
@@ -625,5 +625,6 @@ def export_comparison_json(result, output_path):
     """
     import json
 
+    output_path = validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w") as f:
         json.dump(result.to_dict(), f, indent=2)
