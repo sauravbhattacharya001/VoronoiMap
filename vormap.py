@@ -1512,6 +1512,63 @@ def main():
         help='Color ramp for surface SVG (default: viridis).',
     )
 
+    # ── Spatial clustering arguments ──
+    parser.add_argument(
+        '--cluster',
+        action='store_true',
+        help='Run spatial clustering on Voronoi cells and print '
+             'a summary table to stdout.',
+    )
+    parser.add_argument(
+        '--cluster-svg',
+        metavar='OUTPUT',
+        help='Export spatial clustering results as an SVG visualization '
+             'with distinct colors per cluster.',
+    )
+    parser.add_argument(
+        '--cluster-json',
+        metavar='OUTPUT',
+        help='Export spatial clustering results as a JSON file.',
+    )
+    parser.add_argument(
+        '--cluster-method',
+        default='threshold',
+        choices=['threshold', 'dbscan', 'agglomerative'],
+        help='Clustering method (default: threshold). '
+             'threshold=connected components within metric range, '
+             'dbscan=density-based on adjacency graph, '
+             'agglomerative=bottom-up merging by similarity.',
+    )
+    parser.add_argument(
+        '--cluster-metric',
+        default='area',
+        choices=['area', 'density', 'compactness', 'vertices'],
+        help='Cell metric for clustering (default: area).',
+    )
+    parser.add_argument(
+        '--cluster-range',
+        metavar='MIN,MAX',
+        help='Value range for threshold method (e.g. --cluster-range 0,50000). '
+             'Defaults to mean +/- 1 std dev.',
+    )
+    parser.add_argument(
+        '--cluster-min-neighbors',
+        type=int,
+        default=2,
+        help='Minimum adjacency degree for DBSCAN core cells (default: 2).',
+    )
+    parser.add_argument(
+        '--cluster-count',
+        type=int,
+        default=3,
+        help='Target number of clusters for agglomerative method (default: 3).',
+    )
+    parser.add_argument(
+        '--cluster-labels',
+        action='store_true',
+        help='Show cluster ID labels inside each cell in the SVG.',
+    )
+
     # ── Edge network arguments ──
     parser.add_argument(
         '--edge-network',
@@ -1567,6 +1624,7 @@ def main():
         args.heatmap, args.heatmap_html,
         args.interp_values,
         args.edge_network, args.edge_csv, args.edge_json, args.edge_svg,
+        args.cluster, args.cluster_svg, args.cluster_json,
     ])
 
     data = None
@@ -1787,6 +1845,54 @@ def main():
     if args.interp_values:
         import vormap_interp
         vormap_interp.run_interp_cli(args, data)
+
+    # ── Spatial clustering ──
+    if args.cluster or args.cluster_svg or args.cluster_json:
+        import vormap_cluster
+        import vormap_viz
+
+        region_stats = vormap_viz.compute_region_stats(regions, data)
+
+        # Parse value range if given
+        value_range = None
+        if args.cluster_range:
+            parts = args.cluster_range.split(",")
+            if len(parts) == 2:
+                value_range = (float(parts[0]), float(parts[1]))
+
+        cluster_result = vormap_cluster.cluster_regions(
+            region_stats, regions, data,
+            method=args.cluster_method,
+            metric=args.cluster_metric,
+            value_range=value_range,
+            min_neighbors=args.cluster_min_neighbors,
+            num_clusters=args.cluster_count,
+        )
+        print('Clustering: %d clusters (%s, %s)'
+              % (cluster_result.num_clusters, args.cluster_method,
+                 args.cluster_metric))
+        if cluster_result.num_noise > 0:
+            print('  Noise cells: %d' % cluster_result.num_noise)
+
+        if args.cluster:
+            print()
+            print(vormap_cluster.format_cluster_table(cluster_result))
+
+        if args.cluster_json:
+            vormap_cluster.export_cluster_json(
+                cluster_result, args.cluster_json)
+            print('Cluster JSON saved to %s' % args.cluster_json)
+
+        if args.cluster_svg:
+            vormap_cluster.export_cluster_svg(
+                cluster_result, regions, data, args.cluster_svg,
+                width=args.svg_width, height=args.svg_height,
+                show_labels=args.cluster_labels,
+                title='Spatial Clusters (%s, %s) — %s (%d points)'
+                      % (args.cluster_method, args.cluster_metric,
+                         args.datafile, len(data)),
+            )
+            print('Cluster SVG saved to %s' % args.cluster_svg)
 
     # ── Edge network analysis ──
     if args.edge_network or args.edge_csv or args.edge_json or args.edge_svg:
