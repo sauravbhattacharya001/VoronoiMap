@@ -1245,9 +1245,15 @@ def main():
              'file path (e.g. diagram.geojson).',
     )
     parser.add_argument(
+        '--kml',
+        metavar='OUTPUT',
+        help='Export Voronoi regions as KML for Google Earth. Provide '
+             'the output file path (e.g. diagram.kml).',
+    )
+    parser.add_argument(
         '--no-seeds',
         action='store_true',
-        help='When exporting GeoJSON, omit seed points (include only region polygons).',
+        help='When exporting GeoJSON/KML, omit seed points (include only region polygons).',
     )
     parser.add_argument(
         '--crs',
@@ -1500,7 +1506,7 @@ def main():
     # only apply to --visualize, silently ignoring relaxation for
     # --interactive, --geojson, --stats, and --graph outputs.
     needs_regions = any([
-        args.visualize, args.interactive, args.geojson,
+        args.visualize, args.interactive, args.geojson, args.kml,
         args.stats, args.stats_csv, args.stats_json,
         args.relax_animate,
         args.graph, args.graph_json, args.graph_csv, args.graph_svg,
@@ -1581,6 +1587,19 @@ def main():
             crs_name=args.crs,
         )
         print('GeoJSON saved to %s' % args.geojson)
+
+    # KML export
+    if args.kml:
+        import vormap_kml
+
+        vormap_kml.export_kml(
+            regions,
+            data,
+            args.kml,
+            include_seeds=not args.no_seeds,
+            color_scheme=args.color_scheme,
+        )
+        print('KML saved to %s' % args.kml)
 
     # Region statistics
     if args.stats or args.stats_csv or args.stats_json:
