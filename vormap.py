@@ -1596,6 +1596,63 @@ def main():
              'color-coded.',
     )
 
+    # ── KDE arguments ──
+    parser.add_argument(
+        '--kde-svg',
+        metavar='OUTPUT',
+        help='Export a kernel density estimation (KDE) surface as an '
+             'SVG heatmap. Produces a smooth density surface from '
+             'point locations using Gaussian kernels.',
+    )
+    parser.add_argument(
+        '--kde-csv',
+        metavar='OUTPUT',
+        help='Export the KDE density grid as a CSV file with '
+             'x, y, density columns.',
+    )
+    parser.add_argument(
+        '--kde-bandwidth',
+        type=float,
+        default=None,
+        help='Explicit KDE bandwidth (Gaussian kernel width). '
+             'If omitted, uses Silverman\'s rule-of-thumb.',
+    )
+    parser.add_argument(
+        '--kde-bandwidth-method',
+        choices=['silverman', 'scott'],
+        default='silverman',
+        help='Bandwidth selection method when --kde-bandwidth is not '
+             'specified (default: silverman).',
+    )
+    parser.add_argument(
+        '--kde-nx',
+        type=int,
+        default=50,
+        help='KDE grid columns (default: 50).',
+    )
+    parser.add_argument(
+        '--kde-ny',
+        type=int,
+        default=50,
+        help='KDE grid rows (default: 50).',
+    )
+    parser.add_argument(
+        '--kde-ramp',
+        choices=['viridis', 'plasma', 'hot_cold'],
+        default='viridis',
+        help='Color ramp for KDE SVG (default: viridis).',
+    )
+    parser.add_argument(
+        '--kde-hotspots',
+        metavar='OUTPUT',
+        help='Detect density hotspots and export as JSON.',
+    )
+    parser.add_argument(
+        '--kde-show-hotspots',
+        action='store_true',
+        help='Mark detected hotspots on the KDE SVG output.',
+    )
+
     args = parser.parse_args()
 
     # Apply explicit bounds if given (disables auto-detection)
@@ -1927,6 +1984,48 @@ def main():
                          stats['num_edges']),
             )
             print('Edge network SVG saved to %s' % args.edge_svg)
+
+    # ── Kernel Density Estimation ──
+    kde_requested = (args.kde_svg or args.kde_csv or args.kde_hotspots)
+    if kde_requested:
+        import vormap_kde
+
+        points = [(p[0], p[1]) for p in data]
+        grid = vormap_kde.kde_grid(
+            points,
+            nx=args.kde_nx,
+            ny=args.kde_ny,
+            bandwidth=args.kde_bandwidth,
+            bandwidth_method=args.kde_bandwidth_method,
+        )
+
+        summary = vormap_kde.kde_summary(grid)
+        print('KDE: bandwidth=%.4f  density_range=[%.2e, %.2e]  mass=%.4f'
+              % (summary['bandwidth'], summary['density_min'],
+                 summary['density_max'], summary['total_mass']))
+
+        if args.kde_svg:
+            vormap_kde.export_kde_svg(
+                grid,
+                args.kde_svg,
+                width=args.svg_width,
+                height=args.svg_height,
+                ramp=args.kde_ramp,
+                show_hotspots=args.kde_show_hotspots,
+                title='KDE Density — %s (%d points, h=%.2f)'
+                      % (args.datafile, len(points), grid.bandwidth),
+            )
+            print('KDE SVG saved to %s' % args.kde_svg)
+
+        if args.kde_csv:
+            vormap_kde.export_kde_csv(grid, args.kde_csv)
+            print('KDE CSV saved to %s' % args.kde_csv)
+
+        if args.kde_hotspots:
+            hotspots = vormap_kde.find_hotspots(grid)
+            vormap_kde.export_hotspots_json(hotspots, args.kde_hotspots, grid)
+            print('Found %d hotspots, saved to %s'
+                  % (len(hotspots), args.kde_hotspots))
 
 
 if __name__ == '__main__':
