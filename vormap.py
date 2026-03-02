@@ -1653,6 +1653,41 @@ def main():
         help='Mark detected hotspots on the KDE SVG output.',
     )
 
+    # ── Spatial autocorrelation (Moran's I) ──────────────────────────
+    parser.add_argument(
+        '--autocorr',
+        action='store_true',
+        help="Compute global Moran's I spatial autocorrelation test.",
+    )
+    parser.add_argument(
+        '--autocorr-metric',
+        default='area',
+        help="Metric for autocorrelation analysis: area, density, "
+             "compactness, perimeter (default: area).",
+    )
+    parser.add_argument(
+        '--autocorr-json',
+        metavar='OUTPUT',
+        help="Export autocorrelation results (global + LISA) as JSON.",
+    )
+    parser.add_argument(
+        '--lisa-svg',
+        metavar='OUTPUT',
+        help='Export LISA cluster map as SVG (HH/LL/HL/LH/NS).',
+    )
+    parser.add_argument(
+        '--lisa-permutations',
+        type=int,
+        default=999,
+        help='Number of permutations for LISA pseudo p-values (default: 999).',
+    )
+    parser.add_argument(
+        '--lisa-significance',
+        type=float,
+        default=0.05,
+        help='Significance level for LISA cluster classification (default: 0.05).',
+    )
+
     args = parser.parse_args()
 
     # Apply explicit bounds if given (disables auto-detection)
@@ -1682,6 +1717,7 @@ def main():
         args.interp_values,
         args.edge_network, args.edge_csv, args.edge_json, args.edge_svg,
         args.cluster, args.cluster_svg, args.cluster_json,
+        args.autocorr, args.autocorr_json, args.lisa_svg,
     ])
 
     data = None
@@ -2026,6 +2062,50 @@ def main():
             vormap_kde.export_hotspots_json(hotspots, args.kde_hotspots, grid)
             print('Found %d hotspots, saved to %s'
                   % (len(hotspots), args.kde_hotspots))
+
+    # ── Spatial autocorrelation (Moran's I) ──
+    autocorr_requested = (
+        args.autocorr or args.autocorr_json or args.lisa_svg
+    )
+    if autocorr_requested:
+        import vormap_autocorr
+        import vormap_viz
+
+        region_stats = vormap_viz.compute_region_stats(regions, data)
+        ac_values = vormap_autocorr._extract_metric_values(
+            region_stats, args.autocorr_metric)
+
+        global_result = vormap_autocorr.global_morans_i(
+            ac_values, regions, data, metric=args.autocorr_metric)
+
+        if args.autocorr:
+            print()
+            print(vormap_autocorr.format_global_report(global_result))
+
+        lisa_result = None
+        if args.autocorr_json or args.lisa_svg:
+            lisa_result = vormap_autocorr.local_morans_i(
+                ac_values, regions, data,
+                metric=args.autocorr_metric,
+                permutations=args.lisa_permutations,
+                significance=args.lisa_significance,
+            )
+            print()
+            print(vormap_autocorr.format_lisa_summary(lisa_result))
+
+        if args.autocorr_json:
+            vormap_autocorr.export_autocorr_json(
+                global_result, lisa_result, args.autocorr_json)
+            print('Autocorrelation JSON saved to %s' % args.autocorr_json)
+
+        if args.lisa_svg:
+            vormap_autocorr.export_lisa_svg(
+                lisa_result, regions, data, args.lisa_svg,
+                width=args.svg_width, height=args.svg_height,
+                title="LISA Cluster Map (%s) — %s (%d points)"
+                      % (args.autocorr_metric, args.datafile, len(data)),
+            )
+            print('LISA SVG saved to %s' % args.lisa_svg)
 
 
 if __name__ == '__main__':
