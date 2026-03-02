@@ -270,11 +270,217 @@ _kdtree_cache = _KDTreeCacheView()
 _kdtree_by_id = _KDTreeByIdView()
 
 
+def _detect_format(filepath):
+    """Detect file format from extension and content sniffing.
+
+    Returns one of: 'txt', 'csv', 'json', 'geojson'.
+    """
+    ext = os.path.splitext(filepath)[1].lower()
+    if ext == '.geojson':
+        return 'geojson'
+    if ext == '.json':
+        # Peek at content to distinguish JSON array from GeoJSON
+        try:
+            with open(filepath, 'r') as f:
+                # Read first non-whitespace chars to detect GeoJSON
+                content = f.read(2048)
+                content_stripped = content.lstrip()
+                if '"type"' in content and ('"FeatureCollection"' in content
+                                            or '"Feature"' in content):
+                    return 'geojson'
+        except (IOError, OSError):
+            pass
+        return 'json'
+    if ext == '.csv':
+        return 'csv'
+    # Default: space-separated text
+    return 'txt'
+
+
+def _parse_points_txt(filepath):
+    """Parse space-separated text file (original format)."""
+    points = []
+    with open(filepath, 'r') as objf:
+        for line in objf:
+            if not line.strip():
+                continue
+            coord = line.split()
+            if len(coord) < 2:
+                continue
+            try:
+                lng_val = float(coord[0])
+                lat_val = float(coord[1])
+            except (ValueError, OverflowError):
+                continue
+            if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
+                continue
+            points.append((lng_val, lat_val))
+    return points
+
+
+def _parse_points_csv(filepath):
+    """Parse CSV file with headers. Looks for x/y, lng/lat, lon/lat columns.
+
+    Supports common column names: x/y, lng/lat, lon/lat, longitude/latitude,
+    easting/northing. Falls back to first two numeric columns if no known
+    headers are found.
+    """
+    import csv
+
+    HEADER_PAIRS = [
+        ('x', 'y'), ('lng', 'lat'), ('lon', 'lat'),
+        ('longitude', 'latitude'), ('easting', 'northing'),
+        ('long', 'lat'),
+    ]
+
+    points = []
+    with open(filepath, 'r', newline='') as f:
+        # Sniff the dialect
+        sample = f.read(4096)
+        f.seek(0)
+
+        try:
+            dialect = csv.Sniffer().sniff(sample)
+        except csv.Error:
+            dialect = 'excel'
+
+        reader = csv.reader(f, dialect)
+        rows = list(reader)
+
+    if not rows:
+        return points
+
+    # Check if first row is a header
+    header = [h.strip().lower() for h in rows[0]]
+    x_col, y_col = None, None
+
+    for xname, yname in HEADER_PAIRS:
+        if xname in header and yname in header:
+            x_col = header.index(xname)
+            y_col = header.index(yname)
+            break
+
+    if x_col is not None:
+        data_rows = rows[1:]
+    else:
+        # Try first row as data — use first two columns
+        # Check if first row is numeric
+        try:
+            float(rows[0][0])
+            float(rows[0][1])
+            data_rows = rows  # no header
+        except (ValueError, IndexError):
+            data_rows = rows[1:]  # skip non-numeric header
+        x_col, y_col = 0, 1
+
+    for row in data_rows:
+        if len(row) <= max(x_col, y_col):
+            continue
+        try:
+            lng_val = float(row[x_col].strip())
+            lat_val = float(row[y_col].strip())
+        except (ValueError, OverflowError):
+            continue
+        if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
+            continue
+        points.append((lng_val, lat_val))
+
+    return points
+
+
+def _parse_points_json(filepath):
+    """Parse JSON file — array of [x, y] pairs or array of {x, y} objects."""
+    import json
+
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+
+    if not isinstance(data, list):
+        raise ValueError("JSON file must contain an array of points")
+
+    points = []
+    for item in data:
+        try:
+            if isinstance(item, (list, tuple)) and len(item) >= 2:
+                lng_val = float(item[0])
+                lat_val = float(item[1])
+            elif isinstance(item, dict):
+                # Try common key names
+                lng_val = None
+                lat_val = None
+                for xk in ('x', 'lng', 'lon', 'longitude', 'easting'):
+                    if xk in item:
+                        lng_val = float(item[xk])
+                        break
+                for yk in ('y', 'lat', 'latitude', 'northing'):
+                    if yk in item:
+                        lat_val = float(item[yk])
+                        break
+                if lng_val is None or lat_val is None:
+                    continue
+            else:
+                continue
+        except (ValueError, TypeError, OverflowError):
+            continue
+        if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
+            continue
+        points.append((lng_val, lat_val))
+
+    return points
+
+
+def _parse_points_geojson(filepath):
+    """Parse GeoJSON FeatureCollection or array of Features with Point geometry."""
+    import json
+
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+
+    if not isinstance(data, dict):
+        raise ValueError("GeoJSON file must be a JSON object")
+
+    features = []
+    if data.get('type') == 'FeatureCollection':
+        features = data.get('features', [])
+    elif data.get('type') == 'Feature':
+        features = [data]
+    else:
+        raise ValueError("GeoJSON must be a FeatureCollection or Feature")
+
+    points = []
+    for feat in features:
+        geom = feat.get('geometry') if isinstance(feat, dict) else None
+        if not geom or not isinstance(geom, dict):
+            continue
+        if geom.get('type') != 'Point':
+            continue
+        coords = geom.get('coordinates')
+        if not coords or len(coords) < 2:
+            continue
+        try:
+            lng_val = float(coords[0])
+            lat_val = float(coords[1])
+        except (ValueError, TypeError, OverflowError):
+            continue
+        if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
+            continue
+        points.append((lng_val, lat_val))
+
+    return points
+
+
 def load_data(filename, auto_bounds=True):
     """Load point data from a file and cache it in memory.
 
     Returns a list of (lng, lat) tuples.  Subsequent calls with the same
     filename return the cached list without re-reading the file.
+
+    Supports multiple input formats, auto-detected from file extension:
+
+    - ``.txt`` — Space-separated ``x y`` per line (original format)
+    - ``.csv`` — CSV with headers (x/y, lng/lat, lon/lat, longitude/latitude)
+    - ``.json`` — JSON array of ``[x, y]`` pairs or ``{"x": ..., "y": ...}`` objects
+    - ``.geojson`` — GeoJSON FeatureCollection with Point geometries
 
     When *auto_bounds* is True (the default) the search space boundaries
     are automatically computed from the data extents with 10 % padding.
@@ -295,22 +501,16 @@ def load_data(filename, auto_bounds=True):
     # Validate path stays inside data/ directory
     resolved = validate_input_path(filename, base_dir="data")
 
-    points = []
-    with open(resolved, "r") as objf:
-        for line in objf:
-            if not line.strip():
-                continue
-            coord = line.split()
-            if len(coord) < 2:
-                continue
-            try:
-                lng_val = float(coord[0])
-                lat_val = float(coord[1])
-            except (ValueError, OverflowError):
-                continue  # skip malformed lines instead of crashing
-            if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
-                continue  # reject NaN/Inf coordinates
-            points.append((lng_val, lat_val))
+    # Auto-detect format and parse
+    fmt = _detect_format(resolved)
+    if fmt == 'csv':
+        points = _parse_points_csv(resolved)
+    elif fmt == 'json':
+        points = _parse_points_json(resolved)
+    elif fmt == 'geojson':
+        points = _parse_points_geojson(resolved)
+    else:
+        points = _parse_points_txt(resolved)
 
     if not points:
         raise ValueError("No valid points found in '%s'" % filename)
