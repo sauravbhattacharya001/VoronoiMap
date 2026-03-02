@@ -651,7 +651,8 @@ def export_graph_svg(
         " text-anchor: middle; }"
         " .legend { font-family: 'Helvetica Neue', Arial, sans-serif;"
         " font-size: 11px; fill: #555; }"
-        % (edge_color, edge_width, node_color)
+        % (vormap.sanitize_css_value(edge_color), edge_width,
+           vormap.sanitize_css_value(node_color))
     )
 
     # Background

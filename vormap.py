@@ -159,6 +159,49 @@ def set_bounds(south, north, west, east):
     global IND_S, IND_N, IND_W, IND_E
     IND_S, IND_N, IND_W, IND_E = south, north, west, east
 
+
+import re as _re
+
+_CSS_VALUE_RE = _re.compile(r'^[a-zA-Z0-9#_.,() /%+-]+$')
+
+
+def sanitize_css_value(value):
+    """Sanitize a string intended for use as a CSS property value.
+
+    Prevents CSS injection attacks when user-supplied color or style
+    parameters are interpolated into ``<style>`` blocks inside SVG output.
+    For example, a malicious ``edge_color`` like
+    ``"red; } svg { display: none; } .x {"`` could break out of the CSS
+    rule and inject arbitrary styles.
+
+    Only allows safe characters: alphanumerics, ``#``, ``_``, ``.``,
+    ``,``, ``(``, ``)``, spaces, ``%``, ``+``, ``-``, and ``/``.
+    Characters like ``{``, ``}``, ``;``, ``:``, ``<``, ``>``, ``"``,
+    ``'``, and ``\\`` are rejected.
+
+    Parameters
+    ----------
+    value : str
+        The CSS value to sanitize.
+
+    Returns
+    -------
+    str
+        The validated value (unchanged if safe).
+
+    Raises
+    ------
+    ValueError
+        If the value contains unsafe characters.
+    """
+    s = str(value)
+    if not _CSS_VALUE_RE.match(s):
+        raise ValueError(
+            "Unsafe CSS value rejected: %r — only alphanumerics, "
+            "#, _, ., and common CSS characters are allowed" % s
+        )
+    return s
+
 # Maximum vertices a single Voronoi region can have before we give up.
 # Prevents infinite loops on degenerate point configurations.
 MAX_VERTICES = 50
@@ -498,8 +541,18 @@ def load_data(filename, auto_bounds=True):
     if filename in _file_cache:
         return _file_cache[filename]['points']
 
+    # Strip leading "data/" or "data\" prefix if present, since
+    # validate_input_path already joins with base_dir="data".
+    # This prevents path doubling (data/data/file.txt) when users
+    # pass "data/file.txt" instead of just "file.txt".  (Fixes #36)
+    clean_name = filename
+    for prefix in ("data/", "data\\"):
+        if clean_name.startswith(prefix):
+            clean_name = clean_name[len(prefix):]
+            break
+
     # Validate path stays inside data/ directory
-    resolved = validate_input_path(filename, base_dir="data")
+    resolved = validate_input_path(clean_name, base_dir="data")
 
     # Auto-detect format and parse
     fmt = _detect_format(resolved)

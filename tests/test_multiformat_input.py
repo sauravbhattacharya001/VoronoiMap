@@ -216,3 +216,57 @@ def test_load_data_geojson(tmp_path):
         assert len(pts) == 2
     finally:
         os.chdir(old_cwd)
+
+
+# ── load_data with "data/" prefix (Fixes #36) ───────────────────────
+
+def test_load_data_strips_data_prefix(tmp_path):
+    """load_data('data/file.txt') should not double the path."""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    f = data_dir / "test_prefix.txt"
+    f.write_text("100 200\n300 400\n500 600\n")
+
+    old_cwd = os.getcwd()
+    os.chdir(tmp_path)
+    try:
+        vormap._file_cache.clear()
+        pts = vormap.load_data("data/test_prefix.txt")
+        assert len(pts) == 3
+        assert pts[0] == (100.0, 200.0)
+    finally:
+        os.chdir(old_cwd)
+
+
+def test_load_data_plain_filename_still_works(tmp_path):
+    """load_data('file.txt') without prefix still works."""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    f = data_dir / "plain.txt"
+    f.write_text("10 20\n30 40\n")
+
+    old_cwd = os.getcwd()
+    os.chdir(tmp_path)
+    try:
+        vormap._file_cache.clear()
+        pts = vormap.load_data("plain.txt")
+        assert len(pts) == 2
+    finally:
+        os.chdir(old_cwd)
+
+
+def test_load_data_backslash_prefix(tmp_path):
+    """load_data('data\\\\file.txt') with backslash prefix also works."""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    f = data_dir / "backslash_test.txt"
+    f.write_text("1 2\n3 4\n5 6\n")
+
+    old_cwd = os.getcwd()
+    os.chdir(tmp_path)
+    try:
+        vormap._file_cache.clear()
+        pts = vormap.load_data("data\\backslash_test.txt")
+        assert len(pts) == 3
+    finally:
+        os.chdir(old_cwd)

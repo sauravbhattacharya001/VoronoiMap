@@ -455,7 +455,8 @@ def export_svg(
         " .title { font-family: 'Helvetica Neue', Arial, sans-serif;"
         " font-size: 16px; font-weight: 600; fill: #222;"
         " text-anchor: middle; }"
-        % (stroke_color, stroke_width, point_color)
+        % (vormap.sanitize_css_value(stroke_color), stroke_width,
+           vormap.sanitize_css_value(point_color))
     )
 
     # Background

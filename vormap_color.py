@@ -461,7 +461,7 @@ def export_colored_svg(
         " .label { font-family: 'Helvetica Neue', Arial, sans-serif;"
         " font-size: 10px; fill: #333; text-anchor: middle;"
         " dominant-baseline: central; pointer-events: none; }"
-        % (stroke_color, stroke_width)
+        % (vormap.sanitize_css_value(stroke_color), stroke_width)
     )
 
     # Background

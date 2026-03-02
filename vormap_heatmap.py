@@ -27,6 +27,8 @@ import json
 import math
 import xml.etree.ElementTree as ET
 
+import vormap
+
 
 # ── Color ramps ──────────────────────────────────────────────────────
 
@@ -203,7 +205,8 @@ def export_heatmap_svg(
         " text-anchor: middle; }"
         " .legend-label { font-family: 'Helvetica Neue', Arial, sans-serif;"
         " font-size: 10px; fill: #333; }"
-        % (stroke_color, stroke_width, point_color)
+        % (vormap.sanitize_css_value(stroke_color), stroke_width,
+           vormap.sanitize_css_value(point_color))
     )
 
     ET.SubElement(svg, "rect", {
