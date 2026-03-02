@@ -426,7 +426,8 @@ function render() {
   const metric = metricSel.value;
   const rampFn = ramps[rampSel.value];
   const vals = cells.map(c => c.metrics[metric]);
-  const mn = Math.min(...vals), mx = Math.max(...vals);
+  let mn = Infinity, mx = -Infinity;
+  for (let i = 0; i < vals.length; i++) { if (vals[i] < mn) mn = vals[i]; if (vals[i] > mx) mx = vals[i]; }
   const range = mx > mn ? mx - mn : 1;
 
   while (svg.firstChild) svg.removeChild(svg.firstChild);

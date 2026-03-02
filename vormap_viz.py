@@ -1564,8 +1564,9 @@ frames.forEach(function(f){
   f.points.forEach(function(p){allX.push(p[0]);allY.push(p[1])});
   f.regions.forEach(function(r){r.vertices.forEach(function(v){allX.push(v[0]);allY.push(v[1])})});
 });
-var minX=Math.min.apply(null,allX),maxX=Math.max.apply(null,allX);
-var minY=Math.min.apply(null,allY),maxY=Math.max.apply(null,allY);
+var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+for(var _i=0;_i<allX.length;_i++){if(allX[_i]<minX)minX=allX[_i];if(allX[_i]>maxX)maxX=allX[_i]}
+for(var _i=0;_i<allY.length;_i++){if(allY[_i]<minY)minY=allY[_i];if(allY[_i]>maxY)maxY=allY[_i]}
 var rangeX=Math.max(maxX-minX,1e-6),rangeY=Math.max(maxY-minY,1e-6);
 
 // ── Canvas setup ──
@@ -1675,7 +1676,7 @@ function drawConvergence(){
   convCtx.fillRect(0,0,cw,ch);
 
   var convs=frames.map(function(f){return f.convergence});
-  var maxConv=Math.max.apply(null,convs.filter(function(c){return c>0}));
+  var maxConv=0;for(var _i=0;_i<convs.length;_i++){if(convs[_i]>0&&convs[_i]>maxConv)maxConv=convs[_i]}
   if(!maxConv||maxConv<=0)maxConv=1;
 
   var pad=40,gw=cw-2*pad,gh=ch-25;
@@ -1943,8 +1944,9 @@ var curScheme = initialScheme;
 var allX=[], allY=[];
 points.forEach(function(p){allX.push(p[0]);allY.push(p[1])});
 regions.forEach(function(r){r.vertices.forEach(function(v){allX.push(v[0]);allY.push(v[1])})});
-var minX=Math.min.apply(null,allX), maxX=Math.max.apply(null,allX);
-var minY=Math.min.apply(null,allY), maxY=Math.max.apply(null,allY);
+var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+for(var _i=0;_i<allX.length;_i++){if(allX[_i]<minX)minX=allX[_i];if(allX[_i]>maxX)maxX=allX[_i]}
+for(var _i=0;_i<allY.length;_i++){if(allY[_i]<minY)minY=allY[_i];if(allY[_i]>maxY)maxY=allY[_i]}
 var rangeX=Math.max(maxX-minX,1e-6), rangeY=Math.max(maxY-minY,1e-6);
 
 // ── Canvas setup ──
