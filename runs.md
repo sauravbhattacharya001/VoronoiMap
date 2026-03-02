@@ -1,4 +1,1089 @@
+## 2026-03-01
+
+### Builder Run — 11:05 PM PST
+**Repo:** prompt | **Feature:** PromptDebugger
+- Deep prompt analysis: 10 anti-pattern detectors, 8 component detectors, clarity scoring (0-100), conversation analysis, A/B comparison.
+- 769 lines source + 440 lines tests (47 tests). Commit `a7d2a51`.
+
+### Builder Run — 10:45 PM PST
+**Repo:** agentlens | **Feature:** Webhook notifications for alert rules
+- Added configurable webhook endpoints that fire when alerts trigger
+- Supports JSON, Slack, and Discord payload formats
+- HMAC-SHA256 signature verification, configurable retries with exponential backoff
+- Rule-scoped webhooks, delivery history tracking, test endpoint
+- 9/9 tests pass. Commit `80531c3`.
+
+### Gardener Run 559 — 10:35 PM PST
+**Repo:** Vidly | **Tasks:** perf_improvement, open_issue
+- **perf_improvement:** Eliminated O(n²) lookups in `RentalHistoryService` report generation. `GenerateSummaryReport`: 5 LINQ passes → 1 single-pass loop. `GenerateDetailedReport`: removed redundant `GetAll()`. `GenerateCustomerReport`/`GenerateMovieReport`: replaced O(C)/O(M) `FirstOrDefault` per group with O(1) dictionary lookups. 68/68 tests pass. Commit `d44424c`.
+- **open_issue:** Filed #26 — `ReviewsController.EnrichReviews` has N+1 `GetById` calls, should delegate to `ReviewService`'s batch enrichment.
+
+### Gardener Run 558 — 10:30 PM PST
+**Status:** All 16 repos have 29/29 task types completed. No actionable work remaining.
+
+### Builder Run — 10:30 PM PST
+**Repo:** Vidly | **Feature:** PricingService
+- Membership-tier pricing engine: Basic/Silver/Gold/Platinum with discounts, grace periods, free rentals, late fee reductions.
+- CalculateRentalPrice, CalculateLateFee (grace + cap + discount), CompareTiers, GetBillingSummary.
+- Also fixed pre-existing ExportController build error (JavaScriptSerializer → reflection-based JSON).
+- 463 lines source + 404 lines tests (32 tests). Commit `d4d54de`.
+
+### Feature Builder — 10:15 PM PST
+**Repo:** Vidly (ASP.NET MVC video rental app)
+**Feature:** Data Export page — CSV/JSON download for movies, customers, and rentals
+**Details:** Added ExportController with endpoints for movies, customers, and rentals export in CSV and JSON formats. Created an Export UI page with Bootstrap panels showing record counts and download buttons. Added Export link to the navbar.
+**Commit:** `eb9efb7` pushed to master
+
+### Gardener Run 558 — 10:00 PM PST
+All 16 repos have all 29/29 task types completed. No actionable work remaining. Skipped.
+
+### Builder Run — 9:55 PM PST
+**Repo:** ai (AI Replication Sandbox) | **Feature:** Contract Templates
+- 8 domain-specific replication contract presets: Web Crawler, Data Pipeline, ML Training Swarm, Code Analysis, Security Scanner, Research Experiment, Autonomous Agent, CI/CD Pipeline.
+- Each with safety rationale, domain-specific stop conditions, risk levels, and CLI/programmatic access.
+- 879 lines source + 388 lines tests (115 tests). All 1073 tests pass. Commit `f144449`.
+
+### Builder Run — 9:45 PM PST
+**Repo:** sauravcode | **Feature:** Random number builtins
+- Added 4 stdlib functions: `random min max` (float), `random_int min max` (integer), `random_choice list` (pick element), `random_shuffle list` (shuffled copy)
+- Includes `demos/random_demo.srv` with dice game example
+- All 921 existing tests pass (1 pre-existing failure unrelated)
+
+### Builder Run — 9:30 PM PST
+**Repo:** FeedReader | **Feature:** FeedDiscoveryManager
+- Auto-discover RSS/Atom feeds from website URLs. Two-phase: HTML `<link rel="alternate">` tag parsing + common path fallback (17 paths).
+- URL resolution (relative, root-relative, protocol-relative), normalization, validation, feed content detection.
+- 424 lines source + 578 lines tests (68 tests). Commit `125463a`.
+
+### Feature Builder — 9:15 PM PST
+**Repo:** VoronoiMap
+**Feature:** KML export for Google Earth
+- Added `vormap_kml.py` module with `export_kml()` and `generate_kml()` APIs
+- Added `--kml OUTPUT` CLI flag (works with `--no-seeds` and `--color-scheme`)
+- Regions exported as styled KML Polygons, seeds as Placemarks, organized in folders
+- 6 color schemes supported (pastel, warm, cool, earth, mono, rainbow)
+- 5 tests passing
+- Commit: `532f020`
+
+### Repo Gardener — 9:00 PM PST
+**Tasks:** PR review & merge (x2)
+**PRs Merged (5):**
+- Vidly #22: security: add Cache-Control and Pragma no-cache headers
+- WinSentinel #20: feat: CSV export for audit reports
+- sauravcode #14: feat: Add slice notation for lists and strings
+- sauravcode #15: feat: add ternary conditional expressions
+- Ocaml-sample-code #12: Add JSON parser with queries, transforms, and pretty printing
+**PRs Closed (1):**
+- VoronoiMap #31: fix: remove unused import (merge conflict, likely already resolved)
+**Notes:** All 16 repos fully gardened (29/29 tasks). No open issues. Garden clean.
+
+### Feature Builder — 8:45 PM PST
+**Repo:** VoronoiMap
+**Feature:** Multi-format data input (CSV, JSON, GeoJSON)
+**Details:** `load_data()` now auto-detects file format from extension. Supports CSV with smart header detection (x/y, lng/lat, longitude/latitude, etc.), JSON arrays of coordinate pairs or objects, and GeoJSON FeatureCollection/Feature with Point geometries. All formats reject NaN/Inf gracefully. Added 19 tests, all 1064 existing tests still pass.
+**Commit:** `29f1cf2` → `master`
+
+### Gardener Run #555 — 8:30 PM PST
+**Status:** All 16 repos fully gardened (29/29 task types each). No open Dependabot PRs or issues. Nothing to do.
+
+### Gardener Run #554 — 8:15 PM PST
+**Repo:** everything | **Tasks:** security_fix, add_tests
+- **security_fix 1:** `EventLocation` accepted out-of-range coordinates (lat=999, lon=-500) — `distanceTo()` produced NaN via trig functions, propagating through TravelTimeEstimator. Added `validated()` factory with `ArgumentError` on invalid ranges. Updated `fromJson` to validate. `fromJsonString` returns null for invalid coords.
+- **security_fix 2:** `IcsExportService.generateFilename()` allowed leading dots/underscores in filenames (hidden files, path traversal). Now strips leading dots/underscores, replaces whitespace with underscores.
+- **add_tests:** 12 new EventLocation validation tests + 22 new EventSearchService tests (searchFields, anyTags, isRecurring, date sorting, relevance ranking, edge cases).
+- Filed issue #27, commit `34fa7c7`.
+
+### Gardener Run #555 — 8:55 PM PST
+**Repo:** VoronoiMap | **Tasks:** security_fix, fix_issue
+- **security_fix:** All 22 output file writes across 12 modules accepted unvalidated paths from CLI args — could overwrite arbitrary files via `--svg ../../etc/passwd`. Added `validate_output_path()` mirroring existing input validator, applied to all write sites.
+- **fix_issue:** Filed issue #35, fixed in same commit.
+- All 1045 tests pass. Commit `51fb537`.
+
+### Builder Run — 9:05 PM PST
+**Repo:** GraphVisual | **Feature:** SpectralAnalyzer
+- Added `SpectralAnalyzer.java` (667 lines) — eigenvalue-based graph analysis using Jacobi eigenvalue algorithm (no external deps).
+- Computes: adjacency/Laplacian spectra, spectral radius, spectral gap, algebraic connectivity (Fiedler value), Fiedler vector + spectral bisection, graph energy, spanning tree count (Kirchhoff), bipartite detection, classification.
+- Added `SpectralAnalyzerTest.java` (33 tests) — K2-K5, paths, cycles, stars, disconnected, barbell, eigenvalue properties.
+- All 822 tests pass. Commit `e6505c0`.
+
+### Feature Builder Run #237 — 8:15 PM PST
+**Repo:** agenticchat | **Feature:** Drag-and-Drop File Input
+- Drag text files onto chat area to include contents as code blocks in prompts
+- 50+ supported text extensions (.js, .py, .json, .csv, .md, etc.)
+- Auto-detects language for syntax-highlighted code fences
+- Max 100KB per file, 5 files per drop
+- Visual drop overlay with accent-colored dashed border
+- `/file` slash command as file picker alternative
+- Also supports extensionless files (Makefile, Dockerfile, etc.)
+- Commit: `13ecdf0`
+
+### Gardener Run #554 — 8:04 PM PST
+**Repo:** WinSentinel | **Task:** security_fix
+- `InputSanitizer.CheckDangerousCommand` now blocks 4 new attack vector categories:
+  - `.NET WebClient`/`DownloadString`/`DownloadFile` (bypasses `Invoke-WebRequest` block)
+  - `Invoke-Expression`/`iex` (arbitrary code execution)
+  - `Add-Type -TypeDefinition`/`-MemberDefinition` (inline C# compilation)
+  - `Start-Process powershell/cmd` with `-Verb RunAs` (privilege escalation)
+- Added 9 new test cases covering all new patterns
+- No Dependabot PRs or open issues found across any repos
+
+### Feature Builder Run #236 — 7:45 PM PST
+**Repo:** Ocaml-sample-code | **Feature:** JSON Parser
+- Complete RFC 8259 JSON parser built with parser combinators (~600 lines)
+- Parsing, pretty printing, dot-notation queries, structural equality, functional transforms (map/filter/fold/merge)
+- Unicode escape sequences with surrogate pair support
+- 170+ test assertions in test_json.ml
+- PR: https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/22
+
+### Gardener Run #553 — 7:35 PM PST
+**Repo:** sauravcode | **Tasks:** fix_issue, bug_fix
+- **fix_issue:** Compiler string comparison used C pointer equality instead of `strcmp()`. Added `_is_string_expr()` helper + `strcmp()` emission for all 6 operators. Filed+fixed issue #16. 4 compiler tests.
+- **bug_fix:** Interpreter binary ops on incompatible types leaked Python `TypeError`. Wrapped `_eval_binary_op` in try/except, raises clean `RuntimeError` with type names. 4 interpreter tests.
+- All 1076 tests pass (8 new). Commit `58c3ef3`.
+
+### Builder Run #236 — 7:48 PM PST
+**Repo:** getagentbox | **Feature:** System Status Dashboard
+- 5 service monitors (API/Chat/Memory/Integrations/Webhooks) with 3 status levels + pulsing dots
+- Uptime progress bars with ARIA meter roles, overall status cascade
+- Incident timeline, StatusDashboard module with 12-method API
+- 30 new tests
+- Commit `0a08c1a`
+
+### Gardener Run #552 — 7:30 PM PST
+**Task 1: merge_dependabot** — Merged 3 Dependabot PRs:
+- VoronoiMap #34: bump actions/upload-artifact 6→7
+- VoronoiMap #33: bump actions/download-artifact 7→8
+- agenticchat #26: bump c8 10.1.3→11.0.0
+
+**Task 2: fix_issue** — Vidly #24
+- Optimized `GetInventoryForecast` from O(M×R) to O(M+R) by pre-grouping rentals into a Dictionary keyed by MovieId. PR #25 merged.
+
+### Gardener Run #551 — 7:05 PM PST
+**Repo:** GraphVisual | **Tasks:** perf_improvement, fix_issue
+- **perf_improvement:** Cached neighbor sets in CliqueAnalyzer Bron-Kerbosch. `getNeighbors()` created new `LinkedHashSet` per call during recursion. Built `HashMap<String, Set<String>>` cache once in `compute()` — eliminates O(V²) temporary set allocations. Commit `37f7cb1`.
+- **fix_issue:** Fixed GraphMLExporter wrong namespace URL (`graphml.graphstruct.org` → `graphml.graphdrawing.org`). Files were rejected by Gephi/Cytoscape/NetworkX/yEd. Filed+fixed issue #20. Test updated. Commit `7d47ed0`.
+
+### Builder Run #235 — 7:18 PM PST
+**Repo:** everything | **Feature:** Event Location & Travel Time Estimator
+- EventLocation model: lat/lng coordinates, address, placeName, Haversine distance (km/mi), validation, JSON serialization
+- TravelTimeEstimator: 4 transport modes (driving/transit/cycling/walking) with detour factors, buffer time, schedule analysis, conflict detection (3 severities), departure time calc, mode suggestions
+- 64 new tests
+- Commit `77fad98`
+
+### Gardener Run #550 — 6:35 PM PST
+**Repo:** VoronoiMap | **Tasks:** security_fix, perf_improvement
+- **security_fix:** Replaced `Math.min/max` spread/apply with iterative loops across 5 call sites in `vormap_heatmap.py` and `vormap_viz.py` (relaxation + interactive templates). Prevents RangeError DoS with 60K+ region datasets. Fixes #32.
+- **perf_improvement:** Replaced O(n²) `_data_index()` → O(n) hash map lookup in `vormap_viz.py`. Built `_build_data_index()` for O(1) per-region seed lookups, applied in `export_html()`, `export_geojson()`, `compute_region_stats()`. 1045 tests pass.
+- **Weight self-adjustment applied** at run 550: repeatable tasks boosted (+2), non-repeatable all-done tasks decreased (-3).
+- Commits: `4558960`, `4cb751e`
+
+### Builder Run #234 — 7:00 PM PST
+**Repo:** getagentbox | **Feature:** Product Roadmap
+- 9 feature cards (Shipped/In Progress/Planned) × 3 categories (Core/Integration/Feature)
+- Status filter tabs with ARIA tablist, upvote toggle + localStorage, keyboard nav, summary bar
+- 41 new tests
+- Commit: `4826051`
+
+### Builder Run #233 — 6:15 PM PST
+- **Repo:** agenticchat
+- **Feature:** Streaming API Responses
+- **What:** Added real-time streaming for OpenAI chat completions using SSE. Responses now appear token-by-token instead of waiting for the full response. Includes `callOpenAIStreaming()` with ReadableStream parsing, `appendChatOutput()` for incremental display, `STREAMING_ENABLED` config persisted to localStorage, `/stream` slash command toggle, and graceful fallback to non-streaming path.
+- **Tests:** 590 passing (0 new, 3 updated)
+- **Commit:** `eaf1d5e` → pushed to `main`
+
+
+
+
+### Builder Run #233 — 6:30 PM PST
+**Repo:** GraphVisual | **Feature:** Network Flow Analyzer (Edmonds-Karp)
+- Max flow algorithm: compute(), getMinCut(), getBottleneckEdges(), decomposeFlowPaths()
+- FlowResult snapshot, formatted summary with saturated edge markers
+- 55 new tests
+- Commit: `d753d2e`
+### Gardener Run #549 — 6:15 PM PST
+**Repo:** getagentbox | **Tasks:** package_publish, code_cleanup
+- Scoped npm files field, added exports/engines/prepublishOnly
+- Fixed checkout@v6/setup-node@v6 → @v4 across 7 workflows
+- Removed dead code (unused var, duplicate var i, wrong module header)
+- Commit: `60eddb1`
+### Gardener Run #548 — 5:45 PM PST
+**Repo:** Vidly | **Tasks:** perf_improvement, open_issue
+- Precompute global maximums in MovieInsightsService.GetAllInsights (O(M*R*2) → O(R))
+- Issue #24: GetInventoryForecast O(M*R) rental scan
+- Commit: `f8b5fe8`
+### Builder Run #232 — 5:15 PM PST
+**Repo:** everything | **Feature:** Event Dependency Tracker
+- New `dependency_tracker.dart` — inter-event dependency management with blocks/blocked-by semantics
+- Circular dependency detection (3-color DFS), cycle prevention, topological sort (Kahn's), critical path finding
+- Models: EventDependency, EventDependencyInfo, CriticalPath, DependencyGraphSummary, DependencyStatus enum
+- 500 dependency limit, JSON serialization, human-readable formatSummary
+- 57 new tests covering diamond/fan-out/fan-in patterns
+- Commit: 731a9b5 → github.com/sauravbhattacharya001/everything
+
+### Builder Run #231 — 5:20 PM PST
+**Repo:** Ocaml-sample-code | **Feature:** Suffix Array with LCP Array
+- New `suffix_array.ml` — fundamental string algorithm for efficient pattern matching
+- O(n log^2 n) suffix array build via rank-pair doubling
+- O(n) LCP array via Kasai's algorithm
+- O(m log n) pattern search, count, contains
+- Longest repeated substring, distinct substring count
+- K-th lexicographic substring, Burrows-Wheeler Transform
+- Pretty printing with/without LCP
+- 463 lines: 246 source + 217 tests (101 assertions, 9 suites)
+- Commit: `24ff0b1`
+
+### Gardener Run 547 — 5:07 PM PST
+- **Status:** All 16 repos have all 29 task types completed. No tasks remaining.
+- **Action:** None — full coverage achieved.
+
+### Feature Builder Run — 4:45 PM PST
+- **Repo:** sauravcode
+- **Feature:** Ternary conditional expressions (`value_if_true if condition else value_if_false`)
+- **PR:** https://github.com/sauravbhattacharya001/sauravcode/pull/15
+- **Changes:** Added TernaryNode AST, parser, interpreter eval, and C compiler support. Right-associative for chaining. All existing tests pass.
+
+### Gardener Run #546-547 — 4:30 PM PST
+- **Task 1:** fix_issue on **Vidly** — Fixed issue #23 (ActivityController default constructor creating separate repository instances). Shared single instances between controller field and service, matching pattern used by other controllers. Commit `073667b`.
+- **Task 2:** bug_fix on **prompt** — Fixed `PromptCache.FromJson` not enforcing capacity limit during deserialization. JSON files with more entries than capacity would exceed the cache's size limit and consume unbounded memory. Added capacity check in the loading loop. Commit `e2dca6c`.
+
+### Builder Run #230 — 4:15 PM PST
+- **Repo:** everything
+- **Feature:** Event Duplicate — duplicate any event from detail screen with date/time picker
+- **Commit:** `90ba4c0` — pushed to master
+
+### Gardener Run #545 — 4:05 PM PST
+**Repo:** Vidly | **Tasks:** add_tests + open_issue (no Dependabot PRs to merge)
+- **Tests:** 41 new tests across 3 previously untested components:
+  - `ActivityControllerTests` (12): Index views, customer selection, error handling, null guards
+  - `RecommendationsControllerTests` (13): Index views, customer lookup, 404 for invalid, null guards
+  - `SecurityHeadersAttributeTests` (16): All 7 security headers verified, HSTS HTTP-only, existing headers preserved, server identity headers removed, CSP CDN allowlisting
+- **Issue:** #23 — ActivityController default constructor creates separate InMemoryCustomerRepository instances for controller field and service (should share one set like ReviewsController does)
+- 41 new tests pass, 691 lines added
+- Commit: `6008da9`
+
+### Builder Run #230 — 4:40 PM PST
+**Repo:** VoronoiMap | **Feature:** Territorial Analysis
+- New `vormap_territory.py` for analyzing Voronoi tessellations as territories
+- Gini coefficient & balance score for measuring territorial equality
+- Border pressure: shared border length / total perimeter (neighbor exposure)
+- Territory classification: dominant/average/marginal by area vs mean±1σ
+- Frontier analysis: boundary vs interior regions
+- Shared border detection with per-pair length computation
+- Area distribution stats: min/max/mean/median/std/CV/dominance ratio
+- Human-readable report, JSON export, CSV export
+- 1033 lines: 598 source + 435 tests
+- 51 tests, 1042 total pass (0 failures)
+- Commit: `a6d9bd4`
+
+
+
+
+
+
+### Builder Run #233 — 6:30 PM PST
+**Repo:** GraphVisual | **Feature:** Network Flow Analyzer (Edmonds-Karp)
+- Max flow algorithm: compute(), getMinCut(), getBottleneckEdges(), decomposeFlowPaths()
+- FlowResult snapshot, formatted summary with saturated edge markers
+- 55 new tests
+- Commit: `d753d2e`
+### Gardener Run #549 — 6:15 PM PST
+**Repo:** getagentbox | **Tasks:** package_publish, code_cleanup
+- Scoped npm files field, added exports/engines/prepublishOnly
+- Fixed checkout@v6/setup-node@v6 → @v4 across 7 workflows
+- Removed dead code (unused var, duplicate var i, wrong module header)
+- Commit: `60eddb1`
+### Gardener Run #548 — 5:45 PM PST
+**Repo:** Vidly | **Tasks:** perf_improvement, open_issue
+- Precompute global maximums in MovieInsightsService.GetAllInsights (O(M*R*2) → O(R))
+- Issue #24: GetInventoryForecast O(M*R) rental scan
+- Commit: `f8b5fe8`
+### Builder Run #232 — 5:50 PM PST
+**Repo:** getagentbox | **Feature:** Command Showcase
+- Interactive terminal with typewriter animation for 8 example commands
+- Configurable speed, pause/resume/stop/reset/skipTo, auto-DOM build
+- macOS terminal chrome, blinking cursor, emoji category badges, mobile responsive
+- 28 new tests, 170 total (168 pass, 1 pre-existing fail, 1 skip)
+- Commit: `a6ba414`
+### Gardener Run #547 — 5:20 PM PST
+**Repo:** GraphVisual | **Tasks:** perf_improvement + add_tests
+- **Perf:** Fused betweenness+closeness BFS into single pass in NodeCentralityAnalyzer — previously two separate O(V*E) sweeps, now one BFS per source vertex covers both metrics. Halves graph traversal cost.
+- **Tests:** LinkPredictionAnalyzerTest expanded 10 → 31 tests (+21): isolated vertices, disconnected components, topK boundary, exact scores for Jaccard/Adamic-Adar/PA, metadata fields, density edge cases, unmodifiable collections, ensemble normalization, summary format
+- 500 lines added, 81 removed. Commit: `ba7e65a`
+
+### Gardener Run #546 — 4:50 PM PST
+**Repo:** VoronoiMap | **Tasks:** security_fix + open_issue (no Dependabot PRs)
+- **Security fix:** XSS in `export_heatmap_html()` — user-supplied `title` interpolated raw via `%s` into `<title>` and `<h1>` tags. Also `metric` and `color_ramp` injected unescaped into `<script>`. Fixed with `html.escape()` for title + allowlist validation for JS parameters. Consistent with `vormap_viz.py` which already escapes correctly. 3 new XSS tests.
+- **Issue:** #32 — `Math.min(...vals)` / `Math.max(...vals)` in heatmap JS throws `RangeError` with 60K+ regions (same pattern fixed in BioBots #543)
+- 1045 total tests pass (0 failures)
+- Commit: `4babb07`
+
+### Builder Run #229 — 3:45 PM PST
+- **Repo:** sauravcode
+- **Feature:** Slice Notation (feature #8)
+- **PR:** https://github.com/sauravbhattacharya001/sauravcode/pull/14
+- **Details:** Python-style slice notation for lists and strings (`list[1:3]`, `text[:5]`, `items[2:]`, `data[:]`). SliceNode AST, parser colon detection, interpreter evaluation with negative index support. All 1068 tests pass.
+
+### Gardener Run #544 — 3:30 PM PST
+- **Status:** All 16 repos × 29 task types = fully complete. No work remaining.
+- **Action:** None — skipped run.
+
+### Builder Run #228 — 3:15 PM PST
+- **Repo:** everything (Flutter calendar app)
+- **Feature:** Event Search Service
+- **What:** Added `EventSearchService` with full-text search across title/description/location/tags/checklist, structured filters (priority, date range, tags, location, recurring, checklist, attachments), relevance scoring with field weights, multiple sort modes, and auto-suggest. Includes 20 unit tests.
+- **Commit:** `60ea072` on master
+
+### Gardener Run #543 — 3:00 PM PST
+- **Status:** All 16 repos have all 29 task types completed. No tasks to run.
+- **Note:** Garden is fully tended. Consider adding new repos or task types.
+
+### Builder Run #227 — 2:45 PM PST
+- **Repo:** prompt
+- **Feature:** Prompt Minifier — compresses prompts to reduce token usage with 3 levels (Light/Medium/Aggressive). Removes filler words, simplifies verbose phrases, abbreviates common terms. Returns token savings stats.
+- **Commit:** `7c4585a` → `main`
+
+### Gardener Run #543 — 2:30 PM PST
+- **Repos:** VoronoiMap, Vidly
+- **Actions:**
+  - VoronoiMap: Removed unused `eudist_pts` import from `vormap_interp.py` → [PR #31](https://github.com/sauravbhattacharya001/VoronoiMap/pull/31)
+  - Vidly: Added `Cache-Control` and `Pragma` no-cache security headers to prevent browser caching of sensitive customer/rental data → [PR #22](https://github.com/sauravbhattacharya001/Vidly/pull/22)
+- **Notes:** No open issues or dependabot PRs across any repos. All repos have all task types completed.
+
+### Builder Run #226 — 2:15 PM PST
+- **Repo:** FeedReader (iOS RSS reader)
+- **Feature:** Reading Goals — daily/weekly reading targets with progress tracking
+- ReadingGoalsManager: set daily/weekly story targets, compute progress %, auto-reset achievements per period
+- Posts notifications when goals are achieved
+- Comprehensive test suite included
+- **Commit:** 0f30ad4
+
+### Gardener Run #541 — 2:00 PM PST
+- **Task 1:** fix_issue on **WinSentinel** — Fixed #21 (BlockIp only blocked inbound traffic). Now creates both inbound and outbound firewall rules to prevent data exfiltration. UndoBlockIp updated with backward compatibility.
+- **Task 2:** bug_fix on **everything** — Fixed broken relative import paths in `IcsExportService` (`../models/` → `../../models/`). Would cause compilation failure when ICS export is used.
+
+### Builder Run #225 — 1:45 PM PST
+- **Repo:** agenticchat
+- **Feature:** Model Selector Dropdown
+- **Details:** Added a 🤖 toolbar button that opens a modal letting users choose from 8 OpenAI models (GPT-4o, GPT-4o Mini, GPT-4 Turbo, GPT-4, GPT-3.5 Turbo, o1 Preview, o1 Mini, o3 Mini). Selection persists via localStorage. Refactored ChatConfig from frozen object to getter/setter pattern.
+- **Commit:** d5a9710
+
+### Gardener Run #540 — 1:35 PM PST
+**Repo:** Vidly | **Tasks:** perf_improvement + doc_update
+- **perf_improvement:** Eliminated redundant rental scans in 3 methods:
+  - `BuildMonthlyActivity()`: O(6×R) → O(R) via Dictionary<(Year,Month)> single-pass aggregation
+  - `FindSimilar()`: 3 O(R) scans → 1 pass via pre-built customerMovies + movieRenters indexes
+  - `Compare()`: 4 O(R) scans → 1 pass via same indexes (+ renter sets derived from index)
+- **doc_update:** Added "Performance Patterns" section to ARCHITECTURE.md — documents 5 optimization strategies used across codebase (single-pass aggregation, dictionary grouping, pre-built indexes, HashSet membership, defensive cloning)
+- Weight self-adjustment at run 540: non-repeatable tasks −3 each (all repos done), high-success repeatable tasks +2
+- All 745 tests pass (16 pre-existing date-dependent failures unchanged)
+- Commit: `204ad3b`
+
+### Gardener Run #541 — 2:05 PM PST
+**Repo:** gif-captcha | **Tasks:** code_cleanup + add_tests
+- **code_cleanup:** 3 fixes:
+  - Session manager `_generateId()` used `Math.random()` for session IDs — replaced with `secureRandomInt()` (crypto-backed, prevents CAPTCHA bypass via ID prediction)
+  - `scorePatternPredictability()`: eliminated redundant `firstWords` object, derived diversity from `firstWordCounts` keys
+  - `qualityIssues()` identical_titles: replaced O(n²) nested lookup with single-pass `titleGroups` dictionary
+- **add_tests:** 61 new edge case tests in `tests/core-edge-cases.test.js` covering:
+  - `validateAnswer` (14): null/undefined/empty inputs, custom thresholds, keyword interactions
+  - `textSimilarity` (16): whitespace, unicode, duplicates, Jaccard correctness
+  - `createChallenge` (14): frozen output, XSS URL rejection, defaults, missing fields
+  - `pickChallenges` (10): null/non-array pool, immutability, randomness verification
+  - `sanitize` (5): nested tags, unicode preservation, long strings
+- All 354 tests pass
+- Commit: `53c2544`
+
+### Gardener Run #542 — 2:35 PM PST
+**Repo:** sauravbhattacharya001 (profile) | **Tasks:** code_cleanup + readme_overhaul
+- **code_cleanup:** Removed duplicate "Shortest path finder" entry in PROJECTS.md GraphVisual section (listed twice with different wording). Updated "Last updated" from Feb to Mar 2026.
+- **readme_overhaul:** Updated stale project descriptions across README.md, PROJECTS.md, and docs/app.js:
+  - Fixed Live Sites badge (15 → 16)
+  - GraphVisual: added 5 missing analyzer features (degree distribution, diameter/eccentricity, link prediction, graph generator, topological sort), 650+ tests
+  - everything: expanded from 4 to 12 feature bullets (recurring events, conflict detection, heatmap, time budgets, streak tracking, templates, event location)
+  - Synced docs/app.js card descriptions with README
+- Commit: `8b398d5`
+
+### Gardener Run #543 — 3:05 PM PST
+**Repo:** BioBots | **Tasks:** bug_fix + perf_improvement
+- **bug_fix:** `Math.min/max(...array)` with spread operator throws `RangeError: Maximum call stack size exceeded` when array exceeds ~60K elements. Replaced with iterative loops in 4 files:
+  - quality.html `computeRanges()` — all quality score computation crashed on large datasets
+  - explorer.html `drawHistogram()` + `drawScatterPlot()` — axis/bin calculations
+  - compare.html radar chart range computation
+  - index.html query tool Maximum/Minimum operations
+- **perf_improvement:** Correlation heatmap in quality.html optimized:
+  - Metric values extracted once per metric in single pass (was re-extracting per pair)
+  - Matrix symmetry exploited: 45 pearsonR() calls instead of 90 (n*(n-1)/2 vs n*(n-1))
+  - For 10K prints: eliminates ~450K redundant .get() calls
+- All 865 tests pass
+- Commit: `3a8a8b6`
+
+### Builder Run #224 — 1:15 PM PST
+**Repo:** sauravcode (Python)
+**Feature:** Assert Statements
+- Added `assert` keyword for runtime assertions: `assert condition` or `assert condition "message"`
+- New AST node `AssertNode`, parser method `parse_assert`, interpreter handler `_interp_assert`
+- Also improved error output in main() — catches RuntimeError for clean user-facing messages
+- All 1068 existing tests pass ✅
+- Demo file: `assert_demo.srv`
+
+### Gardener Run #539 — 1:00 PM PST
+**Task 1:** security_fix on **Vidly** (C#)
+- Prevented DailyRate price manipulation in Checkout — users could POST any rate to pay $0.01/day
+- Enforced server-side rental period to prevent due date manipulation
+- Added `[Bind]` attributes to Customer and Movie Edit actions to prevent over-posting (attacker modifying hidden Id field to update different records)
+- Commit: `a4c4bbc`
+
+**Task 2:** bug_fix on **FeedReader** (Swift)
+- `ReadingHistoryManager.recordVisit()` was never called anywhere in the app — reading history, stats, and digest features were completely non-functional
+- Wired up `viewDidAppear`/`viewWillDisappear` in `StoryViewController` to record visits and track reading time
+- Also integrated `ReadStatusManager.markAsRead` for the read/unread filter
+- Commit: `595c86b`
+
+### Builder Run #223 — 12:55 PM PST
+**Repo:** VoronoiMap | **Feature:** Voronoi Edge Network
+- New module `vormap_edge.py` (537 lines) — extracts the primal edge network (vertex-to-vertex polygon boundaries) from Voronoi regions
+- Complements existing `vormap_graph.py` (dual/adjacency graph) with the actual tessellation skeleton
+- Functions: `extract_edge_network()`, `compute_edge_stats()` (17 metrics), `format_edge_stats()`, `export_edge_csv()`, `export_edge_json()`, `export_edge_svg()`
+- SVG visualization with color-coded interior/boundary edges, junction/dead-end vertices
+- CLI: `--edge-network`, `--edge-csv`, `--edge-json`, `--edge-svg`
+- 34 tests (all passing)
+- Commit: `6278cbe`
+
+### Builder Run #224 — 1:30 PM PST
+**Repo:** getagentbox | **Feature:** Trust & Privacy Section
+- 6 interactive trust cards: workspace isolation, TLS encryption, no-training guarantee, user control, open source, minimal data collection
+- Accordion expand/collapse, keyboard accessible, subtle pulse animations
+- 4 trust badges: TLS Encrypted, SOC 2 Aligned, GDPR Compliant, Open Source
+- Responsive (3→2→1 column grid), nav link added
+- 607 lines across index.html + styles.css + app.js + 36 tests (all passing)
+- Commit: `809c3ba`
+
+### Builder Run #225 — 1:48 PM PST
+**Repo:** gif-captcha | **Feature:** Session Manager
+- New `createSessionManager()` module for multi-step CAPTCHA verification flows
+- Configurable challenges per session, pass threshold, session timeout
+- Difficulty escalation: correct → harder, wrong → easier (half step), with base/max/step
+- Session lifecycle: start → submit responses → auto-complete with pass/fail verdict
+- Metadata, invalidation/cancellation, auto-cleanup at capacity
+- Aggregate stats (pass rate, avg response time, avg difficulty)
+- 782 lines: 323 in src/index.js + 459 in tests/session-manager.test.js
+- 41 tests (all passing), 153 total tests pass
+- Commit: `43e8e48`
+
+### Builder Run #226 — 2:18 PM PST
+**Repo:** everything | **Feature:** Time Budget Service
+- New `TimeBudgetService` for time allocation analysis across tags, priorities, weekdays
+- Tag breakdown: hours, event count, avg duration, percentage per tag
+- Priority breakdown: same metrics grouped by EventPriority
+- Budget tracking: configurable weekly hour targets per category, utilization %, over-budget warnings
+- Overload detection: flags days exceeding threshold (default 8h) with excess calculation
+- Weekday distribution: total hours per day-of-week, busiest/lightest identification
+- Period filtering, recurring event expansion, human-readable report summary
+- 1160 lines: 537 service + 623 test
+- 28 tests covering all features
+- Commit: `daaa6b6`
+
+### Builder Run #227 — 2:48 PM PST
+**Repo:** GraphVisual | **Feature:** Graph Isomorphism Analyzer
+- New `GraphIsomorphismAnalyzer` for structural graph comparison
+- Multi-stage algorithm: fast rejection (vertex/edge count, degree sequence) → degree-based partitioning → VF2-style backtracking with forward+reverse feasibility
+- Returns vertex mapping (bijection) when isomorphic, rejection reason when not
+- `analyze()` for full result, `areIsomorphic()` for quick boolean check
+- Immutable result objects (unmodifiable maps and lists)
+- 777 lines: 321 analyzer + 456 test
+- 28 tests: Petersen graph, K2,3 bipartite, C6 vs two-triangles (same degree sequence but not isomorphic), stars, paths, K4, self-isomorphism, mapping verification
+- Commit: `035110c`
+
+### Builder Run #228 — 3:18 PM PST
+**Repo:** agentlens | **Feature:** Token Budget Tracker
+- New `BudgetTracker` module (`agentlens.budget`) for managing token budgets across agent sessions
+- Per-session budgets with `max_tokens` and/or `max_cost_usd` limits
+- Configurable warning thresholds (default 80%), soft or hard limits
+- Hard limits raise `BudgetExceededError` before recording (pre-check)
+- Real-time cost estimation via model pricing (14 models: GPT-4/4o, Claude 3/4, Gemini)
+- Threshold callbacks fire on status transitions (ACTIVE → WARNING → EXCEEDED/EXHAUSTED)
+- `BudgetReport` with `to_dict()` serialization and human-readable `summary` property
+- Session-indexed lookups, budget lifecycle management
+- 860 lines: 464 source + 388 tests
+- 56 tests, 815 total SDK tests pass (1 pre-existing failure)
+- Commit: `530272b`
+
+### Gardener Run #544 — 3:35 PM PST
+**Repo:** agenticchat | **Tasks:** bug_fix + doc_update
+- **Bug fix:** Cost estimation in `showTokenUsage()` was hardcoded to gpt-4o rates ($2.50/$10.00 per 1M tokens) for all 8 models. Added `MODEL_PRICING` table to `ChatConfig` with per-model [input, output] pricing. Cost range spans 100x (gpt-3.5-turbo $0.50/$1.50 vs gpt-4 $30/$60). Falls back to gpt-4o for unknown models.
+- **Doc update:** Fixed `docs/index.html` — architecture table 9→17 modules, test count 90+→590+, keyboard shortcuts 6→22, ChatConfig API (added MODEL_PRICING, AVAILABLE_MODELS), configuration section (corrected Object.freeze claim to getter/setter pattern)
+- 3 new tests (MODEL_PRICING coverage for all models, per-model cost verification, unknown model fallback)
+- 589 pass, 1 pre-existing failure
+- Commit: `041ebdb`
+
+### Builder Run #229 — 4:15 PM PST
+**Repo:** ai | **Feature:** Quarantine Manager
+- New `QuarantineManager` for isolating flagged workers without destroying forensic evidence
+- Three-state lifecycle: QUARANTINED → RELEASED or TERMINATED
+- State snapshot capture on quarantine, investigator notes, restriction tracking
+- Severity levels (LOW/MEDIUM/HIGH/CRITICAL), detection source filtering
+- Lifecycle callbacks (on_quarantine, on_release, on_terminate)
+- QuarantineReport with aggregate metrics (by severity/source, avg duration)
+- Integrates with Controller (registry) and SandboxOrchestrator (container kill)
+- Bulk terminate_all() for incident response
+- 797 lines: 394 source + 390 tests
+- 35 tests, 958 total pass (0 failures)
+- Commit: `ed0166a`
+
+### Builder Run #223 — 12:45 PM PST
+**Repo:** Ocaml-sample-code | **Feature:** B-Tree
+- Added `btree.ml`: configurable minimum degree B-Tree with insert, search, in-order traversal, size, height, and pretty-print
+- Updated Makefile and README
+- Commit: `34a7fbe`
+
+### Gardener Run #538 — 12:40 PM PST
+**Repo:** agentlens | **Tasks:** security_fix + perf_improvement
+- **security_fix:** Replaced `Math.random()` ID generation in `annotations.js` and `alerts.js` with `crypto.randomBytes(6).toString('hex')` — CSPRNG instead of predictable PRNG for annotation/alert IDs
+- **perf_improvement:** Cached all 16 prepared statements in `alerts.js` `evaluateMetric()` — was re-compiling SQL on every metric evaluation call. Now lazily initialized once per process lifetime like every other route module.
+- All 324 tests pass
+- Commit: `d01fe00`
+
+### Gardener Run #539 — 1:10 PM PST
+**Repo:** WinSentinel | **Tasks:** code_cleanup + open_issue
+- **code_cleanup:** Replaced manual `HtmlEncode` in `HtmlDashboardGenerator.cs` with `WebUtility.HtmlEncode` — deduplicates logic already used by `ReportGenerator.cs`. Also fixes missing single-quote encoding (minor XSS hardening). 84 tests pass. Commit `fe3e347`.
+- **open_issue:** Filed #21 "BlockIp only blocks inbound traffic — outbound exfiltration still possible". `AutoRemediator.BlockIp()` creates firewall rule with `dir=in` only, leaving outbound data exfiltration channels open.
+
+### Builder Run #221 — 12:15 PM PST
+**Repo:** agenticchat | **Feature:** System Prompt Presets
+- Added 🎭 Persona button + slide-out panel with 7 built-in system prompt presets (Code Generator, Data Analyst, Creative Designer, Code Teacher, Game Developer, Web Utility, Minimal)
+- Custom prompt textarea for user-defined system prompts
+- Active persona persists via localStorage
+- Keyboard shortcut: Ctrl+P
+- Commit: `27d4800`
+
+### Gardener Run #537 — 12:15 PM PST
+**Repo:** GraphVisual | **Tasks:** security_fix + doc_update
+- **security_fix:** (1) Edge-list parser in `Main.java` crashed on malformed lines (<4 fields) or non-numeric weights. Added field count validation, NumberFormatException catch, NaN/Infinity rejection — malformed lines now skip with stderr warning. (2) `Network.generateFile()` path traversal: added canonical path validation ensuring output stays within working directory.
+- **doc_update:** Created `SECURITY.md` (133 lines) — security model, threat categories table with mitigation status, database security (parameterized queries, credential management), file I/O security (path validation, input validation, XML escaping), dependency audit with upgrade recommendations.
+- Commit: `0f61ed3`
+
+### Builder Run #222 — 12:35 PM PST
+**Repo:** BioBots | **Feature:** Experiment Coverage Map
+- Interactive 2D parameter space heatmap showing tested combinations and gaps
+- Configurable X/Y axes from any metric pair, color by count or avg outcome
+- Adjustable grid resolution, hover tooltips, coverage statistics
+- Smart gap suggestions: unexplored regions adjacent to high-performing experiments
+- 4-band cool-to-hot gradient, distinct empty cell styling
+- `docs/coverage.html` (704 lines) + `__tests__/coverage.test.js` (27 tests, all pass)
+- Commit: `13d7d10`
+
+### Gardener Run 536 — 12:00 PM PST
+- **Task 1:** `security_fix` on **ai** — Fixed non-deterministic HMAC serialization in `ManifestSigner._serialize()`. Was using `str(dict)` which depends on insertion order; switched to `json.dumps(sort_keys=True)` for canonical output. Added test for key-order independence. Commit 049a65d.
+- **Task 2:** `bug_fix` on **BioBots** — Fixed case-sensitive operator matching in `QueryMetric`. `ValidArithmetic` HashSet uses `OrdinalIgnoreCase` but comparison branches use exact `==`, so "Greater"/"LESSER" etc. passed validation but returned 404. Added `ToLowerInvariant()` normalization. Commit e487cd8.
+
+### Builder Run 220 — 11:45 AM PST
+- **Repo:** gif-captcha
+- **Feature:** Frame Inspector — new page that decomposes GIFs into individual frames with a pure JS GIF decoder. Includes timeline visualization, playback controls, frame tagging for critical "twist" moments, per-frame notes, and clipboard export. Helps researchers design more effective GIF CAPTCHAs.
+- **Commit:** `8bf8ce0`
+
+### Gardener Run 534 — 11:30 AM PST
+- **Task 1:** bug_fix on FeedReader — generation-guard `feedCompleted()` to prevent stale load interference. The method wasn't checking the generation counter, so cancelled requests from old loads could decrement the new load's `pendingFeedCount`, causing premature completion with partial results.
+- **Task 2:** refactor on Vidly — extracted duplicated review enrichment loops in `ReviewsController.Index` into a private `EnrichReviews()` helper method (-36 lines, +26 lines).
+
+### Builder Run 219 — 11:15 AM PST
+- **Repo:** ai (AI replication safety sandbox)
+- **Feature:** Compliance Auditor — audits ReplicationContracts against NIST AI RMF, EU AI Act, and internal policy frameworks
+- **Details:** 9 checks across 3 frameworks, structured reports with PASS/WARN/FAIL findings, CLI support, 12 tests passing
+- **Commit:** `0381781` on master
+
+### Gardener Run 531-532 — 11:00 AM PST
+**Task 1:** fix_issue on FeedReader — Fixed OPML parser sticky category bug (#13). Added `outlineDepth` tracking to properly clear `currentCategory` when exiting a folder element. Added 2 regression tests. Commit: `f3373fa`
+**Task 2:** security_fix on WinSentinel — Fixed command injection in `AutoRemediator.ExecuteFixCommand`. Fix commands with double quotes could break out of PowerShell `-Command "..."` and execute arbitrary code. Added proper escaping + `-NoProfile -NonInteractive -ExecutionPolicy Bypass` flags. Commit: `187a08a`
+
+### Builder Run 217 — 10:45 AM PST
+**Repo:** FeedReader
+**Feature:** Keyword Alerts
+**Details:** Added KeywordAlert model and KeywordAlertManager — the inverse of ContentFilter. While filters mute unwanted stories, keyword alerts flag stories matching user-defined topics (with priority levels and color tagging) so important articles aren't missed. Includes batch scanning, match counting, and persistent storage.
+**Commit:** `2be2a50` → `master`
+
+### Gardener Run 530 — 10:30 AM PST
+**Status:** All 16 repos fully saturated — every task type (29/29) already completed on every repo. No work remaining.
+
+### Feature Builder Run 216 — 10:15 AM PST
+**Repo:** WinSentinel | **Feature:** CSV Export
+**PR:** https://github.com/sauravbhattacharya001/WinSentinel/pull/20
+**Changes:** Added `--csv` flag for RFC 4180 CSV export of audit findings. 5 files changed, 5 tests passing.
+
+### Gardener Run — 10:01 AM PST
+**Result:** All 16 repos have all 29 task types completed. No tasks to pick. Gardener is fully caught up. 🎉
+
+### Builder Run #215 — 9:45 AM PST
+**Repo:** VoronoiMap
+**Feature:** Spatial Interpolation (Natural Neighbor, IDW, Nearest)
+- Added `vormap_interp.py` with Sibson natural neighbor, IDW, and nearest-neighbor interpolation
+- Grid interpolation for continuous surface maps with SVG heatmap and CSV export
+- Full CLI integration (`--interp-values`, `--interp-query`, `--interp-surface-svg/csv`)
+- Commit: `4b9fa6a` → pushed to master
+
+### Gardener Run #528 — 9:30 AM PST
+**Status:** All repos fully saturated — skipped
+- All 16 repos have all 29 task types completed
+- No open Dependabot PRs across any repo
+- No open issues across any repo
+- Nothing actionable this run
+
+### Gardener Run #534 — 11:45 AM PST
+**Repo:** everything | **Tasks:** security_fix + bug_fix
+- **security_fix:** URI scheme allowlist for link attachments — blocks `javascript:`, `data:`, `file:`, `vbscript:` schemes. Added `isAllowedLinkUri()` validator, `allowedLinkSchemes` constant (`http`, `https`, `mailto`, `tel`). `EventAttachment.link()` factory throws `ArgumentError` on disallowed schemes. `fromJson()` sanitizes link URIs from persisted data (corrupted/tampered DB defense).
+- **bug_fix:** `ConflictDetector.suggestAlternatives()` was only shifting `date` but not `endDate` when proposing alternative slots. A 2h event at 10:00-12:00 shifted +30min would check 10:30-12:00 (wrong) instead of 10:30-12:30 (correct). Fix: shift both start and end by same offset to preserve event duration.
+- Commit: `ef1506c`
+
+### Builder Run #220 — 11:55 AM PST
+**Repo:** everything | **Feature:** Activity Heatmap
+- GitHub-style year-at-a-glance heatmap showing event density per day
+- `HeatmapService` (348 lines): buckets events by date, expands recurring, computes intensity (4 levels), calculates stats (active days, streaks, busiest day, activity rate)
+- `HeatmapScreen` (512 lines): year navigation, stat cards, scrollable grid, legend, tap-to-drill-down day detail
+- 36 tests covering generation, intensity, edge cases, recurring expansion, leap years
+- Orange/red coloring for days with urgent/high priority events
+- Accessible from home screen grid icon
+- Commit: `082cac5`
+
+### Builder Run #219 — 11:30 AM PST
+**Repo:** prompt | **Feature:** Prompt Batch Processor
+- `PromptBatchProcessor` — batch processing engine for prompt template renders
+- Configurable `RetryPolicy` with exponential backoff, jitter, max delay cap
+- Progress callback (`OnProgress`), processor function (`WithProcessor`), filter (`WithFilter`)
+- `StopOnFirstFailure` mode, tag-based categorization, `RetryFailed` reset
+- `BatchResult` with success/failure rates, per-tag grouping (`GroupByTag`), `ToSummary`, `ToJson`
+- Fluent API for chaining configuration
+- `PromptBatchProcessor.cs` (736 lines) + `PromptBatchProcessorTests.cs` (906 lines, 66 tests all pass)
+- Total suite: 1316 pass, 7 pre-existing failures
+- Commit: `b1a53ff`
+
+### Gardener Run #533 — 11:15 AM PST
+**Repo:** GraphVisual | **Tasks:** add_tests + doc_update
+- **add_tests:** Expanded `GraphStatsTest` from 9 → 55 tests. Coverage for density (sparse/complete/star), average degree (path/star/triangle), top nodes edge cases (0/negative/more-than-exist/all-same-degree), isolated nodes, average weight, category counts, filtered vs visible edges, caching, larger graphs (10-node star/chain)
+- **doc_update:** Created `ARCHITECTURE.md` (195 lines) — full analyzer reference table with algorithms/complexity, design pattern contract, data pipeline diagram, GUI component map, test inventory (~650 tests), dependency table. Updated README Architecture section (was showing 3 files, now shows all 18 with link to ARCHITECTURE.md)
+- Commit: `7378bbe`
+
+### Builder Run #218 — 11:05 AM PST
+**Repo:** GraphVisual | **Feature:** Topological Sort Analyzer
+- Kahn's algorithm topological sort with deterministic lexicographic tie-breaking
+- DFS-based cycle detection (three-color marking) — reports all cycle vertices/edges
+- Critical path computation, depth map, root/leaf identification
+- Scheduling flexibility metric (choice points)
+- Per-vertex transitive dependency analysis (bidirectional BFS)
+- Human-readable summary generator
+- `TopologicalSortAnalyzer.java` (654 lines) + `TopologicalSortAnalyzerTest.java` (706 lines, 42 tests)
+- Commit: `ba56fd7`
+
+### Gardener Run #530 — 10:55 AM PST
+**Repo:** Vidly | **Tasks:** refactor, doc_update
+- **Refactor:** Extracted 13 data model classes from `MovieInsightsService.cs` (455→268 lines) and `DashboardService.cs` (313→237 lines) into `Models/MovieInsightModels.cs` and `Models/DashboardModels.cs`. Follows existing `RentalHistoryModels.cs` convention. Updated `DashboardViewModel.cs` namespace import.
+- **Doc update:** Comprehensive rewrite of `ARCHITECTURE.md` — added all 10 controllers, 8 services, 3 repos, 9 ViewModels, analytics model files, full test listing, and "Adding a New Service" guide.
+- 268 tests pass. Commit `2971ecd`. Weight self-adjustment at run 530.
+
+### Builder Run #216 — 10:30 AM PST
+**Repo:** WinSentinel | **Feature:** Finding Persistence Analyzer
+- Classifies findings across audit runs as Chronic (≥90%), Recurring (≥30%), Transient (<30%), or Resolved (no longer present)
+- Tracks consecutive-from-latest count, first/last seen timestamps, case-insensitive matching
+- Configurable thresholds, plain-text summary formatter, 500-run cap
+- `FindingPersistenceAnalyzer.cs` (455 lines) + `FindingPersistenceAnalyzerTests.cs` (743 lines, 39 tests)
+- Commit: `5a9ee0e`
+
+### Gardener Run #529 — 10:20 AM PST
+**Repo:** FeedReader | **Tasks:** fix_issue (bug_fix), open_issue
+- **Bug fix:** `ContentFilterManager.shouldMute()` incremented `mutedCount` but never called `save()` — counts lost on restart. `mutedStories(from:)` didn't increment counts at all. Fixed all 3 methods to persist counts (batch-save for array methods).
+- **Issue filed:** [#13](https://github.com/sauravbhattacharya001/FeedReader/issues/13) — OPML parser `currentCategory` is never cleared when exiting a folder, causing all subsequent feeds to inherit the wrong category.
+- **Commit:** `f823f35`
+
+### Builder Run #215 — 10:15 AM PST
+**Repo:** BioBots | **Feature:** Wellplate Analyzer dashboard
+- Interactive dashboard breaking down bioprint performance by wellplate format (1/6/12/24/96-well)
+- Per-wellplate statistics (count, mean, median, std, min, max, Q1, Q3) for all 9 metrics
+- Canvas bar chart with error bars + box plot distribution comparison
+- Crosslinking usage breakdown per wellplate (enabled %, avg duration/intensity)
+- Best/worst wellplate identification, metric selector, CSV/JSON export
+- 59 new tests (838 total pass). 1 pre-existing failure (optimizer jsdom dep)
+- **Commit:** `bdb60aa`
+
+### Gardener Run #528 — 9:50 AM PST
+**Repo:** agenticchat | **Tasks:** code_cleanup, perf_improvement
+- **Cleanup:** Extracted `_autoSaveCurrent()` and `_resetUI()` helpers in SessionManager — eliminated duplicate code in `load()` and `newSession()`. Simplified `autoSaveIfEnabled()` (removed redundant if/else).
+- **Perf:** O(1) search navigation — track `previousIndex` to toggle CSS class on only old/new marks vs iterating all. `textContent=''` instead of `innerHTML=''` for container clears.
+- 587 tests pass.
+- **Commit:** `cf91531`
+
+### Builder Run #214 — 9:35 AM PST
+**Repo:** Ocaml-sample-code | **Feature:** Rope data structure
+- Balanced binary tree for efficient string operations (text editor use case)
+- O(log n) concat, split, insert, delete; O(1) length/depth
+- Full API: of_string, substring, lines, find_char, balance, map, fold, equal
+- 88 tests in test_rope.ml, 353-line implementation
+- **Commit:** `1ee785e`
+
+### Builder Run #213 — 9:15 AM PST
+**Repo:** getagentbox | **Feature:** Newsletter Signup Section
+- Added email newsletter signup form between FAQ and CTA sections
+- Client-side email validation, duplicate detection, localStorage-based subscription tracking
+- Responsive design with gradient border styling matching site theme
+- Newsletter nav link added to sticky navigation
+- Commit: `a23d01e`
+
+### Gardener Run #527 — 9:25 AM PST
+**Repo:** Vidly | **Tasks:** security_fix, add_tests
+- **Security:** Added `[Bind(Exclude="Id")]` to Customer/Movie/Collection Create actions (over-posting prevention). Added `[StringLength(500)]` to `CollectionItem.Note` (was unbounded). Validated note length in controller + repository.
+- **Tests:** Expanded ViewModelTests from 3 → 72 (all 9 ViewModels). 745 total pass (+69 new).
+- **Commit:** `5227d02`
+
+### Gardener Run #525-526 — 9:00 AM PST
+**Task 1:** perf_improvement on FeedReader (Swift)
+- ImageCache: Added ImageIO-based downsampling (CGImageSourceCreateThumbnailAtIndex) — decodes images directly at 600px max instead of full-res (often 3000×2000+), saving ~10× memory per thumbnail
+- RSSFeedParser: Replaced per-refresh URLSession creation with a reusable lazy session + generation counter for stale result discarding. Preserves TLS session cache and connection pool across refreshes
+- Commit: 18ae8e2
+
+**Task 2:** merge_dependabot on everything (Dart/Flutter)
+- Merged PR #26: Flutter Docker base image bump 3.22.0 → 3.41.2 (same major, safe)
+- Auto-squash merge enabled
+
+### Builder Run #212 — 9:10 AM PST
+**Repo:** agentlens | **Feature:** Error Analytics API
+- Added `/errors` endpoints: full dashboard, summary, by-type, by-model, by-agent
+- Summary: total errors, affected sessions, error rate %, MTBF (Mean Time Between Failures)
+- Rate over time (daily buckets), hourly distribution, top recurring error messages
+- Error message extraction from output_data JSON (supports error/message/detail fields)
+- Error sessions listing, configurable limit/days params
+- 18 new tests, 324 backend total pass
+- **Commit:** `f7c95b3`
+
+### Builder Run #211 — 8:45 AM PST
+**Repo:** sauravcode | **Feature:** Break and Continue statements
+- Added `break` and `continue` keywords for loop control flow
+- Works in while loops, for loops, and for-each loops
+- Break exits nearest enclosing loop; continue skips to next iteration
+- Nested loops handled correctly (only affects innermost loop)
+- Added demo file `break_continue_demo.srv`, updated README
+- Commit: `b658e19`
+
+### Gardener Run #524 — 8:55 AM PST
+**Repo:** VoronoiMap | **Tasks:** open_issue + security_fix
+1. **Open issue:** Filed [#30](https://github.com/sauravbhattacharya001/VoronoiMap/issues/30) — `vormap_clip`, `vormap_seeds`, `vormap_power`, and `vormap_query` all have file-loading functions that lack path traversal protection, unlike `vormap.load_data()`.
+2. **Security fix:** Extracted `validate_input_path()` as shared utility in `vormap.py`. Applied to all 5 file-loading entry points. Refactored `load_data()` to use it. `allow_absolute=True` for CLI functions, strict `data/` containment for `load_data()`. 957 tests pass.
+- **Commit:** `5fc3529` → pushed to master
+
+### Builder Run #210 — 8:40 AM PST
+- **Repo:** WinSentinel
+- **Feature:** Audit Diff Service — compares two SecurityReport snapshots to show new findings, resolved findings, severity changes, per-module score deltas, module additions/removals, and overall score/grade changes. Case-insensitive matching, handles duplicate titles, human-readable Summary(). 358-line `AuditDiffService.cs`, 563-line test file, 35 tests all passing.
+- **Commit:** `ddb3d7e`
+
+### Builder Run #209 — 8:15 AM PST
+- **Repo:** FeedReader
+- **Feature:** Article Highlights — color-coded text snippets from articles with annotations, search, filtering, and export
+- **Files:** ArticleHighlight.swift, ArticleHighlightsManager.swift, ArticleHighlightsTests.swift + pbxproj updates
+- **Commit:** f8b651b pushed to master
+
+### Gardener Run #521 — 8:00 AM PST
+- **Status:** All 16 repos × 29 task types complete. No Dependabot PRs open. Nothing to do.
+- **Action:** None — full coverage achieved.
+
+### Builder Run #208 — 8:05 AM PST
+- **Repo:** VoronoiMap
+- **Feature:** Spatial Outlier Detection (`vormap_outlier.py`)
+- **Details:** Identifies statistically unusual Voronoi cells using Z-score or IQR methods across area, compactness, perimeter, vertex count, avg edge length. OutlierResult dataclass with text report, JSON/CSV/SVG export. SVG highlights outliers in red on dark theme. 44 tests.
+- **Commit:** `06d3ce3` → pushed to master
+
+### Gardener Run #523 — 8:25 AM PST
+**Repo:** BioBots | **Tasks:** code_cleanup + refactor
+1. **Code cleanup:** Removed committed `__pycache__/` dirs and `.pyc` files from git tracking. Added Python build artifacts to `.gitignore` (`__pycache__/`, `*.py[cod]`, `*.pyo`, `*.egg-info/`, `dist/`, `*.egg`).
+2. **Refactor:** `docs/shared/utils.js` duplicated 9 metric accessor functions already in `constants.js` `METRIC_DESCRIPTORS`. Built `_metricAccessors` dynamically via `reduce()` from `METRIC_DESCRIPTORS` — single source of truth, auto-includes new metrics, fixes missing `wellplate` accessor. 779 JS tests pass.
+- **Commit:** `2353c63` → pushed to master
+
+### Gardener Run #522 — 8:15 AM PST
+**Repo:** WinSentinel | **Tasks:** refactor + add_tests
+1. **Refactor:** Deduplicated scoring formula — `AuditResult.Score` property was copy-pasting the same penalty logic as `SecurityScorer.CalculateCategoryScore()`. Now delegates to the scorer, keeping the formula in one place.
+2. **Add tests:** Expanded SecurityScorerTests from 8 → 46 tests (+38). Covers empty/info-only/pass-only findings, mixed severity combos, boundary deductions, floor-at-zero, AuditResult.Score delegation, overall score averaging/rounding, GetGrade/GetScoreColor boundaries. 63 pass.
+- **Commit:** `0008085` → pushed to main
+
+### Builder Run #207 — 7:45 AM PST
+- **Repo:** agentlens
+- **Feature:** Agent Leaderboard API (`GET /leaderboard`)
+- **Details:** Ranks agents by efficiency, speed, reliability, cost, or volume. Supports configurable lookback window, min sessions threshold, and result limits. Integrates with model_pricing for cost-based ranking. 7 tests added, all 306 tests pass.
+- **Commit:** `850ca6d` → pushed to master
+
+### Gardener Run #521 — 7:30 AM PST
+- **Result:** All 16 repos have all 29 task types completed. No tasks remaining.
+- **Action:** None — full coverage achieved. Consider adding new repos or task types.
+
+### Builder Run #206 — 7:15 AM PST
+- **Repo:** Ocaml-sample-code
+- **Feature:** Weighted Graph with Dijkstra's, Floyd-Warshall, and Prim's MST
+- **Files:** Added `dijkstra.ml`, updated `Makefile` and `README.md`
+- **Details:** New example covering weighted adjacency lists, Dijkstra's shortest path with path reconstruction, Floyd-Warshall all-pairs shortest paths, and Prim's minimum spanning tree. Includes priority queue implementation and comprehensive demo output.
+- **Commit:** `93121a2` pushed to master
+
+### Gardener Run #521-522 — 7:00 AM PST
+**Status:** All 29 task types completed on all 16 eligible repos. No tasks available. Gardener has fully covered all repos — consider adding new task types or new repos.
+
+### Builder Run #205 — 6:45 AM PST
+**Repo:** sauravcode | **Feature:** Enum Types
+Added `enum` keyword with dot-notation variant access. Enums get auto-incrementing integer values (0, 1, 2...). Full implementation across tokenizer (DOT token), AST (EnumNode, EnumAccessNode), parser, and interpreter. Works with match, comparisons, and arithmetic. Includes demo file and 9 tests. All 1059 existing tests pass. Commit `97fed79`.
+
+### Gardener Run #519 — 6:05 AM PST
+**Task 1:** `security_fix` on **getagentbox** — Vendored GoatCounter script locally (eliminates CDN compromise risk), tightened CSP (`script-src 'self'` only, `img-src 'self'` only), added `Permissions-Policy` to docs pages. Updated SECURITY.md and tests. 315 tests pass. Commit `053c5b6`.
+**Task 2:** `bug_fix` on **agenticchat** — Fixed stale bookmarks persisting across conversation changes. `ChatBookmarks.clearAll()` now called in `clearHistory()`, `SessionManager.load()`, and `newSession()`. Without this, bookmarks using DOM index references would incorrectly highlight unrelated messages after switching contexts. 3 tests added, 587 total pass. Commit `68ff643`.
+
+### Builder Run #205 — 6:48 AM PST
+**Repo:** prompt | **Feature:** Prompt Cache
+Thread-safe LRU cache for LLM prompt responses. Configurable capacity (default 256), optional TTL expiration (per-cache + per-entry), SHA-256 prompt hashing with model scoping, cache statistics (hits/misses/evictions/hit rate), JSON serialization + file persistence, metadata per entry, lazy expiration on Get, concurrent-safe. 612-line `PromptCache.cs`, 83 tests (1250 total pass). Commit `b2b5232`.
+
+### Gardener Run #520 — 7:05 AM PST
+**Task 1:** `doc_update` on **agenticchat** — Updated file header to list all 17 modules (was only 6). Added JSDoc `@namespace` documentation blocks above all 17 module IIFEs with purpose, key behaviors, storage details, and caveats. 208 lines added. 587 tests pass. Commit `431c0ab`.
+**Task 2:** `add_tests` on **VoronoiMap** — Expanded `test_heatmap.py` from 13 to 64 tests. New coverage: `_compute_region_area` (9 tests incl. degenerate/concave), `_compute_perimeter` (6 tests), `_isoperimetric_quotient` (5 tests), `_compute_metric` (8 tests), color ramps (8 tests), SVG export (15 tests incl. XML validity, dimensions, styling, legend labels), HTML export (12 tests incl. JSON data, initial selections, tooltip). 913 total pass. Commit `db23e17`.
+**Weight adjustment (run 520):** merge_dependabot 95→90 (no PRs), bug_fix 77→80, add_tests 84→86, doc_update 78→80.
+
+### Builder Run #206 — 7:18 AM PST
+**Repo:** gif-captcha | **Feature:** Response Time Analyzer
+Interactive research tool (`timing.html`) measuring human CAPTCHA-solving speed. Per-challenge precision timing (GIF load → submit), keyword-based correctness detection, full statistical analysis (mean/median/stdDev/percentiles), two canvas charts (bar + scatter), category breakdown, per-challenge table with time bars + status badges, usability grading A–F (Nielsen Norman Group thresholds), JSON/CSV export, rerun capability. 1021-line page, 62 tests. Commit `8eb383f`.
+
+### Gardener Run #520 — 6:30 AM PST
+**Task 1:** fix_issue on VoronoiMap (#29) — Replaced `list.pop(0)` with `collections.deque.popleft()` in both BFS traversals in `vormap_graph.py`. O(n) → O(1) dequeue. Commit `66a39fe`.
+**Task 2:** fix_issue on BioBots (#20) — Added try/catch + `resp.ok` check to profile page fetch, matching error handling on all other dashboard pages. Commit `3d1dde1`.
+
+### Builder Run #204 — 6:15 AM PST
+**Repo:** `ai` (AI Replication Sandbox)
+**Feature:** Drift Detector — gradual behavioral drift analysis across simulation windows
+**Details:** Added `DriftDetector` module with sliding window simulation, linear regression trend analysis, sparkline visualizations, severity-classified alerts, and CLI. 10 tests passing.
+**Commit:** `bbfcaef` → pushed to master
+
+### Gardener Run #519 — 6:00 AM PST
+**Result:** All 16 repos have all 29 task types completed. Nothing to do — the garden is fully tended. 🌱
+
+### Builder Run #203 — 5:45 AM PST
+**Repo:** everything | **Feature:** Event Location
+**Summary:** Added optional location/venue field to events. Shows in create/edit form, event cards, detail screen, ICS export, and search. 6 files changed, +117 lines.
+**Commit:** e0d7653
+
+### Gardener Run #518 — 5:30 AM PST
+**Status:** All 16 repos have all 29 task types completed. No eligible tasks remain. Run skipped.
+
+### Builder Run #202 — 5:15 AM PST
+**Repo:** GraphVisual | **Feature:** Link Prediction Analyzer
+Added `LinkPredictionAnalyzer.java` with four scoring methods (Common Neighbors, Jaccard, Adamic-Adar, Preferential Attachment) plus ensemble mode. Predicts likely missing edges — useful for social network analysis and IMEI correlation discovery. Includes 9 unit tests. Commit `ac415a5`.
+
+### Gardener Run #517 — 5:05 AM PST
+**Task 1:** `bug_fix` on **ai** — Fixed double shutdown events in simulator timeline. Workers denied during `perform_task()` received two shutdown events (early break + normal post-loop), causing forensics `peak_concurrent` tracking to double-decrement. Added `early_shutdown` flag. 3 new tests (900 total pass). Commit `28f1d0b`.
+**Task 2:** `doc_update` on **everything** — Added 52 lines of dartdoc to `login_screen.dart` (was 0 doc comments on 144 lines) and `app_constants.dart`. Covered class docs, field docs, method docs with flow descriptions. Commit `b9eaa40`.
+
+### Builder Run #202 — 5:18 AM PST
+**Repo:** gif-captcha | **Feature:** Batch Validator
+Interactive bulk response validation tool. Import CSV/JSON/file, configure similarity threshold and keyword mode, validate against 10 challenges. Donut pie chart, per-challenge bar chart, per-respondent bars, similarity heatmap, detailed results table, aggregate stats, CSV/JSON export. 1030-line `batch.html`, 46 tests. Commit `92e1cfa`.
+
+### Gardener Run #518 — 5:35 AM PST
+**Task 1:** `add_tests` on **agentlens** — Added 36 tests for pricing API routes (GET/PUT/DELETE `/pricing`, GET `/pricing/costs/:sessionId`). Previously 0 test coverage on 306 lines. Tests cover CRUD, validation, cost calculation, multi-model sessions, edge cases. 299 backend tests pass (was 263). Commit `522b471`.
+**Task 2:** `open_issue` on **VoronoiMap** — Filed #29: BFS implementations in `vormap_graph.py` use `list.pop(0)` (O(n)) instead of `collections.deque.popleft()` (O(1)). Two occurrences: connected components + all-pairs shortest paths. Second case turns O(V(V+E)) into O(V²(V+E)).
+
+### Builder Run #203 — 5:48 AM PST
+**Repo:** GraphVisual | **Feature:** Graph Generator
+Synthetic graph generation with 10 topologies: Complete, Ring, Star, Grid, Path, Tree, Random (Erdős–Rényi), Scale-Free (Barabási–Albert), Small-World (Watts–Strogatz), Bipartite. Fixed-seed reproducibility, GeneratedGraph metadata (density, avg degree, summary), full Javadoc, cross-compatible with all existing analyzers. 565-line `GraphGenerator.java`, 70 tests (551 total pass). Commit `d3fe279`.
+
+### Gardener Run #516 — 5:00 AM PST
+**Task 1:** perf_improvement on **Ocaml-sample-code** — Eliminated O(n) hash index rebuilds in LRU cache. Now tracks size explicitly (no List.length), updates index incrementally per operation instead of rebuilding from scratch. Commit `ace7b3b`.
+
+**Task 2:** perf_improvement on **FeedReader** — Three improvements: (1) ImageCache uses dedicated URLSession with 4-connection limit + in-flight dedup instead of unlimited URLSession.shared downloads, (2) `displayedStories` cached instead of re-filtering on every cellForRowAt, (3) `unreadCount` uses reduce instead of filter+count to avoid intermediate array allocation. Added `cancelPrefetches()` support. Commit `60be2cb`.
+
+### Builder Run #200 — 4:45 AM PST
+**Repo:** FeedReader | **Feature:** Feed Categories
+Added `FeedCategoryManager` for organizing RSS feeds into named groups/folders. Users can create, rename, reorder, and delete categories, then assign feeds to them. `feedsByCategory()` returns feeds grouped with uncategorized last. Also added `category` property to `Feed` model with full NSCoding persistence. Includes comprehensive test suite. Commit `0ead61b`.
+
+### Gardener Run #512-513 — 4:30 AM PST
+**Task 1:** `perf_improvement` on **getagentbox** — Replaced `setInterval` (30ms fixed timer) with `requestAnimationFrame` in Stats counter animation for smooth 60fps rendering. Removed unused `FRAME_INTERVAL` constant, added proper rAF cancellation on reset. Commit `1e45cd5`.
+**Task 2:** `bug_fix` on **WinSentinel** — Fixed duplicate `DefenderPlusUnsigned` correlation in `ThreatCorrelator.cs`. Both branches could fire for the same event window, producing duplicate alerts. Added guard to skip reverse branch when forward branch already matched. Commit `aab54a8`.
+
+### Builder Run #199 — 4:18 AM PST
+**Repo:** Ocaml-sample-code | **Feature:** Skip List
+Probabilistic sorted data structure with O(log n) expected-time search/insert/delete. 293-line `skip_list.ml` with randomized levels, range queries, floor/ceil, custom comparators. 99 test assertions (empty, single, multi, duplicates, remove head/tail/all, range queries, floor/ceil, fold/iter, strings, 500-element stress). Commit `7aa3b6c`.
+
+### Gardener Run #511 — 4:15 AM PST
+**Task 1:** `create_release` on **gif-captcha** — Created v1.2.0 release covering 3 features since v1.1.0: CAPTCHA Effectiveness Dashboard (86 tests), A/B Testing Configurator, Multi-Model Comparison page.
+**Task 2:** `doc_update` on **agentlens** — Added 104 lines of docstrings across `anomaly.py` (15 undocumented methods/properties) and `timeline.py` (3 render methods). Commit `6086483`.
+
+### Gardener Run #514 — 4:35 AM PST
+**Task 1:** `open_issue` on **BioBots** — Filed #20: `profile.html` has no error handling on `fetch('bioprint-data.json')` — silent crash when data fails to load. Every other dashboard page has `.catch()` blocks.
+**Task 2:** `bug_fix` on **WinSentinel** — Fixed integer division in HTML dashboard severity bar chart: `critical * 100 / maxCount` truncated to 0% for small counts (e.g. 1 critical / 200 passes). Cast to double. 4 new tests (84 total pass). Commit `be62b70`.
+
+### Builder Run #201 — 4:48 AM PST
+**Repo:** prompt | **Feature:** Prompt Cost Estimator
+Comparative LLM pricing analysis service. 14 built-in models (OpenAI, Anthropic, Google, DeepSeek), estimates from text or token counts, CostReport with cheapest/most-expensive viable models, max savings, context window warnings, output capping, budget planning (EstimateCallsInBudget), JSON + text report output. 455-line `PromptCostEstimator.cs`, 76 tests (1166 total pass). Commit `6a61fbf`.
+
+### Builder Run #198 — 4:15 AM PST
+**Repo:** agentlens | **Feature:** Span Context Manager
+Added `tracker.span("name")` context manager for grouping events into hierarchical, timed logical units. Supports nesting, auto-timing, error capture, custom attributes, and event counting. 12 tests added, all passing. 759/760 existing tests pass (1 pre-existing failure unrelated).
+
+### Gardener Run #511 — 4:00 AM PST
+**Status:** All 16 repos have all 29 task types completed. No tasks remaining. The gardener has finished its work across all repositories.
+
+### Builder Run #197 — 3:45 AM PST
+**Repo:** `ai` — AI Replication Sandbox
+**Feature:** Contract Optimizer — automated parameter tuning module that searches the contract parameter space (max_depth, max_replicas, cooldown) to find configurations maximizing throughput/efficiency/safety while satisfying policy constraints. Grid search with optional refinement, 4 objectives, full CLI, JSON output. 14 tests, all passing. Commit `adbbf93`.
+
+### Gardener Run #510 — 3:50 AM PST
+**Task 1:** `create_release` on **FeedReader** — Created v1.1.0 release (38 commits since v1.0.0): 13 features (content filters, digest generator, offline reading, OPML, etc.), security hardening (XXE, ATS, CodeQL), bug fixes (race conditions, XML parsing), performance optimizations, architecture improvements.
+**Task 2:** `code_cleanup` on **Vidly** — Extracted `InitializeNewRental()` from `InMemoryRentalRepository` to eliminate 31 duplicate lines between `Add()` and `Checkout()`. Net -6 lines. 686 tests pass. Commit `b4e26eb`.
+**Weight self-adjustment** applied (runs 501–510): +3 to 9 active tasks, -3 to merge_dependabot (95) and open_issue (72).
+
+### Builder Run #196 — 3:40 AM PST
+**Repo:** BioBots | **Feature:** SPC Dashboard
+Added Statistical Process Control page (`docs/spc.html`) with X̄ and R control charts, Western Electric rules violation detection (4 rules), process capability indices (Cp, Cpk, Cpm/Taguchi), configurable subgroup size (2-25), zone shading (A/B/C at 1σ/2σ/3σ), spec limit inputs for capability analysis, canvas-based charts with DPI scaling and tooltips. 62 new tests. Commit `a8b053d`.
+
+### Builder Run #195 — 3:15 AM PST
+**Repo:** BioBots | **Feature:** Material Usage Calculator
+Added interactive calculator page (`docs/calculator.html`) + JS module (`docs/shared/calculator.js`) for estimating bioink consumption, print time, and cost. Supports 4 bioink materials + custom, 5 wellplate types, infill/waste %, extruder speed, crosslinking time. Visual bar chart breakdowns. 34 tests passing. Nav link added to index.html.
+
+### Gardener Run #509 — 3:00 AM PST
+**Task 1:** fix_issue on **Ocaml-sample-code** — Fixed #10: `has_cycle` false positives on undirected graphs. Made function graph-type-aware: uses parent-tracking DFS for undirected, three-color DFS for directed. PR #11 merged.
+**Task 2:** fix_issue on **agentlens** — Merged PR #22 fixing #21: AnomalyDetector was using population variance instead of sample variance (Bessel's correction). Also closed stale PR #19 on GraphVisual (fix already on main).
+
+### Builder Run #194 — 2:49 AM PST
+**Repo:** Ocaml-sample-code | **Feature:** Segment Tree with functor-based monoid abstraction
+Added `segment_tree.ml` — generic segment tree using OCaml's module system (functors). Supports range sum/min/max queries in O(log n), point updates, fold, pretty-print. Includes concrete Sum/Min/Max monoid instantiations and a demo. Updated README table.
+
+### Builder Run #193 — 2:45 AM PST
+**Repo:** gif-captcha | **Feature:** Multi-Model Comparison page
+Added `comparison.html` — interactive tool comparing 8 AI models (GPT-4, GPT-4V, GPT-4o, Claude 3 Opus/3.5 Sonnet, Gemini 1.5 Pro/2.0 Flash, LLaVA) against GIF CAPTCHAs. Includes model scorecards, comparison matrix, radar chart by category, vision timeline, and a form to add custom test results (localStorage). Linked from index page.
+
+### Gardener Run #508 — 2:48 AM PST
+**Task 1:** `bug_fix` on **everything** — ConflictDetector ignored `endDate`, only comparing start times. Events with overlapping time ranges missed when start gap exceeded window. Added `_computeGap()` for proper interval overlap detection. 14 new tests. Commit `10819e9`.
+**Task 2:** `security_fix` on **VoronoiMap** — HTML injection/XSS in `export_html()` and `export_relaxation_html()`. User-supplied `title` and `color_scheme` injected via raw `.replace()` without escaping. Added `html.escape()`. 10 new tests (862 total). Commit `3074710`.
+
+### Gardener Run #509 — 3:20 AM PST
+**Task 1:** `add_tests` on **everything** — 32 new tests for EventProvider covering `getEventById` (9), `eventCount` (5), `isEmpty` (6), index consistency (8), plus 2 updateEvent edge cases. Commit `03a96d7`.
+**Task 2:** `doc_update` on **Vidly** — 125 lines of XML docs across RentalHistoryService (4→24 docs) and MovieInsightsService (8→27 docs). Interface methods, builders, data models. 686 tests pass. Commit `675991d`.
+
+### Builder Run #192 — 2:35 AM PST
+**Repo:** gif-captcha
+**Feature:** A/B Testing Configurator — plan and analyze CAPTCHA A/B experiments with sample size calculators, 8 CAPTCHA type profiles, composite scoring, and statistical analysis. 40 tests. Commit `c8b2111`.
+
+### Gardener Run #507 — 2:05 AM PST
+**Task 1:** `security_fix` on **agenticchat** — Added `clearServiceKeys()`/`clearAll()` to ApiKeyManager. Service keys now purge on session switch and clear-all. Input length caps: session names (200), snippet names (200), code (500KB), tags (20), total snippets (200). 584 tests pass. Commit `be76d5e`.
+**Task 2:** `refactor` on **FeedReader** — Extracted `makeCard(insets:)` helper in ReadingStatsViewController, eliminating 38 lines of repeated card/constraint boilerplate across 5 dashboard sections. Added static `formatHourLabel(_:)`. 624→586 lines. Commit `b175466`.
+
+### Builder Run #192 (sub-agent) — 2:15 AM PST
+**Repo:** GraphVisual
+**Feature:** Graph Diameter & Eccentricity Analyzer
+**Details:** Added `GraphDiameterAnalyzer.java` — computes per-vertex eccentricity, graph diameter, radius, center vertices, and periphery vertices using BFS on the largest connected component. Includes `getRankedByEccentricity()` and `getSummary()`. Full test suite with 10 tests covering empty/single/linear/complete/star/disconnected graphs.
+**Commit:** b91f9c3
+
+### Gardener Run #507 — 2:00 AM PST
+**Result:** All 16 repos have all 29 task types completed. No remaining work to pick. Garden is fully tended. 🌿
+
+### Builder Run #190 — 1:45 AM PST
+**Repo:** agentlens
+**Feature:** Performance Percentiles API — Added `GET /analytics/performance` endpoint with p50/p75/p90/p95/p99 latency percentiles, throughput metrics (events/hour, tokens/sec), token efficiency stats, and per-model + per-event-type breakdowns. Filterable by agent, model, and time window. 7 tests added. (1713d2b)
+
+### Gardener Run #505 — 1:30 AM PST
+**Task 1:** fix_issue on `everything` — Added optional `endDate` field to EventModel, updated ICS export DTEND, added end time picker to EventFormDialog with validation. Closes #25. (9386922)
+**Task 2:** fix_issue on `getagentbox` — Fixed counter animation stalls on small targets by using Math.ceil + monotonic clamping, prevented stacked timers by storing/clearing timer IDs, added early exit. Closes #13. (7d6614b)
+
+### Builder Run #188 — 1:15 AM PST
+**Repo:** BioBots
+**Feature:** Correlation Matrix Heatmap (`docs/correlation.html`)
+**Details:** Added interactive pairwise Pearson correlation heatmap across all 10 bioprinting metrics. Hover for precise values, auto-lists top 8 notable correlations. Added nav link to index.html.
+**Commit:** e8d2272
+
+### Gardener Run #504 — 1:00 AM PST
+**Result:** All 17 repos have all 29 task types completed. No tasks remaining. The gardener has finished its work across all repositories. 🎉
+
+### Builder Run #6 — 12:45 AM PST
+**Repo:** VoronoiMap | **Feature:** Density heatmap visualization
+- Added `vormap_heatmap.py` module: colors Voronoi cells by spatial metrics (density, area, compactness, vertices)
+- 3 color ramps: hot_cold, viridis, plasma
+- SVG export with gradient legend bar
+- Interactive HTML with metric/ramp dropdowns and hover tooltips showing all metrics
+- 5 CLI flags: `--heatmap`, `--heatmap-html`, `--heatmap-metric`, `--heatmap-ramp`, `--heatmap-values`
+- 13 unit tests, all passing
+- Commit: f1029c9
+
+### Builder Run #191 — 1:48 AM PST
+**Repo:** BioBots
+**Feature:** Print Success Predictor — k-NN prediction page for cell viability and elasticity outcomes. Input print parameters, get predicted outcomes from 10K historical prints. IDW weighting, A–D grading, neighbor details, context-aware recommendations. 45 tests. Commit `cc664f9`.
+
+### Gardener Run #506 — 1:35 AM PST
+**Task 1 (perf_improvement):** Vidly — Eliminated O(M×R) rental scan in `GetSimilarityMatrix` by adding `BuildMovieRentersIndex()` reverse index. Each movie's renters now looked up in O(1) instead of scanning all rentals. Also fixed pre-existing syntax error in `RecommendationService.cs`. Commit `8e8d4e7`.
+**Task 2 (doc_update):** everything — 65 new dartdoc comments across `AuthService` (4→40) and `StreakTracker` (43→72). Documented all public methods, error behavior, private helpers, and utility functions. Commit `34ebd4d`.
+
+### Builder Run #189 — 1:18 AM PST
+**Repo:** FeedReader
+**Feature:** Feed Digest Generator — generates formatted reading digests (personal newsletters) from history. 8 time periods, 3 output formats (text/Markdown/HTML), 4 sort orders, feed grouping, stats overview. 591 lines implementation + 66 tests. Commit `eedb303`.
+
+### Gardener Run #504 — 1:05 AM PST
+**Task 1 (doc_update):** everything — 70 lines dartdoc for `EventModel` (11→39 doc comments, all fields + factory + toJson) and `EventCard` (0→9, class-level with ASCII layout diagram). Commit `6813cf3`.
+**Task 2 (code_cleanup):** prompt — Consolidated 18 separate compiled `Regex[]` objects for `ExtractBoolean()` into 2 alternation patterns. 16 fewer static objects, loop elimination, added missing `IgnoreCase`. Commit `8427b2b`.
+
+### Builder Run #186 — 12:25 AM PST
+**Repo:** Ocaml-sample-code
+**Feature:** LRU Cache — functional bounded cache with LRU eviction, hit/miss stats, resize, filter, map_values. 193 lines implementation + 80+ test assertions (standalone + integrated into test_all.ml). Commit `41caec8`.
+
+### Gardener Run #503 — 12:36 AM PST
+**Tasks:** fix_issue × 2
+1. **GraphVisual #18** — Fixed Dijkstra's PriorityQueue heap corruption bug. Replaced mutable-comparator `PriorityQueue<String>` with immutable `double[]` entries that capture distance at insertion time. Commit: e6133a6
+2. **WinSentinel #19** — Fixed SecurityTimeline crash on duplicate finding titles across modules. Changed all finding tracking from `f.Title` to composite key `ModuleName::Title`. Commit: 2e82307
+
+### Feature Builder Run #5 — 12:15 AM PST
+**Repo:** getagentbox
+**Feature:** Sticky navigation bar with smooth scrolling
+**Files changed:** index.html, styles.css, app.js, __tests__/sitenav.test.js
+**Tests:** 17 new tests, all passing. All existing tests still pass.
+**Commit:** 42ebe63
+**Details:** Added a fixed glassmorphism nav bar linking to all major sections (Features, How It Works, Demo, Use Cases, Integrations, Compare, Pricing, FAQ). Includes active section highlighting on scroll, mobile hamburger menu, keyboard accessibility (Escape to close), smooth scrolling with reduced-motion support, and scroll-margin-top for proper anchor positioning.
+
+### Repo Gardener Run #500 — 12:00 AM PST
+**Status:** All 16 repos have all 29 task types completed. No tasks to execute.
+**Note:** Run 500 milestone reached. All repos fully gardened. Weight adjustment applied (-3 to all task types since all repos have every task done).
+
+---
+
+## 2026-03-01
+
+### Gardener Run #501 — 12:30 AM PST
+**Task 1 (perf_improvement):** Vidly — Eliminated O(n²) movie lookup in genre preference counting. `allMovies.FirstOrDefault()` per rental per genre → single-pass dictionary lookup. O(G×R×M) → O(R+M). Commit `a6ab96e`.
+**Task 2 (add_tests):** ai — 68 tests for `observability.py` (38) and `orchestrator.py` (30), both previously at 0% coverage. Metric dataclass, StructuredLogger, SandboxOrchestrator lifecycle. 883 total tests. Commit `44d7b23`.
+
+### Gardener Run #500 — 12:05 AM PST 🎉
+**Task 1 (security_fix):** getagentbox — nginx `location` blocks with `add_header` override parent security headers (CSP, X-Frame-Options, HSTS, etc. all silently dropped for HTML responses). Re-declared all headers in the caching block. Also fixed SECURITY.md incorrectly claiming `'unsafe-inline'`. Commit `dbfe4a8`.
+**Task 2 (add_tests):** WinSentinel — 93 tests for `ConsoleFormatter` (2372 lines, previously **zero** test coverage). Covers output content, color restoration, edge cases across all 28 public methods. Commit `64581a9`.
+**Weight self-adjustment:** Run 500 checkpoint. Adjusted weights based on success rates.
+
 ## 2026-02-28
+
+### Feature Builder Run #186 — 11:48 PM PST
+**Repo:** everything (Flutter)
+**Feature:** Event Attachments — file/photo/link attachment model. EventAttachment (3 types, factory constructors, size formatting B/KB/MB/GB, extension extraction, MIME type, max 20 per event), EventAttachments collection (add/remove/update/reorder, type filtering, capacity limits, total size, summary text, JSON serialization). Integrated into EventModel. 60 new tests.
+**Commit:** 8d61434
+
+### Feature Builder Run #185 — 11:45 PM PST
+**Repo:** everything (Flutter)
+**Feature:** Event Streak Tracker — consecutive-day activity analysis service. StreakTracker with analyze(), currentStreakLength(), longestStreakLength(), suggestDates(). Streak/ActivityStats/StreakReport models with motivation messages, weekday distribution, recurring event expansion. 55 new tests.
+**Commit:** 07e80d9
+
+### Gardener Run #498-499 — 11:30 PM PST
+**Task 1:** fix_issue on **agentlens** — Fixed #21: AnomalyDetector used population variance (÷n) instead of sample variance (÷n-1), inflating false positive rates ~2x for small baselines. PR [#22](https://github.com/sauravbhattacharya001/agentlens/pull/22).
+**Task 2:** fix_issue on **GraphVisual** — Fixed #18: Dijkstra's PriorityQueue comparator read from mutable dist map, corrupting heap invariant. Switched to frozen (distance, vertex) entries. PR [#19](https://github.com/sauravbhattacharya001/GraphVisual/pull/19).
+
+### Builder Run #184 — 11:22 PM PST
+**Repo:** VoronoiMap
+**Feature:** Weighted/Power Voronoi Diagrams (`vormap_power.py`) — three distance modes (power d²-w, multiplicative d/w, additive d-w), 6 weight assignment methods, grid-sampling region computation, weight effect analysis, PowerDiagramResult with stats/correlation/dominance, JSON+SVG export, CLI. 92 new tests (839 total). Commit `bc0fdcd`.
+
+### Gardener Run #497 — 11:25 PM PST
+**Task 1 (add_tests):** sauravcode — 111 tests for compiler safety: `_safe_ident` reserved word prefixing (34 tests), builtin arity validation (20 tests), feature detection (8 tests), output structure (11 tests), variable tracking (5 tests), string helpers (6 tests), end-to-end programs (5 tests). Commit `4327aea`. Total: 1059 tests.
+**Task 2 (refactor):** VoronoiMap — Extracted `_data_index` helper (replaces 3 try/except blocks) and `_CoordinateTransform` class (reusable SVG coordinate mapping from `export_svg`). -51/+78 lines. Commit `dd4436c`. All 747 tests pass.
+
+### Feature Builder Run 183 — 11:15 PM PST
+- **Repo:** getagentbox
+- **Feature:** Changelog / What's New Section
+- **Details:** Timeline-style changelog with 8 product update entries across 3 categories (features, improvements, fixes). Color-coded dots and badges per entry type. Tag filter buttons (All/Features/Improvements/Fixes) with ARIA tablist and click delegation. Changelog JS module with filterBy/getCurrent/getTags/getEntries/getTagCounts/init API.
+- **Tests:** 40 new (298 total)
+- **Commit:** `50b4455`
+
+### Repo Gardener Run 497 — 11:00 PM PST
+**Result:** All 29 task types completed across all 16 repos. No remaining work. The garden is fully tended. 🌿
+
+### Daily Memory Backup — 11:00 PM PST
+Committed and pushed 81 files (18k+ insertions). Includes daily memory, temp-builder updates, gardener weights, and misc test outputs.
 
 ### Gardener Run #496 — 10:40 PM PST
 **Task 1 (open_issue):** GraphVisual — Filed issue #18: Dijkstra's `PriorityQueue` comparator reads from mutable `dist` map. Java's PQ doesn't re-heapify on external changes, so `poll()` may not return the true minimum-distance vertex. Can produce incorrect shortest paths on certain graph topologies.
@@ -3061,3 +4146,8 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
+
+
+
+
