@@ -1688,6 +1688,26 @@ def main():
         help='Significance level for LISA cluster classification (default: 0.05).',
     )
 
+    # ── Convex hull & bounding geometry ──────────────────────────────
+    parser.add_argument(
+        '--hull',
+        action='store_true',
+        help='Print convex hull and bounding geometry analysis '
+             '(hull area/perimeter, MBR, MBC, shape metrics).',
+    )
+    parser.add_argument(
+        '--hull-json',
+        metavar='OUTPUT',
+        help='Export hull analysis as JSON.',
+    )
+    parser.add_argument(
+        '--hull-svg',
+        metavar='OUTPUT',
+        help='Export hull visualization as SVG (hull polygon, '
+             'minimum bounding rectangle, minimum bounding circle, '
+             'diameter line, centroid).',
+    )
+
     args = parser.parse_args()
 
     # Apply explicit bounds if given (disables auto-detection)
@@ -2106,6 +2126,24 @@ def main():
                       % (args.autocorr_metric, args.datafile, len(data)),
             )
             print('LISA SVG saved to %s' % args.lisa_svg)
+
+    # ── Convex hull & bounding geometry ──────────────────────────────
+    if args.hull or args.hull_json or args.hull_svg:
+        import vormap_hull
+
+        pts = [(d["x"], d["y"]) for d in data]
+        analysis = vormap_hull.hull_analysis(pts)
+
+        if args.hull:
+            print(vormap_hull.format_report(analysis))
+
+        if args.hull_json:
+            vormap_hull.export_json(analysis, args.hull_json)
+            print('Hull JSON saved to %s' % args.hull_json)
+
+        if args.hull_svg:
+            vormap_hull.export_svg(analysis, pts, args.hull_svg)
+            print('Hull SVG saved to %s' % args.hull_svg)
 
 
 if __name__ == '__main__':
