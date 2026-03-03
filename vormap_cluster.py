@@ -40,6 +40,7 @@ CLI::
     voronoimap datauni5.txt 5 --cluster --cluster-method threshold --cluster-metric area --cluster-range 0,50000
 """
 
+import heapq
 import json
 import math
 import xml.etree.ElementTree as ET
@@ -294,9 +295,11 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
 
     n_clusters = len(cluster_members)
 
-    # Build edge set from adjacency (each pair once)
+    # Build edge set from adjacency (each pair once) and track
+    # per-cluster adjacency for efficient re-heaping after merges.
     seen_edges = set()
     edges = []
+    cluster_edges = {}  # cluster_id -> set of (seed_a, seed_b) edges
     for seed in seeds:
         for neighbor in adjacency.get(seed, []):
             nb = tuple(neighbor) if not isinstance(neighbor, tuple) else neighbor
@@ -305,29 +308,56 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
                 seen_edges.add(pair)
                 edges.append(pair)
 
-    while n_clusters > num_clusters:
-        # Find the merge with smallest metric distance between
-        # adjacent cluster means
-        best_cost = float("inf")
-        best_merge = None  # (cluster_a, cluster_b)
+    # Build initial min-heap of (cost, cluster_a, cluster_b) entries.
+    # Stale entries (where a cluster has been merged away) are lazily
+    # skipped when popped.
+    def _merge_cost(c1, c2):
+        mean1 = cluster_metric_sum[c1] / cluster_size[c1]
+        mean2 = cluster_metric_sum[c2] / cluster_size[c2]
+        return abs(mean1 - mean2)
 
-        for s1, s2 in edges:
-            c1 = seed_to_cluster.get(s1)
-            c2 = seed_to_cluster.get(s2)
-            if c1 is None or c2 is None or c1 == c2:
-                continue
-            mean1 = cluster_metric_sum[c1] / cluster_size[c1]
-            mean2 = cluster_metric_sum[c2] / cluster_size[c2]
-            cost = abs(mean1 - mean2)
-            if cost < best_cost:
-                best_cost = cost
-                best_merge = (c1, c2)
+    heap = []
+    # Track which cluster-pair edges exist for re-heaping after merge
+    cluster_adj = {}  # cluster_id -> set of adjacent cluster_ids
+    for s1, s2 in edges:
+        c1 = seed_to_cluster.get(s1)
+        c2 = seed_to_cluster.get(s2)
+        if c1 is not None and c2 is not None and c1 != c2:
+            pair = (min(c1, c2), max(c1, c2))
+            cluster_adj.setdefault(c1, set()).add(c2)
+            cluster_adj.setdefault(c2, set()).add(c1)
 
-        if best_merge is None:
-            break  # No more adjacent clusters to merge
+    # Deduplicate cluster adjacencies and push initial costs
+    pushed = set()
+    for c1, neighbors in cluster_adj.items():
+        for c2 in neighbors:
+            pair = (min(c1, c2), max(c1, c2))
+            if pair not in pushed:
+                pushed.add(pair)
+                cost = _merge_cost(c1, c2)
+                heapq.heappush(heap, (cost, pair[0], pair[1]))
 
-        c_keep, c_remove = best_merge
-        # Merge c_remove into c_keep
+    while n_clusters > num_clusters and heap:
+        cost, c1, c2 = heapq.heappop(heap)
+
+        # Skip stale entries — one or both clusters already merged
+        if c1 not in cluster_members or c2 not in cluster_members:
+            continue
+        # Skip if they are actually the same cluster now
+        if c1 == c2:
+            continue
+        # Re-check cost — it may have changed due to prior merges
+        # affecting metric sums.  Only skip if cost is now higher
+        # and there might be a better option.
+        actual_cost = _merge_cost(c1, c2)
+        if actual_cost > cost + 1e-12:
+            # Re-push with updated cost
+            heapq.heappush(heap, (actual_cost, min(c1, c2), max(c1, c2)))
+            continue
+
+        # Merge c2 into c1 (keep lower id for consistency)
+        c_keep, c_remove = (c1, c2) if c1 < c2 else (c2, c1)
+
         for seed in cluster_members[c_remove]:
             seed_to_cluster[seed] = c_keep
         cluster_members[c_keep] |= cluster_members[c_remove]
@@ -337,6 +367,26 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
         del cluster_metric_sum[c_remove]
         del cluster_size[c_remove]
         n_clusters -= 1
+
+        # Update adjacency: c_keep inherits c_remove's neighbors
+        removed_neighbors = cluster_adj.pop(c_remove, set())
+        keep_neighbors = cluster_adj.get(c_keep, set())
+        for nb in removed_neighbors:
+            if nb == c_keep:
+                continue
+            if nb in cluster_adj:
+                cluster_adj[nb].discard(c_remove)
+                cluster_adj[nb].add(c_keep)
+            keep_neighbors.add(nb)
+        keep_neighbors.discard(c_remove)
+        cluster_adj[c_keep] = keep_neighbors
+
+        # Push updated costs for c_keep's new adjacencies
+        for nb in keep_neighbors:
+            if nb in cluster_members:
+                cost = _merge_cost(c_keep, nb)
+                pair = (min(c_keep, nb), max(c_keep, nb))
+                heapq.heappush(heap, (cost, pair[0], pair[1]))
 
     # Renumber clusters 0..n-1
     old_ids = sorted(cluster_members.keys())
