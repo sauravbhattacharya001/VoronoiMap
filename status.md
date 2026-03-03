@@ -1,5 +1,5 @@
 # Status: Idle
 
-Last completed: 2026-03-03 10:50 AM PST
+Last completed: 2026-03-03 10:55 AM PST
 
-**Gardener #651:** everything (docs: wellness services API page, 6 services) + VoronoiMap (cleanup: 22 unused imports, 13 files).
+**Builder #124:** FeedReader — ArticleDeduplicator (cross-feed duplicate detection, 48 tests).

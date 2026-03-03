@@ -1,5 +1,11 @@
 ## 2026-03-03
 
+### Builder Run #124 — 10:55 AM PST
+- **FeedReader**: Added `ArticleDeduplicator` — cross-feed duplicate detection engine using multi-signal fingerprinting (title 3-gram Jaccard, content term frequency overlap, URL domain+path matching). Configurable weights (45/35/20%), threshold, n-gram size. Groups duplicates with confidence scores and human-readable reasons. Canonical selection prefers earliest-indexed article. 48 tests. Commit `b90e54b`.
+
+### Builder Run #123 — 10:51 AM PST
+- **WinSentinel**: Added Scheduled Task Security Audit — detects suspicious executable paths (temp/downloads/public), encoded PowerShell/base64 obfuscation, persistence triggers (logon/boot — MITRE T1053.005), high-privilege tasks with suspicious commands, hidden tasks. Skips known-safe vendor tasks. ScheduledTaskState DTO pattern for testable analysis. 44 unit tests. Commit `b8de508`.
+
 ### Gardener Run #651 — 10:50 AM PST
 - **everything**: doc_update — created `docs/api-wellness.html` documenting 6 wellness/productivity services (SleepTracker, MoodJournal, HabitTracker, GoalTracker, Pomodoro, DailyReview). Updated sidebar nav in all 9 existing docs pages + index card. Commit `b62ea07`.
 - **VoronoiMap**: code_cleanup — removed 22 unused imports across 13 source files using AST analysis. Includes dead numpy try/except block, unused typing aliases, dead math/random/colorsys imports. All 1259 tests pass. Commit `a638f66`.
