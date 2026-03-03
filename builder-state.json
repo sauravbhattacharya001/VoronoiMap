@@ -1,5 +1,5 @@
 {
-  "totalRuns": 127,
+  "totalRuns": 128,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -258,7 +258,8 @@
       "GADTs module -- type-safe expressions, length-indexed vectors, typed printf, existential types, well-typed stack machine, 40+ tests (2026-03-03)",
       "Probability monad & Monte Carlo simulation -- sampling monad (bind/return/map/join), 8 distributions (uniform/normal/exponential/poisson/geometric/binomial/bernoulli/discrete), statistics (mean/variance/percentile/CI), histogram, Monte Carlo integration + Pi estimation, Markov chains with stationary distribution, Bayesian rejection sampling, 4 composable programs, 50+ tests (2026-03-03)",
       "Relational algebra engine with typed tables, full relational operators (select/project/rename/union/intersect/difference/cross/natural-join/theta-join), aggregates (count/sum/avg/min/max/group-by), pipeline DSL, WHERE clause helpers, functional indexes, pretty-printing, 35 tests (2026-03-03)",
-      "Optics module -- lenses, prisms, traversals, optionals, isos with |>> composition, nested record/sum type examples, type conversions, 48 tests (2026-03-03)"
+      "Optics module -- lenses, prisms, traversals, optionals, isos with |>> composition, nested record/sum type examples, type conversions, 48 tests (2026-03-03)",
+      "Computational geometry module (geometry.ml) -- point/segment/polygon types, cross/dot product, orientation test, convex hull (Graham scan O(n log n)), point-in-polygon (ray casting O(n)), point-in-convex-polygon (binary search O(log n)), segment intersection, closest pair (divide and conquer O(n log n)), Shoelace area, perimeter, centroid, is_convex, bounding box. 55 tests (2026-03-03)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",

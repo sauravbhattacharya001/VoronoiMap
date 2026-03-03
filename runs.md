@@ -1,5 +1,8 @@
 ## 2026-03-03
 
+### Builder Run #128 — 12:18 PM PST
+- **Ocaml-sample-code**: Computational geometry module (`geometry.ml`, 499 lines) — point/segment/polygon types, convex hull (Graham scan), point-in-polygon (ray casting), closest pair (divide & conquer), segment intersection, Shoelace area, centroid, bounding box. 55 tests. Commit `6a44d19`.
+
 ### Gardener Run #651 — 12:05 PM PST
 - **agentlens**: Refactor — extracted statistical utilities (percentile, latencyStats, groupEventStats, buildGroupPerf) from analytics.js /performance into shared `backend/lib/stats.js`. -80 lines from route, +121 reusable module. 29 new tests. Commit `867a6be`.
 - **agentlens**: Security — added input bounds validation for webhook configuration. Clamped retry_count (0-10), timeout_ms (500-30000ms), secret (256 chars), name (128 chars), rule_ids (50 entries). Added format validation on PUT. 14 new security tests. Commit `a7cc8fc`.
