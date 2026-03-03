@@ -591,3 +591,45 @@ class TestEdgeCases:
         assert result.point_count == 3
         # All 1-NN distances should be 10.0
         assert abs(result.stats["std"]) < 1e-8
+
+
+# ── Path validation security tests ──────────────────────────────────
+
+class TestPathValidation:
+    """Verify that export functions validate paths to prevent traversal."""
+
+    POINTS = [(0, 0), (10, 0), (5, 8.66), (3, 4), (7, 2)]
+
+    def test_csv_rejects_traversal(self):
+        pts = self.POINTS
+        result = distance_summary(pts, k=1)
+        with pytest.raises(ValueError, match="traversal"):
+            export_nn_csv(result, "../../etc/passwd")
+
+    def test_json_rejects_traversal(self):
+        pts = self.POINTS
+        result = clark_evans(pts, area=100)
+        with pytest.raises(ValueError, match="traversal"):
+            export_nn_json(result, "../../../tmp/evil.json")
+
+    def test_csv_accepts_valid_path(self):
+        pts = self.POINTS
+        result = distance_summary(pts, k=1)
+        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as f:
+            path = f.name
+        try:
+            written = export_nn_csv(result, path)
+            assert os.path.exists(written)
+        finally:
+            os.unlink(path)
+
+    def test_json_accepts_valid_path(self):
+        pts = self.POINTS
+        result = clark_evans(pts, area=100)
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            path = f.name
+        try:
+            written = export_nn_json(result, path)
+            assert os.path.exists(written)
+        finally:
+            os.unlink(path)

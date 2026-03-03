@@ -44,6 +44,8 @@ import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
+from vormap import validate_output_path
+
 
 # ── Helpers ─────────────────────────────────────────────────────────
 
@@ -692,6 +694,7 @@ def export_svg(analysis: HullAnalysis,
     Shows points, convex hull polygon, minimum bounding rectangle,
     minimum bounding circle, centroid, and diameter line.
     """
+    output_path = validate_output_path(output_path, allow_absolute=True)
     if not points:
         return
 
@@ -842,5 +845,6 @@ def export_svg(analysis: HullAnalysis,
 
 def export_json(analysis: HullAnalysis, output_path: str) -> None:
     """Export hull analysis results as JSON."""
+    output_path = validate_output_path(output_path, allow_absolute=True)
     with open(output_path, 'w') as f:
         json.dump(analysis.to_dict(), f, indent=2)

@@ -41,7 +41,7 @@ import math
 import csv
 import xml.etree.ElementTree as ET
 
-from vormap import eudist_pts, validate_output_path
+from vormap import eudist_pts, validate_output_path, validate_input_path
 
 try:
     from scipy.spatial import Voronoi as ScipyVoronoi
@@ -218,6 +218,7 @@ def _value_to_color(val, vmin, vmax, ramp='viridis'):
 def export_surface_svg(grid_result, output_path, width=800, height=600,
                        ramp='viridis', title=None):
     """Export interpolated surface as an SVG heatmap."""
+    output_path = validate_output_path(output_path, allow_absolute=True)
     grid = grid_result['grid']
     ny = len(grid)
     nx = len(grid[0]) if ny > 0 else 0
@@ -275,7 +276,8 @@ def export_surface_csv(grid_result, output_path):
 
 def run_interp_cli(args, data):
     """Execute interpolation commands from CLI args."""
-    with open(args.interp_values, 'r') as f:
+    interp_path = validate_input_path(args.interp_values, allow_absolute=True)
+    with open(interp_path, 'r') as f:
         raw = [line.strip() for line in f if line.strip()]
     values = [float(v) for v in raw]
     if len(values) != len(data):

@@ -43,6 +43,8 @@ import math
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
+from vormap import validate_output_path
+
 
 # ── Helpers ─────────────────────────────────────────────────────────
 
@@ -674,6 +676,7 @@ def export_nn_csv(summary: DistanceSummary, path: str) -> str:
         Absolute path to the written file.
     """
     import os
+    path = validate_output_path(path, allow_absolute=True)
     abs_path = os.path.abspath(path)
     os.makedirs(os.path.dirname(abs_path) or ".", exist_ok=True)
     lines = ["x,y,k,nn_distance,neighbor_index"]
@@ -706,6 +709,7 @@ def export_nn_json(result: object, path: str) -> str:
         Absolute path to the written file.
     """
     import os
+    path = validate_output_path(path, allow_absolute=True)
     abs_path = os.path.abspath(path)
     os.makedirs(os.path.dirname(abs_path) or ".", exist_ok=True)
     with open(abs_path, "w") as f:
