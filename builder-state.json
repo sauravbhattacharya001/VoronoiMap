@@ -1,5 +1,5 @@
 {
-  "totalRuns": 132,
+  "totalRuns": 133,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -194,7 +194,8 @@
       "Added adversarial robustness testing with prompt injection, jailbreak attempts, social engineering, and manipulation resistance scoring",
       "Added agent influence mapping with cascade detection, convergence analysis, coalition detection, monopoly identification, and echo chamber discovery (2026-03-03)",
       "Added agent alignment drift monitor with value tracking, priority ordering (Kendall tau), reward hacking detection, composite scoring, 3 spec presets, 54 tests (2026-03-03)",
-      "Agent Goal Inference Engine — Bayesian latent goal detection with 5 goal hypotheses, configurable priors (uniform/skeptical/trust), conflict detection, deception scoring, multi-agent correlation, temporal tracking, CLI demo, 50 tests (2026-03-03)"
+      "Agent Goal Inference Engine — Bayesian latent goal detection with 5 goal hypotheses, configurable priors (uniform/skeptical/trust), conflict detection, deception scoring, multi-agent correlation, temporal tracking, CLI demo, 50 tests (2026-03-03)",
+      "Agent Consensus Protocol -- Byzantine fault-tolerant multi-agent voting for safety decisions (quarantine/terminate/escalate). Simple majority + supermajority for critical actions, weighted voting, quorum enforcement, proposal lifecycle, tamper-evident SHA-256 audit chain, voting bloc detection, vote change policy, per-voter rate limiting, CLI demo. 62 tests (2026-03-03)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -237,7 +238,8 @@
       "ArticleReadabilityAnalyzer -- Flesch readability scoring, grade level, reading time, difficulty classification, syllable counting (2026-03-03)",
       "ArticleSentimentAnalyzer -- lexicon-based sentiment scoring with negation/intensifier handling, 8-emotion detection, per-sentence breakdown, subjectivity score, 30 tests (2026-03-03)",
       "FeedUpdateScheduler -- adaptive polling that learns feed publishing frequency, back-off/speed-up algorithm, tier classification, per-feed stats, JSON persistence, 41 tests (2026-03-03)",
-      "ArticleDeduplicator -- cross-feed duplicate detection using multi-signal fingerprinting (title 3-gram Jaccard, content term overlap, URL domain+path matching), configurable weights/threshold, canonical selection, human-readable grouping reasons, 48 tests (2026-03-03)"
+      "ArticleDeduplicator -- cross-feed duplicate detection using multi-signal fingerprinting (title 3-gram Jaccard, content term overlap, URL domain+path matching), configurable weights/threshold, canonical selection, human-readable grouping reasons, 48 tests (2026-03-03)",
+      "ArticleTrendDetector -- trending topic discovery with time-window keyword frequency tracking, momentum scoring, rising/spike/stable/declining/fading detection, top keywords, topic history, summary, 38 tests (2026-03-03)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
