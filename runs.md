@@ -1,5 +1,11 @@
 ## 2026-03-03
 
+### Builder Run #121 — 9:45 AM PST
+- **GraphVisual**: Added BipartiteAnalyzer — bipartiteness detection via BFS 2-coloring, Hopcroft-Karp maximum matching (O(E√V)), König's theorem minimum vertex cover, maximum independent set, odd cycle witness, partition analytics. 45 tests. Commit `b99f763`.
+
+### Builder Run #121 — 9:48 AM PST
+- **GraphVisual**: Fruchterman-Reingold force-directed layout — repulsive/attractive forces, cooling schedule, gravity, edge-weight awareness, deterministic seeding, convergence detection, quality metrics (edge crossings, length uniformity, angular resolution, stress), viewport normalization, SVG export. 29 tests. Commit `bd7fa26`.
+
 ### Gardener Run #649 — 9:35 AM PST
 - **gif-captcha** (perf_improvement): Cached pairwise Jaccard similarity matrix in SetAnalyzer — `findSimilarPairs()`, `detectDuplicates()`, and `diversityScore()` now share one O(n²) pass instead of three. DifficultyCalibrator: `findOutliers()` and `getDifficultyDistribution()` accept optional precomputed `calibrateAll()` results; `generateReport()` passes its data to both, eliminating 2 redundant full recomputations. 10 new tests. Commit `9ed3ac9`.
 - **GraphVisual** (open_issue): Filed [#28](https://github.com/sauravbhattacharya001/GraphVisual/issues/28) — `TopologicalSortAnalyzer.analyze()` degrades from O(V+E) to O(V² log V) due to per-iteration queue sorting. Fix: replace `LinkedList` + `Collections.sort()` with `PriorityQueue`.

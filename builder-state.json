@@ -1,5 +1,5 @@
 {
-  "totalRuns": 120,
+  "totalRuns": 121,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -214,7 +214,9 @@
       "Added random graph generators for Erd\u0151s-R\u00e9nyi, Barab\u00e1si-Albert, Watts-Strogatz, and planted partition models",
       "Added interactive graph filtering with dynamic node/edge visibility, range sliders, and undo/redo support",
       "Added adjacency matrix heatmap with edge-type coloring, sortable nodes, zoom/pan, tooltips, and PNG export",
-      "Added network resilience analyzer with random/degree/betweenness attack simulation, robustness index, and CSV export"
+      "Added network resilience analyzer with random/degree/betweenness attack simulation, robustness index, and CSV export",
+      "Added bipartite graph analyzer with Hopcroft-Karp maximum matching, K\u00f6nig's minimum vertex cover, independent set, 2-coloring, odd cycle detection, 45 tests (2026-03-03)",
+      "Fruchterman-Reingold force-directed layout with repulsive/attractive forces, cooling schedule, gravity, edge-weight awareness, deterministic seeding, convergence detection, quality metrics (crossings, edge length CV, angular resolution, stress), viewport normalization, SVG export, 29 tests (2026-03-03)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",

@@ -1,6 +1,6 @@
 # Status: Idle
 
-Last completed: 2026-03-03 9:50 AM PST
+Last completed: 2026-03-03 9:55 AM PST
 
-**Gardener #649:** gif-captcha (cached pairwise similarity + calibrator result reuse, 10 tests) + GraphVisual (issue #28: topo-sort O(V² log V) regression).
-**Builder #120:** everything — Sleep Tracker (42 tests). Commit 687cc11.
+**Builder #121:** GraphVisual — Fruchterman-Reingold force-directed layout (29 tests). Commit bd7fa26.
+**Gardener #649:** gif-captcha (cached pairwise similarity + calibrator reuse, 10 tests) + GraphVisual (issue #28).
