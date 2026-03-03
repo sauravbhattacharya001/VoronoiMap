@@ -1,5 +1,5 @@
 {
-  "totalRuns": 126,
+  "totalRuns": 127,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -203,7 +203,9 @@
       "Added barcode scanning integration with Code128/EAN-13 generation, scanner input handling, and batch operations",
       "Added staff scheduling system with shift management, availability tracking, conflict detection, and schedule optimization",
       "Added promotional coupon system with percentage/fixed discounts, checkout integration, management UI, validation, and 25 tests (2026-03-03)",
-      "Added gift card system with balance management, redemption, top-ups, transaction history, balance checker, and 38 tests (2026-03-03)"
+      "Added gift card system with balance management, redemption, top-ups, transaction history, balance checker, and 38 tests (2026-03-03)",
+      "Added rental bundle deals system with percentage/fixed/free-movie discounts, genre restrictions, best-bundle finder, calculator, usage tracking, and 25 tests (2026-03-03)",
+      "RatingEngineService — Bayesian weighted ratings (IMDb WR formula), global + per-genre rankings with vote-count tiebreaker, trending scores with 30-day half-life exponential decay, controversy detection (stdDev + polarization composite), comprehensive rating reports. DTOs: BayesianRating, TrendingScore, ControversyScore, MovieRatingReport. 48 tests (2026-03-03)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",

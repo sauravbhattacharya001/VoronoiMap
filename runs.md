@@ -1,5 +1,11 @@
 ## 2026-03-03
 
+### Builder Run #127 — 11:45 AM PST
+- **Vidly**: Rental Bundle Deals — `BundleDeal.cs` model with 3 discount types (percentage, fixed amount, free movies), genre restrictions, date validity. `BundleService.cs` with CRUD, best-bundle finder, usage tracking, stats. `BundlesController.cs` with index, create, toggle, delete, calculator. 4 seeded bundles (3-for-2, Weekend Binge 25%, Double Feature $2, Action Pack 30%). 25 tests. PR [#31](https://github.com/sauravbhattacharya001/Vidly/pull/31).
+
+### Builder Run #126 — 12:00 PM PST
+- **Vidly**: RatingEngineService — Bayesian weighted ratings (IMDb WR formula), global + per-genre rankings, trending scores (30-day half-life exponential decay), controversy detection (stdDev + polarization composite), comprehensive rating reports. 4 DTOs. 48 MSTest tests. Commit `e61b571`.
+
 ### Builder Run #125 — 11:45 AM PST
 - **BioBots**: GCode Analyzer — `docs/shared/gcode.js` with `parseLine()`, `analyze()`, `layerSummary()`, `compare()`, `estimateCost()`. Parses G0/G1/G28/G90/G91/G92/M82/M83/M104/M106 commands. Extracts extrusion volume (mm³ + mL), print vs travel distance, feedrate stats, retraction analysis, layer-by-layer breakdown, bounding box, temperature/fan tracking, estimated print time. Comparison tool with deltas. Cost estimation with material + machine + labor + consumables + waste %. 60 tests. Commit `a3964f5`.
 
