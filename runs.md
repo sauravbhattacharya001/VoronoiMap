@@ -89,6 +89,9 @@
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
 
+### Builder Run #119 — 9:15 AM PST
+- **Ocaml-sample-code**: Relational algebra engine (`relational.ml`, 782 lines) — typed tables, full relational algebra (σ/π/ρ/∪/∩/−/×/⋈/⋈_θ), aggregates (COUNT/SUM/AVG/MIN/MAX/GROUP BY), composable pipeline DSL, WHERE clause helpers (eq/gt/lt/between/like/in/null/and/or), functional hash indexes, pretty-printed output. 35 tests. Commit `cc297b0`.
+
 ### Gardener Run #645 — 9:00 AM PST
 - **ai** (`code_cleanup`): Removed 41 unused imports across 19 source modules (AST-verified). Includes math, sys, field, Optional, Sequence, deque, defaultdict, PRESETS, Strategy, StopCondition, WorkerRecord, PolicyResult, MitigationStatus, datetime/timezone. All 1488 tests pass. Commit `e85e0dc`.
 - **GraphVisual** (`bug_fix`): Dijkstra zero-weight edge fix — removed incorrect `Math.max(e.getWeight(), 0.001)` clamp that silently broke shortest paths involving zero-weight edges. Added negative weight validation. 5 new tests. Commit `19a60e5`.

@@ -1,5 +1,5 @@
 {
-  "totalRuns": 118,
+  "totalRuns": 119,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -247,7 +247,8 @@
       "Added DPLL SAT solver with unit propagation, pure literal elimination, backtracking, DIMACS parser, and graph coloring examples",
       "Hindley-Milner type inference engine (Algorithm W) -- full polymorphic type inference for mini functional language with let-polymorphism, unification, occurs check, pairs (2026-03-03)",
       "GADTs module -- type-safe expressions, length-indexed vectors, typed printf, existential types, well-typed stack machine, 40+ tests (2026-03-03)",
-      "Probability monad & Monte Carlo simulation -- sampling monad (bind/return/map/join), 8 distributions (uniform/normal/exponential/poisson/geometric/binomial/bernoulli/discrete), statistics (mean/variance/percentile/CI), histogram, Monte Carlo integration + Pi estimation, Markov chains with stationary distribution, Bayesian rejection sampling, 4 composable programs, 50+ tests (2026-03-03)"
+      "Probability monad & Monte Carlo simulation -- sampling monad (bind/return/map/join), 8 distributions (uniform/normal/exponential/poisson/geometric/binomial/bernoulli/discrete), statistics (mean/variance/percentile/CI), histogram, Monte Carlo integration + Pi estimation, Markov chains with stationary distribution, Bayesian rejection sampling, 4 composable programs, 50+ tests (2026-03-03)",
+      "Relational algebra engine with typed tables, full relational operators (select/project/rename/union/intersect/difference/cross/natural-join/theta-join), aggregates (count/sum/avg/min/max/group-by), pipeline DSL, WHERE clause helpers, functional indexes, pretty-printing, 35 tests (2026-03-03)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -258,7 +259,8 @@
       "Added clipboard security monitor with sensitive data detection (credit cards, SSN, crypto addresses, private keys, API tokens) and auto-clear",
       "Added Software Inventory Audit - scans installed programs for unsigned executables, PUPs, suspicious locations, outdated software, orphaned installs, software age (2026-03-03)",
       "Added Certificate Store Audit - scans Windows cert stores for expired/expiring certs, weak algorithms (SHA-1/MD5/MD2), small RSA keys, self-signed in trusted stores. Configurable thresholds. 33 tests (2026-03-03)",
-      "Added PowerShell Security Audit \u2014 execution policy, script block/module/transcription logging, language mode, v2 engine downgrade, AMSI registration, WinRM remoting exposure. PowerShellState DTO for testable analysis. 49 tests (2026-03-03)"
+      "Added PowerShell Security Audit \u2014 execution policy, script block/module/transcription logging, language mode, v2 engine downgrade, AMSI registration, WinRM remoting exposure. PowerShellState DTO for testable analysis. 49 tests (2026-03-03)",
+      "Added DNS Security Audit \u2014 DNS server validation, DoH status, LLMNR/NetBIOS exposure, hosts file tampering detection, cache TTL analysis. DnsState DTO for testable analysis. 45 tests (2026-03-03)"
     ]
   }
 }
