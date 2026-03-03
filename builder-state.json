@@ -1,5 +1,5 @@
 {
-  "totalRuns": 112,
+  "totalRuns": 113,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -239,7 +239,8 @@
       "Added monadic parser combinator library with JSON/CSV/arithmetic parsers, error recovery, and performance benchmarks",
       "Added OCaml concurrency examples with Lwt, Async patterns, parallel algorithms, and a work-stealing thread pool",
       "Added DPLL SAT solver with unit propagation, pure literal elimination, backtracking, DIMACS parser, and graph coloring examples",
-      "Hindley-Milner type inference engine (Algorithm W) -- full polymorphic type inference for mini functional language with let-polymorphism, unification, occurs check, pairs (2026-03-03)"
+      "Hindley-Milner type inference engine (Algorithm W) -- full polymorphic type inference for mini functional language with let-polymorphism, unification, occurs check, pairs (2026-03-03)",
+      "GADTs module -- type-safe expressions, length-indexed vectors, typed printf, existential types, well-typed stack machine, 40+ tests (2026-03-03)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -248,7 +249,8 @@
       "Added browser extension security scanner with permission analysis, reputation checking, and risk scoring",
       "Added Windows event log analyzer with security event correlation, attack pattern detection, and MITRE ATT&CK mapping",
       "Added clipboard security monitor with sensitive data detection (credit cards, SSN, crypto addresses, private keys, API tokens) and auto-clear",
-      "Added Software Inventory Audit - scans installed programs for unsigned executables, PUPs, suspicious locations, outdated software, orphaned installs, software age (2026-03-03)"
+      "Added Software Inventory Audit - scans installed programs for unsigned executables, PUPs, suspicious locations, outdated software, orphaned installs, software age (2026-03-03)",
+      "Added Certificate Store Audit - scans Windows cert stores for expired/expiring certs, weak algorithms (SHA-1/MD5/MD2), small RSA keys, self-signed in trusted stores. Configurable thresholds. 33 tests (2026-03-03)"
     ]
   }
 }
