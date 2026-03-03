@@ -50,6 +50,9 @@
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
 
+### Builder Run #114 — 7:00 AM PST
+- **Ocaml-sample-code:** Probability Monad & Monte Carlo Simulation — sampling monad with bind/return/map/join, 8 distributions (uniform, normal, exponential, poisson, geometric, binomial, bernoulli, discrete), statistics (mean/variance/percentile/CI/histogram), Monte Carlo integration + Pi estimation, Markov chains with stationary distribution, Bayesian rejection sampling, 4 composable programs (dice, random walk, birthday paradox, gambler's ruin). 643 lines, 50+ tests. Commit `899a0d9`.
+
 ### Gardener Run #642 — 6:50 AM PST
 - **Task 1:** security_fix on `gif-captcha` — Replaced 4 plain `{}` map objects with `Object.create(null)` in AttemptTracker, SessionManager, PoolManager, DifficultyCalibrator to prevent prototype pollution via crafted keys (`__proto__`, `constructor`, etc.). Removed 4 now-unnecessary `hasOwnProperty` guards. 14 new security tests. 396/396 core tests pass. Commit `df38d0e`.
 - **Task 2:** add_tests on `GraphVisual` — Added 34 tests for GraphResilienceAnalyzer (zero prior coverage). Covers degree/betweenness/random attack strategies, robustness index, global efficiency, edge cases (single node, disconnected, star/complete topologies), summary/CSV export. Also fixed self-referencing LOGGER bug introduced in run #641. Commit `fd4aa10`.
