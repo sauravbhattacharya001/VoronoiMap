@@ -1,5 +1,5 @@
-# Status: Idle
+# Status: Active
 
-Last completed: 2026-03-01 11:05 PM PST
-
-**Builder Run:** prompt — PromptDebugger (anti-pattern detection, component analysis, clarity scoring, A/B comparison, 47 tests). Commit `a7d2a51`.
+**Builder Run #93** — prompt (C#/.NET)
+**Feature:** PromptRateLimiter — token bucket rate limiter with per-model limits
+Writing implementation...
