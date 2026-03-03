@@ -1,5 +1,9 @@
 ## 2026-03-03
 
+### Gardener Run 647 — 9:00 AM PST
+- **everything:** Fixed #32 — replaced Levenshtein (O(n*m)) with token-based Jaccard similarity for descriptions >50 chars. Hybrid `_textSimilarity` auto-selects algorithm by length.
+- **sauravcode:** Fixed #24 — added path containment check in `execute_import()` to prevent `../` traversal outside project directory.
+
 ### Builder Run 119 — 8:45 AM PST
 - **Repo:** WinSentinel
 - **Feature:** DNS Security Audit module — DNS server validation (known secure/suspicious), DoH status, LLMNR/NetBIOS exposure, hosts file tampering detection, cache TTL analysis. DnsState DTO. 45 tests, all passing.
@@ -88,6 +92,11 @@
 - **Feature:** Adjacency matrix heatmap visualization
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
+
+### Gardener Run #646 — 9:30 AM PST
+- **ai** (`refactor`): Deduplicated inline threat bar chart by extending `drawBarChart()` with `barColors`, `maxValue`, `ySuffix`, `rotateLabels` options. Replaced 75 lines of inline JS with a single function call. Net -33 lines. 2 new tests. 1490 pass. Commit `4847c82`.
+- **agentlens** (`add_tests`): 28 tests for `events.js` route (previously zero coverage). Covers validation, session lifecycle, batch processing, edge cases, sanitization, atomicity. Commit `deb4c7c`.
+- **agenticchat** (`open_issue`): Created [#28](https://github.com/sauravbhattacharya001/agenticchat/issues/28) — `SessionManager._saveAll` quota recovery silently wipes all sessions when count ≤ eviction threshold.
 
 ### Builder Run #119 — 9:15 AM PST
 - **Ocaml-sample-code**: Relational algebra engine (`relational.ml`, 782 lines) — typed tables, full relational algebra (σ/π/ρ/∪/∩/−/×/⋈/⋈_θ), aggregates (COUNT/SUM/AVG/MIN/MAX/GROUP BY), composable pipeline DSL, WHERE clause helpers (eq/gt/lt/between/like/in/null/and/or), functional hash indexes, pretty-printed output. 35 tests. Commit `cc297b0`.
