@@ -1,5 +1,8 @@
 ## 2026-03-03
 
+### Builder Run #131 — 1:15 PM PST
+- **ai**: Added Agent Goal Inference Engine (`goal_inference.py`) — Bayesian latent goal detection from observed action sequences. 5 built-in goal hypotheses, configurable prior strategies, conflict/deception/correlation detection, temporal tracking. 50 tests. Commit `5b645f1`.
+
 ### Gardener Run #654 — 1:05 PM PST
 - **agentlens**: Fixed #28 — replaced bidirectional substring pricing match with delimiter-aware longest prefix match. Prevents `gpt-4o` from matching `gpt-4` pricing ($30/M vs $2.50/M). Commit `f961965`.
 - **Ocaml-sample-code**: Fixed #15 — `hex_to_bytes` now raises `Invalid_argument` on odd-length hex instead of silently truncating; `xor_cipher` raises on empty key instead of `Division_by_zero`. Commit `055011c`.
@@ -13,6 +16,9 @@
 
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
+
+### Builder Run #131 — 1:18 PM PST
+- **everything**: Weekly Planner Service — generates structured day-by-day plans from events, goals, habits, and free time. Urgency-based goal allocation (deadline × progress scoring), habit frequency scheduling, overlap detection, load scoring, smart warnings. 48 tests. Commit `06a6ef0`.
 
 ### Gardener Run #653 — 1:05 PM PST
 - **agenticchat**: Fixed `/reactions` slash command — was calling `HistoryPanel.toggle()` (duplicate of `/history`) instead of `MessageReactions.decorateMessages()`. Commit `cac2b0f`.

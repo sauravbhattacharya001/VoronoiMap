@@ -1,5 +1,5 @@
 {
-  "totalRuns": 129,
+  "totalRuns": 131,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -177,7 +177,9 @@
       "Added Pomodoro Timer screen with circular countdown, configurable intervals, phase transitions, daily stats, and streak tracking (2026-03-03)",
       "Added Goals Tracker with milestones, progress tracking, deadlines, category organization, and overview dashboard (2026-03-03)",
       "Added Mood Journal with 5-level mood logging, 14 activity tags, notes, trend charts, activity-mood correlation, streaks, and swipe-to-delete history (2026-03-03)",
-      "Sleep Tracker with bedtime/wake time logging, 5-level quality rating, 12 sleep factors, awakenings count, duration trends, factor-quality correlations, sleep debt calculator, consistency scoring, streak tracking, 14-day bar chart, 42 tests (2026-03-03)"
+      "Sleep Tracker with bedtime/wake time logging, 5-level quality rating, 12 sleep factors, awakenings count, duration trends, factor-quality correlations, sleep debt calculator, consistency scoring, streak tracking, 14-day bar chart, 42 tests (2026-03-03)",
+      "Event Pattern Recognizer — discovers recurring patterns from historical events, detects scheduling habits (time-of-day, busiest day, density, duration), predicts future events with confidence decay, suggests formalizing informal recurrences. 42 tests (2026-03-03)",
+      "Weekly Planner Service — generates structured day-by-day plans from events/goals/habits/free time with urgency-based goal allocation (deadline × progress scoring), habit frequency scheduling, overlap detection, load scoring (free/light/moderate/heavy/overloaded), smart warnings (context switching, unallocated goals, imminent deadlines), configurable working hours/buffer/block sizes, text summary. 48 tests (2026-03-03)"
     ],
     "ai": [
       "Added escape attempt detection system with filesystem, network, process, and code injection monitors",
@@ -191,7 +193,8 @@
       "Added agent memory forensics with memory scanning, data flow tracking, information accumulation detection, and privacy analysis",
       "Added adversarial robustness testing with prompt injection, jailbreak attempts, social engineering, and manipulation resistance scoring",
       "Added agent influence mapping with cascade detection, convergence analysis, coalition detection, monopoly identification, and echo chamber discovery (2026-03-03)",
-      "Added agent alignment drift monitor with value tracking, priority ordering (Kendall tau), reward hacking detection, composite scoring, 3 spec presets, 54 tests (2026-03-03)"
+      "Added agent alignment drift monitor with value tracking, priority ordering (Kendall tau), reward hacking detection, composite scoring, 3 spec presets, 54 tests (2026-03-03)",
+      "Agent Goal Inference Engine — Bayesian latent goal detection with 5 goal hypotheses, configurable priors (uniform/skeptical/trust), conflict detection, deception scoring, multi-agent correlation, temporal tracking, CLI demo, 50 tests (2026-03-03)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
