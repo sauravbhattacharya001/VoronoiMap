@@ -1,5 +1,5 @@
 {
-  "totalRuns": 134,
+  "totalRuns": 136,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -146,7 +146,8 @@
       "Added CAPTCHA performance benchmark suite with rendering speed, memory profiling, network simulation, and cross-browser testing",
       "Added visual theme system with 6 built-in themes, CSS custom properties, dark mode, and high contrast accessibility mode",
       "Added honeypot and bot behavior detector with multi-signal analysis (honeypots, mouse entropy, keystroke dynamics, page timing, scroll patterns, JS token verification), weighted composite scoring, configurable thresholds, 62 tests (2026-03-03)",
-      "HMAC-signed token verifier (createTokenVerifier) for stateless CAPTCHA validation -- HMAC-SHA256 signing, configurable TTL, IP binding, replay protection with bounded LRU nonce tracking, metadata embedding, session manager integration via issueFromSession(). 49 tests (2026-03-03)"
+      "HMAC-signed token verifier (createTokenVerifier) for stateless CAPTCHA validation -- HMAC-SHA256 signing, configurable TTL, IP binding, replay protection with bounded LRU nonce tracking, metadata embedding, session manager integration via issueFromSession(). 49 tests (2026-03-03)",
+      "Cross-session IP/device reputation tracker (createReputationTracker) -- score-based reputation with solve/fail/timeout weights, exponential decay, burst detection, allowlist/blocklist, action recommendations, LRU eviction, export/import persistence, metadata tagging. 61 tests (2026-03-03)"
     ],
     "prompt": [
       "Added CLI tool for managing and testing prompts from the command line with interactive mode",
@@ -225,7 +226,8 @@
       "Added network resilience analyzer with random/degree/betweenness attack simulation, robustness index, and CSV export",
       "Added bipartite graph analyzer with Hopcroft-Karp maximum matching, König's minimum vertex cover, independent set, 2-coloring, odd cycle detection, 45 tests (2026-03-03)",
       "Fruchterman-Reingold force-directed layout with repulsive/attractive forces, cooling schedule, gravity, edge-weight awareness, deterministic seeding, convergence detection, quality metrics (crossings, edge length CV, angular resolution, stress), viewport normalization, SVG export, 29 tests (2026-03-03)",
-      "Eulerian path/circuit analyzer — Hierholzer's O(V+E) algorithm, degree-based classification, edge connectivity via max-flow, Chinese Postman suggestions, report generation, 38 tests (2026-03-03)"
+      "Eulerian path/circuit analyzer — Hierholzer's O(V+E) algorithm, degree-based classification, edge connectivity via max-flow, Chinese Postman suggestions, report generation, 38 tests (2026-03-03)",
+      "Strongly Connected Components (SCC) Analyzer — Tarjan's and Kosaraju's algorithms, condensation DAG, component classification (source/sink/intermediate), bridge edges, connectivity queries, min-edges-to-connect, 30 tests (2026-03-03)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",

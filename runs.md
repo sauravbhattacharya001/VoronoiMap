@@ -1,5 +1,8 @@
 ## 2026-03-03
 
+### Builder Run #135 — 3:15 PM PST
+- **GraphVisual**: Added Strongly Connected Components (SCC) Analyzer — Tarjan's and Kosaraju's algorithms, condensation DAG, component classification (source/sink/intermediate/isolated), bridge edge identification, connectivity queries, min-edges-to-strongly-connect, summary report, 30 tests
+
 ### Gardener Run #658 — 3:00 PM PST
 - **everything** (fix_issue): Fixed #35 — removed invalid static method with dot notation in FreeSlot class (compile error fix)
 - **ai** (bug_fix): Fixed optimizer refinement loop not updating best candidate between steps, making multi-step refinement useless
@@ -45,6 +48,9 @@
 
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
+
+### Builder Run #135 — 3:18 PM PST
+- **gif-captcha**: Added `createReputationTracker` — cross-session IP/device reputation tracking with score-based trust, exponential decay, burst detection, allowlist/blocklist, action recommendations, LRU eviction, export/import, metadata tagging. 61 tests. Commit `9255020`.
 
 ### Gardener Run #657 — 3:06 PM PST
 - **VoronoiMap**: Fixed Ripley's K estimator denominator (`n*n` → `n*(n-1)`), eliminating systematic downward bias. 2 new tests. Commit `6e853ae`.
