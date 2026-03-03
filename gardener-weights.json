@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-03T11:35:00",
-  "totalRuns": 654,
+  "lastUpdated": "2026-03-03T12:00:00",
+  "totalRuns": 651,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -15,8 +15,8 @@
     },
     "security_fix": {
       "weight": 92,
-      "runs": 41,
-      "successes": 41,
+      "runs": 42,
+      "successes": 42,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
@@ -29,8 +29,8 @@
     },
     "refactor": {
       "weight": 83,
-      "runs": 31,
-      "successes": 33,
+      "runs": 32,
+      "successes": 34,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
@@ -64,23 +64,23 @@
     },
     "open_issue": {
       "weight": 76,
-      "runs": 53,
-      "successes": 56,
+      "runs": 54,
+      "successes": 57,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
     },
     "fix_issue": {
       "weight": 75,
-      "runs": 66,
-      "successes": 67,
+      "runs": 68,
+      "successes": 69,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
       "weight": 72,
       "runs": 20,
       "successes": 19,
-      "description": "Review and merge open Dependabot PRs \u00e2\u20ac\u201d PRIORITY: 60+ PRs waiting across all repos"
+      "description": "Review and merge open Dependabot PRs â€” PRIORITY: 60+ PRs waiting across all repos"
     },
     "add_ci_cd": {
       "weight": 74,
@@ -128,7 +128,7 @@
       "weight": 96,
       "runs": 17,
       "successes": 17,
-      "description": "Set up package publishing (PyPI/npm/NuGet) \u00e2\u20ac\u201d PRIORITY: PyPI is back online, publish Python packages!"
+      "description": "Set up package publishing (PyPI/npm/NuGet) â€” PRIORITY: PyPI is back online, publish Python packages!"
     },
     "add_badges": {
       "weight": 59,
@@ -685,21 +685,21 @@
       "docs_site"
     ]
   },
-  "notes": "Run 652. Vidly: removed 3 dead methods (-41 lines). gif-captcha: 37 integration tests across 7 pipeline scenarios.",
-  "lastRepo": "gif-captcha",
-  "lastRun": "2026-03-03T11:35:00",
-  "runCount": 10,
+  "notes": "Run 656. VoronoiMap: fixed #38 - converted recursive Welzl MEC to iterative. prompt: fixed #32 - made ProcessAll() idempotent by skipping completed items.",
+  "lastRepo": "prompt",
+  "lastRun": "2026-03-03T12:00:00",
+  "runCount": 12,
   "lastWeightAdjustment": 650,
   "adjustmentHistory": [
     {
       "run": 650,
       "changes": {
-        "merge_dependabot": "94\u219272 (frequently re-rolled, no Dependabot PRs exist)",
-        "fix_issue": "80\u219275 (often no open issues, requires re-roll)",
-        "security_fix": "90\u219292 (consistently productive)",
-        "add_tests": "90\u219292 (consistently productive)",
-        "refactor": "81\u219283 (consistently productive)",
-        "perf_improvement": "86\u219288 (consistently productive)"
+        "merge_dependabot": "94→72 (frequently re-rolled, no Dependabot PRs exist)",
+        "fix_issue": "80→75 (often no open issues, requires re-roll)",
+        "security_fix": "90→92 (consistently productive)",
+        "add_tests": "90→92 (consistently productive)",
+        "refactor": "81→83 (consistently productive)",
+        "perf_improvement": "86→88 (consistently productive)"
       }
     }
   ]

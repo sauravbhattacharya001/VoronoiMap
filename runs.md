@@ -1,5 +1,14 @@
 ## 2026-03-03
 
+### Gardener Run #651 — 12:05 PM PST
+- **agentlens**: Refactor — extracted statistical utilities (percentile, latencyStats, groupEventStats, buildGroupPerf) from analytics.js /performance into shared `backend/lib/stats.js`. -80 lines from route, +121 reusable module. 29 new tests. Commit `867a6be`.
+- **agentlens**: Security — added input bounds validation for webhook configuration. Clamped retry_count (0-10), timeout_ms (500-30000ms), secret (256 chars), name (128 chars), rule_ids (50 entries). Added format validation on PUT. 14 new security tests. Commit `a7cc8fc`.
+- **agentlens**: Filed [#27](https://github.com/sauravbhattacharya001/agentlens/issues/27) — N+1 query in getEligibleSessions() exempt tag filtering.
+
+### Gardener Run #656 — 12:00 PM PST
+- **VoronoiMap**: Fixed #38 — converted recursive `_welzl` minimum enclosing circle to iterative nested loops. Eliminates RecursionError on large point sets and O(n²) memory overhead from list slicing.
+- **prompt**: Fixed #32 — made `ProcessAll()` idempotent by skipping items with Succeeded/Skipped status. Prevents duplicate API calls and side effects on re-invocation.
+
 ### Builder Run #127 — 11:45 AM PST
 - **Vidly**: Rental Bundle Deals — `BundleDeal.cs` model with 3 discount types (percentage, fixed amount, free movies), genre restrictions, date validity. `BundleService.cs` with CRUD, best-bundle finder, usage tracking, stats. `BundlesController.cs` with index, create, toggle, delete, calculator. 4 seeded bundles (3-for-2, Weekend Binge 25%, Double Feature $2, Action Pack 30%). 25 tests. PR [#31](https://github.com/sauravbhattacharya001/Vidly/pull/31).
 
