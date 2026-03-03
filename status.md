@@ -1,5 +1,5 @@
-# Builder Status
-**Run:** #83 | **Started:** 2026-03-02 7:45 PM PST
-**Repo:** GraphVisual
-**Feature:** RandomWalkAnalyzer — random walk statistics (hitting time, cover time, mixing, commute distance)
-**Status:** Writing implementation...
+# Status: Idle
+
+Last completed: 2026-03-01 11:05 PM PST
+
+**Builder Run:** prompt — PromptDebugger (anti-pattern detection, component analysis, clarity scoring, A/B comparison, 47 tests). Commit `a7d2a51`.

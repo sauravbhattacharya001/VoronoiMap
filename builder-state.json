@@ -1,16 +1,14 @@
 {
-  "lastRun": "2026-03-02T19:15:00-08:00",
+  "lastRun": "2026-03-01T23:05:00-08:00",
   "repos": {
     "sauravbhattacharya001/agenticchat": {
       "features": [
-        "drag-and-drop file input (2026-03-01)",
-        "Response Time Tracking - per-response timing badges, color-coded speed indicator, /timing toggle, stats integration, 13 tests (2026-03-02)",
-        "ConversationFork - branch chats from any message into new sessions, fork buttons in history panel, auto-naming, toast notification, 18 tests (2026-03-02)"
+        "drag-and-drop file input (2026-03-01)"
       ]
     },
     "sauravbhattacharya001/GraphVisual": {
       "features": [
-        "SpectralAnalyzer \u00e2\u20ac\u201d eigenvalue-based graph analysis with Jacobi algorithm (2026-03-01)"
+        "SpectralAnalyzer — eigenvalue-based graph analysis with Jacobi algorithm (2026-03-01)"
       ]
     },
     "sauravbhattacharya001/VoronoiMap": {
@@ -20,63 +18,34 @@
     },
     "sauravbhattacharya001/FeedReader": {
       "features": [
-        "FeedDiscoveryManager \u00e2\u20ac\u201d auto-discover RSS feeds from website URLs (2026-03-01)"
+        "FeedDiscoveryManager — auto-discover RSS feeds from website URLs (2026-03-01)"
       ]
     },
     "sauravbhattacharya001/sauravcode": {
       "features": [
-        "Random number builtins: random, random_int, random_choice, random_shuffle (2026-03-01)",
-        "String padding & char utility builtins: pad_left, pad_right, repeat, char_code, from_char_code (2026-03-02)"
+        "Random number builtins: random, random_int, random_choice, random_shuffle (2026-03-01)"
       ]
     },
     "sauravbhattacharya001/ai": {
       "features": [
-        "Contract Templates \u00e2\u20ac\u201d 8 domain-specific replication contract presets with safety rationale (2026-03-01)"
+        "Contract Templates — 8 domain-specific replication contract presets with safety rationale (2026-03-01)"
       ]
     },
     "sauravbhattacharya001/Vidly": {
       "features": [
-        "Data export page \u00e2\u20ac\u201d CSV/JSON download for movies, customers, and rentals (2026-03-01)",
-        "PricingService \u00e2\u20ac\u201d membership-tier pricing, late fees with grace periods, billing summary (2026-03-01)"
+        "Data export page — CSV/JSON download for movies, customers, and rentals (2026-03-01)",
+        "PricingService — membership-tier pricing, late fees with grace periods, billing summary (2026-03-01)"
       ]
     },
     "sauravbhattacharya001/agentlens": {
       "features": [
-        "Webhook notifications \u00e2\u20ac\u201d configurable webhooks with JSON/Slack/Discord formats, HMAC signing, retries, delivery history (2026-03-01)",
-        "SLA Monitor \u2014 service-level compliance tracking with SLO definitions, error budgets, at-risk detection, preset policies, 60 tests (2026-03-02)"
+        "Webhook notifications — configurable webhooks with JSON/Slack/Discord formats, HMAC signing, retries, delivery history (2026-03-01)"
       ]
     },
     "sauravbhattacharya001/prompt": {
       "features": [
-        "PromptDebugger \u00e2\u20ac\u201d anti-pattern detection, component analysis, clarity scoring, A/B comparison (2026-03-01)",
-        "PromptVariantGenerator \u00e2\u20ac\u201d systematic prompt variant generation across 5 axes (tone/style/strategy/verbosity/custom), independent + combinatorial modes, 81 tests (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/gif-captcha": {
-      "features": [
-        "Embed Widget Generator \u00e2\u20ac\u201d configurable embed code generator with live preview, theme/behavior/text/security options, HTML+npm snippets (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/everything": {
-      "features": [
-        "SnoozeService \u00e2\u20ac\u201d event postponement with 10 presets, history tracking, serial-snooze detection, smart suggestions, 65 tests (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/BioBots": {
-      "features": [
-        "Print Report Generator \u00e2\u20ac\u201d select prints, generate formatted printable lab reports with summary stats, quality grades, metric bars, print/PDF and copy-as-text (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/getagentbox": {
-      "features": [
-        "Time Saved Calculator \u00e2\u20ac\u201d interactive slider widget estimating weekly time savings across 5 task categories with real-time results (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/Ocaml-sample-code": {
-      "features": [
-        "Classical ciphers \u00e2\u20ac\u201d ROT13, Caesar, Vigen\u00c3\u00a8re, XOR, Rail Fence, Atbash with frequency analysis, 22 tests (2026-03-02)"
+        "PromptDebugger — anti-pattern detection, component analysis, clarity scoring, A/B comparison (2026-03-01)"
       ]
     }
-  },
-  "totalRuns": 82
+  }
 }
