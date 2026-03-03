@@ -1,5 +1,15 @@
 ## 2026-03-03
 
+### Feature Builder Run 115 — 7:15 AM PST
+- **Repo:** Vidly
+- **Feature:** Promotional Coupon System
+- **Files:** 14 changed, 1369 insertions
+- **Details:** Coupon model (percentage/fixed discounts, validity dates, usage limits, min order), repository with 5 seed coupons, CouponService with validation & atomic redemption, CouponsController with full CRUD + status filters, checkout form integration with coupon code field, 25 unit tests
+- **Commit:** `8a50674` → pushed to master
+
+### Gardener Run 644 — 7:00 AM PST
+- **Status:** All 16 repos at 29/29 task types — nothing to do. Gardener is fully caught up.
+
 ### Feature Builder Run 114 — 6:45 AM PST
 - **Repo:** BioBots
 - **Feature:** Protocol template library with 8 bioprinting protocols, filtering, cloning, comparison, recommendations, import/export, parameter validation, volume estimation
@@ -49,6 +59,11 @@
 - **Feature:** Adjacency matrix heatmap visualization
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
+
+### Gardener Run #643 — 7:10 AM PST
+- **Vidly** (`security_fix`): Fixed over-posting / mass assignment vulnerability in `CollectionsController.Edit` — form-submitted `Id` was trusted over route parameter. Added `[Bind(Include)]` whitelist, route ID enforcement, server-side timestamps. 7 new security tests (85 total pass). Commit `6e6ab38`.
+- **agenticchat** (`add_tests`): Added 99 tests for 6 previously uncovered modules: Scratchpad (27), PersonaPresets (16), QuickReplies (9), FocusMode (10), ModelSelector (8), FileDropZone (29). Also added DOM elements to test setup. Commit `d0b1940`.
+- **everything** (`open_issue`): Created [#32](https://github.com/sauravbhattacharya001/everything/issues/32) — Levenshtein distance is O(n*m) and inaccurate for long event descriptions in deduplication service; suggests Jaccard token similarity for text > 50 chars.
 
 ### Builder Run #114 — 7:00 AM PST
 - **Ocaml-sample-code:** Probability Monad & Monte Carlo Simulation — sampling monad with bind/return/map/join, 8 distributions (uniform, normal, exponential, poisson, geometric, binomial, bernoulli, discrete), statistics (mean/variance/percentile/CI/histogram), Monte Carlo integration + Pi estimation, Markov chains with stationary distribution, Bayesian rejection sampling, 4 composable programs (dice, random walk, birthday paradox, gambler's ruin). 643 lines, 50+ tests. Commit `899a0d9`.
