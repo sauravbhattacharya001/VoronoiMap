@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-03T12:00:00",
-  "totalRuns": 654,
+  "totalRuns": 655,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -15,8 +15,8 @@
     },
     "security_fix": {
       "weight": 92,
-      "runs": 42,
-      "successes": 42,
+      "runs": 43,
+      "successes": 43,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
@@ -36,8 +36,8 @@
     },
     "add_tests": {
       "weight": 92,
-      "runs": 41,
-      "successes": 46,
+      "runs": 42,
+      "successes": 47,
       "description": "Add meaningful tests",
       "attempts": 2
     },
@@ -685,9 +685,9 @@
       "docs_site"
     ]
   },
-  "notes": "Run 654. getagentbox: replaced setInterval with rAF in Stats (src/index.js), cleaned up Playground (template typing, pendingTimer, patternMap O(1) lookup), filed issue #19 (CommandPalette.render DOM rebuild).",
-  "lastRepo": "getagentbox",
-  "lastRun": "2026-03-03T13:35:00",
+  "notes": "Run 655. prompt: ReDoS protection for PromptRouter regex patterns (2s timeout, pattern validation in AddRoute, SafeIsMatch helper, 8 new security tests).",
+  "lastRepo": "prompt",
+  "lastRun": "2026-03-03T14:05:00",
   "runCount": 14,
   "lastWeightAdjustment": 650,
   "adjustmentHistory": [

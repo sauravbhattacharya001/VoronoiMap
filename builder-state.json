@@ -1,5 +1,5 @@
 {
-  "totalRuns": 131,
+  "totalRuns": 132,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -223,7 +223,8 @@
       "Added adjacency matrix heatmap with edge-type coloring, sortable nodes, zoom/pan, tooltips, and PNG export",
       "Added network resilience analyzer with random/degree/betweenness attack simulation, robustness index, and CSV export",
       "Added bipartite graph analyzer with Hopcroft-Karp maximum matching, König's minimum vertex cover, independent set, 2-coloring, odd cycle detection, 45 tests (2026-03-03)",
-      "Fruchterman-Reingold force-directed layout with repulsive/attractive forces, cooling schedule, gravity, edge-weight awareness, deterministic seeding, convergence detection, quality metrics (crossings, edge length CV, angular resolution, stress), viewport normalization, SVG export, 29 tests (2026-03-03)"
+      "Fruchterman-Reingold force-directed layout with repulsive/attractive forces, cooling schedule, gravity, edge-weight awareness, deterministic seeding, convergence detection, quality metrics (crossings, edge length CV, angular resolution, stress), viewport normalization, SVG export, 29 tests (2026-03-03)",
+      "Eulerian path/circuit analyzer — Hierholzer's O(V+E) algorithm, degree-based classification, edge connectivity via max-flow, Chinese Postman suggestions, report generation, 38 tests (2026-03-03)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",
@@ -249,7 +250,8 @@
       "Added failure mode analysis dashboard with 8 failure classifiers, Pareto chart, root cause parameter stats, co-occurrence matrix, and prevention recommendations (2026-03-03)",
       "Added protocol template library with 8 bioprinting protocols, filtering, cloning, comparison, recommendations, import/export, parameter validation, and volume estimation (2026-03-03)",
       "Added bioink rheology modeler — Power Law / Cross / Herschel-Bulkley viscosity models, nozzle shear rate (Weissenberg-Rabinowitsch correction), Arrhenius temperature-viscosity, printability scoring (4 weighted factors), log-log curve fitting, 6 bioink presets from literature, 73 tests (2026-03-03)",
-      "GCode Analyzer — parse GCode files with extrusion metrics (filament length, volume), movement tracking (print vs travel distance), feedrate stats, retraction analysis, layer breakdown, bounding box, temperature/fan tracking, time estimation, layer summary, GCode comparison with deltas, cost estimation (material + machine + labor + consumables + waste), 60 tests (2026-03-03)"
+      "GCode Analyzer — parse GCode files with extrusion metrics (filament length, volume), movement tracking (print vs travel distance), feedrate stats, retraction analysis, layer breakdown, bounding box, temperature/fan tracking, time estimation, layer summary, GCode comparison with deltas, cost estimation (material + machine + labor + consumables + waste), 60 tests (2026-03-03)",
+      "Cross-linking Kinetics Analyzer — first-order kinetics (degree-of-crosslinking curves, gel point estimation), Hill equation dose-response, bell-shaped viability model (benefit vs quadratic damage, golden-section optimization), therapeutic dose window, 2D response surface (duration x intensity grid with peak detection), photo-initiator efficiency (Beer-Lambert, radical yield), print data analysis with intensity binning and rate constant estimation. 81 tests (2026-03-03)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
