@@ -1,5 +1,9 @@
 ## 2026-03-03
 
+### Gardener Run #658 — 3:00 PM PST
+- **everything** (fix_issue): Fixed #35 — removed invalid static method with dot notation in FreeSlot class (compile error fix)
+- **ai** (bug_fix): Fixed optimizer refinement loop not updating best candidate between steps, making multi-step refinement useless
+
 ### Builder Run #134 — 2:45 PM PST
 - **Repo:** FeedReader | **Feature:** ArticleSummarizer — extractive summarization with TF-IDF sentence scoring, title/position boosting, batch and multi-article digest summary, top keyword extraction, 38 tests
 
@@ -41,6 +45,11 @@
 
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
+
+### Gardener Run #657 — 3:06 PM PST
+- **VoronoiMap**: Fixed Ripley's K estimator denominator (`n*n` → `n*(n-1)`), eliminating systematic downward bias. 2 new tests. Commit `6e853ae`.
+- **FeedReader**: Extracted shared `formatReadingTimeLabel` (4 copies → 1) and `FormatContext` parameter object (8-param signatures → 1 struct) in DigestGenerator. Net -10 lines. Commit `e5ac6c6`.
+- **GraphVisual**: Filed [#30](https://github.com/sauravbhattacharya001/GraphVisual/issues/30) — CliqueAnalyzer unbounded recursion/clique storage can cause StackOverflow/OOM on dense graphs.
 
 ### Builder Run #134 — 2:49 PM PST
 - **Ocaml-sample-code**: CSP solver (`csp.ml`, 532 lines). Backtracking + AC-3 + MRV + LCV + forward checking. Applications: N-Queens, graph coloring, Sudoku. 35 tests. Commit `f239d9b`.

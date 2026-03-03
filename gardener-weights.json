@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-03T14:30:00",
-  "totalRuns": 656,
+  "totalRuns": 657,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 84,
-      "runs": 39,
-      "successes": 39
+      "runs": 41,
+      "successes": 41
     },
     "security_fix": {
       "weight": 92,
@@ -29,8 +29,8 @@
     },
     "refactor": {
       "weight": 83,
-      "runs": 32,
-      "successes": 34,
+      "runs": 33,
+      "successes": 35,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
@@ -64,16 +64,16 @@
     },
     "open_issue": {
       "weight": 76,
-      "runs": 57,
-      "successes": 60,
+      "runs": 58,
+      "successes": 61,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
     },
     "fix_issue": {
       "weight": 75,
-      "runs": 74,
-      "successes": 75,
+      "runs": 75,
+      "successes": 76,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 657. getagentbox: DOM pooling fix for CommandPalette.render() (fixes #19). VoronoiMap: guard against empty vertex lists in SVG rendering + interpolation (vormap_cluster, vormap_heatmap, vormap_interp).",
-  "lastRepo": "VoronoiMap",
-  "lastRun": "2026-03-03T14:30:00",
-  "runCount": 14,
+  "notes": "Run 658. everything: fixed issue #35 (invalid static method syntax in FreeSlot). ai: fixed optimizer refinement loop not updating best candidate between steps.",
+  "lastRepo": "ai",
+  "lastRun": "2026-03-03T15:00:00",
+  "runCount": 15,
   "lastWeightAdjustment": 650,
   "adjustmentHistory": [
     {
