@@ -1,5 +1,5 @@
 {
-  "totalRuns": 119,
+  "totalRuns": 120,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -174,7 +174,9 @@
       "Added habit tracker screen with daily checklist, progress ring, streaks, and 30-day stats",
       "Added daily review screen with day summary, completion stats, mood/energy tracking, star rating, highlights/lowlights, tomorrow preview, 7-day trends, and review streaks (2026-03-03)",
       "Added Pomodoro Timer screen with circular countdown, configurable intervals, phase transitions, daily stats, and streak tracking (2026-03-03)",
-      "Added Goals Tracker with milestones, progress tracking, deadlines, category organization, and overview dashboard (2026-03-03)"
+      "Added Goals Tracker with milestones, progress tracking, deadlines, category organization, and overview dashboard (2026-03-03)",
+      "Added Mood Journal with 5-level mood logging, 14 activity tags, notes, trend charts, activity-mood correlation, streaks, and swipe-to-delete history (2026-03-03)",
+      "Sleep Tracker with bedtime/wake time logging, 5-level quality rating, 12 sleep factors, awakenings count, duration trends, factor-quality correlations, sleep debt calculator, consistency scoring, streak tracking, 14-day bar chart, 42 tests (2026-03-03)"
     ],
     "ai": [
       "Added escape attempt detection system with filesystem, network, process, and code injection monitors",

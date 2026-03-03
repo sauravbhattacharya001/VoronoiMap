@@ -1,5 +1,8 @@
 ## 2026-03-03
 
+### Builder Run 120 — 9:15 AM PST
+- **everything:** Added Mood Journal — 3-tab screen (Log/History/Insights) with 5 mood levels, 14 activity tags, notes, 14-day trend chart, activity-mood correlation analysis, streak tracking, swipe-to-delete history. Model + service + screen + 10 tests.
+
 ### Gardener Run 647 — 9:00 AM PST
 - **everything:** Fixed #32 — replaced Levenshtein (O(n*m)) with token-based Jaccard similarity for descriptions >50 chars. Hybrid `_textSimilarity` auto-selects algorithm by length.
 - **sauravcode:** Fixed #24 — added path containment check in `execute_import()` to prevent `../` traversal outside project directory.
@@ -92,6 +95,9 @@
 - **Feature:** Adjacency matrix heatmap visualization
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
+
+### Builder Run #120 — 9:45 AM PST
+- **everything**: Sleep Tracker — model (SleepEntry, SleepQuality, SleepFactor), service (persistence, trends, debt, consistency, streaks, factor analysis), screen (log/history/insights tabs with duration chart, quality heatmap, factor correlations). 42 tests. Wired into home screen. Commit `687cc11`.
 
 ### Gardener Run #646 — 9:30 AM PST
 - **ai** (`refactor`): Deduplicated inline threat bar chart by extending `drawBarChart()` with `barColors`, `maxValue`, `ySuffix`, `rotateLabels` options. Replaced 75 lines of inline JS with a single function call. Net -33 lines. 2 new tests. 1490 pass. Commit `4847c82`.
