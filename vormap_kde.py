@@ -263,8 +263,9 @@ def find_hotspots(
 ) -> list[Hotspot]:
     """Find local density maxima (hotspots) in the KDE grid.
 
-    A cell is a local maximum if its density exceeds all 8 neighbors
-    and is above the percentile threshold.
+    A cell is a local maximum if its density is greater than or equal
+    to all 8 neighbors (with at least one strict inequality) and is
+    above the percentile threshold.
     """
     if threshold_pct < 0 or threshold_pct > 100:
         raise ValueError("threshold_pct must be 0-100")
@@ -285,15 +286,22 @@ def find_hotspots(
                 continue
 
             is_max = True
+            has_strict = False
             for dr in (-1, 0, 1):
                 for dc in (-1, 0, 1):
                     if dr == 0 and dc == 0:
                         continue
-                    if grid.values[r + dr][c + dc] >= val:
+                    neighbor = grid.values[r + dr][c + dc]
+                    if neighbor > val:
                         is_max = False
                         break
+                    if neighbor < val:
+                        has_strict = True
                 if not is_max:
                     break
+            # Require at least one neighbor strictly less to avoid
+            # marking every cell in a uniform-density region
+            is_max = is_max and has_strict
 
             if is_max:
                 x, y = grid.grid_to_coords(r, c)
