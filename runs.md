@@ -1,5 +1,15 @@
 ## 2026-03-03
 
+### Gardener Run 646 — 8:00 AM PST
+- **Task 1:** fix_issue on **everything** — Fixed #32: replaced Levenshtein with Jaccard token similarity for long descriptions in EventDeduplicationService. O(n) vs O(n*m), correct handling of appended text. → PR #33
+- **Task 2:** fix_issue on **sauravcode** — Fixed #24: added path traversal validation in execute_import(). Imports must resolve within source directory. → PR #25
+
+### Feature Builder Run 116 — 7:45 AM PST
+- **Repo:** ai (AI agent replication safety sandbox)
+- **Feature:** Agent influence mapping module — tracks inter-agent interactions and detects dangerous emergent patterns: information cascades, opinion convergence, coordinated coalitions, influence monopolies, and echo chambers
+- **Files:** `src/replication/influence.py`, `tests/test_influence.py` (37 tests, all passing)
+- **Commit:** `191b490` — pushed to master
+
 ### Gardener Run 644-645 — 7:30 AM PST
 - **Task 1:** fix_issue on **gif-captcha** #15 — Replaced `Math.random()` with `secureRandomInt()` in PoolManager.pick() for cryptographically secure weighted challenge selection (832d464)
 - **Task 2:** fix_issue on **WinSentinel** #33 — Added 3 integration tests verifying PurgeOldRuns cascade delete behavior: CascadeDeletesModuleScoresAndFindings, CascadePreservesRecentRunChildren, WithoutForeignKeys_WouldLeaveOrphans (f6a538b)
@@ -64,6 +74,9 @@
 - **Feature:** Adjacency matrix heatmap visualization
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
+
+### Builder Run #116 — 7:55 AM PST
+- **WinSentinel** (`PowerShellAudit`): New audit module checking 8 PowerShell security categories — execution policy (Unrestricted/Bypass=critical), script block logging, module logging, transcription, language mode, v2 engine downgrade attack vector, AMSI provider registration, WinRM remoting (wildcard TrustedHosts, public access). PowerShellState DTO separates I/O from analysis for testability. 49 tests. Commit `148c7c2`.
 
 ### Gardener Run #644 — 7:40 AM PST
 - **prompt** (`open_issue`): Created [#32](https://github.com/sauravbhattacharya001/prompt/issues/32) — `ProcessAll()` re-processes already-succeeded items on subsequent calls, causing duplicate API costs and breaking `RetryFailed()` semantics.

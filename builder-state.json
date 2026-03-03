@@ -1,5 +1,5 @@
 {
-  "totalRuns": 115,
+  "totalRuns": 117,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -186,7 +186,8 @@
       "Added temporal behavior analysis with time-series monitoring, pattern detection, drift analysis, and predictive modeling",
       "Added deception detection module with honesty testing, consistency analysis, hidden goal inference, and trust scoring",
       "Added agent memory forensics with memory scanning, data flow tracking, information accumulation detection, and privacy analysis",
-      "Added adversarial robustness testing with prompt injection, jailbreak attempts, social engineering, and manipulation resistance scoring"
+      "Added adversarial robustness testing with prompt injection, jailbreak attempts, social engineering, and manipulation resistance scoring",
+      "Added agent influence mapping with cascade detection, convergence analysis, coalition detection, monopoly identification, and echo chamber discovery (2026-03-03)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -254,7 +255,8 @@
       "Added Windows event log analyzer with security event correlation, attack pattern detection, and MITRE ATT&CK mapping",
       "Added clipboard security monitor with sensitive data detection (credit cards, SSN, crypto addresses, private keys, API tokens) and auto-clear",
       "Added Software Inventory Audit - scans installed programs for unsigned executables, PUPs, suspicious locations, outdated software, orphaned installs, software age (2026-03-03)",
-      "Added Certificate Store Audit - scans Windows cert stores for expired/expiring certs, weak algorithms (SHA-1/MD5/MD2), small RSA keys, self-signed in trusted stores. Configurable thresholds. 33 tests (2026-03-03)"
+      "Added Certificate Store Audit - scans Windows cert stores for expired/expiring certs, weak algorithms (SHA-1/MD5/MD2), small RSA keys, self-signed in trusted stores. Configurable thresholds. 33 tests (2026-03-03)",
+      "Added PowerShell Security Audit \u2014 execution policy, script block/module/transcription logging, language mode, v2 engine downgrade, AMSI registration, WinRM remoting exposure. PowerShellState DTO for testable analysis. 49 tests (2026-03-03)"
     ]
   }
 }
