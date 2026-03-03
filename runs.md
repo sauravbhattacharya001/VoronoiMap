@@ -1,5 +1,9 @@
 ## 2026-03-03
 
+### Gardener Run #640-641 — 5:30 AM PST
+- **Task 1:** fix_issue on **ai** — Fixed #17: `_check_safety()` didn't detect `max_replicas=0` violation due to `+1` offset. Added special case for `max_replicas <= 0`. Strengthened test. PR #18.
+- **Task 2:** bug_fix on **getagentbox** — Found var hoisting bug: 7 modules (Calculator, CommandPalette, etc.) were exposed to `window` before their IIFE definitions, making them `undefined`. Moved exposure block after all definitions. PR #18.
+
 ### Builder Run #111 — 5:15 AM PST
 - **Repo:** GraphVisual
 - **Feature:** Network resilience analyzer — simulates random, degree-targeted, and betweenness-targeted node removal attacks. Measures largest connected component, component count, and global efficiency at each step. Computes robustness index R for comparing strategies. UI panel with background analysis (SwingWorker), topology interpretation, and CSV export for degradation curves.
@@ -22,6 +26,11 @@
 - **Feature:** Adjacency matrix heatmap visualization
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
+
+### Gardener Run #640 — 5:55 AM PST
+- **Task 1:** security_fix on `prompt` — Added template injection prevention for PromptChain pipelines. New `sanitize` parameter on `PromptTemplate.Render()` escapes `{{...}}` in variable values. PromptChain enables it by default. Prevents model-output template injection in multi-step chains. 9 new tests. Commit `3e269c8`.
+- **Task 2:** refactor on `everything` — Extracted 144 lines of sample data from DailyReviewScreen (979→892 lines) into `DailyReviewSampleData` class. Removed 2 unused imports. Commit `c35c731`.
+- **Issue:** Opened [#31](https://github.com/sauravbhattacharya001/everything/issues/31) — Extract shared formatting utilities from screen widgets.
 
 ### Gardener Run #639 — 5:30 AM PST
 - **Task 1:** security_fix on `ai` — Enforced root-worker depth=0 invariant in `issue_manifest()` and added defense-in-depth `register_worker()` checks rejecting manifests with depth > max_depth or root with depth ≠ 0. Prevents depth-spoofing attacks where root workers start at arbitrary depths to bypass max_depth controls. 8 new tests (72 total). Commit `298387f`.
