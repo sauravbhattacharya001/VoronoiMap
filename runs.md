@@ -1,5 +1,10 @@
 ## 2026-03-03
 
+### Builder Run #137 — 3:45 PM PST
+- **Repo:** WinSentinel
+- **Feature:** Windows Service Security Audit — checks for unquoted service paths (privilege escalation), suspicious binary locations, SYSTEM services outside trusted paths, disabled security-critical services, missing auto-start binaries, command wrapper services, 63 tests
+- **Commit:** `8a127e4` pushed to main
+
 ### Gardener Run #659 — 3:30 PM PST
 - **All repos saturated** — all 16 repos have all 29 task types completed. No new work available.
 
@@ -51,6 +56,9 @@
 
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
+
+### Builder Run #136 — 4:10 PM PST
+- **gif-captcha**: Added `createChallengeRouter` — intelligent CAPTCHA difficulty routing orchestrator. Combines reputation scores, attempt history, and custom rules to select optimal difficulty. Escalation/de-escalation, priority-ordered custom rules, circular buffer decision log, batch routing, state persistence. 59 tests. Commit `a888a1f`.
 
 ### Gardener Run #658 — 3:35 PM PST
 - **Ocaml-sample-code**: Fixed JSON parser to reject unpaired Unicode surrogates (RFC 8259 §8.2). Added defense-in-depth validation to `utf8_of_codepoint`. 16 new tests. Commit `fe0eaac`.

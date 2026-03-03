@@ -1,5 +1,5 @@
 {
-  "totalRuns": 136,
+  "totalRuns": 137,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -147,7 +147,8 @@
       "Added visual theme system with 6 built-in themes, CSS custom properties, dark mode, and high contrast accessibility mode",
       "Added honeypot and bot behavior detector with multi-signal analysis (honeypots, mouse entropy, keystroke dynamics, page timing, scroll patterns, JS token verification), weighted composite scoring, configurable thresholds, 62 tests (2026-03-03)",
       "HMAC-signed token verifier (createTokenVerifier) for stateless CAPTCHA validation -- HMAC-SHA256 signing, configurable TTL, IP binding, replay protection with bounded LRU nonce tracking, metadata embedding, session manager integration via issueFromSession(). 49 tests (2026-03-03)",
-      "Cross-session IP/device reputation tracker (createReputationTracker) -- score-based reputation with solve/fail/timeout weights, exponential decay, burst detection, allowlist/blocklist, action recommendations, LRU eviction, export/import persistence, metadata tagging. 61 tests (2026-03-03)"
+      "Cross-session IP/device reputation tracker (createReputationTracker) -- score-based reputation with solve/fail/timeout weights, exponential decay, burst detection, allowlist/blocklist, action recommendations, LRU eviction, export/import persistence, metadata tagging. 61 tests (2026-03-03)",
+      "Challenge Router (createChallengeRouter) -- intelligent CAPTCHA difficulty routing orchestrator. Combines reputation scores, attempt history, and custom rules to select optimal difficulty per client. Escalation/de-escalation with configurable thresholds, priority-ordered custom rules, circular buffer decision log, batch routing, state persistence, aggregate stats. 59 tests (2026-03-03)"
     ],
     "prompt": [
       "Added CLI tool for managing and testing prompts from the command line with interactive mode",
@@ -285,7 +286,8 @@
       "Added PowerShell Security Audit — execution policy, script block/module/transcription logging, language mode, v2 engine downgrade, AMSI registration, WinRM remoting exposure. PowerShellState DTO for testable analysis. 49 tests (2026-03-03)",
       "Added DNS Security Audit — DNS server validation, DoH status, LLMNR/NetBIOS exposure, hosts file tampering detection, cache TTL analysis. DnsState DTO for testable analysis. 45 tests (2026-03-03)",
       "Added Scheduled Task Security Audit — suspicious executable paths, encoded commands, persistence triggers (MITRE T1053.005), elevated privilege analysis, hidden task detection. ScheduledTaskState DTO, 44 tests (2026-03-03)",
-      "File Integrity Monitor — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion, 47 tests (2026-03-03)"
+      "File Integrity Monitor — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion, 47 tests (2026-03-03)",
+      "Windows Service Security Audit — unquoted path detection, suspicious binary locations, SYSTEM services outside trusted paths, disabled security-critical services, missing auto-start binaries, command wrapper detection, ServiceState DTO, 63 tests (2026-03-03)"
     ]
   }
 }
