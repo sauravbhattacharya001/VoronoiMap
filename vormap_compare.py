@@ -16,7 +16,6 @@ Usage
     print(result.summary())
 """
 
-import math
 from dataclasses import dataclass, field
 
 from vormap import eudist_pts, validate_output_path

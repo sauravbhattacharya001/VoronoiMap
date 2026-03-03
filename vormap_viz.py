@@ -37,7 +37,6 @@ Usage (CLI):
 import colorsys
 import html as _html_mod
 import math
-import random
 import xml.etree.ElementTree as ET
 
 import vormap

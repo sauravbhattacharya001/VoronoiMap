@@ -50,7 +50,7 @@ import json
 import math
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple, Dict
+from typing import List, Optional, Dict
 
 import vormap
 

@@ -41,7 +41,7 @@ import math
 import csv
 import xml.etree.ElementTree as ET
 
-from vormap import eudist_pts, validate_output_path, validate_input_path
+from vormap import validate_output_path, validate_input_path
 
 try:
     from scipy.spatial import Voronoi as ScipyVoronoi

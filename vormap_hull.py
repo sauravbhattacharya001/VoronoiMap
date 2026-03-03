@@ -41,8 +41,8 @@ CLI::
 
 import json
 import math
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import List, Optional, Tuple
 
 from vormap import validate_output_path
 

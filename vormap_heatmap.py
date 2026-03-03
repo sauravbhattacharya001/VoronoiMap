@@ -21,7 +21,6 @@ CLI::
     voronoimap datauni5.txt 5 --heatmap heatmap.svg --heatmap-metric compactness
 """
 
-import colorsys
 import html as _html_mod
 import json
 import math

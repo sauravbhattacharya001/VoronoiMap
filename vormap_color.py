@@ -32,10 +32,8 @@ Usage (CLI):
 
 import argparse
 import heapq
-import math
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
-from typing import Any
+from dataclasses import dataclass
 
 import vormap
 import vormap_viz

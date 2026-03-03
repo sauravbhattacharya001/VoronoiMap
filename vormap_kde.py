@@ -38,7 +38,7 @@ from __future__ import annotations
 import json
 import math
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import vormap
 

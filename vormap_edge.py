@@ -24,11 +24,6 @@ import xml.etree.ElementTree as ET
 
 import vormap
 
-try:
-    import numpy as np
-    _HAS_NUMPY = True
-except ImportError:
-    _HAS_NUMPY = False
 
 from vormap_viz import compute_regions
 

@@ -34,7 +34,6 @@ Analyses provided
 from __future__ import annotations
 
 import math
-import random as _random
 from collections import namedtuple
 
 from vormap import eudist_pts

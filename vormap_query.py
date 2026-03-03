@@ -21,8 +21,8 @@ from __future__ import annotations
 import json
 import math
 import statistics
-from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from dataclasses import asdict, dataclass
+from typing import Dict, List, Optional, Sequence, Tuple
 
 try:
     from scipy.spatial import cKDTree as KDTree
