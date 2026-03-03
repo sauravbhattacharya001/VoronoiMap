@@ -682,6 +682,8 @@ def export_cluster_svg(result, regions, data, output_path, *,
 
     # Draw regions colored by cluster
     for seed, verts in regions.items():
+        if not verts:
+            continue
         seed_t = tuple(seed) if not isinstance(seed, tuple) else seed
         cid = label_lookup.get(seed_t, -1)
         color = _cluster_color(cid, result.num_clusters)

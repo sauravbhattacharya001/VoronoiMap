@@ -195,6 +195,8 @@ def export_heatmap_svg(
     region_group = ET.SubElement(svg, "g", {"id": "heatmap-regions"})
     for seed in sorted_seeds:
         verts = regions[seed]
+        if not verts:
+            continue
         t = (metrics[seed] - min_val) / val_range
         color = ramp_fn(t)
         points_str = " ".join(
@@ -210,6 +212,8 @@ def export_heatmap_svg(
         label_group = ET.SubElement(svg, "g", {"id": "value-labels"})
         for seed in sorted_seeds:
             verts = regions[seed]
+            if not verts:
+                continue
             cx = sum(v[0] for v in verts) / len(verts)
             cy = sum(v[1] for v in verts) / len(verts)
             val = metrics[seed]

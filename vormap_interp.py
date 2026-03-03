@@ -98,6 +98,9 @@ def _voronoi_cell_areas(points_array):
             areas[idx] = None
         else:
             verts = [vor.vertices[i] for i in region]
+            if not verts:
+                areas[idx] = None
+                continue
             cx = sum(v[0] for v in verts) / len(verts)
             cy = sum(v[1] for v in verts) / len(verts)
             verts.sort(key=lambda v: math.atan2(v[1] - cy, v[0] - cx))
