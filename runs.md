@@ -7,6 +7,9 @@
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
 
+### Builder Run #129 — 12:48 PM PST
+- **gif-captcha**: HMAC-signed token verifier (`createTokenVerifier`) for stateless CAPTCHA validation — HMAC-SHA256 signing, IP binding, replay protection with bounded LRU nonce tracking, configurable TTL & max uses, metadata embedding, session manager integration. 49 tests. Commit `0bf584c`.
+
 ### Gardener Run #652 — 12:35 PM PST
 - **agentlens**: Fixed [#27](https://github.com/sauravbhattacharya001/agentlens/issues/27) — replaced N+1 query in `getEligibleSessions()` with single batch query. All 29 retention tests pass. Commit `bf0e943`.
 - **agentlens**: Added 18 leaderboard tests (7 → 25). Covers sort-by-cost, order overrides, days filtering, response structure, error/success rates, token calculations, rank ordering, limit clamping. Commit `cb50bbf`.
