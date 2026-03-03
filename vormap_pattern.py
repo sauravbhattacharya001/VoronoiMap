@@ -332,7 +332,7 @@ def ripleys_k(points, radii=None, n_radii=20, bounds=None):
                 d_sq = (pts[i][0] - pts[j][0]) ** 2 + (pts[i][1] - pts[j][1]) ** 2
                 if d_sq <= r_sq:
                     count += 1
-        k_r = (area / (n * n)) * count
+        k_r = (area / (n * (n - 1))) * count
         l_r = math.sqrt(k_r / math.pi) - r if k_r >= 0 else -r
         csr_kr = math.pi * r_sq
 

@@ -242,6 +242,30 @@ class TestRipleysK(unittest.TestCase):
         self.assertIsNotNone(result.peak_clustering_r)
         self.assertIsNotNone(result.peak_clustering_l)
 
+    def test_k_uses_n_minus_1_denominator(self):
+        """K estimator must use n*(n-1) not n*n in the denominator.
+
+        For a pair of points distance 1 apart in area 100, at radius 2:
+        count = 2 (both ordered pairs within radius).
+        K(r) = (A / (n*(n-1))) * count = (100 / 2) * 2 = 100.
+        The biased n*n formula would give (100/4) * 2 = 50.
+        """
+        pts = [(0.0, 0.0), (1.0, 0.0)]
+        result = ripleys_k(pts, radii=[2.0])
+        # area ~ bounding box with padding
+        area = result.area
+        expected_k = (area / (2 * 1)) * 2  # n=2, n-1=1, count=2
+        self.assertAlmostEqual(result.k_values[0], round(expected_k, 6), places=2)
+
+    def test_k_small_sample_not_biased(self):
+        """With n=3 equilateral triangle, K should use n*(n-1)=6 not n*n=9."""
+        pts = [(0.0, 0.0), (10.0, 0.0), (5.0, 8.66)]
+        result = ripleys_k(pts, radii=[15.0])
+        area = result.area
+        # All 6 ordered pairs within radius 15
+        expected_k = (area / (3 * 2)) * 6  # = area
+        self.assertAlmostEqual(result.k_values[0], round(expected_k, 6), places=2)
+
 
 class TestQuadratAnalysis(unittest.TestCase):
     """Quadrat (grid cell) analysis."""
