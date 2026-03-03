@@ -1,5 +1,5 @@
 {
-  "totalRuns": 117,
+  "totalRuns": 118,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -199,7 +199,8 @@
       "Added customer loyalty rewards program with points earning, tier progression, rewards redemption, and program analytics",
       "Added barcode scanning integration with Code128/EAN-13 generation, scanner input handling, and batch operations",
       "Added staff scheduling system with shift management, availability tracking, conflict detection, and schedule optimization",
-      "Added promotional coupon system with percentage/fixed discounts, checkout integration, management UI, validation, and 25 tests (2026-03-03)"
+      "Added promotional coupon system with percentage/fixed discounts, checkout integration, management UI, validation, and 25 tests (2026-03-03)",
+      "Added gift card system with balance management, redemption, top-ups, transaction history, balance checker, and 38 tests (2026-03-03)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
@@ -234,7 +235,8 @@
       "Added calibration management with multi-axis tracking, drift detection, auto-calibration routines, and compliance reporting",
       "Added environmental monitoring with temperature, humidity, and pressure tracking, alert thresholds, and compliance logging",
       "Added failure mode analysis dashboard with 8 failure classifiers, Pareto chart, root cause parameter stats, co-occurrence matrix, and prevention recommendations (2026-03-03)",
-      "Added protocol template library with 8 bioprinting protocols, filtering, cloning, comparison, recommendations, import/export, parameter validation, and volume estimation (2026-03-03)"
+      "Added protocol template library with 8 bioprinting protocols, filtering, cloning, comparison, recommendations, import/export, parameter validation, and volume estimation (2026-03-03)",
+      "Added bioink rheology modeler \u2014 Power Law / Cross / Herschel-Bulkley viscosity models, nozzle shear rate (Weissenberg-Rabinowitsch correction), Arrhenius temperature-viscosity, printability scoring (4 weighted factors), log-log curve fitting, 6 bioink presets from literature, 73 tests (2026-03-03)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",

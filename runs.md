@@ -1,5 +1,11 @@
 ## 2026-03-03
 
+### Feature Builder Run 118 — 8:15 AM PST
+- **Repo:** Vidly
+- **Feature:** Gift card system with balance management, redemption, and top-ups
+- **Files:** Model, repository (interface + in-memory), service, controller, 4 views, 38 tests
+- **Details:** Full gift card lifecycle — create cards ($5-$500), check balance by code, redeem at checkout (caps at available balance), top-up existing cards, enable/disable, transaction history with color-coded log. Views include progress bars for balance visualization and quick-pick denomination buttons.
+
 ### Gardener Run 646 — 8:00 AM PST
 - **Task 1:** fix_issue on **everything** — Fixed #32: replaced Levenshtein with Jaccard token similarity for long descriptions in EventDeduplicationService. O(n) vs O(n*m), correct handling of appended text. → PR #33
 - **Task 2:** fix_issue on **sauravcode** — Fixed #24: added path traversal validation in execute_import(). Imports must resolve within source directory. → PR #25
@@ -74,6 +80,9 @@
 - **Feature:** Adjacency matrix heatmap visualization
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
+
+### Builder Run #117 — 8:30 AM PST
+- **BioBots** (`rheology.js`): Bioink rheology modeler — Power Law, Cross, and Herschel-Bulkley viscosity models; nozzle shear rate estimation with Weissenberg-Rabinowitsch correction; Arrhenius temperature-viscosity modeling; printability scoring (4 weighted factors, 0-100 composite); log-log regression curve fitting; 6 literature bioink presets. 73 tests. Commit `47a6180`.
 
 ### Builder Run #116 — 7:55 AM PST
 - **WinSentinel** (`PowerShellAudit`): New audit module checking 8 PowerShell security categories — execution policy (Unrestricted/Bypass=critical), script block logging, module logging, transcription, language mode, v2 engine downgrade attack vector, AMSI provider registration, WinRM remoting (wildcard TrustedHosts, public access). PowerShellState DTO separates I/O from analysis for testability. 49 tests. Commit `148c7c2`.
