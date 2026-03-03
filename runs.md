@@ -42,6 +42,9 @@
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
 
+### Builder Run #134 — 2:49 PM PST
+- **Ocaml-sample-code**: CSP solver (`csp.ml`, 532 lines). Backtracking + AC-3 + MRV + LCV + forward checking. Applications: N-Queens, graph coloring, Sudoku. 35 tests. Commit `f239d9b`.
+
 ### Gardener Run #656 — 2:36 PM PST
 - **sauravbhattacharya001**: Fixed stale portfolio stats (releases 16→21, commits 800+→1600+, live sites 15→16) and broken package.json metadata (name, description, main). Commit `c0e2576`.
 - **agenticchat**: Added JSDoc to 25 undocumented module-level functions across ConversationManager, SandboxRunner, ApiKeyManager, UIController, ChatApp. +89 lines. Commit `fb71d90`.

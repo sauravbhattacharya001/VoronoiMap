@@ -1,5 +1,5 @@
 {
-  "totalRuns": 133,
+  "totalRuns": 134,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -239,7 +239,8 @@
       "ArticleSentimentAnalyzer -- lexicon-based sentiment scoring with negation/intensifier handling, 8-emotion detection, per-sentence breakdown, subjectivity score, 30 tests (2026-03-03)",
       "FeedUpdateScheduler -- adaptive polling that learns feed publishing frequency, back-off/speed-up algorithm, tier classification, per-feed stats, JSON persistence, 41 tests (2026-03-03)",
       "ArticleDeduplicator -- cross-feed duplicate detection using multi-signal fingerprinting (title 3-gram Jaccard, content term overlap, URL domain+path matching), configurable weights/threshold, canonical selection, human-readable grouping reasons, 48 tests (2026-03-03)",
-      "ArticleTrendDetector -- trending topic discovery with time-window keyword frequency tracking, momentum scoring, rising/spike/stable/declining/fading detection, top keywords, topic history, summary, 38 tests (2026-03-03)"
+      "ArticleTrendDetector -- trending topic discovery with time-window keyword frequency tracking, momentum scoring, rising/spike/stable/declining/fading detection, top keywords, topic history, summary, 38 tests (2026-03-03)",
+      "ArticleSummarizer -- extractive TF-IDF summarization with title/position boosting, batch and multi-article digest, top keyword extraction, compression ratio, 38 tests (2026-03-03)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
@@ -267,7 +268,8 @@
       "Probability monad & Monte Carlo simulation -- sampling monad (bind/return/map/join), 8 distributions (uniform/normal/exponential/poisson/geometric/binomial/bernoulli/discrete), statistics (mean/variance/percentile/CI), histogram, Monte Carlo integration + Pi estimation, Markov chains with stationary distribution, Bayesian rejection sampling, 4 composable programs, 50+ tests (2026-03-03)",
       "Relational algebra engine with typed tables, full relational operators (select/project/rename/union/intersect/difference/cross/natural-join/theta-join), aggregates (count/sum/avg/min/max/group-by), pipeline DSL, WHERE clause helpers, functional indexes, pretty-printing, 35 tests (2026-03-03)",
       "Optics module -- lenses, prisms, traversals, optionals, isos with |>> composition, nested record/sum type examples, type conversions, 48 tests (2026-03-03)",
-      "Computational geometry module (geometry.ml) -- point/segment/polygon types, cross/dot product, orientation test, convex hull (Graham scan O(n log n)), point-in-polygon (ray casting O(n)), point-in-convex-polygon (binary search O(log n)), segment intersection, closest pair (divide and conquer O(n log n)), Shoelace area, perimeter, centroid, is_convex, bounding box. 55 tests (2026-03-03)"
+      "Computational geometry module (geometry.ml) -- point/segment/polygon types, cross/dot product, orientation test, convex hull (Graham scan O(n log n)), point-in-polygon (ray casting O(n)), point-in-convex-polygon (binary search O(log n)), segment intersection, closest pair (divide and conquer O(n log n)), Shoelace area, perimeter, centroid, is_convex, bounding box. 55 tests (2026-03-03)",
+      "CSP solver -- constraint satisfaction problems with backtracking search, AC-3 arc consistency, MRV/LCV heuristics, forward checking. Applications: N-Queens, graph coloring, Sudoku. 35 tests (2026-03-03)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
