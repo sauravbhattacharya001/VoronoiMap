@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-03T04:00:00Z",
-  "totalRuns": 625,
+  "lastUpdated": "2026-03-03T04:55:00",
+  "totalRuns": 636,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -10,33 +10,36 @@
     },
     "bug_fix": {
       "weight": 84,
-      "runs": 33,
-      "successes": 33
+      "runs": 34,
+      "successes": 34
     },
     "security_fix": {
       "weight": 90,
-      "runs": 36,
-      "successes": 36,
+      "runs": 38,
+      "successes": 38,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
     "perf_improvement": {
       "weight": 86,
-      "runs": 40,
-      "successes": 41,
-      "totalDone": 1
+      "runs": 41,
+      "successes": 44,
+      "totalDone": 1,
+      "attempts": 2
     },
     "refactor": {
       "weight": 81,
-      "runs": 26,
-      "successes": 26,
-      "description": "Architecture/code refactor"
+      "runs": 29,
+      "successes": 31,
+      "description": "Architecture/code refactor",
+      "attempts": 2
     },
     "add_tests": {
       "weight": 90,
-      "runs": 37,
-      "successes": 40,
-      "description": "Add meaningful tests"
+      "runs": 38,
+      "successes": 43,
+      "description": "Add meaningful tests",
+      "attempts": 2
     },
     "readme_overhaul": {
       "weight": 64,
@@ -47,27 +50,30 @@
     "doc_update": {
       "weight": 84,
       "runs": 30,
-      "successes": 32,
-      "description": "Improve non-README documentation"
+      "successes": 33,
+      "description": "Improve non-README documentation",
+      "attempts": 1
     },
     "code_cleanup": {
       "weight": 78,
       "runs": 30,
-      "successes": 30,
+      "successes": 34,
       "description": "Remove dead code, unused deps",
-      "totalDone": 1
+      "totalDone": 1,
+      "attempts": 4
     },
     "open_issue": {
       "weight": 76,
-      "runs": 44,
-      "successes": 44,
+      "runs": 48,
+      "successes": 51,
       "description": "Open a thoughtful issue",
-      "totalDone": 1
+      "totalDone": 1,
+      "attempts": 3
     },
     "fix_issue": {
       "weight": 85,
-      "runs": 46,
-      "successes": 47,
+      "runs": 50,
+      "successes": 51,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -677,8 +683,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 561. All 16 repos at 29/29 task types. No open Dependabot PRs or issues. Garden fully tended.",
-  "lastRepo": "none",
-  "lastRun": "2026-03-03T04:30:00Z",
-  "runCount": 14
+  "notes": "Run 637. Fixed floyd_warshall negative cycle detection (#14) on Ocaml-sample-code. Opened issue #32 on WinSentinel (AutoRemediator history not persisted). All 16 repos at 29/29.",
+  "lastRepo": "WinSentinel",
+  "lastRun": "2026-03-03T04:55:00",
+  "runCount": 18
 }

@@ -1,85 +1,250 @@
 {
-  "lastRun": "2026-03-02T22:45:00-08:00",
-  "repos": {
-    "sauravbhattacharya001/agenticchat": {
-      "features": [
-        "drag-and-drop file input (2026-03-01)"
-      ]
-    },
-    "sauravbhattacharya001/GraphVisual": {
-      "features": [
-        "SpectralAnalyzer -- eigenvalue-based graph analysis with Jacobi algorithm (2026-03-01)",
-        "RandomWalkAnalyzer -- Monte Carlo random walk stats (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/VoronoiMap": {
-      "features": [
-        "KML export for Google Earth with 6 color schemes (2026-03-01)",
-        "Stability Analysis -- Monte Carlo perturbation, per-cell area CV + topology churn + survival rate, JSON/CSV/SVG export (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/FeedReader": {
-      "features": [
-        "FeedDiscoveryManager -- auto-discover RSS feeds from website URLs (2026-03-01)",
-        "ArticleSimilarityManager -- TF-IDF keyword similarity for related articles (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/sauravcode": {
-      "features": [
-        "Random number builtins: random, random_int, random_choice, random_shuffle (2026-03-01)",
-        "Statistics & Math Builtins: mean, median, stdev, variance, mode, percentile, clamp, lerp, remap (2026-03-02)",
-        "Date Arithmetic Builtins -- date_add, date_diff, date_compare, date_range with unit aliases (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/ai": {
-      "features": [
-        "Contract Templates -- 8 domain-specific replication contract presets (2026-03-01)"
-      ]
-    },
-    "sauravbhattacharya001/Vidly": {
-      "features": [
-        "Data export page -- CSV/JSON download (2026-03-01)",
-        "PricingService -- membership-tier pricing, late fees, billing summary (2026-03-01)"
-      ]
-    },
-    "sauravbhattacharya001/agentlens": {
-      "features": [
-        "Webhook notifications -- configurable webhooks with HMAC signing (2026-03-01)",
-        "Activity Heatmap -- day-of-week x hour-of-day matrix, backend endpoint + dashboard widget + SDK method (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/prompt": {
-      "features": [
-        "PromptDebugger -- anti-pattern detection, clarity scoring (2026-03-01)",
-        "PromptHistory -- execution audit log with search, stats, JSON/CSV export (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/BioBots": {
-      "features": [
-        "Pareto Front Analyzer -- multi-objective trade-off visualization with knee detection (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/gif-captcha": {
-      "features": [
-        "Challenge Pool Manager -- weighted selection, usage tracking, auto-retirement (2026-03-02)",
-        "Response Analyzer -- bot detection via timing/linguistics/duplicates/humanity scoring (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/everything": {
-      "features": [
-        "DailyTimelineService -- chronological day view with gap analysis and conflict detection (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/Ocaml-sample-code": {
-      "features": [
-        "Symbolic Differentiation (calculus.ml) -- expression AST, diff rules, simplification, eval, gradient (2026-03-02)"
-      ]
-    },
-    "sauravbhattacharya001/getagentbox": {
-      "features": [
-        "Interactive chat playground -- type messages, get simulated AI responses with keyword matching (2026-03-02)"
-      ]
-    }
-  },
-  "totalRuns": 92
+  "totalRuns": 110,
+  "repoFeatures": {
+    "getagentbox": [
+      "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
+      "Added testimonials carousel with auto-play and navigation dots",
+      "Added monthly/yearly pricing toggle for billing section",
+      "Added FAQ accordion component with keyboard accessibility",
+      "Added scroll-triggered step animations for How It Works section",
+      "Added animated social proof stat counters with easeOutCubic easing",
+      "Added tabbed Use Cases section with keyboard navigation (dev/student/professional)",
+      "Added integrations grid with category filtering (messaging/productivity/dev/smart-home)",
+      "Added changelog section with tag-based filtering (feature/improvement/fix)",
+      "Added Trust & Privacy expandable detail cards with accordion behavior",
+      "Added product roadmap section with voting, status filters, and localStorage persistence",
+      "Added system status dashboard with service health monitoring, uptime bars, and incident log",
+      "Added sticky navigation bar with scroll spy, mobile hamburger menu, and smooth scrolling",
+      "Added newsletter signup form with email validation, duplicate detection, and localStorage",
+      "Added Time Saved Calculator with interactive sliders and yearly projection",
+      "Added Command Palette (Ctrl+K) for quick section navigation with fuzzy search",
+      "Added floating share button with Twitter/LinkedIn sharing and link copy with toast",
+      "Added dark/light theme toggle with localStorage persistence and keyboard shortcut (T)",
+      "Added scroll progress bar and back-to-top button with smooth scrolling",
+      "Added keyboard shortcuts help dialog (?) with all available shortcuts listed",
+      "Added interactive chat playground with pattern-matched responses and typing indicators"
+    ],
+    "agentlens": [
+      "Added CLI entry point with rich terminal dashboard for trace inspection",
+      "Added trace timeline visualization with color-coded spans and timing bars",
+      "Added JSON and CSV export for trace data with filtering support",
+      "Added real-time trace streaming via WebSocket with live dashboard updates",
+      "Added trace comparison tool for side-by-side analysis of two traces",
+      "Added anomaly detection system with statistical analysis and configurable thresholds",
+      "Added cost tracking and budget alerts with per-model token pricing",
+      "Added trace replay with speed control, step-through, and jump-to-span",
+      "Added performance regression detection comparing traces against historical baselines",
+      "Added natural language trace search using TF-IDF scoring across span names, metadata, and events",
+      "Added trace data retention manager with configurable TTL policies and archive/compress support",
+      "Added Prometheus metrics exporter with /metrics endpoint for trace and span statistics",
+      "Added Grafana dashboard JSON provisioning with 10 pre-built panels for agent observability",
+      "Added custom alerting rules engine with multi-condition support and webhook/email/Slack/PagerDuty notifications",
+      "Added trace diff tool for structural comparison of two traces with detailed change analysis",
+      "Added token usage forecasting with linear regression, EWMA, and budget projections",
+      "Added distributed trace correlation for linking spans across multiple services via trace context propagation",
+      "Added agent behavior pattern mining to detect repeated sequences and behavioral anomalies across traces",
+      "Added multi-format trace export supporting OpenTelemetry (OTLP JSON), Jaeger, Zipkin, Datadog, and Chrome Trace Event formats",
+      "Added trace-driven test generation that creates pytest test cases from captured agent traces",
+      "Added real-time trace streaming dashboard with WebSocket push, auto-reconnect, and live visualization",
+      "Added agent decision flow visualization generating Mermaid flowcharts from trace span hierarchies",
+      "Added SLA compliance monitoring with configurable targets, tracking, violation detection, and trend analysis",
+      "Added trace-powered agent simulation with replay, what-if scenarios, chaos injection, and statistical analysis",
+      "Added inter-agent communication analyzer for message flow tracking, protocol detection, and bottleneck identification",
+      "Added root cause analysis engine with automated error correlation, impact scoring, and fix suggestions",
+      "Added agent capability matrix tracking which tools/models each agent uses with proficiency scoring",
+      "Added trace privacy and compliance module with PII detection, GDPR/HIPAA annotation, and redaction support",
+      "Added agent health scoring system with composite health index, trend tracking, and predictive degradation alerts"
+    ],
+    "VoronoiMap": [
+      "Added interactive mode with click-to-add points and real-time diagram updates",
+      "Added CSV and GeoJSON export for Voronoi regions with area and centroid data",
+      "Added point clustering with adjustable distance threshold for dense datasets",
+      "Added weighted Voronoi diagram support with multiplicative weight model",
+      "Added Voronoi-based nearest facility analysis for spatial optimization",
+      "Added spatial statistics module with nearest-neighbor, Ripley's K, quadrat analysis and Clark-Evans index",
+      "Added Lloyd's relaxation algorithm for iterative Voronoi smoothing with convergence tracking",
+      "Added bounded Voronoi clipping to rectangular/polygonal boundaries with proper edge handling",
+      "Added Voronoi-based spatial interpolation (natural neighbor) for estimating values at arbitrary query points",
+      "Added Delaunay triangulation dual graph extraction with triangle quality metrics and visualization",
+      "Added multi-layer Voronoi overlay for comparing two point sets with intersection analysis and metrics",
+      "Added power diagram (Laguerre\u2013Voronoi) support for circle-weighted tessellation",
+      "Added Voronoi fracture simulation for modeling material crack patterns with stress propagation",
+      "Added point pattern simulation with CSR, clustered (Thomas), and regular (SSI) processes plus L-function analysis",
+      "Added spherical Voronoi tessellation for generating diagrams on a sphere with stereographic projection visualization",
+      "Added k-order Voronoi diagram computation for higher-order spatial partitioning with color-coded visualization",
+      "Added Voronoi-based image stippling that converts images to point art using weighted centroidal tessellation",
+      "Added anisotropic Voronoi diagrams with directional distance metrics and tensor field visualization",
+      "Added multiplicatively-weighted Voronoi 3D support for spatial tessellation with cross-section slicing and STL export",
+      "Added Voronoi graph network analysis with shortest path, minimum spanning tree, betweenness centrality, and community detection",
+      "Added morphological Voronoi analysis for grain boundary detection with grain size distribution and texture metrics",
+      "Added Voronoi-based terrain generation with elevation interpolation, erosion simulation, and 3D mesh export",
+      "Added centroidal Voronoi tessellation (CVT) meshing with density control for FEM-ready adaptive mesh generation"
+    ],
+    "sauravcode": [
+      "Added REPL (Read-Eval-Print Loop) interactive mode for the sauravcode language",
+      "Added syntax highlighting module for sauravcode with terminal (ANSI) and HTML output",
+      "Added a built-in debugger with breakpoints, step-through execution, and variable inspection",
+      "Added string interpolation support with ${expression} syntax inside string literals",
+      "Added array/list data type with bracket syntax, built-in methods (push, pop, length, map, filter), and iteration",
+      "Added module/import system for splitting sauravcode programs across files with dependency resolution",
+      "Added dictionary/map data type with brace syntax, iteration, built-in methods, and destructuring",
+      "Added error handling with try-catch-finally blocks, throw statements, and custom error types",
+      "Added lambda/anonymous function support with arrow syntax, closures, and higher-order function patterns",
+      "Added pattern matching with match expressions, destructuring, guard clauses, and exhaustiveness checking",
+      "Added type system with type annotations, inference, checking, and custom type definitions",
+      "Added async/await concurrency with event loop, promises, sleep, parallel execution, and timeout support",
+      "Added built-in unit testing framework with assertions, test suites, setup/teardown, and CLI runner",
+      "Added pipe operator (|>) for function chaining with partial application and method pipe support",
+      "Added list comprehension syntax with filtering, nested iteration, and pattern destructuring",
+      "Added decorator/annotation system with @decorator syntax for function wrapping, memoization, logging, and type-checking",
+      "Added tuple data type with parenthesis syntax, destructuring, named fields, pattern matching, and spread operator",
+      "Added standard library system with Math, String, IO, Collections, DateTime, Random, and JSON modules",
+      "Added range literals (start..end, start..=end, start..end..step) with lazy iteration and collection operations",
+      "Added enum data type with associated values, methods, pattern matching, iteration, and JSON serialization",
+      "Added operator overloading with custom operators, precedence control, and compound assignment",
+      "Added set data type with brace-pipe syntax, set operations, comprehensions, frozen sets, and pattern matching",
+      "Added trait/interface system with default methods, multiple implementation, trait bounds, and delegation",
+      "Added optional chaining (?.) and null coalescing (??) operators with safe method calls and assignment",
+      "Added string templates with multi-line heredoc syntax, expression interpolation, and custom delimiters"
+    ],
+    "agenticchat": [
+      "Added Markdown rendering support for AI responses with syntax-highlighted code blocks and copy button",
+      "Added conversation export to JSON/Markdown/TXT formats with download functionality",
+      "Added customizable system prompt editor with save/load presets for different AI personas",
+      "Added multi-model provider support with OpenAI, Anthropic, and Google Gemini integration and model selector UI",
+      "Added conversation branching with fork-from-any-message, branch navigator, and independent branch histories",
+      "Added tool/function calling UI with visual tool definitions, execution results, and approval workflow",
+      "Added conversation search with full-text highlighting, result navigation, and keyboard shortcuts",
+      "Added message bookmarking with star/flag system, filterable bookmarks panel, and bookmark export",
+      "Added conversation templates with starter prompts, categorized template gallery, and custom template creation",
+      "Added streaming response controls with pause/resume/stop, speed indicator, and token-level display",
+      "Added voice input with Web Speech API, auto-language detection, continuous mode, and inline transcription editing",
+      "Added file attachment support for images, PDFs, and text files with drag-and-drop, clipboard paste, and inline preview",
+      "Added response rating system with thumbs up/down, detailed feedback form, analytics dashboard, and CSV export",
+      "Added conversation memory/context management with token budget visualization, auto-summarization, and pinned messages",
+      "Added split-view comparison mode for running two models side-by-side with synchronized prompts and diff highlighting",
+      "Added keyboard shortcuts system with 20+ bindings, discoverable overlay (Ctrl+/), and customizable mappings",
+      "Added collaborative multi-user chat with real-time sync, user cursors, presence indicators, and role-based permissions",
+      "Added message threading with inline reply chains, collapsible threads, and thread-aware navigation",
+      "Added prompt version history with diff viewer, rollback, branching, and performance comparison across versions",
+      "Added auto-complete suggestions with slash commands, @mentions, #tags, and fuzzy-matched history search",
+      "Added cost tracking dashboard with per-conversation and per-model token usage, spend alerts, and budget forecasting",
+      "Added accessibility audit and ARIA overhaul with screen reader support, focus management, and WCAG 2.1 AA compliance",
+      "Added real-time collaboration with WebRTC-based P2P sync, shared cursors, conflict resolution, and session management",
+      "MessagePinning -- pin messages to floating bar with jump navigation, localStorage persistence (2026-03-03)",
+      "ReadAloud -- text-to-speech for messages with Web Speech Synthesis API, voice/speed/pitch controls, floating control bar (2026-03-03)"
+    ],
+    "gif-captcha": [
+      "Added difficulty levels (easy/medium/hard) with configurable distortion, speed, and noise parameters",
+      "Added analytics dashboard tracking solve rates, timing, difficulty distribution, and accessibility metrics",
+      "Added audio CAPTCHA alternative with spoken characters, background noise, and speed control for accessibility",
+      "Added GIF CAPTCHA API server with Express.js endpoints for generation, verification, rate limiting, and session management",
+      "Added automated CAPTCHA security testing framework with OCR attacks, timing analysis, brute force, and ML resistance scoring",
+      "Added CAPTCHA localization system with 12-language support, RTL layout, locale-specific character sets, and cultural adaptation",
+      "Added progressive difficulty system with ML-powered risk scoring, behavioral analysis, and adaptive challenge selection",
+      "Added batch CAPTCHA generation CLI with template system, format options, difficulty presets, and manifest export",
+      "Added CAPTCHA performance benchmark suite with rendering speed, memory profiling, network simulation, and cross-browser testing",
+      "Added visual theme system with 6 built-in themes, CSS custom properties, dark mode, and high contrast accessibility mode"
+    ],
+    "prompt": [
+      "Added CLI tool for managing and testing prompts from the command line with interactive mode",
+      "Added prompt versioning system with diff, rollback, branching, and migration support",
+      "Added prompt A/B testing framework with experiment management, statistical analysis, and winner selection",
+      "Added prompt composition system with reusable building blocks, slots, conditional sections, and template inheritance",
+      "Added prompt validation and linting with 12 rules, auto-fix suggestions, and CI/CD integration",
+      "Added prompt analytics and cost estimation with token counting, cost tracking, model comparison, and budget alerts",
+      "Added prompt chain orchestration with multi-step workflows, conditional routing, parallel execution, and retry policies",
+      "Added prompt localization with ICU message format, 9-language support, XLIFF import/export, and pseudo-localization testing",
+      "Added few-shot example management with an example store, similarity search, auto-selection, and A/B testing of example sets",
+      "Added prompt security scanning with injection detection, PII scanning, output validation, and OWASP-aligned threat analysis",
+      "Added structured output enforcement with JSON Schema, XML, CSV, and YAML format validators and auto-repair",
+      "Added prompt caching layer with semantic similarity matching, LRU/TTL eviction, cache warming, and analytics",
+      "Added dynamic prompt optimization with gradient-free tuning, Monte Carlo sampling, and automated prompt rewriting",
+      "Added prompt dependency graph with DAG visualization, impact analysis, circular dependency detection, and topological ordering",
+      "Added prompt playground with side-by-side model comparison, streaming, variable injection, and response diff view"
+    ],
+    "everything": [
+      "Added calendar view with month grid, event dots, and day-tap to filter events",
+      "Added event analytics dashboard with charts for priority, tag, and weekly distributions",
+      "Added activity heatmap screen with GitHub-style contribution grid and streak tracking",
+      "Added daily agenda timeline view with hour markers, now indicator, and day navigation",
+      "Added weekly report screen with visual charts, week navigation, and week-over-week comparison",
+      "Added event countdown screen with live timers, urgency colors, and progress bars",
+      "Added habit tracker screen with daily checklist, progress ring, streaks, and 30-day stats",
+      "Added daily review screen with day summary, completion stats, mood/energy tracking, star rating, highlights/lowlights, tomorrow preview, 7-day trends, and review streaks (2026-03-03)",
+      "Added Pomodoro Timer screen with circular countdown, configurable intervals, phase transitions, daily stats, and streak tracking (2026-03-03)"
+    ],
+    "ai": [
+      "Added escape attempt detection system with filesystem, network, process, and code injection monitors",
+      "Added sandboxed agent communication protocol with message validation, rate limiting, and conversation logging",
+      "Added agent capability assessment framework with 7 test categories, scoring rubrics, and comparative analysis",
+      "Added resource consumption monitor with CPU/memory/disk/network tracking, quotas, anomaly detection, and enforcement",
+      "Added agent genealogy tracker with replication tree visualization, trait inheritance analysis, and mutation detection",
+      "Added multi-agent interaction arena with matchmaking, ELO ratings, tournament modes, and behavioral analysis",
+      "Added temporal behavior analysis with time-series monitoring, pattern detection, drift analysis, and predictive modeling",
+      "Added deception detection module with honesty testing, consistency analysis, hidden goal inference, and trust scoring",
+      "Added agent memory forensics with memory scanning, data flow tracking, information accumulation detection, and privacy analysis",
+      "Added adversarial robustness testing with prompt injection, jailbreak attempts, social engineering, and manipulation resistance scoring"
+    ],
+    "Vidly": [
+      "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
+      "Added customer rental history with timeline view, stats dashboard, and CSV export",
+      "Added movie recommendation engine with genre affinity scoring, collaborative filtering, and personalized suggestions",
+      "Added late fee calculator with grace periods, tiered pricing, loyalty discounts, and batch processing",
+      "Added inventory management dashboard with stock tracking, reorder alerts, and turnover analytics",
+      "Added revenue analytics with daily/monthly/yearly reports, genre breakdown, forecasting, and CSV/chart export",
+      "Added customer loyalty rewards program with points earning, tier progression, rewards redemption, and program analytics",
+      "Added barcode scanning integration with Code128/EAN-13 generation, scanner input handling, and batch operations",
+      "Added staff scheduling system with shift management, availability tracking, conflict detection, and schedule optimization"
+    ],
+    "GraphVisual": [
+      "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
+      "Added graph export to DOT/GraphML/JSON/CSV formats with layout preservation and metadata",
+      "Added community detection with Louvain, Label Propagation, and Girvan-Newman algorithms with modularity scoring",
+      "Added temporal graph animation with timeline slider, keyframe snapshots, and community evolution playback",
+      "Added graph pattern matching with subgraph isomorphism, motif detection, and visual query builder",
+      "Added graph comparison tool with edit distance, spectral similarity, MCS detection, and side-by-side visualization",
+      "Added random graph generators for Erd\u0151s-R\u00e9nyi, Barab\u00e1si-Albert, Watts-Strogatz, and planted partition models",
+      "Added interactive graph filtering with dynamic node/edge visibility, range sliders, and undo/redo support",
+      "Added adjacency matrix heatmap with edge-type coloring, sortable nodes, zoom/pan, tooltips, and PNG export"
+    ],
+    "FeedReader": [
+      "Added offline reading with article caching, read-state tracking, and configurable retention policy",
+      "Added article search with full-text indexing, highlighted results, and search history",
+      "Added OPML import/export for feed subscriptions with drag-and-drop and Files app integration",
+      "Added article sharing with activity sheet, read-later services, and custom share text formatting",
+      "Added feed health monitoring with status tracking, error history, performance metrics, and auto-disable",
+      "Added article text-to-speech with AVSpeechSynthesizer, playback controls, and background audio support",
+      "Added Smart Feed with ML-powered article ranking, reading pattern analysis, and personalized recommendations",
+      "ArticleReadabilityAnalyzer -- Flesch readability scoring, grade level, reading time, difficulty classification, syllable counting (2026-03-03)"
+    ],
+    "BioBots": [
+      "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
+      "Added material usage analytics with per-material tracking, waste calculation, cost estimation, and trend charts",
+      "Added maintenance scheduler with component tracking, predictive maintenance, service history, and alert notifications",
+      "Added print quality scoring with dimensional accuracy, surface finish, bio-compatibility metrics, and trend analysis",
+      "Added experiment log with structured run records, parameter comparison, batch analysis, and CSV/PDF export",
+      "Added calibration management with multi-axis tracking, drift detection, auto-calibration routines, and compliance reporting",
+      "Added environmental monitoring with temperature, humidity, and pressure tracking, alert thresholds, and compliance logging",
+      "Added failure mode analysis dashboard with 8 failure classifiers, Pareto chart, root cause parameter stats, co-occurrence matrix, and prevention recommendations (2026-03-03)"
+    ],
+    "Ocaml-sample-code": [
+      "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
+      "Added property-based testing examples using QCheck with generators, shrinking, and statistical analysis",
+      "Added functional data structures module with persistent red-black trees, finger trees, zippers, and HAMTs with benchmarks",
+      "Added monadic parser combinator library with JSON/CSV/arithmetic parsers, error recovery, and performance benchmarks",
+      "Added OCaml concurrency examples with Lwt, Async patterns, parallel algorithms, and a work-stealing thread pool",
+      "Added DPLL SAT solver with unit propagation, pure literal elimination, backtracking, DIMACS parser, and graph coloring examples",
+      "Hindley-Milner type inference engine (Algorithm W) -- full polymorphic type inference for mini functional language with let-polymorphism, unification, occurs check, pairs (2026-03-03)"
+    ],
+    "WinSentinel": [
+      "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
+      "Added network traffic analyzer with protocol classification, anomaly detection, bandwidth monitoring, and threat intelligence",
+      "Added scheduled security scanning with configurable scan profiles, automated remediation, and compliance reporting",
+      "Added browser extension security scanner with permission analysis, reputation checking, and risk scoring",
+      "Added Windows event log analyzer with security event correlation, attack pattern detection, and MITRE ATT&CK mapping",
+      "Added clipboard security monitor with sensitive data detection (credit cards, SSN, crypto addresses, private keys, API tokens) and auto-clear",
+      "Added Software Inventory Audit - scans installed programs for unsigned executables, PUPs, suspicious locations, outdated software, orphaned installs, software age (2026-03-03)"
+    ]
+  }
 }
