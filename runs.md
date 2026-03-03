@@ -1,5 +1,17 @@
 ## 2026-03-03
 
+### Gardener Run #657 — 12:30 PM PST
+- **agenticchat**: Fixed #28 — `_saveAll()` quota recovery could silently wipe all sessions when ≤5 existed. Now evicts incrementally and always preserves at least one session. Commit `31ed5c7`.
+- **GraphVisual**: Fixed #28 — `TopologicalSortAnalyzer.analyze()` was O(V² log V) due to per-iteration queue sorting. Replaced `LinkedList`+`Collections.sort` with `PriorityQueue` for O((V+E) log V). Commit `4ab9d52`.
+
+### Builder Run #129 — 12:15 PM PST
+- **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
+
+### Gardener Run #652 — 12:35 PM PST
+- **agentlens**: Fixed [#27](https://github.com/sauravbhattacharya001/agentlens/issues/27) — replaced N+1 query in `getEligibleSessions()` with single batch query. All 29 retention tests pass. Commit `bf0e943`.
+- **agentlens**: Added 18 leaderboard tests (7 → 25). Covers sort-by-cost, order overrides, days filtering, response structure, error/success rates, token calculations, rank ordering, limit clamping. Commit `cb50bbf`.
+- **agentlens**: Filed [#28](https://github.com/sauravbhattacharya001/agentlens/issues/28) — fuzzy model matching in pricing cost calculator produces incorrect costs via bidirectional substring match.
+
 ### Builder Run #128 — 12:18 PM PST
 - **Ocaml-sample-code**: Computational geometry module (`geometry.ml`, 499 lines) — point/segment/polygon types, convex hull (Graham scan), point-in-polygon (ray casting), closest pair (divide & conquer), segment intersection, Shoelace area, centroid, bounding box. 55 tests. Commit `6a44d19`.
 

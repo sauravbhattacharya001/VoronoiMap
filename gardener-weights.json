@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-03T12:00:00",
-  "totalRuns": 651,
+  "totalRuns": 652,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -36,8 +36,8 @@
     },
     "add_tests": {
       "weight": 92,
-      "runs": 40,
-      "successes": 45,
+      "runs": 41,
+      "successes": 46,
       "description": "Add meaningful tests",
       "attempts": 2
     },
@@ -64,16 +64,16 @@
     },
     "open_issue": {
       "weight": 76,
-      "runs": 54,
-      "successes": 57,
+      "runs": 55,
+      "successes": 58,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
     },
     "fix_issue": {
       "weight": 75,
-      "runs": 68,
-      "successes": 69,
+      "runs": 71,
+      "successes": 72,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 656. VoronoiMap: fixed #38 - converted recursive Welzl MEC to iterative. prompt: fixed #32 - made ProcessAll() idempotent by skipping completed items.",
-  "lastRepo": "prompt",
-  "lastRun": "2026-03-03T12:00:00",
-  "runCount": 12,
+  "notes": "Run 652. agentlens: fixed #27 (N+1 query), added 18 leaderboard tests, filed #28 (fuzzy pricing bug).",
+  "lastRepo": "agentlens",
+  "lastRun": "2026-03-03T12:35:00",
+  "runCount": 13,
   "lastWeightAdjustment": 650,
   "adjustmentHistory": [
     {
