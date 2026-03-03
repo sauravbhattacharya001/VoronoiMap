@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-03T10:01:00",
-  "totalRuns": 650,
+  "lastUpdated": "2026-03-03T10:50:00",
+  "totalRuns": 653,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 84,
-      "runs": 35,
-      "successes": 35
+      "runs": 36,
+      "successes": 36
     },
     "security_fix": {
       "weight": 92,
@@ -49,15 +49,15 @@
     },
     "doc_update": {
       "weight": 84,
-      "runs": 30,
-      "successes": 33,
+      "runs": 31,
+      "successes": 34,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
       "weight": 78,
-      "runs": 31,
-      "successes": 35,
+      "runs": 32,
+      "successes": 36,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
@@ -72,8 +72,8 @@
     },
     "fix_issue": {
       "weight": 75,
-      "runs": 65,
-      "successes": 66,
+      "runs": 66,
+      "successes": 67,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 650-651. GraphVisual: fixed #28 (TopologicalSortAnalyzer O(V\u00b2 log V) \u2192 O((V+E) log V) via PriorityQueue, PR #29). prompt: fixed #32 (ProcessAll() idempotency, PR #34).",
-  "lastRepo": "prompt",
-  "lastRun": "2026-03-03T10:01:00",
-  "runCount": 8,
+  "notes": "Run 651. everything: wellness services docs page. VoronoiMap: removed 22 unused imports across 13 files.",
+  "lastRepo": "VoronoiMap",
+  "lastRun": "2026-03-03T10:50:00",
+  "runCount": 10,
   "lastWeightAdjustment": 650,
   "adjustmentHistory": [
     {

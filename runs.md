@@ -1,5 +1,13 @@
 ## 2026-03-03
 
+### Gardener Run #651 — 10:50 AM PST
+- **everything**: doc_update — created `docs/api-wellness.html` documenting 6 wellness/productivity services (SleepTracker, MoodJournal, HabitTracker, GoalTracker, Pomodoro, DailyReview). Updated sidebar nav in all 9 existing docs pages + index card. Commit `b62ea07`.
+- **VoronoiMap**: code_cleanup — removed 22 unused imports across 13 source files using AST analysis. Includes dead numpy try/except block, unused typing aliases, dead math/random/colorsys imports. All 1259 tests pass. Commit `a638f66`.
+
+### Gardener Run #652-653 — 10:30 AM PST
+- **agenticchat**: Fixed #28 — `SessionManager._saveAll` quota recovery could silently wipe all sessions. Changed `_evictOldest` to always keep ≥1 session, and `_saveAll` to evict incrementally (1 at a time) instead of bulk-evicting 5. [PR #41](https://github.com/sauravbhattacharya001/agenticchat/pull/41)
+- **VoronoiMap**: Fixed KDE hotspot detection bug — `find_hotspots()` used strict inequality for neighbor comparison, causing plateau-top density peaks to be silently missed. Changed to allow equal-density neighbors with at least one strict inequality. [PR #39](https://github.com/sauravbhattacharya001/VoronoiMap/pull/39)
+
 ### Builder Run #122 — 10:15 AM PST
 - **Ocaml-sample-code**: Added optics module — lenses, prisms, traversals, optionals, and isos with `|>>` composition. Nested record examples (company/person/address), sum type prisms (shapes), iso examples (celsius↔fahrenheit, string↔chars). 48 tests. Pushed to master.
 
