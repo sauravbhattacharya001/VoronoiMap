@@ -1,5 +1,5 @@
 {
-  "totalRuns": 110,
+  "totalRuns": 111,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -206,7 +206,8 @@
       "Added graph comparison tool with edit distance, spectral similarity, MCS detection, and side-by-side visualization",
       "Added random graph generators for Erd\u0151s-R\u00e9nyi, Barab\u00e1si-Albert, Watts-Strogatz, and planted partition models",
       "Added interactive graph filtering with dynamic node/edge visibility, range sliders, and undo/redo support",
-      "Added adjacency matrix heatmap with edge-type coloring, sortable nodes, zoom/pan, tooltips, and PNG export"
+      "Added adjacency matrix heatmap with edge-type coloring, sortable nodes, zoom/pan, tooltips, and PNG export",
+      "Added network resilience analyzer with random/degree/betweenness attack simulation, robustness index, and CSV export"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",
@@ -216,7 +217,8 @@
       "Added feed health monitoring with status tracking, error history, performance metrics, and auto-disable",
       "Added article text-to-speech with AVSpeechSynthesizer, playback controls, and background audio support",
       "Added Smart Feed with ML-powered article ranking, reading pattern analysis, and personalized recommendations",
-      "ArticleReadabilityAnalyzer -- Flesch readability scoring, grade level, reading time, difficulty classification, syllable counting (2026-03-03)"
+      "ArticleReadabilityAnalyzer -- Flesch readability scoring, grade level, reading time, difficulty classification, syllable counting (2026-03-03)",
+      "ArticleSentimentAnalyzer -- lexicon-based sentiment scoring with negation/intensifier handling, 8-emotion detection, per-sentence breakdown, subjectivity score, 30 tests (2026-03-03)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
