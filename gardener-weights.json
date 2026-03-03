@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-03T09:00:00",
-  "totalRuns": 646,
+  "totalRuns": 649,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -22,8 +22,8 @@
     },
     "perf_improvement": {
       "weight": 86,
-      "runs": 41,
-      "successes": 44,
+      "runs": 42,
+      "successes": 45,
       "totalDone": 1,
       "attempts": 2
     },
@@ -64,8 +64,8 @@
     },
     "open_issue": {
       "weight": 76,
-      "runs": 52,
-      "successes": 55,
+      "runs": 53,
+      "successes": 56,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -78,7 +78,7 @@
     },
     "merge_dependabot": {
       "weight": 94,
-      "runs": 19,
+      "runs": 20,
       "successes": 19,
       "description": "Review and merge open Dependabot PRs \u00e2\u20ac\u201d PRIORITY: 60+ PRs waiting across all repos"
     },
@@ -370,7 +370,8 @@
       "docs_site",
       "code_cleanup",
       "add_badges",
-      "refactor"
+      "refactor",
+      "open_issue"
     ],
     "ai": [
       "add_ci_cd",
@@ -618,7 +619,8 @@
       "add_codeql",
       "add_license",
       "package_publish",
-      "docs_site"
+      "docs_site",
+      "perf_improvement"
     ],
     "getagentbox": [
       "setup_copilot_agent",
