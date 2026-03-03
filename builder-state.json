@@ -1,5 +1,5 @@
 {
-  "totalRuns": 124,
+  "totalRuns": 126,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -67,7 +67,7 @@
       "Added Voronoi-based spatial interpolation (natural neighbor) for estimating values at arbitrary query points",
       "Added Delaunay triangulation dual graph extraction with triangle quality metrics and visualization",
       "Added multi-layer Voronoi overlay for comparing two point sets with intersection analysis and metrics",
-      "Added power diagram (Laguerre\u2013Voronoi) support for circle-weighted tessellation",
+      "Added power diagram (Laguerre–Voronoi) support for circle-weighted tessellation",
       "Added Voronoi fracture simulation for modeling material crack patterns with stress propagation",
       "Added point pattern simulation with CSR, clustered (Thomas), and regular (SSI) processes plus L-function analysis",
       "Added spherical Voronoi tessellation for generating diagrams on a sphere with stereographic projection visualization",
@@ -189,7 +189,8 @@
       "Added deception detection module with honesty testing, consistency analysis, hidden goal inference, and trust scoring",
       "Added agent memory forensics with memory scanning, data flow tracking, information accumulation detection, and privacy analysis",
       "Added adversarial robustness testing with prompt injection, jailbreak attempts, social engineering, and manipulation resistance scoring",
-      "Added agent influence mapping with cascade detection, convergence analysis, coalition detection, monopoly identification, and echo chamber discovery (2026-03-03)"
+      "Added agent influence mapping with cascade detection, convergence analysis, coalition detection, monopoly identification, and echo chamber discovery (2026-03-03)",
+      "Added agent alignment drift monitor with value tracking, priority ordering (Kendall tau), reward hacking detection, composite scoring, 3 spec presets, 54 tests (2026-03-03)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -211,11 +212,11 @@
       "Added temporal graph animation with timeline slider, keyframe snapshots, and community evolution playback",
       "Added graph pattern matching with subgraph isomorphism, motif detection, and visual query builder",
       "Added graph comparison tool with edit distance, spectral similarity, MCS detection, and side-by-side visualization",
-      "Added random graph generators for Erd\u0151s-R\u00e9nyi, Barab\u00e1si-Albert, Watts-Strogatz, and planted partition models",
+      "Added random graph generators for Erdős-Rényi, Barabási-Albert, Watts-Strogatz, and planted partition models",
       "Added interactive graph filtering with dynamic node/edge visibility, range sliders, and undo/redo support",
       "Added adjacency matrix heatmap with edge-type coloring, sortable nodes, zoom/pan, tooltips, and PNG export",
       "Added network resilience analyzer with random/degree/betweenness attack simulation, robustness index, and CSV export",
-      "Added bipartite graph analyzer with Hopcroft-Karp maximum matching, K\u00f6nig's minimum vertex cover, independent set, 2-coloring, odd cycle detection, 45 tests (2026-03-03)",
+      "Added bipartite graph analyzer with Hopcroft-Karp maximum matching, König's minimum vertex cover, independent set, 2-coloring, odd cycle detection, 45 tests (2026-03-03)",
       "Fruchterman-Reingold force-directed layout with repulsive/attractive forces, cooling schedule, gravity, edge-weight awareness, deterministic seeding, convergence detection, quality metrics (crossings, edge length CV, angular resolution, stress), viewport normalization, SVG export, 29 tests (2026-03-03)"
     ],
     "FeedReader": [
@@ -241,7 +242,8 @@
       "Added environmental monitoring with temperature, humidity, and pressure tracking, alert thresholds, and compliance logging",
       "Added failure mode analysis dashboard with 8 failure classifiers, Pareto chart, root cause parameter stats, co-occurrence matrix, and prevention recommendations (2026-03-03)",
       "Added protocol template library with 8 bioprinting protocols, filtering, cloning, comparison, recommendations, import/export, parameter validation, and volume estimation (2026-03-03)",
-      "Added bioink rheology modeler \u2014 Power Law / Cross / Herschel-Bulkley viscosity models, nozzle shear rate (Weissenberg-Rabinowitsch correction), Arrhenius temperature-viscosity, printability scoring (4 weighted factors), log-log curve fitting, 6 bioink presets from literature, 73 tests (2026-03-03)"
+      "Added bioink rheology modeler — Power Law / Cross / Herschel-Bulkley viscosity models, nozzle shear rate (Weissenberg-Rabinowitsch correction), Arrhenius temperature-viscosity, printability scoring (4 weighted factors), log-log curve fitting, 6 bioink presets from literature, 73 tests (2026-03-03)",
+      "GCode Analyzer — parse GCode files with extrusion metrics (filament length, volume), movement tracking (print vs travel distance), feedrate stats, retraction analysis, layer breakdown, bounding box, temperature/fan tracking, time estimation, layer summary, GCode comparison with deltas, cost estimation (material + machine + labor + consumables + waste), 60 tests (2026-03-03)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -265,9 +267,9 @@
       "Added clipboard security monitor with sensitive data detection (credit cards, SSN, crypto addresses, private keys, API tokens) and auto-clear",
       "Added Software Inventory Audit - scans installed programs for unsigned executables, PUPs, suspicious locations, outdated software, orphaned installs, software age (2026-03-03)",
       "Added Certificate Store Audit - scans Windows cert stores for expired/expiring certs, weak algorithms (SHA-1/MD5/MD2), small RSA keys, self-signed in trusted stores. Configurable thresholds. 33 tests (2026-03-03)",
-      "Added PowerShell Security Audit \u2014 execution policy, script block/module/transcription logging, language mode, v2 engine downgrade, AMSI registration, WinRM remoting exposure. PowerShellState DTO for testable analysis. 49 tests (2026-03-03)",
-      "Added DNS Security Audit \u2014 DNS server validation, DoH status, LLMNR/NetBIOS exposure, hosts file tampering detection, cache TTL analysis. DnsState DTO for testable analysis. 45 tests (2026-03-03)",
-      "Added Scheduled Task Security Audit \u2014 suspicious executable paths, encoded commands, persistence triggers (MITRE T1053.005), elevated privilege analysis, hidden task detection. ScheduledTaskState DTO, 44 tests (2026-03-03)"
+      "Added PowerShell Security Audit — execution policy, script block/module/transcription logging, language mode, v2 engine downgrade, AMSI registration, WinRM remoting exposure. PowerShellState DTO for testable analysis. 49 tests (2026-03-03)",
+      "Added DNS Security Audit — DNS server validation, DoH status, LLMNR/NetBIOS exposure, hosts file tampering detection, cache TTL analysis. DnsState DTO for testable analysis. 45 tests (2026-03-03)",
+      "Added Scheduled Task Security Audit — suspicious executable paths, encoded commands, persistence triggers (MITRE T1053.005), elevated privilege analysis, hidden task detection. ScheduledTaskState DTO, 44 tests (2026-03-03)"
     ]
   }
 }
