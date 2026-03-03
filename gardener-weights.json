@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-03T12:00:00",
-  "totalRuns": 653,
+  "totalRuns": 654,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -22,8 +22,8 @@
     },
     "perf_improvement": {
       "weight": 88,
-      "runs": 42,
-      "successes": 45,
+      "runs": 43,
+      "successes": 46,
       "totalDone": 1,
       "attempts": 2
     },
@@ -56,16 +56,16 @@
     },
     "code_cleanup": {
       "weight": 78,
-      "runs": 33,
-      "successes": 37,
+      "runs": 34,
+      "successes": 38,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 76,
-      "runs": 55,
-      "successes": 58,
+      "runs": 56,
+      "successes": 59,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -685,9 +685,9 @@
       "docs_site"
     ]
   },
-  "notes": "Run 653. agenticchat: fixed /reactions slash command bug (called HistoryPanel.toggle instead of MessageReactions.decorateMessages), updated docs (17->29 modules, added 12 missing module descriptions + 6 feature cards).",
-  "lastRepo": "agenticchat",
-  "lastRun": "2026-03-03T13:05:00",
+  "notes": "Run 654. getagentbox: replaced setInterval with rAF in Stats (src/index.js), cleaned up Playground (template typing, pendingTimer, patternMap O(1) lookup), filed issue #19 (CommandPalette.render DOM rebuild).",
+  "lastRepo": "getagentbox",
+  "lastRun": "2026-03-03T13:35:00",
   "runCount": 14,
   "lastWeightAdjustment": 650,
   "adjustmentHistory": [
