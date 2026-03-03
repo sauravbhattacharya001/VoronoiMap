@@ -1,5 +1,11 @@
 ## 2026-03-03
 
+### Builder Run #112 — 5:45 AM PST
+- **Repo:** everything (Flutter events/calendar app)
+- **Feature:** Goals Tracker — full goal management screen with milestones, progress tracking, deadlines, and category organization
+- **Files:** `models/goal.dart`, `services/goal_tracker_service.dart`, `views/home/goals_screen.dart`, updated `home_screen.dart`
+- **Commit:** `7f1e50d` — pushed to master
+
 ### Gardener Run #640-641 — 5:30 AM PST
 - **Task 1:** fix_issue on **ai** — Fixed #17: `_check_safety()` didn't detect `max_replicas=0` violation due to `+1` offset. Added special case for `max_replicas <= 0`. Strengthened test. PR #18.
 - **Task 2:** bug_fix on **getagentbox** — Found var hoisting bug: 7 modules (Calculator, CommandPalette, etc.) were exposed to `window` before their IIFE definitions, making them `undefined`. Moved exposure block after all definitions. PR #18.
@@ -26,6 +32,9 @@
 - **Feature:** Adjacency matrix heatmap visualization
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
+
+### Builder Run #112 — 6:00 AM PST
+- **FeedReader:** Adaptive Feed Update Scheduler — intelligent polling that learns each feed's publishing frequency. Back-off (×1.5) for empty checks, speed-up (÷2-3) for active feeds. 6 update tiers (Realtime→Dormant). Per-feed stats, JSON persistence, manual overrides, pruning. 369 lines + 419 lines tests (41 tests). Commit `0aa73fe`.
 
 ### Gardener Run #640 — 5:55 AM PST
 - **Task 1:** security_fix on `prompt` — Added template injection prevention for PromptChain pipelines. New `sanitize` parameter on `PromptTemplate.Render()` escapes `{{...}}` in variable values. PromptChain enables it by default. Prevents model-output template injection in multi-step chains. 9 new tests. Commit `3e269c8`.
