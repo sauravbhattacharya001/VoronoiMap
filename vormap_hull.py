@@ -500,21 +500,35 @@ def _welzl(pts: list, boundary: list) -> tuple:
     """Welzl's algorithm (iterative with explicit stack to avoid recursion depth)."""
     import random as _rand
 
-    # Shuffle for expected linear time
+    # Shuffle once at the top level for expected linear time
     pts = list(pts)
     _rand.shuffle(pts)
 
-    circ = (0.0, 0.0, 0.0)
-    if len(boundary) == 1:
-        circ = _circle_from_1(boundary[0])
-    elif len(boundary) == 2:
-        circ = _circle_from_2(boundary[0], boundary[1])
-    elif len(boundary) >= 3:
-        circ = _circle_from_3(boundary[0], boundary[1], boundary[2])
+    def _make_circle(bnd):
+        if len(bnd) == 0:
+            return (0.0, 0.0, 0.0)
+        elif len(bnd) == 1:
+            return _circle_from_1(bnd[0])
+        elif len(bnd) == 2:
+            return _circle_from_2(bnd[0], bnd[1])
+        else:
+            return _circle_from_3(bnd[0], bnd[1], bnd[2])
 
-    for i, p in enumerate(pts):
-        if not _in_circle(circ, p):
-            circ = _welzl(pts[:i], boundary + [p])
+    n = len(pts)
+    # Explicit stack frames: (index, boundary, circle_so_far)
+    # We process points 0..n-1; at each point we either keep the
+    # current circle or restart from scratch with the point on boundary.
+    circ = _make_circle(boundary)
+    for i in range(n):
+        if not _in_circle(circ, pts[i]):
+            # Restart with pts[i] added to boundary, considering only pts[0..i-1]
+            circ = _make_circle(boundary + [pts[i]])
+            for j in range(i):
+                if not _in_circle(circ, pts[j]):
+                    circ = _make_circle(boundary + [pts[i], pts[j]])
+                    for k in range(j):
+                        if not _in_circle(circ, pts[k]):
+                            circ = _circle_from_3(pts[i], pts[j], pts[k])
 
     return circ
 
