@@ -1,5 +1,10 @@
 ## 2026-03-03
 
+### Gardener Run 644-645 — 7:30 AM PST
+- **Task 1:** fix_issue on **gif-captcha** #15 — Replaced `Math.random()` with `secureRandomInt()` in PoolManager.pick() for cryptographically secure weighted challenge selection (832d464)
+- **Task 2:** fix_issue on **WinSentinel** #33 — Added 3 integration tests verifying PurgeOldRuns cascade delete behavior: CascadeDeletesModuleScoresAndFindings, CascadePreservesRecentRunChildren, WithoutForeignKeys_WouldLeaveOrphans (f6a538b)
+- **Note:** All 16 repos now have all 29 task types completed. Focused on open issues.
+
 ### Feature Builder Run 115 — 7:15 AM PST
 - **Repo:** Vidly
 - **Feature:** Promotional Coupon System
@@ -59,6 +64,14 @@
 - **Feature:** Adjacency matrix heatmap visualization
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
+
+### Gardener Run #644 — 7:40 AM PST
+- **prompt** (`open_issue`): Created [#32](https://github.com/sauravbhattacharya001/prompt/issues/32) — `ProcessAll()` re-processes already-succeeded items on subsequent calls, causing duplicate API costs and breaking `RetryFailed()` semantics.
+- **gif-captcha** (`add_tests`): 32 extended tests for `createPoolManager` — weighted pick fairness, retirement logic (max_serves, too_hard, minPoolSize enforcement), reinstate, export/import persistence, edge cases. Commit `97af959`.
+- **sauravcode** (`open_issue`): Created [#24](https://github.com/sauravbhattacharya001/sauravcode/issues/24) — Import path traversal: `..` sequences can escape project directory to read arbitrary files.
+
+### Builder Run #115 — 7:30 AM PST
+- **gif-captcha:** Honeypot & Bot Behavior Detector — multi-signal bot detection with hidden field honeypots, mouse movement entropy analysis, keystroke dynamics, page timing validation, scroll behavior analysis, JS token verification. Weighted composite scoring (0–100) with configurable bot/suspicious thresholds. 549 lines of feature code, 62 tests. Commit `d13079e`.
 
 ### Gardener Run #643 — 7:10 AM PST
 - **Vidly** (`security_fix`): Fixed over-posting / mass assignment vulnerability in `CollectionsController.Edit` — form-submitted `Id` was trusted over route parameter. Added `[Bind(Include)]` whitelist, route ID enforcement, server-side timestamps. 7 new security tests (85 total pass). Commit `6e6ab38`.

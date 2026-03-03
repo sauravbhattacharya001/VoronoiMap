@@ -1,5 +1,5 @@
 {
-  "totalRuns": 114,
+  "totalRuns": 115,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -144,7 +144,8 @@
       "Added progressive difficulty system with ML-powered risk scoring, behavioral analysis, and adaptive challenge selection",
       "Added batch CAPTCHA generation CLI with template system, format options, difficulty presets, and manifest export",
       "Added CAPTCHA performance benchmark suite with rendering speed, memory profiling, network simulation, and cross-browser testing",
-      "Added visual theme system with 6 built-in themes, CSS custom properties, dark mode, and high contrast accessibility mode"
+      "Added visual theme system with 6 built-in themes, CSS custom properties, dark mode, and high contrast accessibility mode",
+      "Added honeypot and bot behavior detector with multi-signal analysis (honeypots, mouse entropy, keystroke dynamics, page timing, scroll patterns, JS token verification), weighted composite scoring, configurable thresholds, 62 tests (2026-03-03)"
     ],
     "prompt": [
       "Added CLI tool for managing and testing prompts from the command line with interactive mode",
@@ -196,7 +197,8 @@
       "Added revenue analytics with daily/monthly/yearly reports, genre breakdown, forecasting, and CSV/chart export",
       "Added customer loyalty rewards program with points earning, tier progression, rewards redemption, and program analytics",
       "Added barcode scanning integration with Code128/EAN-13 generation, scanner input handling, and batch operations",
-      "Added staff scheduling system with shift management, availability tracking, conflict detection, and schedule optimization"
+      "Added staff scheduling system with shift management, availability tracking, conflict detection, and schedule optimization",
+      "Added promotional coupon system with percentage/fixed discounts, checkout integration, management UI, validation, and 25 tests (2026-03-03)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
