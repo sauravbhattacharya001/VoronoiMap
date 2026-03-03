@@ -1,5 +1,18 @@
 ## 2026-03-03
 
+### Builder Run #125 — 11:15 AM PST
+- **Repo:** ai (sauravbhattacharya001/ai)
+- **Feature:** Agent alignment drift monitor — tracks value alignment across replication generations with objective consistency analysis, priority ordering shifts (Kendall tau), reward hacking detection, composite scoring (0-100 with letter grades), 3 spec presets (default/strict/permissive), CLI with demo mode
+- **Tests:** 54 passing
+- **Commit:** fce8775
+
+### Gardener Run #654 — 11:00 AM PST
+- **Result:** All 16 repos have all 29 task types completed. No tasks to execute. The gardener has finished tending every repo.
+
+### Gardener Run #652 — 11:35 AM PST
+- **Vidly**: code_cleanup — removed 3 dead methods from MovieSimilarityService (BuildCoRentalIndex, GetUniqueRenters, legacy BuildCoRentalFromIndex overload). Migrated 5 tests to use index-based API. Net -41 lines. Commit `c8c1f77`.
+- **gif-captcha**: add_tests — 37 integration tests across 7 pipeline scenarios (challenge→pool, challenge→session, pool→security scorer, setAnalyzer→calibrator, responseAnalyzer+botDetector, attemptTracker, full end-to-end). Commit `ce77681`.
+
 ### Builder Run #124 — 10:55 AM PST
 - **FeedReader**: Added `ArticleDeduplicator` — cross-feed duplicate detection engine using multi-signal fingerprinting (title 3-gram Jaccard, content term frequency overlap, URL domain+path matching). Configurable weights (45/35/20%), threshold, n-gram size. Groups duplicates with confidence scores and human-readable reasons. Canonical selection prefers earliest-indexed article. 48 tests. Commit `b90e54b`.
 
