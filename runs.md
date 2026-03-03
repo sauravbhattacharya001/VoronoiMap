@@ -1,7 +1,20 @@
 ## 2026-03-03
 
+### Builder Run #122 — 10:15 AM PST
+- **Ocaml-sample-code**: Added optics module — lenses, prisms, traversals, optionals, and isos with `|>>` composition. Nested record examples (company/person/address), sum type prisms (shapes), iso examples (celsius↔fahrenheit, string↔chars). 48 tests. Pushed to master.
+
+### Gardener Run — 10:01 AM PST
+- **Task 1:** fix_issue on **GraphVisual** — Fixed #28: TopologicalSortAnalyzer.analyze() perf regression O(V² log V) → O((V+E) log V). Replaced LinkedList+sort loop with PriorityQueue. Also fixed same pattern in countChoicePoints(). PR #29.
+- **Task 2:** fix_issue on **prompt** — Fixed #32: ProcessAll() re-processing succeeded items. Added status check to skip completed items, making it idempotent. Added 2 tests. PR #34.
+
 ### Builder Run #121 — 9:45 AM PST
 - **GraphVisual**: Added BipartiteAnalyzer — bipartiteness detection via BFS 2-coloring, Hopcroft-Karp maximum matching (O(E√V)), König's theorem minimum vertex cover, maximum independent set, odd cycle witness, partition analytics. 45 tests. Commit `b99f763`.
+
+### Gardener Run #650 — 10:05 AM PST
+- **VoronoiMap**: Security fix — added `validate_output_path()` to hull, nndist, and interp export functions (5 files, 10 new tests). Commit `390e062`.
+- **VoronoiMap**: Opened [#38](https://github.com/sauravbhattacharya001/VoronoiMap/issues/38) — Welzl MEC recursive despite docstring claiming iterative.
+- **Vidly**: Refactor — extracted `SimpleJsonSerialize` from ExportController into `JsonSerializer` utility class. Fixed pre-existing CouponsController build error. 27 new tests. Commit `da8bb97`.
+- **Weight adjustment** at run 650: lowered merge_dependabot (94→72), fix_issue (80→75); boosted security_fix, add_tests, refactor, perf_improvement.
 
 ### Builder Run #121 — 9:48 AM PST
 - **GraphVisual**: Fruchterman-Reingold force-directed layout — repulsive/attractive forces, cooling schedule, gravity, edge-weight awareness, deterministic seeding, convergence detection, quality metrics (edge crossings, length uniformity, angular resolution, stress), viewport normalization, SVG export. 29 tests. Commit `bd7fa26`.

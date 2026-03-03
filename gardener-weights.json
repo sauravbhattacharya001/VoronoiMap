@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-03T09:00:00",
-  "totalRuns": 649,
+  "lastUpdated": "2026-03-03T10:01:00",
+  "totalRuns": 650,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -14,28 +14,28 @@
       "successes": 35
     },
     "security_fix": {
-      "weight": 90,
+      "weight": 92,
       "runs": 41,
       "successes": 41,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
     "perf_improvement": {
-      "weight": 86,
+      "weight": 88,
       "runs": 42,
       "successes": 45,
       "totalDone": 1,
       "attempts": 2
     },
     "refactor": {
-      "weight": 81,
+      "weight": 83,
       "runs": 31,
       "successes": 33,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
     "add_tests": {
-      "weight": 90,
+      "weight": 92,
       "runs": 39,
       "successes": 44,
       "description": "Add meaningful tests",
@@ -71,13 +71,13 @@
       "attempts": 3
     },
     "fix_issue": {
-      "weight": 85,
-      "runs": 63,
-      "successes": 64,
+      "weight": 75,
+      "runs": 65,
+      "successes": 66,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
-      "weight": 94,
+      "weight": 72,
       "runs": 20,
       "successes": 19,
       "description": "Review and merge open Dependabot PRs \u00e2\u20ac\u201d PRIORITY: 60+ PRs waiting across all repos"
@@ -685,8 +685,22 @@
       "docs_site"
     ]
   },
-  "notes": "Run 646. ai: refactored threat chart (deduplicated drawBarChart, -33 lines, 1490 tests). agentlens: 28 events route tests (0->28 coverage). agenticchat: issue #28 (SessionManager quota wipe bug).",
-  "lastRepo": "sauravcode",
-  "lastRun": "2026-03-03T09:00:00",
-  "runCount": 6
+  "notes": "Run 650-651. GraphVisual: fixed #28 (TopologicalSortAnalyzer O(V\u00b2 log V) \u2192 O((V+E) log V) via PriorityQueue, PR #29). prompt: fixed #32 (ProcessAll() idempotency, PR #34).",
+  "lastRepo": "prompt",
+  "lastRun": "2026-03-03T10:01:00",
+  "runCount": 8,
+  "lastWeightAdjustment": 650,
+  "adjustmentHistory": [
+    {
+      "run": 650,
+      "changes": {
+        "merge_dependabot": "94\u219272 (frequently re-rolled, no Dependabot PRs exist)",
+        "fix_issue": "80\u219275 (often no open issues, requires re-roll)",
+        "security_fix": "90\u219292 (consistently productive)",
+        "add_tests": "90\u219292 (consistently productive)",
+        "refactor": "81\u219283 (consistently productive)",
+        "perf_improvement": "86\u219288 (consistently productive)"
+      }
+    }
+  ]
 }
