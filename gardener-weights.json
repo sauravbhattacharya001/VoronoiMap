@@ -1,179 +1,189 @@
 {
-  "lastUpdated": "2026-03-02T06:35:00Z",
-  "totalRuns": 559,
+  "lastUpdated": "2026-03-03T01:30:00Z",
+  "totalRuns": 621,
   "taskTypes": {
     "setup_copilot_agent": {
-      "weight": 50,
+      "weight": 52,
       "runs": 16,
       "successes": 16,
       "description": "Set up GitHub Copilot coding agent"
     },
     "bug_fix": {
-      "weight": 84,
+      "weight": 86,
       "runs": 33,
-      "successes": 33
+      "successes": 34,
+      "runCount": 2,
+      "successCount": 2
     },
     "security_fix": {
-      "weight": 90,
+      "weight": 92,
       "runs": 36,
       "successes": 36,
       "description": "Fix security vulnerability",
-      "totalDone": 1
+      "totalDone": 1,
+      "runCount": 1,
+      "successCount": 1
     },
     "perf_improvement": {
-      "weight": 86,
-      "runs": 40,
-      "successes": 41,
+      "weight": 88,
+      "runs": 41,
+      "successes": 42,
       "totalDone": 1
     },
     "refactor": {
-      "weight": 81,
+      "weight": 83,
       "runs": 26,
-      "successes": 26,
-      "description": "Architecture/code refactor"
+      "successes": 27,
+      "description": "Architecture/code refactor",
+      "runCount": 1,
+      "successCount": 1
     },
     "add_tests": {
-      "weight": 90,
+      "weight": 92,
       "runs": 37,
-      "successes": 37,
-      "description": "Add meaningful tests"
+      "successes": 39,
+      "description": "Add meaningful tests",
+      "runCount": 1,
+      "successCount": 1
     },
     "readme_overhaul": {
-      "weight": 64,
+      "weight": 66,
       "runs": 20,
       "successes": 20,
       "description": "Overhaul repo README"
     },
     "doc_update": {
-      "weight": 84,
+      "weight": 86,
       "runs": 30,
       "successes": 30,
-      "description": "Improve non-README documentation"
+      "description": "Improve non-README documentation",
+      "runCount": 1,
+      "successCount": 1
     },
     "code_cleanup": {
-      "weight": 78,
+      "weight": 80,
       "runs": 30,
       "successes": 30,
       "description": "Remove dead code, unused deps",
       "totalDone": 1
     },
     "open_issue": {
-      "weight": 76,
-      "runs": 44,
-      "successes": 44,
+      "weight": 78,
+      "runs": 45,
+      "successes": 46,
       "description": "Open a thoughtful issue",
       "totalDone": 1
     },
     "fix_issue": {
-      "weight": 85,
+      "weight": 87,
       "runs": 45,
-      "successes": 45,
+      "successes": 46,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
-      "weight": 94,
+      "weight": 96,
       "runs": 19,
       "successes": 19,
-      "description": "Review and merge open Dependabot PRs â€” PRIORITY: 60+ PRs waiting across all repos"
+      "description": "Review and merge open Dependabot PRs \u00e2\u20ac\u201d PRIORITY: 60+ PRs waiting across all repos"
     },
     "add_ci_cd": {
-      "weight": 74,
+      "weight": 76,
       "runs": 14,
       "successes": 14,
       "description": "Add GitHub Actions CI/CD workflow"
     },
     "add_codeql": {
-      "weight": 61,
+      "weight": 63,
       "runs": 15,
       "successes": 15,
       "description": "Add CodeQL security scanning"
     },
     "add_dependabot": {
-      "weight": 73,
+      "weight": 75,
       "runs": 16,
       "successes": 16,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
-      "weight": 69,
+      "weight": 71,
       "runs": 15,
       "successes": 15,
       "description": "Deploy to GitHub Pages"
     },
     "create_release": {
-      "weight": 74,
+      "weight": 76,
       "runs": 19,
       "successes": 19,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
-      "weight": 75,
+      "weight": 77,
       "runs": 10,
       "successes": 10,
       "description": "Add Dockerfile"
     },
     "docker_workflow": {
-      "weight": 65,
+      "weight": 67,
       "runs": 16,
       "successes": 16,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
-      "weight": 96,
+      "weight": 98,
       "runs": 17,
       "successes": 17,
-      "description": "Set up package publishing (PyPI/npm/NuGet) â€” PRIORITY: PyPI is back online, publish Python packages!"
+      "description": "Set up package publishing (PyPI/npm/NuGet) \u00e2\u20ac\u201d PRIORITY: PyPI is back online, publish Python packages!"
     },
     "add_badges": {
-      "weight": 59,
+      "weight": 61,
       "runs": 11,
       "successes": 11,
       "description": "Add badges to README"
     },
     "add_license": {
-      "weight": 77,
+      "weight": 79,
       "runs": 7,
       "successes": 7,
       "description": "Add/update LICENSE file"
     },
     "issue_templates": {
-      "weight": 64,
+      "weight": 66,
       "runs": 16,
       "successes": 16,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
-      "weight": 71,
+      "weight": 73,
       "runs": 16,
       "successes": 16,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
-      "weight": 55,
+      "weight": 57,
       "runs": 12,
       "successes": 12,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
-      "weight": 66,
+      "weight": 68,
       "runs": 15,
       "successes": 15,
       "description": "Configure branch protection"
     },
     "code_coverage": {
-      "weight": 66,
+      "weight": 68,
       "runs": 16,
       "successes": 16,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
-      "weight": 71,
+      "weight": 73,
       "runs": 16,
       "successes": 16,
       "description": "Generate & deploy docs site"
     },
     "auto_labeler": {
-      "weight": 62,
+      "weight": 64,
       "runs": 15,
       "successes": 15,
       "description": "Add auto-labeler or stale bot"
@@ -677,8 +687,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 557. All repos 29/29, no open issues or Dependabot PRs. Code review pass on FeedReader + ai — no actionable items.",
-  "lastRepo": "none",
-  "lastRun": "2026-03-02T05:30:00Z",
-  "runCount": 12
+  "notes": "Run 616. All repos 29/29. Vidly: fixed N+1 movie lookups in NotificationService (PR #30, merged). ai: opened issue #15 about capacity planner missing worker lifecycle simulation.",
+  "lastRepo": "ai",
+  "lastRun": "2026-03-02T17:30:00-08:00",
+  "runCount": 621
 }
