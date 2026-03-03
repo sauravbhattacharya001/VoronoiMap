@@ -1,11 +1,22 @@
 ## 2026-03-03
 
+### Gardener Run #654 — 1:05 PM PST
+- **agentlens**: Fixed #28 — replaced bidirectional substring pricing match with delimiter-aware longest prefix match. Prevents `gpt-4o` from matching `gpt-4` pricing ($30/M vs $2.50/M). Commit `f961965`.
+- **Ocaml-sample-code**: Fixed #15 — `hex_to_bytes` now raises `Invalid_argument` on odd-length hex instead of silently truncating; `xor_cipher` raises on empty key instead of `Division_by_zero`. Commit `055011c`.
+
+### Builder Run #130 — 12:45 PM PST
+- **everything**: Added Event Pattern Recognizer service (`event_pattern_service.dart`) — analyzes historical events to discover recurring patterns (daily/weekly/biweekly/monthly), detect 6 scheduling habits (time-of-day, busiest/quietest day, event density, priority preference, weekend activity, duration), predict future events with confidence decay and day/hour snapping, suggest formalizing informal recurrences. 42 tests. Commit `8dbfd11`.
+
 ### Gardener Run #657 — 12:30 PM PST
 - **agenticchat**: Fixed #28 — `_saveAll()` quota recovery could silently wipe all sessions when ≤5 existed. Now evicts incrementally and always preserves at least one session. Commit `31ed5c7`.
 - **GraphVisual**: Fixed #28 — `TopologicalSortAnalyzer.analyze()` was O(V² log V) due to per-iteration queue sorting. Replaced `LinkedList`+`Collections.sort` with `PriorityQueue` for O((V+E) log V). Commit `4ab9d52`.
 
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
+
+### Gardener Run #653 — 1:05 PM PST
+- **agenticchat**: Fixed `/reactions` slash command — was calling `HistoryPanel.toggle()` (duplicate of `/history`) instead of `MessageReactions.decorateMessages()`. Commit `cac2b0f`.
+- **agenticchat**: Updated docs/index.html — fixed module count (17→29), added 12 missing module descriptions to architecture table, added 6 missing feature overview cards. Commit `cac2b0f`.
 
 ### Builder Run #129 — 12:48 PM PST
 - **gif-captcha**: HMAC-signed token verifier (`createTokenVerifier`) for stateless CAPTCHA validation — HMAC-SHA256 signing, IP binding, replay protection with bounded LRU nonce tracking, configurable TTL & max uses, metadata embedding, session manager integration. 49 tests. Commit `0bf584c`.

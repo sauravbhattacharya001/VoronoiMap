@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-03T12:00:00",
-  "totalRuns": 652,
+  "totalRuns": 653,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 50,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 84,
-      "runs": 36,
-      "successes": 36
+      "runs": 37,
+      "successes": 37
     },
     "security_fix": {
       "weight": 92,
@@ -49,8 +49,8 @@
     },
     "doc_update": {
       "weight": 84,
-      "runs": 31,
-      "successes": 34,
+      "runs": 32,
+      "successes": 35,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
@@ -72,8 +72,8 @@
     },
     "fix_issue": {
       "weight": 75,
-      "runs": 71,
-      "successes": 72,
+      "runs": 73,
+      "successes": 74,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 652. agentlens: fixed #27 (N+1 query), added 18 leaderboard tests, filed #28 (fuzzy pricing bug).",
-  "lastRepo": "agentlens",
-  "lastRun": "2026-03-03T12:35:00",
-  "runCount": 13,
+  "notes": "Run 653. agenticchat: fixed /reactions slash command bug (called HistoryPanel.toggle instead of MessageReactions.decorateMessages), updated docs (17->29 modules, added 12 missing module descriptions + 6 feature cards).",
+  "lastRepo": "agenticchat",
+  "lastRun": "2026-03-03T13:05:00",
+  "runCount": 14,
   "lastWeightAdjustment": 650,
   "adjustmentHistory": [
     {
