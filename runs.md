@@ -1,5 +1,9 @@
 ## 2026-03-03
 
+### Gardener Run #638 — 5:00 AM PST
+- **Task 1:** fix_issue on **WinSentinel** — Fixed #32: AutoRemediator history now persisted to `remediation-history.json` in data dir. Records survive restarts, undo operations work across sessions, capped at 1000 records with atomic writes.
+- **Task 2:** fix_issue on **GraphVisual** — Fixed #27: Extracted 5 anonymous Transformer classes from Main.java into new `GraphRenderers` class. Reduced Main.java by ~140 lines, centralized overlay priority logic, made rendering independently testable.
+
 ### Builder Run #111 — 4:45 AM PST
 - **Repo:** everything (Flutter)
 - **Feature:** Pomodoro Timer screen with circular countdown, configurable work/break intervals, phase auto-transitions, daily stats (completed pomodoros, focus minutes, streak), and pulse animation
@@ -14,6 +18,11 @@
 - **Feature:** Adjacency matrix heatmap visualization
 - **Details:** New `AdjacencyMatrixHeatmap` panel shows the graph as a color-coded matrix (cells colored by edge type). Sortable by degree/name/community, zoom/pan, hover tooltips with edge details, row/col highlighting, PNG export. Accessible via "Adjacency Matrix" button in Tools panel.
 - **Commit:** `7c5efad` → pushed to master
+
+### Gardener Run #639 — 5:30 AM PST
+- **Task 1:** security_fix on `ai` — Enforced root-worker depth=0 invariant in `issue_manifest()` and added defense-in-depth `register_worker()` checks rejecting manifests with depth > max_depth or root with depth ≠ 0. Prevents depth-spoofing attacks where root workers start at arbitrary depths to bypass max_depth controls. 8 new tests (72 total). Commit `298387f`.
+- **Task 2:** refactor on `agentlens` — Extracted 66-line `computeMetrics` closure from sessions compare handler into `lib/session-metrics.js` (reusable module). Also extracted `pctDelta` helper. 21 new tests. sessions.js 835→769 lines. Commit `d5eddfa`.
+- **Issue:** Opened [#17](https://github.com/sauravbhattacharya001/ai/issues/17) — pre-existing test_safety_check_respects_replicas failure.
 
 ### Gardener Run #638 — 4:55 AM PST
 - **Task 1:** perf_improvement on `getagentbox` — Cached section offsetTop values to eliminate forced layout reflows in scroll spy (was reading offsetTop on every rAF). Replaced CommandPalette.move() full DOM rebuild with in-place aria-selected update (O(n) → O(1)). Commit `6fdcfe7`.
