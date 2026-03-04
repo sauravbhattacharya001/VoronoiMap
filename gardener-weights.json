@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T15:20:00",
-  "totalRuns": 707,
+  "totalRuns": 709,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -29,15 +29,15 @@
     },
     "refactor": {
       "weight": 20,
-      "runs": 37,
-      "successes": 40,
+      "runs": 38,
+      "successes": 41,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
     "add_tests": {
       "weight": 20,
-      "runs": 49,
-      "successes": 49,
+      "runs": 50,
+      "successes": 50,
       "description": "Add meaningful tests",
       "attempts": 2
     },
@@ -685,9 +685,9 @@
       "docs_site"
     ]
   },
-  "notes": "Run 700. fix_issue on VoronoiMap #40 (replaced O(V*(V+E)) all-pairs BFS with double-BFS + sampling for diameter/avg_path_length). fix_issue on gif-captcha #16 (resetAll() prototype pollution fix).",
-  "lastRepo": "BioBots",
-  "lastRun": "2026-03-04T15:20:00",
+  "notes": "Run 703. refactor on Ocaml-sample-code (geometry.ml closest_pair O(n) list->O(1) hash). add_tests on Ocaml-sample-code (test_geometry.ml ~120 tests).",
+  "lastRepo": "Ocaml-sample-code",
+  "lastRun": "2026-03-04T15:35:00",
   "runCount": 27,
   "lastWeightAdjustment": 700,
   "adjustmentHistory": [
