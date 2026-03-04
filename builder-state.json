@@ -1,5 +1,5 @@
 {
-  "totalRuns": 194,
+  "totalRuns": 195,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -160,7 +160,8 @@
       "Challenge Router (createChallengeRouter) -- intelligent CAPTCHA difficulty routing orchestrator. Combines reputation scores, attempt history, and custom rules to select optimal difficulty per client. Escalation/de-escalation with configurable thresholds, priority-ordered custom rules, circular buffer decision log, batch routing, state persistence, aggregate stats. 59 tests (2026-03-03)",
       "Sliding Window Rate Limiter (createRateLimiter) -- per-client request throttling with sliding window counters, progressive exponential delay, burst detection, allowlist/blocklist, LRU eviction, dry-run/peek, batch check, state persistence, top clients reporting. 44 tests (2026-03-04)",
       "Client Fingerprinter (createClientFingerprinter) -- cookieless browser/device fingerprinting with 10 signal types, djb2 hashing, weighted similarity search, bot pattern detection, IP identity change tracking, composite risk scoring, LRU+TTL storage, state persistence. 43 tests (2026-03-04)",
-      "Security Incident Correlator -- createIncidentCorrelator (395 lines). Aggregates cross-system security signals into unified incidents with severity escalation (INFO/WARNING/HIGH/CRITICAL), correlation windowing, weighted signals, alert callbacks, query/filter, LRU eviction, export. 49 tests. (2026-03-04)"
+      "Security Incident Correlator -- createIncidentCorrelator (395 lines). Aggregates cross-system security signals into unified incidents with severity escalation (INFO/WARNING/HIGH/CRITICAL), correlation windowing, weighted signals, alert callbacks, query/filter, LRU eviction, export. 49 tests. (2026-03-04)",
+      "Adaptive Timeout Manager -- createAdaptiveTimeout (330 lines). Dynamic CAPTCHA response windows based on difficulty (easy/medium/hard), client reputation (suspicious/neutral/trusted), historical response time percentiles (90th, 10+ sample threshold), and per-client network latency tracking. Binary-search sorted insert for O(log n) percentiles. LRU eviction, export/import state, full factor breakdown. 43 tests. (2026-03-04)"
     ],
     "prompt": [
       "Added CLI tool for managing and testing prompts from the command line with interactive mode",
@@ -345,7 +346,8 @@
       "String matching algorithms -- Naive, KMP, Boyer-Moore, Horspool, Rabin-Karp (+ multi-pattern), Z-Algorithm, Aho-Corasick, wildcard matching, edit/Hamming distance, LCS, benchmark comparison, 65+ tests (2026-03-04)",
       "Propositional theorem prover -- natural deduction backward proof search with 17 inference rules (Axiom/TrueI/FalseE/AndI-E/OrI-E/ImpI-E/NotI-E/DNE/IffI-E), formula parser (multiple syntaxes), NNF, truth tables, counterexamples, 16 classic theorems library, prover-vs-truth-table consistency. 850 lines, 73 tests (2026-03-04)",
       "Functional Reactive Programming -- behaviors (time-varying values), events (timestamped occurrences), push-based signals, reactive cells, event streams with combinators, reactive state machines, animation primitives (easing/spring/keyframes/oscillation). 6 modules, 75+ tests (2026-03-04)",
-      "Abstract interpretation with interval domain -- mini abstract interpreter (assignments, if/else, while, assert), interval lattice (join/meet/widening/narrowing), abstract arithmetic, condition filtering, fixed-point loop analysis, div-by-zero/dead-code/assertion detection, trace analysis, 70+ tests (2026-03-04)"
+      "Abstract interpretation with interval domain -- mini abstract interpreter (assignments, if/else, while, assert), interval lattice (join/meet/widening/narrowing), abstract arithmetic, condition filtering, fixed-point loop analysis, div-by-zero/dead-code/assertion detection, trace analysis, 70+ tests (2026-03-04)",
+      "Network flow algorithms -- Edmonds-Karp max flow, min-cut, bipartite matching via flow reduction, multi-source/sink, flow decomposition, min-cost max flow (Bellman-Ford SPFA), edge connectivity, bipartite check. 720 lines, 55+ tests (2026-03-04)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -373,7 +375,7 @@
       "Virtualization Security Audit -- Hyper-V VM isolation (external switch/checkpoints/guest services), WSL (version/root distros/mirrored networking/firewall/interop/systemd), Windows Sandbox (networking/writable mapped folders), Docker (TCP exposure/privileged mode/root containers/content trust/user namespaces/ICC), VBS/Credential Guard/HVCI/Memory Integrity/Secure Boot. VirtualizationState DTO, 66 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "everything",
-  "lastFeature": "Decision Journal",
+  "lastRepo": "gif-captcha",
+  "lastFeature": "Adaptive Timeout Manager",
   "lastRun": "2026-03-04"
 }
