@@ -1,5 +1,5 @@
 {
-  "totalRuns": 165,
+  "totalRuns": 167,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -223,7 +223,8 @@
       "Added rental bundle deals system with percentage/fixed/free-movie discounts, genre restrictions, best-bundle finder, calculator, usage tracking, and 25 tests (2026-03-03)",
       "RatingEngineService — Bayesian weighted ratings (IMDb WR formula), global + per-genre rankings with vote-count tiebreaker, trending scores with 30-day half-life exponential decay, controversy detection (stdDev + polarization composite), comprehensive rating reports. DTOs: BayesianRating, TrendingScore, ControversyScore, MovieRatingReport. 48 tests (2026-03-03)",
       "RentalForecastService — day-of-week distribution, monthly trends, genre popularity with momentum, movie velocity, N-day demand forecasting, inventory recommendations (high demand/dead stock/never rented/genre gaps), summary report. 45 tests (2026-03-03)",
-      "CustomerSegmentationService — RFM (Recency/Frequency/Monetary) analysis with quintile scoring, 11 marketing segments, segment distribution summary, at-risk customer identification, marketing recommendations, segment migration comparison. 58 tests (2026-03-03)"
+      "CustomerSegmentationService — RFM (Recency/Frequency/Monetary) analysis with quintile scoring, 11 marketing segments, segment distribution summary, at-risk customer identification, marketing recommendations, segment migration comparison. 58 tests (2026-03-03)",
+      "ChurnPredictorService -- multi-factor churn risk analysis (recency/frequency-decline/engagement/late-returns/genre-diversity), composite 0-100 scoring, 4 risk levels, configurable weights/thresholds, winnable customer targeting, time-period comparison, smart retention actions. 55 tests (2026-03-04)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
@@ -301,7 +302,9 @@
       "Algebraic effects and handlers -- free monads, CPS encoding, State/Exception/Nondeterminism/Writer/Reader/Coroutine effects, effect composition via coproducts, N-Queens solver, Fibonacci generator, 50+ tests (2026-03-03)",
       "Untyped lambda calculus interpreter (lambda.ml) -- named + De Bruijn terms, capture-avoiding substitution, alpha-equivalence, 3 reduction strategies (normal/applicative/CBV), Church booleans/numerals/pairs/lists with extraction, S/K/I/B/C/W/Y/Z/Theta combinators, parser, term metrics. 800 lines, 62 tests (2026-03-03)",
       "Automatic differentiation (forward & reverse mode) -- dual numbers, tape-based backprop, gradient/Jacobian/Hessian, Adam/momentum optimizers, neural network building blocks, 65+ tests (2026-03-04)",
-      "Minimax game AI framework -- GAME module type, MakeAI functor (minimax/alpha-beta/transposition table/iterative deepening), Tic-Tac-Toe + Connect Four + Nim implementations, 40+ tests (2026-03-04)"
+      "Minimax game AI framework -- GAME module type, MakeAI functor (minimax/alpha-beta/transposition table/iterative deepening), Tic-Tac-Toe + Connect Four + Nim implementations, 40+ tests (2026-03-04)",
+      "String matching algorithms -- Naive, KMP, Boyer-Moore, Horspool, Rabin-Karp (+ multi-pattern), Z-Algorithm, Aho-Corasick, wildcard matching, edit/Hamming distance, LCS, benchmark comparison, 65+ tests (2026-03-04)",
+      "Propositional theorem prover -- natural deduction backward proof search with 17 inference rules (Axiom/TrueI/FalseE/AndI-E/OrI-E/ImpI-E/NotI-E/DNE/IffI-E), formula parser (multiple syntaxes), NNF, truth tables, counterexamples, 16 classic theorems library, prover-vs-truth-table consistency. 850 lines, 73 tests (2026-03-04)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -326,7 +329,7 @@
       "Group Policy Security Audit (2026-03-04)"
     ]
   },
-  "lastRepo": "everything",
-  "lastFeature": "Cross-Domain Correlation Analyzer",
+  "lastRepo": "Ocaml-sample-code",
+  "lastFeature": "Propositional theorem prover with natural deduction",
   "lastRun": "2026-03-04"
 }
