@@ -1,5 +1,5 @@
 {
-  "totalRuns": 175,
+  "totalRuns": 176,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -80,7 +80,8 @@
       "Added Voronoi graph network analysis with shortest path, minimum spanning tree, betweenness centrality, and community detection",
       "Added morphological Voronoi analysis for grain boundary detection with grain size distribution and texture metrics",
       "Added Voronoi-based terrain generation with elevation interpolation, erosion simulation, and 3D mesh export",
-      "Added centroidal Voronoi tessellation (CVT) meshing with density control for FEM-ready adaptive mesh generation"
+      "Added centroidal Voronoi tessellation (CVT) meshing with density control for FEM-ready adaptive mesh generation",
+      "Added Voronoi-based spatial sampling (vormap_sample.py) with 6 strategies: stratified_random, systematic_grid, centroid_based, boundary_focused, density_weighted, adaptive. Largest-remainder allocation, coverage analysis, CSV/GeoJSON export. SpatialSampler class with SamplePlan/SamplePoint data classes. 52 pytest tests. (2026-03-04)"
     ],
     "sauravcode": [
       "Added REPL (Read-Eval-Print Loop) interactive mode for the sauravcode language",
@@ -342,7 +343,7 @@
       "WiFi Security Audit -- saved profile encryption (Open/WEP/WPA-TKIP), auto-connect risks, hidden network probing, public network matching, MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO, 63 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "agentlens",
-  "lastFeature": "ServiceDependencyMap",
+  "lastRepo": "VoronoiMap",
+  "lastFeature": "SpatialSampling",
   "lastRun": "2026-03-04"
 }
