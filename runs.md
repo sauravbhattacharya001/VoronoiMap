@@ -1,3 +1,12 @@
+## Gardener Run 685-686 — 2026-03-03 11:00 PM PST
+- **PR Triage**: Merged 6 PRs, closed 7 redundant/conflicted PRs
+- **Merged**: FeedReader #17 (DateFormatter perf), FeedReader #18 (OPML nested folders), VoronoiMap #39 (hotspot plateau detection), ai #22, GraphVisual #32, Vidly #31
+- **Closed (redundant)**: prompt #33 #34 (fix already in main), Ocaml #17 (fix already in master)
+- **Closed (conflicts)**: agenticchat #29, GraphVisual #29, sauravcode #25, getagentbox #18
+
+## Daily Memory Backup — 2026-03-03 11:00 PM PST
+- Committed & pushed to zalenix-memory repo. Updated .gitignore to exclude embedded repos (ai/, sauravbhattacharya001/). 3 files changed.
+
 ## Builder Run 157 — 2026-03-03 10:45 PM PST
 - **GraphVisual**: Added Dominating Set Analyzer — greedy/exact/independent/connected dominating sets, k-domination, domination number bounds, per-vertex coverage analysis, verification, full report generation. 56 tests, all passing.
 
@@ -103,6 +112,10 @@
 - **Tests:** 47/47 passing
 - **Highlights:** Planarity testing via Euler bound + K5/K3,3 minor detection (exhaustive contraction for ≤12 vertices, 8 heuristic strategies for larger). Face enumeration using force-directed planar embedding with angle-ordered neighbors. Dual graph construction. Kuratowski subdivision certificates. Triangle-free bound. Genus estimation. Comprehensive PlanarityReport with text output.
 ## 2026-03-03
+### Gardener Run #685 (Vidly) - 11:20 PM PST
+- **open_issue**: Filed [#32](https://github.com/sauravbhattacharya001/Vidly/issues/32) — `CustomerSegmentationService.AnalyzeCustomer()` is O(C*R) for single customer lookup. Calls `AnalyzeAll()` then `FirstOrDefault`. Same issue in `CompareSegments()` (2x full computation). Suggested fix: pre-build rental-by-customer dict O(R), targeted single-customer path.
+- **refactor**: Extracted `InsightContext` struct + `LoadSharedContext()` + `BuildInsightFromContext()` in MovieInsightsService. Eliminated 3 independent full-data loads (GetInsight/GetAllInsights/Compare each loaded all repos separately). Compare() now uses single shared context for consistent global maximums. Removed unused scan-everything overload. Updated 8 tests. All 55 MovieInsightsService tests pass. Commit `82a2080`.
+
 ### Builder Run #157 (everything) - 11:00 PM PST
 - **Productivity Score Service**: 6-dimension composite daily scoring (events 25%, habits 20%, goals 20%, sleep 15%, mood 10%, focus 10%). Configurable weights with 3 presets (balanced/taskFocused/wellnessFocused). 5-tier grading (Excellent through Needs Work). Per-dimension insights, strength/improvement identification, trend analysis (linear regression slope for rising/stable/declining), weekly summary with week-over-week comparison. 788 lines impl, 55 tests (910 lines). Commit `54b3110`.
 
@@ -5151,6 +5164,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

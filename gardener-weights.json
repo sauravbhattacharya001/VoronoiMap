@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T06:30:00",
-  "totalRuns": 684,
+  "totalRuns": 685,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -29,8 +29,8 @@
     },
     "refactor": {
       "weight": 20,
-      "runs": 34,
-      "successes": 37,
+      "runs": 35,
+      "successes": 38,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
@@ -64,8 +64,8 @@
     },
     "open_issue": {
       "weight": 20,
-      "runs": 64,
-      "successes": 67,
+      "runs": 65,
+      "successes": 68,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 683-684. fix_issue on sauravcode #26 (closure scope for imported module functions), fix_issue on GraphVisual #33 (square participation counts). All repos have all task types done — only open issues remain as work.",
-  "lastRepo": "BioBots",
-  "lastRun": "2026-03-04T06:30:00",
-  "runCount": 20,
+  "notes": "Run 685-686. PR triage: merged FeedReader #17 #18, VoronoiMap #39, ai #22, GraphVisual #32, Vidly #31. Closed redundant/conflicted PRs: prompt #33 #34, Ocaml #17, agenticchat #29, GraphVisual #29, sauravcode #25, getagentbox #18.",
+  "lastRepo": "Vidly",
+  "lastRun": "2026-03-04T07:20:00",
+  "runCount": 22,
   "lastWeightAdjustment": 680,
   "adjustmentHistory": [
     {
