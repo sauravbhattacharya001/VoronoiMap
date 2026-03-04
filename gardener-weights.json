@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-03T19:40:00",
-  "totalRuns": 670,
+  "lastUpdated": "2026-03-03T20:00:00",
+  "totalRuns": 672,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 52,
@@ -15,8 +15,8 @@
     },
     "security_fix": {
       "weight": 94,
-      "runs": 46,
-      "successes": 46,
+      "runs": 47,
+      "successes": 47,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
@@ -29,8 +29,8 @@
     },
     "refactor": {
       "weight": 85,
-      "runs": 33,
-      "successes": 33,
+      "runs": 34,
+      "successes": 34,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
@@ -685,9 +685,9 @@
       "docs_site"
     ]
   },
-  "notes": "Run 670. doc_update on BioBots (calculator.js JSDoc + CHANGELOG 6 versions), add_tests on BioBots (batch planner 13 to 63 tests), open_issue on BioBots #22. Weight adjustment due.",
+  "notes": "Run 671-672. Refactor + security_fix on getagentbox. Shared typing template, merged DOMContentLoaded, input length cap + message eviction. 20 tests.",
   "lastRepo": "Vidly",
-  "lastRun": "2026-03-03T19:40:00",
+  "lastRun": "2026-03-03T20:00:00",
   "runCount": 20,
   "lastWeightAdjustment": 670,
   "adjustmentHistory": [

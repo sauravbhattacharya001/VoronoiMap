@@ -1,3 +1,14 @@
+## Feature Builder Run 147 — 2026-03-03 7:45 PM PST
+- **Repo:** everything (Flutter events/calendar app)
+- **Feature:** Eisenhower Matrix Service — categorizes events into 4 quadrants (Do First/Schedule/Delegate/Eliminate) based on urgency + importance scoring
+- **Details:** Configurable thresholds, tag-based importance weighting, balance scoring, actionable recommendations, text summary output
+- **Tests:** 45 tests
+- **Commit:** f5756dd
+
+## Repo Gardener Run 671 — 2026-03-03 7:30 PM PST
+- **Result:** All 16 repos have all 29 task types completed. No remaining tasks to execute.
+- **Action:** None — gardener has fully covered all repos.
+
 ## Feature Builder Run 146 — 2026-03-03 7:15 PM PST
 - **Repo:** prompt
 - **Feature:** PromptFingerprint — content-addressable prompt hashing with SHA-256, 5 normalization levels (None/Whitespace/CaseInsensitive/Structural/Semantic), Jaccard similarity via word-level shingling, batch fingerprinting with duplicate detection, FindSimilar threshold search, fingerprint diffing with word-level change tracking, stop word removal, JSON serialization
@@ -37,6 +48,10 @@
 - **Highlights:** Planarity testing via Euler bound + K5/K3,3 minor detection (exhaustive contraction for ≤12 vertices, 8 heuristic strategies for larger). Face enumeration using force-directed planar embedding with angle-ordered neighbors. Dual graph construction. Kuratowski subdivision certificates. Triangle-free bound. Genus estimation. Comprehensive PlanarityReport with text output.
 ## 2026-03-03
 
+### Gardener Run #671-672 - 7:35 PM PST
+- **getagentbox** (refactor): Extracted shared `_typingIndicatorTemplate` from duplicate definitions in ChatDemo and Playground. Merged two `DOMContentLoaded` listeners into one. Net -2 lines.
+- **getagentbox** (security_fix): Added `MAX_INPUT_LENGTH=500` (truncates before regex/split in findResponse) and `MAX_MESSAGES=50` (evicts oldest DOM children to prevent memory exhaustion). Updated HTML maxlength 200->500. 20 new tests. Commit `1c01b32`.
+
 ### Builder Run #144 $ 7:18 PM PST
 - **FeedReader** (feature): ReadingQueueManager $-- ordered read-later queue with 4 priority levels (low/normal/high/urgent), estimated reading time (238 WPM), completion tracking with timestamps, queue position management (move up/down/top/bottom), 3 sort modes (priority/time/date added), per-article notes, filtering (status/priority/feed), batch enqueue, queue statistics, estimated time to empty. 388 lines impl, 57 tests. Commit `675572d`.
 
@@ -70,6 +85,10 @@
 ### Gardener Run #661 — 5:30 PM PST
 - **everything**: Replaced try/firstWhere/catch anti-pattern with `.where().isEmpty` in 2 services, documented 6 empty catch blocks in model deserialization. 8 files, net 0 lines. Commit `b83e14d`.
 - **sauravcode**: Documented all 74 undocumented built-in functions in LANGUAGE.md (20→94 covered). Added 9 new sections: Collections, Statistics, Date/Time, JSON, Regex, File I/O, Encoding/Hashing, Math extras, String extras. +126 lines. Commit `2ce96e8`.
+
+### Gardener Run #671-672 - 7:35 PM PST
+- **getagentbox** (refactor): Extracted shared `_typingIndicatorTemplate` from duplicate definitions in ChatDemo and Playground. Merged two `DOMContentLoaded` listeners into one. Net -2 lines.
+- **getagentbox** (security_fix): Added `MAX_INPUT_LENGTH=500` (truncates before regex/split in findResponse) and `MAX_MESSAGES=50` (evicts oldest DOM children to prevent memory exhaustion). Updated HTML maxlength 200->500. 20 new tests. Commit `1c01b32`.
 
 ### Builder Run #144 $ 7:18 PM PST
 - **FeedReader** (feature): ReadingQueueManager $-- ordered read-later queue with 4 priority levels (low/normal/high/urgent), estimated reading time (238 WPM), completion tracking with timestamps, queue position management (move up/down/top/bottom), 3 sort modes (priority/time/date added), per-article notes, filtering (status/priority/feed), batch enqueue, queue statistics, estimated time to empty. 388 lines impl, 57 tests. Commit `675572d`.
@@ -2169,6 +2188,10 @@ Committed and pushed workspace to `zalenix-memory`. 12 files changed (435+/55−
 ### Gardener Run #453 — 5:12 AM PST
 **Task 1 (fix_issue):** Vidly — Fixed [#21](https://github.com/sauravbhattacharya001/Vidly/issues/21): Split dashboard TotalRevenue into RealizedRevenue (returned rentals only) and ProjectedRevenue (active/overdue). Updated `RentalStats` model with two new properties, `InMemoryRentalRepository.GetStats()` to classify revenue by rental status, `DashboardData` to expose both figures, and `DashboardService.GetDashboard()` to compute AverageRevenuePerRental using realized revenue / returned count. Updated TestRentalRepository in DashboardTests. Added 4 new tests (RealizedRevenue only counts returned, ProjectedRevenue only counts active/overdue, sum equals TotalRevenue, average uses realized). 500 tests passing (14 pre-existing failures unchanged). Commit `08fd299`.
 **Task 2 (perf_improvement):** agentlens — Eliminated N+1 tag queries in `/sessions/by-tag/:tag` endpoint. Previously fetched tags individually per session via `getTagsForSession` (N+1 queries). Replaced with single batch `WHERE session_id IN (...)` query, reducing 51 queries to 2 for a page of 50 sessions. Added batch-fetch test verifying all tags returned per session. 256 tests passing. Commit `c263f87`.
+
+### Gardener Run #671-672 - 7:35 PM PST
+- **getagentbox** (refactor): Extracted shared `_typingIndicatorTemplate` from duplicate definitions in ChatDemo and Playground. Merged two `DOMContentLoaded` listeners into one. Net -2 lines.
+- **getagentbox** (security_fix): Added `MAX_INPUT_LENGTH=500` (truncates before regex/split in findResponse) and `MAX_MESSAGES=50` (evicts oldest DOM children to prevent memory exhaustion). Updated HTML maxlength 200->500. 20 new tests. Commit `1c01b32`.
 
 ### Builder Run #144 $ 7:18 PM PST
 - **FeedReader** (feature): ReadingQueueManager $-- ordered read-later queue with 4 priority levels (low/normal/high/urgent), estimated reading time (238 WPM), completion tracking with timestamps, queue position management (move up/down/top/bottom), 3 sort modes (priority/time/date added), per-article notes, filtering (status/priority/feed), batch enqueue, queue statistics, estimated time to empty. 388 lines impl, 57 tests. Commit `675572d`.
@@ -4982,6 +5005,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
