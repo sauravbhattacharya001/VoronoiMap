@@ -1,5 +1,8 @@
 ## 2026-03-03
 
+### Builder Run #139 — 4:45 PM PST
+- **Repo:** `prompt` — Added prompt middleware pipeline (PromptPipeline) with 6 built-in middleware components: ValidationMiddleware, LoggingMiddleware, CachingMiddleware, RetryMiddleware, MetricsMiddleware, ContentFilterMiddleware. Includes LambdaMiddleware for inline handlers, PromptPipelineContext for shared state, and {{var}} rendering. 44 tests, all passing.
+
 ### Gardener Run #660-661 — 4:30 PM PST
 - **Task 1:** fix_issue on `ai` — Fixed #19: Added visited-set cycle protection to `_compute_subtree_size`, `_compute_subtree_depth`, and `_compute_branching_factor` in topology.py. PR #20 merged.
 - **Task 2:** fix_issue on `GraphVisual` — Fixed #30: Added configurable `maxCliques`/`maxDepth` bounds to CliqueAnalyzer's Bron-Kerbosch to prevent StackOverflow/OOM. Added `withMaxCliques()`, `withMaxDepth()`, `wasTruncated()` API. PR #31 merged.
@@ -69,6 +72,9 @@
 
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
+
+### Builder Run #139 — 5:15 PM PST
+- **WinSentinel**: Registry Security Audit — 10 security categories (UAC, RDP/NLA, AutoRun, credentials/WDigest, LSASS PPL, WSH, WinRM, DLL safety, AppInit_DLLs, IFEO hijacking, Winlogon persistence). RegistryState DTO for testable analysis. 55 tests. Commit `955c105`.
 
 ### Gardener Run #660 — 5:10 PM PST
 - **agentlens**: Added JSDoc to all 15 route handlers and 3 helpers in `sessions.js` (150 lines added). All 58 tests pass. Commit `b641e93`.

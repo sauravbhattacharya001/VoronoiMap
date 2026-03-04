@@ -1,5 +1,5 @@
 {
-  "totalRuns": 137,
+  "totalRuns": 139,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -165,7 +165,8 @@
       "Added prompt caching layer with semantic similarity matching, LRU/TTL eviction, cache warming, and analytics",
       "Added dynamic prompt optimization with gradient-free tuning, Monte Carlo sampling, and automated prompt rewriting",
       "Added prompt dependency graph with DAG visualization, impact analysis, circular dependency detection, and topological ordering",
-      "Added prompt playground with side-by-side model comparison, streaming, variable injection, and response diff view"
+      "Added prompt playground with side-by-side model comparison, streaming, variable injection, and response diff view",
+      "Added prompt middleware pipeline with 6 built-in components (validation, logging, caching, retry, metrics, content filter), lambda middleware, variable rendering, 44 tests (2026-03-03)"
     ],
     "everything": [
       "Added calendar view with month grid, event dots, and day-tap to filter events",
@@ -257,7 +258,8 @@
       "Added protocol template library with 8 bioprinting protocols, filtering, cloning, comparison, recommendations, import/export, parameter validation, and volume estimation (2026-03-03)",
       "Added bioink rheology modeler — Power Law / Cross / Herschel-Bulkley viscosity models, nozzle shear rate (Weissenberg-Rabinowitsch correction), Arrhenius temperature-viscosity, printability scoring (4 weighted factors), log-log curve fitting, 6 bioink presets from literature, 73 tests (2026-03-03)",
       "GCode Analyzer — parse GCode files with extrusion metrics (filament length, volume), movement tracking (print vs travel distance), feedrate stats, retraction analysis, layer breakdown, bounding box, temperature/fan tracking, time estimation, layer summary, GCode comparison with deltas, cost estimation (material + machine + labor + consumables + waste), 60 tests (2026-03-03)",
-      "Cross-linking Kinetics Analyzer — first-order kinetics (degree-of-crosslinking curves, gel point estimation), Hill equation dose-response, bell-shaped viability model (benefit vs quadratic damage, golden-section optimization), therapeutic dose window, 2D response surface (duration x intensity grid with peak detection), photo-initiator efficiency (Beer-Lambert, radical yield), print data analysis with intensity binning and rate constant estimation. 81 tests (2026-03-03)"
+      "Cross-linking Kinetics Analyzer — first-order kinetics (degree-of-crosslinking curves, gel point estimation), Hill equation dose-response, bell-shaped viability model (benefit vs quadratic damage, golden-section optimization), therapeutic dose window, 2D response surface (duration x intensity grid with peak detection), photo-initiator efficiency (Beer-Lambert, radical yield), print data analysis with intensity binning and rate constant estimation. 81 tests (2026-03-03)",
+      "Scaffold Porosity Analyzer — volumetric porosity calculation, pore size distribution, interconnectivity estimation, Kozeny-Carman permeability, tissue suitability scoring (6 types), parameter optimization. 62 tests (2026-03-03)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -287,7 +289,8 @@
       "Added DNS Security Audit — DNS server validation, DoH status, LLMNR/NetBIOS exposure, hosts file tampering detection, cache TTL analysis. DnsState DTO for testable analysis. 45 tests (2026-03-03)",
       "Added Scheduled Task Security Audit — suspicious executable paths, encoded commands, persistence triggers (MITRE T1053.005), elevated privilege analysis, hidden task detection. ScheduledTaskState DTO, 44 tests (2026-03-03)",
       "File Integrity Monitor — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion, 47 tests (2026-03-03)",
-      "Windows Service Security Audit — unquoted path detection, suspicious binary locations, SYSTEM services outside trusted paths, disabled security-critical services, missing auto-start binaries, command wrapper detection, ServiceState DTO, 63 tests (2026-03-03)"
+      "Windows Service Security Audit — unquoted path detection, suspicious binary locations, SYSTEM services outside trusted paths, disabled security-critical services, missing auto-start binaries, command wrapper detection, ServiceState DTO, 63 tests (2026-03-03)",
+      "Registry Security Audit -- UAC policy, Remote Desktop/NLA, AutoPlay/AutoRun, credential caching/WDigest, LSASS protection, Windows Script Host, WinRM exposure, Safe DLL search, AppInit_DLLs, IFEO debugger hijacking (MITRE T1546.008), Winlogon Shell/Userinit tampering. RegistryState DTO, 55 tests (2026-03-03)"
     ]
   }
 }
