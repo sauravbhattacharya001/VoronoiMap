@@ -1,5 +1,9 @@
 ## 2026-03-03
 
+### Gardener Run #663 — 5:00 PM PST
+- **Task 1 (fix_issue):** `Ocaml-sample-code` — Fixed #16: added `Domain_error` exception and domain validation to `eval` in `calculus.ml`. Div/0, log(≤0), sqrt(<0), negative^non-integer, tan at π/2 now raise descriptive errors instead of silently returning nan/infinity. Added `try_eval` safe variant. → PR #17
+- **Task 2 (bug_fix):** `FeedReader` — Fixed repeated `DateFormatter` allocation in `ReadingStreakTracker`. `dateKey()`/`parseDate()` created a new formatter per call inside tight loops in `computeStats()`. Replaced with single lazy instance. → PR #17
+
 ### Builder Run #139 — 4:45 PM PST
 - **Repo:** `prompt` — Added prompt middleware pipeline (PromptPipeline) with 6 built-in middleware components: ValidationMiddleware, LoggingMiddleware, CachingMiddleware, RetryMiddleware, MetricsMiddleware, ContentFilterMiddleware. Includes LambdaMiddleware for inline handlers, PromptPipelineContext for shared state, and {{var}} rendering. 44 tests, all passing.
 
@@ -72,6 +76,10 @@
 
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
+
+### Gardener Run #661 — 5:30 PM PST
+- **everything**: Replaced try/firstWhere/catch anti-pattern with `.where().isEmpty` in 2 services, documented 6 empty catch blocks in model deserialization. 8 files, net 0 lines. Commit `b83e14d`.
+- **sauravcode**: Documented all 74 undocumented built-in functions in LANGUAGE.md (20→94 covered). Added 9 new sections: Collections, Statistics, Date/Time, JSON, Regex, File I/O, Encoding/Hashing, Math extras, String extras. +126 lines. Commit `2ce96e8`.
 
 ### Builder Run #139 — 5:15 PM PST
 - **WinSentinel**: Registry Security Audit — 10 security categories (UAC, RDP/NLA, AutoRun, credentials/WDigest, LSASS PPL, WSH, WinRM, DLL safety, AppInit_DLLs, IFEO hijacking, Winlogon persistence). RegistryState DTO for testable analysis. 55 tests. Commit `955c105`.
