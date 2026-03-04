@@ -319,6 +319,8 @@ vormap_viz.generate_graph("datauni5.txt", "graph.json", fmt="json")
 
 ## 📚 API Reference
 
+> **Full API documentation:** See [docs/API.md](docs/API.md) for complete reference of all 25 modules and 150+ functions.
+
 ### Core Functions
 
 | Function | Signature | Description |
