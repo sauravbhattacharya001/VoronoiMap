@@ -1,3 +1,11 @@
+## Gardener Run 712 -- 2026-03-04 8:42 AM PST
+- **Repo:** VoronoiMap
+- **Task 1 (security_fix):** Added MAX_GRID_CELLS (4M) resource limit to prevent memory exhaustion DoS. Grid functions (kde_grid, grid_interpolate) accepted unbounded nx/ny — e.g. nx=100000, ny=100000 would allocate 10B cells (~80GB). Added vormap.validate_grid_size() validation. Also capped ripleys_k n_radii at 10,000. Filed and fixed #43. All 443 tests pass.
+- **Task 2 (perf_improvement):** Replaced O(n^2) brute-force nearest-neighbor in nn_distances() and clark_evans() with scipy cKDTree for O(n log n). ~600x speedup on 5000-point datasets. Falls back to brute-force when scipy unavailable. All 271 nndist/sample/query/pattern tests pass.
+- **Pushed:** 2b47c37 to master
+## Gardener Run 712 -- 2026-03-04 8:30 AM PST
+- **Task 1 (fix_issue):** Vidly #32 — Optimized CustomerSegmentationService from O(C×R) to O(R) by replacing nested LINQ Where() with a pre-built rental-by-customer dictionary. PR #33, merged.
+- **Task 2 (bug_fix):** agentlens — Replaced 9 deprecated `asyncio.get_event_loop().run_until_complete()` calls with `asyncio.run()` in test_decorators.py and test_decorators_extended.py. Fixes DeprecationWarning on Python 3.10+ and RuntimeError on Python 3.12+. PR #30, merged.
 ## Builder Run 179 -- 2026-03-04 8:30 AM PST
 - **Repo:** Vidly
 - **Feature:** MovieLifecycleService -- lifecycle stage tracking for inventory management
@@ -5985,6 +5993,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

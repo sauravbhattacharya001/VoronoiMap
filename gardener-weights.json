@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T15:20:00",
-  "totalRuns": 711,
+  "totalRuns": 712,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -10,20 +10,20 @@
     },
     "bug_fix": {
       "weight": 20,
-      "runs": 51,
-      "successes": 52
+      "runs": 52,
+      "successes": 53
     },
     "security_fix": {
       "weight": 20,
-      "runs": 50,
-      "successes": 50,
+      "runs": 51,
+      "successes": 51,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
     "perf_improvement": {
       "weight": 20,
-      "runs": 49,
-      "successes": 49,
+      "runs": 50,
+      "successes": 50,
       "totalDone": 1,
       "attempts": 2
     },
@@ -72,8 +72,8 @@
     },
     "fix_issue": {
       "weight": 20,
-      "runs": 93,
-      "successes": 93,
+      "runs": 94,
+      "successes": 94,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 710. fix_issue on ai (quarantine terminate() race window, #23). doc_update on ai (README project structure 10→36 modules + API ref).",
-  "lastRepo": "ai",
-  "lastRun": "2026-03-04T16:15:00",
-  "runCount": 27,
+  "notes": "Run 712. security_fix on VoronoiMap (MAX_GRID_CELLS DoS protection, #43). perf_improvement on VoronoiMap (KDTree O(n log n) in nn_distances+clark_evans).",
+  "lastRepo": "VoronoiMap",
+  "lastRun": "2026-03-04T16:40:00",
+  "runCount": 28,
   "lastWeightAdjustment": 700,
   "adjustmentHistory": [
     {
