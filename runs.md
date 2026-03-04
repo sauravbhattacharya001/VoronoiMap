@@ -1,5 +1,23 @@
 ## 2026-03-03
 
+### Gardener Run #662 — 5:50 PM PST
+- **VoronoiMap** (doc_update): Created `docs/API.md` — comprehensive API reference for all 25 modules (150+ public functions). Includes summary tables, signatures, and docstring descriptions. Added cross-reference from README. Commit `2f4522b`.
+- **agentlens** (open_issue): Filed [#29](https://github.com/sauravbhattacharya001/agentlens/issues/29) — unbounded `eventsBySession` query loads all events into memory across 5 routes. `/diff` endpoint loads two full sessions simultaneously. Also flagged `annotations.js` missing all error handling (0 try-catch across 5 routes).
+
+### Gardener Run #661 — 5:30 PM PST
+- **everything**: Replaced try/firstWhere/catch anti-pattern with `.where().isEmpty` in 2 services, documented 6 empty catch blocks in model deserialization. 8 files, net 0 lines. Commit `b83e14d`.
+- **sauravcode**: Documented all 74 undocumented built-in functions in LANGUAGE.md (20→94 covered). Added 9 new sections: Collections, Statistics, Date/Time, JSON, Regex, File I/O, Encoding/Hashing, Math extras, String extras. +126 lines. Commit `2ce96e8`.
+
+### Gardener Run #664-665 — 5:30 PM PST
+- **Task 1:** fix_issue on `Ocaml-sample-code` — Fixed #16: `eval` in `calculus.ml` silently produced `nan`/`infinity` on domain errors. Added `Domain_error` exception with checks for div-by-zero, log of non-positive, sqrt of negative, tan singularity, and pow overflow. Added `try_eval` helper returning `option`. PR #18 merged.
+- **Task 2:** bug_fix on `ai` — Quarantine enforcement was entirely cosmetic: `QuarantineManager.quarantine()` only stored restrictions in a dataclass without enforcing them. Quarantined workers could still replicate, execute tasks, and send heartbeats. Added `_quarantined` set to Controller with `mark/clear/is_quarantined` methods, integrated enforcement into `can_spawn`, `heartbeat`, and `Worker.perform_task`. All 136 tests pass. PR #21 merged.
+
+### Builder Run #140 — 5:15 PM PST
+- **Repo:** `Vidly`
+- **Feature:** RentalForecastService — demand forecasting and inventory planning. Day-of-week distribution, monthly trends, genre popularity with momentum/trend detection, per-movie velocity metrics, N-day demand forecasting with confidence decay, inventory recommendations (high demand, dead stock, never rented, genre gaps), human-readable summary report.
+- **Tests:** 45 passing (MSTest)
+- **Commit:** `1ce4d2f`
+
 ### Gardener Run #663 — 5:00 PM PST
 - **Task 1 (fix_issue):** `Ocaml-sample-code` — Fixed #16: added `Domain_error` exception and domain validation to `eval` in `calculus.ml`. Div/0, log(≤0), sqrt(<0), negative^non-integer, tan at π/2 now raise descriptive errors instead of silently returning nan/infinity. Added `try_eval` safe variant. → PR #17
 - **Task 2 (bug_fix):** `FeedReader` — Fixed repeated `DateFormatter` allocation in `ReadingStreakTracker`. `dateKey()`/`parseDate()` created a new formatter per call inside tight loops in `computeStats()`. Replaced with single lazy instance. → PR #17
