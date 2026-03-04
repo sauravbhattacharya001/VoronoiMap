@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T04:55:00",
-  "totalRuns": 678,
+  "totalRuns": 679,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 52,
@@ -11,7 +11,7 @@
     "bug_fix": {
       "weight": 86,
       "runs": 44,
-      "successes": 44
+      "successes": 45
     },
     "security_fix": {
       "weight": 94,
@@ -30,7 +30,7 @@
     "refactor": {
       "weight": 85,
       "runs": 34,
-      "successes": 34,
+      "successes": 35,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
@@ -65,7 +65,7 @@
     "open_issue": {
       "weight": 78,
       "runs": 64,
-      "successes": 64,
+      "successes": 65,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -686,7 +686,7 @@
     ]
   },
   "notes": "Run 675-676 (counted as 677-678). doc_update on GraphVisual (ARCHITECTURE.md: 11 missing analyzers + 6 utility classes + 12 test files), open_issue #33 on GraphVisual (MotifAnalyzer square participation double-counting bug).",
-  "lastRepo": "BioBots",
+  "lastRepo": "getagentbox",
   "lastRun": "2026-03-04T04:55:00",
   "runCount": 20,
   "lastWeightAdjustment": 670,
