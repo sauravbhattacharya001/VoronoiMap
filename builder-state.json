@@ -1,5 +1,5 @@
 {
-  "totalRuns": 168,
+  "totalRuns": 169,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -53,7 +53,8 @@
       "Added root cause analysis engine with automated error correlation, impact scoring, and fix suggestions",
       "Added agent capability matrix tracking which tools/models each agent uses with proficiency scoring",
       "Added trace privacy and compliance module with PII detection, GDPR/HIPAA annotation, and redaction support",
-      "Added agent health scoring system with composite health index, trend tracking, and predictive degradation alerts"
+      "Added agent health scoring system with composite health index, trend tracking, and predictive degradation alerts",
+      "Added trace sampling and rate limiting with 7 strategies (Probabilistic, RateLimited, Priority, Tail, Composite, Always, Never). Deterministic hash sampling, sliding-window rate cap, tag-based rules, thread-safe stats. 466 lines, 63 tests (2026-03-04)"
     ],
     "VoronoiMap": [
       "Added interactive mode with click-to-add points and real-time diagram updates",
@@ -168,7 +169,8 @@
       "Added prompt dependency graph with DAG visualization, impact analysis, circular dependency detection, and topological ordering",
       "Added prompt playground with side-by-side model comparison, streaming, variable injection, and response diff view",
       "Added prompt middleware pipeline with 6 built-in components (validation, logging, caching, retry, metrics, content filter), lambda middleware, variable rendering, 44 tests (2026-03-03)",
-      "Added prompt fingerprinting with SHA-256 hashing, 5 normalization levels, Jaccard similarity via shingling, batch dedup detection, FindSimilar search, fingerprint diffing, stop word removal, 53 tests (2026-03-03)"
+      "Added prompt fingerprinting with SHA-256 hashing, 5 normalization levels, Jaccard similarity via shingling, batch dedup detection, FindSimilar search, fingerprint diffing, stop word removal, 53 tests (2026-03-03)",
+      "Added Prompt Environment Manager with multi-env config (dev/staging/prod), variable overrides, promotion pipelines, rollback, comparison, deployment matrix, locking, JSON export, 51 tests (2026-03-04)"
     ],
     "everything": [
       "Added calendar view with month grid, event dots, and day-tap to filter events",
@@ -331,7 +333,7 @@
       "WiFi Security Audit -- saved profile encryption (Open/WEP/WPA-TKIP), auto-connect risks, hidden network probing, public network matching, MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO, 63 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "ai",
-  "lastFeature": "Resource hoarding detector for agent containment",
+  "lastRepo": "agentlens",
+  "lastFeature": "Trace sampling and rate limiting",
   "lastRun": "2026-03-04"
 }
