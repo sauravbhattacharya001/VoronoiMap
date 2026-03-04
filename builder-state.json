@@ -1,5 +1,5 @@
 {
-  "totalRuns": 171,
+  "totalRuns": 173,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -171,7 +171,8 @@
       "Added prompt playground with side-by-side model comparison, streaming, variable injection, and response diff view",
       "Added prompt middleware pipeline with 6 built-in components (validation, logging, caching, retry, metrics, content filter), lambda middleware, variable rendering, 44 tests (2026-03-03)",
       "Added prompt fingerprinting with SHA-256 hashing, 5 normalization levels, Jaccard similarity via shingling, batch dedup detection, FindSimilar search, fingerprint diffing, stop word removal, 53 tests (2026-03-03)",
-      "Added Prompt Environment Manager with multi-env config (dev/staging/prod), variable overrides, promotion pipelines, rollback, comparison, deployment matrix, locking, JSON export, 51 tests (2026-03-04)"
+      "Added Prompt Environment Manager with multi-env config (dev/staging/prod), variable overrides, promotion pipelines, rollback, comparison, deployment matrix, locking, JSON export, 51 tests (2026-03-04)",
+      "Added PromptResponseEvaluator for automated quality assessment of prompt-response pairs (relevance, completeness, format, conciseness, safety) with consistency analysis and A/B comparison"
     ],
     "everything": [
       "Added calendar view with month grid, event dots, and day-tap to filter events",
@@ -250,7 +251,8 @@
       "Planar Graph Analyzer -- planarity testing (Euler bound + K5/K3,3 minor detection with exhaustive contraction), face enumeration via force-directed planar embedding, dual graph construction, Kuratowski subgraph extraction, genus estimation, triangle-free bound, comprehensive PlanarityReport. 47 tests (2026-03-03)",
       "Cycle Analyzer -- cycle detection (DFS back-edges), girth computation (BFS shortest cycle), fundamental cycle basis (spanning tree), bounded simple cycle enumeration with canonical deduplication, full analysis report (circumference, cyclomatic number, per-vertex participation, most-cyclic vertex). Supports directed and undirected graphs. 51 tests (2026-03-03)",
       "Dominating Set Analyzer -- greedy/exact/independent/connected dominating sets, k-domination, bounds (ceil(n/(1+Δ)) to n-Δ), coverage analysis, verification, full report. 56 tests (2026-03-03)",
-      "Vertex Cover Analyzer -- 2-approximation, greedy, exact, weighted algorithms, kernel reduction (degree-0/1/universal rules), LP relaxation bound, cover verification, uncovered edge detection, coverage contribution, full report. 73 tests (2026-03-03)"
+      "Vertex Cover Analyzer -- 2-approximation, greedy, exact, weighted algorithms, kernel reduction (degree-0/1/universal rules), LP relaxation bound, cover verification, uncovered edge detection, coverage contribution, full report. 73 tests (2026-03-03)",
+      "Tree Analyzer -- tree/forest detection, center (leaf peeling), centroid (subtree size), diameter (double BFS), Prüfer sequence encode/decode, LCA engine (Euler tour + sparse table O(1) queries), tree isomorphism (AHU canonical form), rooted tree info, degree distribution, full report. 750 lines, 55 tests (2026-03-04)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",
@@ -289,7 +291,8 @@
       "Cell Viability Estimator -- multi-stressor model predicting cell survival through bioprinting. Shear stress (Weissenberg-Rabinowitsch), pressure (logistic), UV crosslink (Hill), thermal (Gaussian), duration (linear) damage models. Combined multiplicative estimation, sensitivity analysis with ranking, optimal window finder from historical data, batch analyze with RMSE/MAE/correlation, 2D parameter sweep, grid-search calibration, comprehensive reports. 72 tests (2026-03-03)",
       "Bioink Compatibility Matrix -- pairwise multi-material compatibility analysis across 6 dimensions (rheology, crosslinking, thermal, pH, interface adhesion, degradation), 6 built-in bioink profiles, full NxN matrix, multi-material print planning with common windows and print order suggestion. 64 tests (2026-03-04)",
       "Scaffold Degradation Predictor -- 8 material profiles, hydrolytic+enzymatic kinetics with Arrhenius/pH/crystallinity/porosity corrections, mass/MW/mechanical decay curves, functional lifetime estimation, 6 tissue targets with suitability scoring, material recommendation engine, sensitivity analysis, full reports. 59 tests (2026-03-04)",
-      "Tissue Maturation Simulator -- post-print tissue development with logistic cell growth (6 cell types), ECM deposition (collagen/GAGs/elastin/mineral), mechanical evolution, Krogh oxygen diffusion, 4-dimension maturity scoring (A-F), trajectory comparison, optimal culture time finder, full reports. 53 tests (2026-03-04)"
+      "Tissue Maturation Simulator -- post-print tissue development with logistic cell growth (6 cell types), ECM deposition (collagen/GAGs/elastin/mineral), mechanical evolution, Krogh oxygen diffusion, 4-dimension maturity scoring (A-F), trajectory comparison, optimal culture time finder, full reports. 53 tests (2026-03-04)",
+      "Vascularization Planner -- vascular channel network design with Krogh O2 diffusion, Murray's law branching trees, channel spacing (parallel/hexagonal), perfusion adequacy (O2 delivery, shear stress), Hagen-Poiseuille flow distribution, printability assessment, complete network planner with feasibility scoring, 6 tissue presets, multi-tissue comparison. 61 tests (2026-03-04)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -337,7 +340,7 @@
       "WiFi Security Audit -- saved profile encryption (Open/WEP/WPA-TKIP), auto-connect risks, hidden network probing, public network matching, MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO, 63 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "everything",
-  "lastFeature": "RoutineBuilderService",
+  "lastRepo": "BioBots",
+  "lastFeature": "VascularizationPlanner",
   "lastRun": "2026-03-04"
 }
