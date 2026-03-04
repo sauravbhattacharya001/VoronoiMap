@@ -1,5 +1,5 @@
 {
-  "totalRuns": 153,
+  "totalRuns": 154,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -307,7 +307,9 @@
       "Registry Security Audit -- UAC policy, Remote Desktop/NLA, AutoPlay/AutoRun, credential caching/WDigest, LSASS protection, Windows Script Host, WinRM exposure, Safe DLL search, AppInit_DLLs, IFEO debugger hijacking (MITRE T1546.008), Winlogon Shell/Userinit tampering. RegistryState DTO, 55 tests (2026-03-03)",
       "Firewall Rule Security Analyzer -- deep rule-level analysis: overly permissive detection, 13 dangerous ports, public profile exposure, programless rules, duplicate/shadowed rule detection, composite risk scoring (0-100), FirewallRuleState DTO, port spec parser. 60 tests (2026-03-03)",
       "SMB & Network Share Security Audit (SmbShareAudit.cs, 496 lines) -- SMBv1 detection, signing enforcement, encryption status, guest/null session access, anonymous enumeration, hidden shares, permissive permissions. 9 security categories, 39 tests (2026-03-03)",
-      "Driver Security Audit -- unsigned driver detection, BYOVD vulnerable driver hash matching (30+ known drivers from loldrivers.io), Secure Boot/HVCI/test signing checks, suspicious path analysis, driver age warnings, DriverState DTO. 67 tests (2026-03-03)"
+      "Driver Security Audit -- unsigned driver detection, BYOVD vulnerable driver hash matching (30+ known drivers from loldrivers.io), Secure Boot/HVCI/test signing checks, suspicious path analysis, driver age warnings, DriverState DTO. 67 tests (2026-03-03)",
+      "Bluetooth Security Audit -- radio state, discoverability, paired device trust (stale/unauthenticated/unnamed/suspicious type), risky service detection (OBEX/Serial/PAN), SSP/encryption enforcement, adapter name hostname leak, driver age, BluetoothState DTO. 60 tests (2026-03-03)",
+      "Environment Variable Security Audit -- PATH hijacking (T1574.007) via writable/relative/UNC/nonexistent dirs, secret leakage (API keys/tokens/passwords with 15 detection patterns), proxy security (HTTP_PROXY credential embedding, insecure protocol), PATHEXT risk analysis (12 risky extensions), TEMP/TMP shared directory detection. EnvironmentState DTO, 46 tests (2026-03-03)"
     ]
   }
 }
