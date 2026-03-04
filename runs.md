@@ -1,3 +1,29 @@
+## Gardener Run 724 -- 2026-03-04 2:50 PM PST
+- **Repo:** gif-captcha
+- **Task 1 (security_fix):** Timing-safe token verification
+  - verifyToken() had a timing side-channel: length check returned early before constant-time comparison, leaking signature length
+  - Replaced manual char-by-char loop with crypto.timingSafeEqual()
+  - Length mismatches now consume constant time (compare expected against itself then reject)
+  - All 49 token verifier tests pass
+- **Task 2 (perf_improvement):** O(1) rate limiter LRU hot path
+  - touchClient() used clientOrder.indexOf() + splice() on EVERY rate limit check — O(n) with n=10,000 default maxClients
+  - Removed clientOrder array entirely; eviction now uses lastAccess timestamps with sort (O(n log n) but only at capacity)
+  - Hot path (check()) drops from O(n) to O(1) — massive throughput improvement under load
+  - All 44 rate limiter tests pass
+- **Commit:** e364544
+## Gardener Run 725-726 -- 2026-03-04 2:30 PM PST
+- **Task 1:** fix_issue on **agenticchat** — #30 cross-tab localStorage sync
+  - Added `storage` event listener for cross-tab conflict detection
+  - Created sync banner UI with Reload/Keep/Switch/Ignore actions
+  - All SessionManager writes now go through `_guardedSave()` to prevent self-loops
+  - PR #31: https://github.com/sauravbhattacharya001/agenticchat/pull/31
+- **Task 2:** fix_issue on **prompt** — #36 streaming response support
+  - Added `StreamChunk` model with Delta, FullText, IsComplete, FinishReason, TokensUsed
+  - Added `Main.GetResponseStreamAsync()` — IAsyncEnumerable streaming for single prompts
+  - Added `Conversation.SendStreamAsync()` — streaming with auto history update
+  - Build verified: 0 errors
+  - PR #37: https://github.com/sauravbhattacharya001/prompt/pull/37
+
 ## Builder Run 193 -- 2026-03-04 2:35 PM PST
 - **Repo:** gif-captcha
 - **Feature:** Security Incident Correlator (createIncidentCorrelator)
@@ -6284,6 +6310,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
