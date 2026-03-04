@@ -1,5 +1,5 @@
 {
-  "totalRuns": 146,
+  "totalRuns": 147,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -182,6 +182,7 @@
       "Added Goals Tracker with milestones, progress tracking, deadlines, category organization, and overview dashboard (2026-03-03)",
       "Added Mood Journal with 5-level mood logging, 14 activity tags, notes, trend charts, activity-mood correlation, streaks, and swipe-to-delete history (2026-03-03)",
       "Sleep Tracker with bedtime/wake time logging, 5-level quality rating, 12 sleep factors, awakenings count, duration trends, factor-quality correlations, sleep debt calculator, consistency scoring, streak tracking, 14-day bar chart, 42 tests (2026-03-03)",
+      "Eisenhower Matrix Service — 4-quadrant event prioritization (urgency × importance scoring), configurable thresholds, tag weights, balance scoring, recommendations, 45 tests (2026-03-03)",
       "Event Pattern Recognizer — discovers recurring patterns from historical events, detects scheduling habits (time-of-day, busiest day, density, duration), predicts future events with confidence decay, suggests formalizing informal recurrences. 42 tests (2026-03-03)",
       "Weekly Planner Service — generates structured day-by-day plans from events/goals/habits/free time with urgency-based goal allocation (deadline × progress scoring), habit frequency scheduling, overlap detection, load scoring (free/light/moderate/heavy/overloaded), smart warnings (context switching, unallocated goals, imminent deadlines), configurable working hours/buffer/block sizes, text summary. 48 tests (2026-03-03)"
     ],
@@ -250,7 +251,8 @@
       "ArticleTrendDetector -- trending topic discovery with time-window keyword frequency tracking, momentum scoring, rising/spike/stable/declining/fading detection, top keywords, topic history, summary, 38 tests (2026-03-03)",
       "ArticleSummarizer -- extractive TF-IDF summarization with title/position boosting, batch and multi-article digest, top keyword extraction, compression ratio, 38 tests (2026-03-03)",
       "FeedPerformanceAnalyzer -- per-feed report cards with publishing frequency/consistency, Flesch readability, sentiment profiling, engagement tracking, composite 0-100 scoring (3 weight presets), A+ through F grading, actionable recommendations, multi-feed comparison with ranking and summary. 50 tests (2026-03-03)",
-      "ReadingQueueManager -- ordered read-later queue with 4 priority levels, estimated reading time (238 WPM), completion tracking, queue position management (move up/down/top/bottom), 3 sort modes (priority/time/date), per-article notes, filtering (status/priority/feed), batch enqueue, queue statistics, estimated time to empty. 57 tests (2026-03-03)"
+      "ReadingQueueManager -- ordered read-later queue with 4 priority levels, estimated reading time (238 WPM), completion tracking, queue position management (move up/down/top/bottom), 3 sort modes (priority/time/date), per-article notes, filtering (status/priority/feed), batch enqueue, queue statistics, estimated time to empty. 57 tests (2026-03-03)",
+      "FeedBundleManager -- curated feed bundles by topic (6 built-in: Tech, Dev, Science, Design, AI, News with 27 feeds). One-click subscribe, custom bundle creation with dedup, add/remove feeds, built-in protection, JSON export/import, search, statistics. 48 tests (2026-03-03)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
