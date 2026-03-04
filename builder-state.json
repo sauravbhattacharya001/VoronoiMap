@@ -1,5 +1,5 @@
 {
-  "totalRuns": 159,
+  "totalRuns": 162,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -203,7 +203,8 @@
       "Agent Goal Inference Engine — Bayesian latent goal detection with 5 goal hypotheses, configurable priors (uniform/skeptical/trust), conflict detection, deception scoring, multi-agent correlation, temporal tracking, CLI demo, 50 tests (2026-03-03)",
       "Agent Consensus Protocol -- Byzantine fault-tolerant multi-agent voting for safety decisions (quarantine/terminate/escalate). Simple majority + supermajority for critical actions, weighted voting, quorum enforcement, proposal lifecycle, tamper-evident SHA-256 audit chain, voting bloc detection, vote change policy, per-voter rate limiting, CLI demo. 62 tests (2026-03-03)",
       "Agent Self-Modification Detector -- multi-vector detection (code/config/model/prompt/goal), 18 built-in rules with sequence matching, intent profiling (stealth/persistence/sophistication), escalation detection, correlation clustering for coordinated campaigns, 5 agent strategies, composite risk scoring, CLI. 57 tests (2026-03-03)",
-      "Agent Game-Theory Analyzer -- models inter-agent interactions as 2x2 symmetric games (Prisoner's Dilemma, Stag Hunt, Chicken, Harmony). Payoff matrix classification, Nash equilibria (pure + mixed), strategy detection (TFT/grudger/pavlov/random/always-C/D), 5-category alert detection (collusion/escalation/free-riding/instability/dominant-defectors), cooperation trend analysis, composite risk scoring (0-100), round-robin tournament simulation with 7 strategies, CLI. 979 lines, 63 tests (2026-03-03)"
+      "Agent Game-Theory Analyzer -- models inter-agent interactions as 2x2 symmetric games (Prisoner's Dilemma, Stag Hunt, Chicken, Harmony). Payoff matrix classification, Nash equilibria (pure + mixed), strategy detection (TFT/grudger/pavlov/random/always-C/D), 5-category alert detection (collusion/escalation/free-riding/instability/dominant-defectors), cooperation trend analysis, composite risk scoring (0-100), round-robin tournament simulation with 7 strategies, CLI. 979 lines, 63 tests (2026-03-03)",
+      "Agent Covert Channel Detector -- 5-vector analysis (content entropy/base64/hex/padding, timing regularity/bimodal/decode, protocol deviation, frequency n-gram anomalies, metadata leakage), per-pair profiling with suspicion scoring, incremental drift detection, single-message scanning, configurable thresholds, risk scoring 0-100 with grades and recommendations, CLI demo. 700 lines, 64 tests (2026-03-04)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -276,7 +277,8 @@
       "GCode Analyzer — parse GCode files with extrusion metrics (filament length, volume), movement tracking (print vs travel distance), feedrate stats, retraction analysis, layer breakdown, bounding box, temperature/fan tracking, time estimation, layer summary, GCode comparison with deltas, cost estimation (material + machine + labor + consumables + waste), 60 tests (2026-03-03)",
       "Cross-linking Kinetics Analyzer — first-order kinetics (degree-of-crosslinking curves, gel point estimation), Hill equation dose-response, bell-shaped viability model (benefit vs quadratic damage, golden-section optimization), therapeutic dose window, 2D response surface (duration x intensity grid with peak detection), photo-initiator efficiency (Beer-Lambert, radical yield), print data analysis with intensity binning and rate constant estimation. 81 tests (2026-03-03)",
       "Scaffold Porosity Analyzer — volumetric porosity calculation, pore size distribution, interconnectivity estimation, Kozeny-Carman permeability, tissue suitability scoring (6 types), parameter optimization. 62 tests (2026-03-03)",
-      "Cell Viability Estimator -- multi-stressor model predicting cell survival through bioprinting. Shear stress (Weissenberg-Rabinowitsch), pressure (logistic), UV crosslink (Hill), thermal (Gaussian), duration (linear) damage models. Combined multiplicative estimation, sensitivity analysis with ranking, optimal window finder from historical data, batch analyze with RMSE/MAE/correlation, 2D parameter sweep, grid-search calibration, comprehensive reports. 72 tests (2026-03-03)"
+      "Cell Viability Estimator -- multi-stressor model predicting cell survival through bioprinting. Shear stress (Weissenberg-Rabinowitsch), pressure (logistic), UV crosslink (Hill), thermal (Gaussian), duration (linear) damage models. Combined multiplicative estimation, sensitivity analysis with ranking, optimal window finder from historical data, batch analyze with RMSE/MAE/correlation, 2D parameter sweep, grid-search calibration, comprehensive reports. 72 tests (2026-03-03)",
+      "Bioink Compatibility Matrix -- pairwise multi-material compatibility analysis across 6 dimensions (rheology, crosslinking, thermal, pH, interface adhesion, degradation), 6 built-in bioink profiles, full NxN matrix, multi-material print planning with common windows and print order suggestion. 64 tests (2026-03-04)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -294,7 +296,8 @@
       "CSP solver -- constraint satisfaction problems with backtracking search, AC-3 arc consistency, MRV/LCV heuristics, forward checking. Applications: N-Queens, graph coloring, Sudoku. 35 tests (2026-03-03)",
       "miniKanren logic programming engine -- unification with occurs check, lazy interleaving streams, relational list ops (appendo/membero/reverseo), Peano arithmetic (pluso/multo/leo), map coloring, permutations, reification, 55+ tests (2026-03-03)",
       "Algebraic effects and handlers -- free monads, CPS encoding, State/Exception/Nondeterminism/Writer/Reader/Coroutine effects, effect composition via coproducts, N-Queens solver, Fibonacci generator, 50+ tests (2026-03-03)",
-      "Untyped lambda calculus interpreter (lambda.ml) -- named + De Bruijn terms, capture-avoiding substitution, alpha-equivalence, 3 reduction strategies (normal/applicative/CBV), Church booleans/numerals/pairs/lists with extraction, S/K/I/B/C/W/Y/Z/Theta combinators, parser, term metrics. 800 lines, 62 tests (2026-03-03)"
+      "Untyped lambda calculus interpreter (lambda.ml) -- named + De Bruijn terms, capture-avoiding substitution, alpha-equivalence, 3 reduction strategies (normal/applicative/CBV), Church booleans/numerals/pairs/lists with extraction, S/K/I/B/C/W/Y/Z/Theta combinators, parser, term metrics. 800 lines, 62 tests (2026-03-03)",
+      "Automatic differentiation (forward & reverse mode) -- dual numbers, tape-based backprop, gradient/Jacobian/Hessian, Adam/momentum optimizers, neural network building blocks, 65+ tests (2026-03-04)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
