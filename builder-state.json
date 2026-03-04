@@ -1,5 +1,5 @@
 {
-  "totalRuns": 139,
+  "totalRuns": 141,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -213,7 +213,8 @@
       "Added promotional coupon system with percentage/fixed discounts, checkout integration, management UI, validation, and 25 tests (2026-03-03)",
       "Added gift card system with balance management, redemption, top-ups, transaction history, balance checker, and 38 tests (2026-03-03)",
       "Added rental bundle deals system with percentage/fixed/free-movie discounts, genre restrictions, best-bundle finder, calculator, usage tracking, and 25 tests (2026-03-03)",
-      "RatingEngineService — Bayesian weighted ratings (IMDb WR formula), global + per-genre rankings with vote-count tiebreaker, trending scores with 30-day half-life exponential decay, controversy detection (stdDev + polarization composite), comprehensive rating reports. DTOs: BayesianRating, TrendingScore, ControversyScore, MovieRatingReport. 48 tests (2026-03-03)"
+      "RatingEngineService — Bayesian weighted ratings (IMDb WR formula), global + per-genre rankings with vote-count tiebreaker, trending scores with 30-day half-life exponential decay, controversy detection (stdDev + polarization composite), comprehensive rating reports. DTOs: BayesianRating, TrendingScore, ControversyScore, MovieRatingReport. 48 tests (2026-03-03)",
+      "RentalForecastService — day-of-week distribution, monthly trends, genre popularity with momentum, movie velocity, N-day demand forecasting, inventory recommendations (high demand/dead stock/never rented/genre gaps), summary report. 45 tests (2026-03-03)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
@@ -244,7 +245,8 @@
       "FeedUpdateScheduler -- adaptive polling that learns feed publishing frequency, back-off/speed-up algorithm, tier classification, per-feed stats, JSON persistence, 41 tests (2026-03-03)",
       "ArticleDeduplicator -- cross-feed duplicate detection using multi-signal fingerprinting (title 3-gram Jaccard, content term overlap, URL domain+path matching), configurable weights/threshold, canonical selection, human-readable grouping reasons, 48 tests (2026-03-03)",
       "ArticleTrendDetector -- trending topic discovery with time-window keyword frequency tracking, momentum scoring, rising/spike/stable/declining/fading detection, top keywords, topic history, summary, 38 tests (2026-03-03)",
-      "ArticleSummarizer -- extractive TF-IDF summarization with title/position boosting, batch and multi-article digest, top keyword extraction, compression ratio, 38 tests (2026-03-03)"
+      "ArticleSummarizer -- extractive TF-IDF summarization with title/position boosting, batch and multi-article digest, top keyword extraction, compression ratio, 38 tests (2026-03-03)",
+      "FeedPerformanceAnalyzer -- per-feed report cards with publishing frequency/consistency, Flesch readability, sentiment profiling, engagement tracking, composite 0-100 scoring (3 weight presets), A+ through F grading, actionable recommendations, multi-feed comparison with ranking and summary. 50 tests (2026-03-03)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
