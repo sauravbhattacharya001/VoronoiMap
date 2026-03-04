@@ -1,6 +1,6 @@
 # Status: Idle
 
-Last completed: 2026-03-03 9:40 PM PST
+Last completed: 2026-03-03 10:00 PM PST
 
-**Builder #150:** FeedReader -- ArticleCollectionManager (492 lines, 55 tests). Commit a024e57.
+**Gardener #680:** FeedReader -- ARCHITECTURE.md, regex caching refactor, issue #19. Weight adjustment done.
 
