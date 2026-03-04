@@ -1,5 +1,5 @@
 {
-  "totalRuns": 177,
+  "totalRuns": 179,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -235,7 +235,8 @@
       "RentalForecastService â€” day-of-week distribution, monthly trends, genre popularity with momentum, movie velocity, N-day demand forecasting, inventory recommendations (high demand/dead stock/never rented/genre gaps), summary report. 45 tests (2026-03-03)",
       "CustomerSegmentationService â€” RFM (Recency/Frequency/Monetary) analysis with quintile scoring, 11 marketing segments, segment distribution summary, at-risk customer identification, marketing recommendations, segment migration comparison. 58 tests (2026-03-03)",
       "ChurnPredictorService -- multi-factor churn risk analysis (recency/frequency-decline/engagement/late-returns/genre-diversity), composite 0-100 scoring, 4 risk levels, configurable weights/thresholds, winnable customer targeting, time-period comparison, smart retention actions. 55 tests (2026-03-04)",
-      "WatchlistService -- smart ordering (priority+availability+rating), trending movies, watchlist comparison (Dice similarity), insights (genre breakdown, stale items, top pick, avg rating), bulk add with auto new-release promotion. 435 lines + 35 tests (2026-03-04)"
+      "WatchlistService -- smart ordering (priority+availability+rating), trending movies, watchlist comparison (Dice similarity), insights (genre breakdown, stale items, top pick, avg rating), bulk add with auto new-release promotion. 435 lines + 35 tests (2026-03-04)",
+      "MovieLifecycleService -- lifecycle stage tracking (NewRelease/Trending/Catalog/Archive) with demand scoring, pricing recommendations (premium/scaled/standard/discount), retirement candidate detection, restock suggestions, transition alerts, fleet health report. Configurable thresholds via LifecycleConfig. Also fixed pre-existing build error in WatchlistServiceTests stubs. 55 tests (2026-03-04)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
@@ -343,10 +344,11 @@
       "Bluetooth Security Audit -- radio state, discoverability, paired device trust (stale/unauthenticated/unnamed/suspicious type), risky service detection (OBEX/Serial/PAN), SSP/encryption enforcement, adapter name hostname leak, driver age, BluetoothState DTO. 60 tests (2026-03-03)",
       "Environment Variable Security Audit -- PATH hijacking (T1574.007) via writable/relative/UNC/nonexistent dirs, secret leakage (API keys/tokens/passwords with 15 detection patterns), proxy security (HTTP_PROXY credential embedding, insecure protocol), PATHEXT risk analysis (12 risky extensions), TEMP/TMP shared directory detection. EnvironmentState DTO, 46 tests (2026-03-03)",
       "Group Policy Security Audit (2026-03-04)",
-      "WiFi Security Audit -- saved profile encryption (Open/WEP/WPA-TKIP), auto-connect risks, hidden network probing, public network matching, MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO, 63 tests (2026-03-04)"
+      "WiFi Security Audit -- saved profile encryption (Open/WEP/WPA-TKIP), auto-connect risks, hidden network probing, public network matching, MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO, 63 tests (2026-03-04)",
+      "Remote Access Security Audit -- RDP (NLA/encryption/security layer/idle timeout/port/user group), SSH (password auth/root login/port), 13 third-party tools with risk scoring (TeamViewer/AnyDesk/VNC/Ammyy/etc), WinRM (encryption/basic auth/HTTP vs HTTPS), Remote Registry, Remote Assistance, Telnet, overall exposure scoring. RemoteAccessState DTO, 66 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "getagentbox",
-  "lastFeature": "ActivityFeed",
+  "lastRepo": "Vidly",
+  "lastFeature": "MovieLifecycleService",
   "lastRun": "2026-03-04"
 }
