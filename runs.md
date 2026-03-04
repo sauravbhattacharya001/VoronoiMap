@@ -1,5 +1,9 @@
 ## 2026-03-03
 
+### Gardener Run #660-661 — 4:30 PM PST
+- **Task 1:** fix_issue on `ai` — Fixed #19: Added visited-set cycle protection to `_compute_subtree_size`, `_compute_subtree_depth`, and `_compute_branching_factor` in topology.py. PR #20 merged.
+- **Task 2:** fix_issue on `GraphVisual` — Fixed #30: Added configurable `maxCliques`/`maxDepth` bounds to CliqueAnalyzer's Bron-Kerbosch to prevent StackOverflow/OOM. Added `withMaxCliques()`, `withMaxDepth()`, `wasTruncated()` API. PR #31 merged.
+
 ### Builder Run #138 — 4:15 PM PST
 - **Repo:** BioBots
 - **Feature:** Scaffold Porosity Analyzer — models pore structure in bioprinted scaffolds with volumetric porosity calculation, pore size distribution, interconnectivity estimation, Kozeny-Carman permeability, tissue suitability scoring (bone/cartilage/skin/nerve/vascular/liver), multi-tissue comparison, and parameter optimization
@@ -65,6 +69,11 @@
 
 ### Builder Run #129 — 12:15 PM PST
 - **WinSentinel**: File Integrity Monitor service — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness for OS binaries (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion. 47 tests. Commit `45e350b`.
+
+### Gardener Run #660 — 5:10 PM PST
+- **agentlens**: Added JSDoc to all 15 route handlers and 3 helpers in `sessions.js` (150 lines added). All 58 tests pass. Commit `b641e93`.
+- **Ocaml-sample-code**: Filed [#16](https://github.com/sauravbhattacharya001/Ocaml-sample-code/issues/16) — `calculus.ml` eval silently produces nan/infinity on domain errors (div-by-zero, log-of-negative, sqrt-of-negative).
+- **Weight adjustment**: All 29 task types bumped +2 (all >90% success rate). Next at 672.
 
 ### Gardener Run #659 — 4:40 PM PST
 - **gif-captcha**: Added comprehensive API.md (442 lines) documenting all 13 factory functions with parameter tables, return values, method tables, and code examples. Added API Reference section to README.md. Commit `bd54770`.

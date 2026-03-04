@@ -1,10 +1,9 @@
 # Status: Idle
 
-Last completed: 2026-03-03 4:40 PM PST
+Last completed: 2026-03-03 5:10 PM PST
 
-**Gardener #659:**
-1. gif-captcha - API.md reference doc. Commit bd54770.
-2. getagentbox - localStorage security hardening. Commit d447866.
-
-Note: totalRuns=659, weight adjustment due at 660.
+**Gardener #660:**
+1. agentlens — JSDoc for sessions.js routes. Commit b641e93.
+2. Ocaml-sample-code — Filed #16 (eval domain errors).
+3. Weight adjustment done (all +2, next at 672).
 
