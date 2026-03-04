@@ -1,3 +1,8 @@
+## Gardener Run 681-682 — 2026-03-03 10:00 PM PST
+- **Task 1:** fix_issue on FeedReader — PR #20 merged, closes #19. Batched `save()` in `shouldMute`, added batch overload `shouldMute(_:[Story])`, cached `activeFilters` in local vars in `mutedStories`/`filteredStories` closures to avoid O(n*m) recomputation.
+- **Task 2:** fix_issue on getagentbox — PR #22 merged, closes #21. Debounced `cacheSectionOffsets` on resize with 200ms timer to prevent layout thrashing at 60fps.
+- **Note:** All 16 repos now have all 29 task types completed. Only open issues remain as actionable work.
+
 ## Feature Builder Run 154 — 2026-03-03 9:45 PM PST
 - **Repo:** WinSentinel
 - **Feature:** Bluetooth Security Audit — radio state/discoverability, paired device trust (stale/unauthenticated/unnamed/suspicious type), risky service detection (OBEX/Serial/PAN), SSP/encryption enforcement, adapter name hostname leak, driver age warnings, BluetoothState DTO for testability. 60 tests.
@@ -87,6 +92,11 @@
 - **Tests:** 47/47 passing
 - **Highlights:** Planarity testing via Euler bound + K5/K3,3 minor detection (exhaustive contraction for ≤12 vertices, 8 heuristic strategies for larger). Face enumeration using force-directed planar embedding with angle-ordered neighbors. Dual graph construction. Kuratowski subdivision certificates. Triangle-free bound. Genus estimation. Comprehensive PlanarityReport with text output.
 ## 2026-03-03
+### Gardener Run #681 - 10:55 PM PST
+- **sauravcode** (refactor): Extracted `_scoped_env()` context manager replacing 6 instances of save/restore pattern across execute_function, _call_lambda, _call_function_with_args, _eval_pipe. Extracted `_guarded_repeat()` consolidating 4 identical MAX_ALLOC_SIZE guards. Net -4 lines. All 1598 tests pass. Commit `14f2f0a`.
+- **sauravcode** (doc_update): Created STDLIB.md (206 lines) — complete reference for all 95 built-in functions in 12 categories with usage examples and operator table.
+- **sauravcode** (open_issue): Filed [#26](https://github.com/sauravbhattacharya001/sauravcode/issues/26) — import: module functions lose access to module-level variables (closure scope bug).
+
 ### Builder Run #151 - 10:15 PM PST
 - **WinSentinel** — Environment Variable Security Audit (`EnvironmentAudit.cs`, 683 lines). PATH hijacking detection (writable dirs before System32, relative/UNC/non-existent paths), secret leakage in env vars (15 detection patterns), proxy security (credential embedding, insecure HTTP), PATHEXT risk analysis, TEMP/TMP validation. EnvironmentState DTO. Also registered missing DriverAudit in AuditEngine. 46 tests, all passing. Commit `369a853`.
 
@@ -5120,6 +5130,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
