@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T11:00:00",
-  "totalRuns": 694,
+  "totalRuns": 695,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 20,
-      "runs": 47,
-      "successes": 48
+      "runs": 48,
+      "successes": 49
     },
     "security_fix": {
       "weight": 20,
@@ -49,23 +49,23 @@
     },
     "doc_update": {
       "weight": 20,
-      "runs": 41,
-      "successes": 43,
+      "runs": 42,
+      "successes": 44,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
       "weight": 20,
-      "runs": 37,
-      "successes": 37,
+      "runs": 38,
+      "successes": 38,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 20,
-      "runs": 66,
-      "successes": 69,
+      "runs": 67,
+      "successes": 70,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 695-696. fix_issue: VoronoiMap #40 double-BFS diameter (PR #41). fix_issue: Vidly #32 O(C*R) segmentation (PR #33 updated).",
-  "lastRepo": "getagentbox",
-  "lastRun": "2026-03-04T11:20:00",
-  "runCount": 22,
+  "notes": "Run 697-698. open_issue+bug_fix: gif-captcha #16 resetAll() prototype pollution (PR #17).",
+  "lastRepo": "prompt",
+  "lastRun": "2026-03-04T11:35:00",
+  "runCount": 24,
   "lastWeightAdjustment": 690,
   "adjustmentHistory": [
     {
