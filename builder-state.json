@@ -1,5 +1,5 @@
 {
-  "totalRuns": 149,
+  "totalRuns": 151,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -216,7 +216,8 @@
       "Added gift card system with balance management, redemption, top-ups, transaction history, balance checker, and 38 tests (2026-03-03)",
       "Added rental bundle deals system with percentage/fixed/free-movie discounts, genre restrictions, best-bundle finder, calculator, usage tracking, and 25 tests (2026-03-03)",
       "RatingEngineService — Bayesian weighted ratings (IMDb WR formula), global + per-genre rankings with vote-count tiebreaker, trending scores with 30-day half-life exponential decay, controversy detection (stdDev + polarization composite), comprehensive rating reports. DTOs: BayesianRating, TrendingScore, ControversyScore, MovieRatingReport. 48 tests (2026-03-03)",
-      "RentalForecastService — day-of-week distribution, monthly trends, genre popularity with momentum, movie velocity, N-day demand forecasting, inventory recommendations (high demand/dead stock/never rented/genre gaps), summary report. 45 tests (2026-03-03)"
+      "RentalForecastService — day-of-week distribution, monthly trends, genre popularity with momentum, movie velocity, N-day demand forecasting, inventory recommendations (high demand/dead stock/never rented/genre gaps), summary report. 45 tests (2026-03-03)",
+      "CustomerSegmentationService — RFM (Recency/Frequency/Monetary) analysis with quintile scoring, 11 marketing segments, segment distribution summary, at-risk customer identification, marketing recommendations, segment migration comparison. 58 tests (2026-03-03)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
@@ -303,7 +304,8 @@
       "File Integrity Monitor — SHA-256 baseline hashing for critical system files, change detection (modified/added/deleted/permissions), critical file awareness (lsass, ntoskrnl, SAM, etc.), JSON baseline serialization, audit Finding conversion, 47 tests (2026-03-03)",
       "Windows Service Security Audit — unquoted path detection, suspicious binary locations, SYSTEM services outside trusted paths, disabled security-critical services, missing auto-start binaries, command wrapper detection, ServiceState DTO, 63 tests (2026-03-03)",
       "Registry Security Audit -- UAC policy, Remote Desktop/NLA, AutoPlay/AutoRun, credential caching/WDigest, LSASS protection, Windows Script Host, WinRM exposure, Safe DLL search, AppInit_DLLs, IFEO debugger hijacking (MITRE T1546.008), Winlogon Shell/Userinit tampering. RegistryState DTO, 55 tests (2026-03-03)",
-      "Firewall Rule Security Analyzer -- deep rule-level analysis: overly permissive detection, 13 dangerous ports, public profile exposure, programless rules, duplicate/shadowed rule detection, composite risk scoring (0-100), FirewallRuleState DTO, port spec parser. 60 tests (2026-03-03)"
+      "Firewall Rule Security Analyzer -- deep rule-level analysis: overly permissive detection, 13 dangerous ports, public profile exposure, programless rules, duplicate/shadowed rule detection, composite risk scoring (0-100), FirewallRuleState DTO, port spec parser. 60 tests (2026-03-03)",
+      "SMB & Network Share Security Audit (SmbShareAudit.cs, 496 lines) -- SMBv1 detection, signing enforcement, encryption status, guest/null session access, anonymous enumeration, hidden shares, permissive permissions. 9 security categories, 39 tests (2026-03-03)"
     ]
   }
 }

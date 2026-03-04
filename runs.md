@@ -1,3 +1,10 @@
+## Feature Builder Run 150 — 2026-03-03 8:45 PM PST
+- **Repo:** Vidly
+- **Feature:** CustomerSegmentationService — RFM (Recency/Frequency/Monetary) analysis
+- **Details:** Quintile-based R/F/M scoring (1-5), 11 marketing segments (Champions through Lost), segment distribution summary, at-risk customer identification, per-segment marketing recommendations, segment migration comparison between time periods. Also fixed pre-existing build errors in ReviewServiceTests.cs.
+- **Tests:** 58 passing
+- **Commit:** c845447
+
 ## Gardener Run 675-676 — 2026-03-03 8:30 PM PST
 - **Task 1:** fix_issue on **getagentbox** (#20) — Replaced O(n×m) nested loop in CommandPalette.render() with O(1) poolIndex hash map lookup. Commit f75b204.
 - **Task 2:** fix_issue on **BioBots** (#22) — Added crosslinking duration parameter to Batch Planner estimateTime(), plus form input field. Fixes 4-hour underestimation on UV crosslinking jobs. Commit c6af912.
@@ -62,6 +69,9 @@
 - **Highlights:** Planarity testing via Euler bound + K5/K3,3 minor detection (exhaustive contraction for ≤12 vertices, 8 heuristic strategies for larger). Face enumeration using force-directed planar embedding with angle-ordered neighbors. Dual graph construction. Kuratowski subdivision certificates. Triangle-free bound. Genus estimation. Comprehensive PlanarityReport with text output.
 ## 2026-03-03
 
+### Builder Run #149 - 8:48 PM PST
+- **WinSentinel** (feature): SMB & Network Share Security Audit (`SmbShareAudit.cs`, 496 lines). 9 security categories: SMBv1 (EternalBlue), signing, encryption, guest/null session, anonymous enumeration, null pipes/shares, hidden shares, permissive permissions. 39 tests. Commit `d088735`.
+
 ### Gardener Run #675-676 - 8:35 PM PST
 - **GraphVisual** (doc_update): Updated ARCHITECTURE.md -- added 11 missing analyzers (BipartiteAnalyzer, CycleAnalyzer, EulerianPathAnalyzer, GraphDiffAnalyzer, GraphIsomorphismAnalyzer, GraphResilienceAnalyzer, MotifAnalyzer, NetworkFlowAnalyzer, RandomWalkAnalyzer, SpectralAnalyzer, StronglyConnectedComponentsAnalyzer), 6 utility classes, 12 test files. Fixed class counts (18->29, 17->30 test). Commit `8df4b07`.
 - **GraphVisual** (open_issue): Filed [#33](https://github.com/sauravbhattacharya001/GraphVisual/issues/33) -- MotifAnalyzer.countSquares() divides squareCount/2 but vertex participation is not corrected (2x overcounted) and only non-adjacent pair vertices get credit (common-neighbor corners excluded).
@@ -113,6 +123,9 @@
 ### Gardener Run #661 — 5:30 PM PST
 - **everything**: Replaced try/firstWhere/catch anti-pattern with `.where().isEmpty` in 2 services, documented 6 empty catch blocks in model deserialization. 8 files, net 0 lines. Commit `b83e14d`.
 - **sauravcode**: Documented all 74 undocumented built-in functions in LANGUAGE.md (20→94 covered). Added 9 new sections: Collections, Statistics, Date/Time, JSON, Regex, File I/O, Encoding/Hashing, Math extras, String extras. +126 lines. Commit `2ce96e8`.
+
+### Builder Run #149 - 8:48 PM PST
+- **WinSentinel** (feature): SMB & Network Share Security Audit (`SmbShareAudit.cs`, 496 lines). 9 security categories: SMBv1 (EternalBlue), signing, encryption, guest/null session, anonymous enumeration, null pipes/shares, hidden shares, permissive permissions. 39 tests. Commit `d088735`.
 
 ### Gardener Run #675-676 - 8:35 PM PST
 - **GraphVisual** (doc_update): Updated ARCHITECTURE.md -- added 11 missing analyzers (BipartiteAnalyzer, CycleAnalyzer, EulerianPathAnalyzer, GraphDiffAnalyzer, GraphIsomorphismAnalyzer, GraphResilienceAnalyzer, MotifAnalyzer, NetworkFlowAnalyzer, RandomWalkAnalyzer, SpectralAnalyzer, StronglyConnectedComponentsAnalyzer), 6 utility classes, 12 test files. Fixed class counts (18->29, 17->30 test). Commit `8df4b07`.
@@ -2202,6 +2215,9 @@ Committed and pushed workspace to `zalenix-memory`. 12 files changed (435+/55−
 **Task 1 (open_issue):** everything — Filed issue #24 "ICS export drops event reminders (no VALARM)". `IcsExportService._buildVEvent()` builds VEVENT without VALARM components for events with `ReminderSettings`, silently dropping all reminders during ICS export. Issue references RFC 5545 §3.6.6 and the relevant source files.
 **Task 2 (perf_improvement):** prompt — Hoisted 9 inline `Regex.Replace()` calls in `PromptGuard.Sanitize()` to `private static readonly Regex` fields with `RegexOptions.Compiled`. Also extracted shared name-validation pattern (`^[\w\-\.]+$`) used by `PromptLibrary.cs` and `PromptVersionManager.cs` into `PromptGuard.NameValidationPattern`. 3 files changed, 38 insertions, 17 deletions. Build succeeded, 852 tests passing (7 pre-existing failures unchanged). Commit `7737d30`.
 
+### Builder Run #149 - 8:48 PM PST
+- **WinSentinel** (feature): SMB & Network Share Security Audit (`SmbShareAudit.cs`, 496 lines). 9 security categories: SMBv1 (EternalBlue), signing, encryption, guest/null session, anonymous enumeration, null pipes/shares, hidden shares, permissive permissions. 39 tests. Commit `d088735`.
+
 ### Gardener Run #675-676 - 8:35 PM PST
 - **GraphVisual** (doc_update): Updated ARCHITECTURE.md -- added 11 missing analyzers (BipartiteAnalyzer, CycleAnalyzer, EulerianPathAnalyzer, GraphDiffAnalyzer, GraphIsomorphismAnalyzer, GraphResilienceAnalyzer, MotifAnalyzer, NetworkFlowAnalyzer, RandomWalkAnalyzer, SpectralAnalyzer, StronglyConnectedComponentsAnalyzer), 6 utility classes, 12 test files. Fixed class counts (18->29, 17->30 test). Commit `8df4b07`.
 - **GraphVisual** (open_issue): Filed [#33](https://github.com/sauravbhattacharya001/GraphVisual/issues/33) -- MotifAnalyzer.countSquares() divides squareCount/2 but vertex participation is not corrected (2x overcounted) and only non-adjacent pair vertices get credit (common-neighbor corners excluded).
@@ -2234,6 +2250,9 @@ Committed and pushed workspace to `zalenix-memory`. 12 files changed (435+/55−
 ### Gardener Run #453 — 5:12 AM PST
 **Task 1 (fix_issue):** Vidly — Fixed [#21](https://github.com/sauravbhattacharya001/Vidly/issues/21): Split dashboard TotalRevenue into RealizedRevenue (returned rentals only) and ProjectedRevenue (active/overdue). Updated `RentalStats` model with two new properties, `InMemoryRentalRepository.GetStats()` to classify revenue by rental status, `DashboardData` to expose both figures, and `DashboardService.GetDashboard()` to compute AverageRevenuePerRental using realized revenue / returned count. Updated TestRentalRepository in DashboardTests. Added 4 new tests (RealizedRevenue only counts returned, ProjectedRevenue only counts active/overdue, sum equals TotalRevenue, average uses realized). 500 tests passing (14 pre-existing failures unchanged). Commit `08fd299`.
 **Task 2 (perf_improvement):** agentlens — Eliminated N+1 tag queries in `/sessions/by-tag/:tag` endpoint. Previously fetched tags individually per session via `getTagsForSession` (N+1 queries). Replaced with single batch `WHERE session_id IN (...)` query, reducing 51 queries to 2 for a page of 50 sessions. Added batch-fetch test verifying all tags returned per session. 256 tests passing. Commit `c263f87`.
+
+### Builder Run #149 - 8:48 PM PST
+- **WinSentinel** (feature): SMB & Network Share Security Audit (`SmbShareAudit.cs`, 496 lines). 9 security categories: SMBv1 (EternalBlue), signing, encryption, guest/null session, anonymous enumeration, null pipes/shares, hidden shares, permissive permissions. 39 tests. Commit `d088735`.
 
 ### Gardener Run #675-676 - 8:35 PM PST
 - **GraphVisual** (doc_update): Updated ARCHITECTURE.md -- added 11 missing analyzers (BipartiteAnalyzer, CycleAnalyzer, EulerianPathAnalyzer, GraphDiffAnalyzer, GraphIsomorphismAnalyzer, GraphResilienceAnalyzer, MotifAnalyzer, NetworkFlowAnalyzer, RandomWalkAnalyzer, SpectralAnalyzer, StronglyConnectedComponentsAnalyzer), 6 utility classes, 12 test files. Fixed class counts (18->29, 17->30 test). Commit `8df4b07`.
@@ -5065,6 +5084,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
