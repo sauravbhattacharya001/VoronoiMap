@@ -1,3 +1,10 @@
+## Gardener Run 699-700 — 2026-03-04 4:00 AM PST
+- **Task 1:** fix_issue on VoronoiMap — Fixed #40: replaced O(V*(V+E)) all-pairs BFS diameter computation with double-BFS approximation O(V+E) + sampled avg_path_length (K=50). PR #42.
+- **Task 2:** fix_issue on Vidly — Fixed #32: eliminated O(C*R) nested LINQ in CustomerSegmentationService by pre-indexing rentals with Dictionary. Extracted BuildRawMetrics() and ScoreAndBuildProfiles(). PR #34.
+
+## Gardener Run 696 -- 2026-03-04 4:05 AM PST
+- **Task 1 (bug_fix on VoronoiMap):** Fixed shared border length calculation in `vormap_territory.py`. Angular sort from centroid was producing phantom diagonal edges between non-adjacent shared vertices. Replaced with actual polygon edge matching -- only sums real boundary edges where both endpoints are shared. Commit `8b303ec`.
+- **Task 2 (perf_improvement on GraphVisual):** Replaced HashMap-based Brandes' algorithm in `NodeCentralityAnalyzer` with array indexing. Eliminated O(V^2) HashMap.put() calls, Integer/Double boxing, and GC pressure from short-lived Map.Entry objects. Pre-built adjacency arrays for cache-friendly traversal. Commit `10eef10`.
 ## Builder Run 168 — 2026-03-04 3:45 AM PST
 - **Repo:** WinSentinel
 - **Feature:** WiFi Security Audit — saved profile encryption analysis (Open/WEP/WPA-TKIP), auto-connect risk assessment, hidden network probing, public network matching (20+ SSIDs), MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO. 63 tests.
@@ -6,6 +13,9 @@
 ## Gardener Run 697-698 — 2026-03-04 3:30 AM PST
 - **Task 1:** open_issue + bug_fix on **gif-captcha** — Found & filed #16: `resetAll()` in `createAttemptTracker()` uses `{}` instead of `Object.create(null)`, breaking prototype pollution protection. Fixed in PR #17.
 
+## Gardener Run 696 -- 2026-03-04 4:05 AM PST
+- **Task 1 (bug_fix on VoronoiMap):** Fixed shared border length calculation in `vormap_territory.py`. Angular sort from centroid was producing phantom diagonal edges between non-adjacent shared vertices. Replaced with actual polygon edge matching -- only sums real boundary edges where both endpoints are shared. Commit `8b303ec`.
+- **Task 2 (perf_improvement on GraphVisual):** Replaced HashMap-based Brandes' algorithm in `NodeCentralityAnalyzer` with array indexing. Eliminated O(V^2) HashMap.put() calls, Integer/Double boxing, and GC pressure from short-lived Map.Entry objects. Pre-built adjacency arrays for cache-friendly traversal. Commit `10eef10`.
 ## Builder Run 168 -- 2026-03-04 3:48 AM PST
 - **Repo:** ai
 - **Feature:** Agent Resource Hoarding Detector
@@ -20,6 +30,9 @@
 ## Builder Run 167 — 2026-03-04 3:15 AM PST
 - **Repo:** Vidly | **Feature:** ChurnPredictorService — multi-factor churn risk analysis (recency/frequency-decline/engagement/late-returns/genre-diversity), composite scoring, 4 risk levels, winnable targeting, time comparison, retention actions. 55 tests.
 
+## Gardener Run 696 -- 2026-03-04 4:05 AM PST
+- **Task 1 (bug_fix on VoronoiMap):** Fixed shared border length calculation in `vormap_territory.py`. Angular sort from centroid was producing phantom diagonal edges between non-adjacent shared vertices. Replaced with actual polygon edge matching -- only sums real boundary edges where both endpoints are shared. Commit `8b303ec`.
+- **Task 2 (perf_improvement on GraphVisual):** Replaced HashMap-based Brandes' algorithm in `NodeCentralityAnalyzer` with array indexing. Eliminated O(V^2) HashMap.put() calls, Integer/Double boxing, and GC pressure from short-lived Map.Entry objects. Pre-built adjacency arrays for cache-friendly traversal. Commit `10eef10`.
 ## Builder Run 168 -- 2026-03-04 3:48 AM PST
 - **Repo:** ai
 - **Feature:** Agent Resource Hoarding Detector
@@ -37,6 +50,9 @@
 - **Feature:** String matching algorithms — 7 classic algorithms (Naive, KMP, Boyer-Moore, Horspool, Rabin-Karp with multi-pattern, Z-Algorithm, Aho-Corasick), plus utilities (case-insensitive search, wildcard matching, longest common substring, Levenshtein edit distance, Hamming distance), benchmark comparison module, 65+ tests with cross-algorithm consistency checks. 961 lines.
 - **Commit:** `d70d859`
 
+## Gardener Run 696 -- 2026-03-04 4:05 AM PST
+- **Task 1 (bug_fix on VoronoiMap):** Fixed shared border length calculation in `vormap_territory.py`. Angular sort from centroid was producing phantom diagonal edges between non-adjacent shared vertices. Replaced with actual polygon edge matching -- only sums real boundary edges where both endpoints are shared. Commit `8b303ec`.
+- **Task 2 (perf_improvement on GraphVisual):** Replaced HashMap-based Brandes' algorithm in `NodeCentralityAnalyzer` with array indexing. Eliminated O(V^2) HashMap.put() calls, Integer/Double boxing, and GC pressure from short-lived Map.Entry objects. Pre-built adjacency arrays for cache-friendly traversal. Commit `10eef10`.
 ## Builder Run 168 -- 2026-03-04 3:48 AM PST
 - **Repo:** ai
 - **Feature:** Agent Resource Hoarding Detector
@@ -68,6 +84,9 @@
 ## Gardener Run 693-694 — 2026-03-04 2:30 AM PST
 - **Result:** All 17 repos have all 29 task types completed. Nothing to do — full coverage reached.
 
+## Gardener Run 696 -- 2026-03-04 4:05 AM PST
+- **Task 1 (bug_fix on VoronoiMap):** Fixed shared border length calculation in `vormap_territory.py`. Angular sort from centroid was producing phantom diagonal edges between non-adjacent shared vertices. Replaced with actual polygon edge matching -- only sums real boundary edges where both endpoints are shared. Commit `8b303ec`.
+- **Task 2 (perf_improvement on GraphVisual):** Replaced HashMap-based Brandes' algorithm in `NodeCentralityAnalyzer` with array indexing. Eliminated O(V^2) HashMap.put() calls, Integer/Double boxing, and GC pressure from short-lived Map.Entry objects. Pre-built adjacency arrays for cache-friendly traversal. Commit `10eef10`.
 ## Builder Run 168 -- 2026-03-04 3:48 AM PST
 - **Repo:** ai
 - **Feature:** Agent Resource Hoarding Detector
@@ -97,6 +116,9 @@
 - **Details:** Per-client request throttling with sliding window counters, progressive exponential delay, burst detection, allowlist/blocklist, LRU eviction, dry-run/peek, batch check, state persistence, top clients reporting. 44 tests.
 - **Commit:** `e7dbc00` pushed to main
 
+## Gardener Run 696 -- 2026-03-04 4:05 AM PST
+- **Task 1 (bug_fix on VoronoiMap):** Fixed shared border length calculation in `vormap_territory.py`. Angular sort from centroid was producing phantom diagonal edges between non-adjacent shared vertices. Replaced with actual polygon edge matching -- only sums real boundary edges where both endpoints are shared. Commit `8b303ec`.
+- **Task 2 (perf_improvement on GraphVisual):** Replaced HashMap-based Brandes' algorithm in `NodeCentralityAnalyzer` with array indexing. Eliminated O(V^2) HashMap.put() calls, Integer/Double boxing, and GC pressure from short-lived Map.Entry objects. Pre-built adjacency arrays for cache-friendly traversal. Commit `10eef10`.
 ## Builder Run 168 -- 2026-03-04 3:48 AM PST
 - **Repo:** ai
 - **Feature:** Agent Resource Hoarding Detector
@@ -129,6 +151,9 @@
 - **Result:** All 16 repos have all 29 task types completed. No tasks remaining to execute.
 - **Action:** None — full coverage achieved.
 
+## Gardener Run 696 -- 2026-03-04 4:05 AM PST
+- **Task 1 (bug_fix on VoronoiMap):** Fixed shared border length calculation in `vormap_territory.py`. Angular sort from centroid was producing phantom diagonal edges between non-adjacent shared vertices. Replaced with actual polygon edge matching -- only sums real boundary edges where both endpoints are shared. Commit `8b303ec`.
+- **Task 2 (perf_improvement on GraphVisual):** Replaced HashMap-based Brandes' algorithm in `NodeCentralityAnalyzer` with array indexing. Eliminated O(V^2) HashMap.put() calls, Integer/Double boxing, and GC pressure from short-lived Map.Entry objects. Pre-built adjacency arrays for cache-friendly traversal. Commit `10eef10`.
 ## Builder Run 168 -- 2026-03-04 3:48 AM PST
 - **Repo:** ai
 - **Feature:** Agent Resource Hoarding Detector
@@ -165,6 +190,9 @@
 - **Feature:** Minimax game AI framework (game_ai.ml, 857 lines) — GAME module type signature for abstract 2-player zero-sum games, MakeAI functor with minimax, alpha-beta pruning, transposition table (hash-based memoization), iterative deepening. Three complete games: Tic-Tac-Toe (3×3), Connect Four (7×6 with heuristic eval), Nim (multi-pile misère). 40+ self-contained tests.
 - **Commit:** `0b6f36a`
 
+## Gardener Run 696 -- 2026-03-04 4:05 AM PST
+- **Task 1 (bug_fix on VoronoiMap):** Fixed shared border length calculation in `vormap_territory.py`. Angular sort from centroid was producing phantom diagonal edges between non-adjacent shared vertices. Replaced with actual polygon edge matching -- only sums real boundary edges where both endpoints are shared. Commit `8b303ec`.
+- **Task 2 (perf_improvement on GraphVisual):** Replaced HashMap-based Brandes' algorithm in `NodeCentralityAnalyzer` with array indexing. Eliminated O(V^2) HashMap.put() calls, Integer/Double boxing, and GC pressure from short-lived Map.Entry objects. Pre-built adjacency arrays for cache-friendly traversal. Commit `10eef10`.
 ## Builder Run 168 -- 2026-03-04 3:48 AM PST
 - **Repo:** ai
 - **Feature:** Agent Resource Hoarding Detector
@@ -5432,6 +5460,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

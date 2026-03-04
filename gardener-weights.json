@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T11:00:00",
-  "totalRuns": 695,
+  "totalRuns": 696,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 20,
-      "runs": 48,
-      "successes": 49
+      "runs": 49,
+      "successes": 50
     },
     "security_fix": {
       "weight": 20,
@@ -22,8 +22,8 @@
     },
     "perf_improvement": {
       "weight": 20,
-      "runs": 48,
-      "successes": 48,
+      "runs": 49,
+      "successes": 49,
       "totalDone": 1,
       "attempts": 2
     },
@@ -72,8 +72,8 @@
     },
     "fix_issue": {
       "weight": 20,
-      "runs": 87,
-      "successes": 87,
+      "runs": 89,
+      "successes": 89,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 697-698. open_issue+bug_fix: gif-captcha #16 resetAll() prototype pollution (PR #17).",
-  "lastRepo": "prompt",
-  "lastRun": "2026-03-04T11:35:00",
-  "runCount": 24,
+  "notes": "Run 699-700. fix_issue x2: VoronoiMap #40 diameter perf (PR #42), Vidly #32 segmentation perf (PR #34).",
+  "lastRepo": "GraphVisual",
+  "lastRun": "2026-03-04T12:05:00",
+  "runCount": 26,
   "lastWeightAdjustment": 690,
   "adjustmentHistory": [
     {
