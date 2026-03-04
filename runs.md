@@ -1,3 +1,21 @@
+## Gardener Run 723 -- 2026-03-04 2:20 PM PST
+- **Repo:** ai
+- **Task 1 (security_fix):** Hardened 5 escalation detection rules against bypass attacks
+  - FS-001: Added URL-encoded traversal detection (%2e%2e), iterative decoding (3 rounds for double/triple encoding), null byte injection detection
+  - FS-002: Added posixpath.normpath canonicalization + case-insensitive comparison for blocked path checks; proper boundary matching (path + '/' prefix)
+  - FS-003: Same canonicalization for scope boundary checks
+  - NET-001: Replaced naive substring match with proper hostname extraction (strip protocol/port/path) + subdomain matching (blocks sub.evil.com when evil.com is blocked)
+  - NET-002: Added hex/octal/decimal IP aliases for metadata endpoint (0xA9FEA9FE, 2852039166, etc.), GCP metadata.google.internal, Azure metadata.azure.com; removed overly broad 'metadata' substring check
+  - Commit: 02b86eb. All 80 existing tests pass.
+- **Task 2 (doc_update):** Created escalation detection documentation
+  - New docs/concepts/escalation.md (155 lines) — detection rules, path canonicalization notes, AgentPermissions model, scoring, CLI usage, integration guide, API reference
+  - Added to mkdocs.yml nav, cross-reference in security.md
+  - Commit: 60629f1
+- **Re-rolled:** merge_dependabot (no Dependabot PRs exist on ai)
+## Gardener Run 723 — 2026-03-04 2:00 PM PST
+- **Status:** All 29 task types completed across all 17 repos. No remaining tasks to execute.
+- **Note:** The repo gardener has fully covered every task type on every non-fork repo. Consider adding new repos or new task types to continue.
+
 ## Builder Run 192 -- 2026-03-04 2:10 PM PST
 - **Repo:** BioBots
 - **Feature:** Bioink Shelf Life Tracker (shelfLife.js)
@@ -6250,6 +6268,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
