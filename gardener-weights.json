@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T15:20:00",
-  "totalRuns": 712,
+  "totalRuns": 713,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 20,
-      "runs": 52,
-      "successes": 53
+      "runs": 53,
+      "successes": 54
     },
     "security_fix": {
       "weight": 20,
@@ -29,8 +29,8 @@
     },
     "refactor": {
       "weight": 20,
-      "runs": 38,
-      "successes": 41,
+      "runs": 39,
+      "successes": 42,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
@@ -685,9 +685,9 @@
       "docs_site"
     ]
   },
-  "notes": "Run 712. security_fix on VoronoiMap (MAX_GRID_CELLS DoS protection, #43). perf_improvement on VoronoiMap (KDTree O(n log n) in nn_distances+clark_evans).",
-  "lastRepo": "VoronoiMap",
-  "lastRun": "2026-03-04T16:40:00",
+  "notes": "Run 713. bug_fix on getagentbox (decimal missing in Stats animation intermediate frames). refactor on getagentbox (SiteNav + CommandPalette destroy() methods for event handler cleanup). Filed #24 for index.test.js hanging.",
+  "lastRepo": "getagentbox",
+  "lastRun": "2026-03-04T17:25:00",
   "runCount": 28,
   "lastWeightAdjustment": 700,
   "adjustmentHistory": [
