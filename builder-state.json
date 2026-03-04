@@ -1,5 +1,5 @@
 {
-  "totalRuns": 154,
+  "totalRuns": 156,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -200,7 +200,8 @@
       "Added agent influence mapping with cascade detection, convergence analysis, coalition detection, monopoly identification, and echo chamber discovery (2026-03-03)",
       "Added agent alignment drift monitor with value tracking, priority ordering (Kendall tau), reward hacking detection, composite scoring, 3 spec presets, 54 tests (2026-03-03)",
       "Agent Goal Inference Engine — Bayesian latent goal detection with 5 goal hypotheses, configurable priors (uniform/skeptical/trust), conflict detection, deception scoring, multi-agent correlation, temporal tracking, CLI demo, 50 tests (2026-03-03)",
-      "Agent Consensus Protocol -- Byzantine fault-tolerant multi-agent voting for safety decisions (quarantine/terminate/escalate). Simple majority + supermajority for critical actions, weighted voting, quorum enforcement, proposal lifecycle, tamper-evident SHA-256 audit chain, voting bloc detection, vote change policy, per-voter rate limiting, CLI demo. 62 tests (2026-03-03)"
+      "Agent Consensus Protocol -- Byzantine fault-tolerant multi-agent voting for safety decisions (quarantine/terminate/escalate). Simple majority + supermajority for critical actions, weighted voting, quorum enforcement, proposal lifecycle, tamper-evident SHA-256 audit chain, voting bloc detection, vote change policy, per-voter rate limiting, CLI demo. 62 tests (2026-03-03)",
+      "Agent Self-Modification Detector -- multi-vector detection (code/config/model/prompt/goal), 18 built-in rules with sequence matching, intent profiling (stealth/persistence/sophistication), escalation detection, correlation clustering for coordinated campaigns, 5 agent strategies, composite risk scoring, CLI. 57 tests (2026-03-03)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -254,7 +255,8 @@
       "FeedPerformanceAnalyzer -- per-feed report cards with publishing frequency/consistency, Flesch readability, sentiment profiling, engagement tracking, composite 0-100 scoring (3 weight presets), A+ through F grading, actionable recommendations, multi-feed comparison with ranking and summary. 50 tests (2026-03-03)",
       "ReadingQueueManager -- ordered read-later queue with 4 priority levels, estimated reading time (238 WPM), completion tracking, queue position management (move up/down/top/bottom), 3 sort modes (priority/time/date), per-article notes, filtering (status/priority/feed), batch enqueue, queue statistics, estimated time to empty. 57 tests (2026-03-03)",
       "FeedBundleManager -- curated feed bundles by topic (6 built-in: Tech, Dev, Science, Design, AI, News with 27 feeds). One-click subscribe, custom bundle creation with dedup, add/remove feeds, built-in protection, JSON export/import, search, statistics. 48 tests (2026-03-03)",
-      "ArticleCollectionManager -- named article collections (playlists for articles). Create/update/delete collections with emoji icons, add/remove/reorder articles, pin, merge with dedup, search, JSON export/import, statistics, bulk ops. O(1) reverse index. 55 tests (2026-03-03)"
+      "ArticleCollectionManager -- named article collections (playlists for articles). Create/update/delete collections with emoji icons, add/remove/reorder articles, pin, merge with dedup, search, JSON export/import, statistics, bulk ops. O(1) reverse index. 55 tests (2026-03-03)",
+      "FeedAutomationEngine -- rule-based article automation with AND/OR condition groups (title/body/link/feed matching via contains/exact/startsWith/endsWith/regex), 7 action types (tag/star/read/collection/priority/notify/hide), feed-scoped rules, priority ordering, stop-processing, daily rate limiting, dry-run, execution history, 4 preset factories, JSON import/export, rule validation, bulk ops, search/filter. 790 lines, 82 tests (2026-03-03)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",

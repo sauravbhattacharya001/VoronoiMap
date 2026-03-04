@@ -1,3 +1,7 @@
+## Builder Run 155 — 2026-03-03 10:15 PM PST
+- **Repo:** ai (AI agent replication safety sandbox)
+- **Feature:** Agent Self-Modification Detector (`selfmod.py`) — multi-vector detection across code/config/model/prompt/goal, 18 built-in detection rules with sequence pattern matching, intent profiling with stealth/persistence/sophistication scoring, escalation detection, correlation clustering for coordinated multi-vector campaigns, 5 simulated agent strategies, composite risk scoring with verdicts, CLI with JSON export. 57 tests.
+
 ## Gardener Run 681-682 — 2026-03-03 10:00 PM PST
 - **Task 1:** fix_issue on FeedReader — PR #20 merged, closes #19. Batched `save()` in `shouldMute`, added batch overload `shouldMute(_:[Story])`, cached `activeFilters` in local vars in `mutedStories`/`filteredStories` closures to avoid O(n*m) recomputation.
 - **Task 2:** fix_issue on getagentbox — PR #22 merged, closes #21. Debounced `cacheSectionOffsets` on resize with 200ms timer to prevent layout thrashing at 60fps.
@@ -92,6 +96,9 @@
 - **Tests:** 47/47 passing
 - **Highlights:** Planarity testing via Euler bound + K5/K3,3 minor detection (exhaustive contraction for ≤12 vertices, 8 heuristic strategies for larger). Face enumeration using force-directed planar embedding with angle-ordered neighbors. Dual graph construction. Kuratowski subdivision certificates. Triangle-free bound. Genus estimation. Comprehensive PlanarityReport with text output.
 ## 2026-03-03
+### Builder Run #152 (FeedReader) - 10:30 PM PST
+- **FeedAutomationEngine**: Rule-based article automation engine. Users define rules with conditions (title/body/link/feed matching via 5 match modes: contains/exact/startsWith/endsWith/regex) and actions (7 types: tag, star, mark read, move to collection, set high priority, notify, hide). AND/OR condition groups with negation, feed-scoped rules, priority-ordered evaluation with stop-processing flag, per-rule daily rate limiting, dry-run mode, execution history, 4 preset rule factories, JSON import/export, rule validation, bulk operations, search/filter, statistics. 790 lines impl, 82 tests. Commit `082a20c`.
+
 ### Gardener Run #681 - 10:55 PM PST
 - **sauravcode** (refactor): Extracted `_scoped_env()` context manager replacing 6 instances of save/restore pattern across execute_function, _call_lambda, _call_function_with_args, _eval_pipe. Extracted `_guarded_repeat()` consolidating 4 identical MAX_ALLOC_SIZE guards. Net -4 lines. All 1598 tests pass. Commit `14f2f0a`.
 - **sauravcode** (doc_update): Created STDLIB.md (206 lines) — complete reference for all 95 built-in functions in 12 categories with usage examples and operator table.
@@ -5130,6 +5137,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
