@@ -108,7 +108,20 @@ def _find_shared_borders(
                     pair_shared_verts[pair] = []
                 pair_shared_verts[pair].append(key)
 
-    # Compute shared border length for each pair
+    # Build a set of actual polygon edges (from both regions in each pair)
+    # so we can chain shared vertices along real edges, not angular sort.
+    region_edges: Dict[Tuple[float, float], set] = {}
+    for seed, verts in regions.items():
+        edge_set: set = set()
+        n = len(verts)
+        for k in range(n):
+            v1 = (round(verts[k][0], 4), round(verts[k][1], 4))
+            v2 = (round(verts[(k + 1) % n][0], 4), round(verts[(k + 1) % n][1], 4))
+            edge_set.add((min(v1, v2), max(v1, v2)))
+        region_edges[seed] = edge_set
+
+    # Compute shared border length for each pair by summing actual
+    # shared polygon edges (not phantom diagonals from angular sort)
     shared_borders: Dict[
         Tuple[Tuple[float, float], Tuple[float, float]],
         float,
@@ -116,14 +129,15 @@ def _find_shared_borders(
     for pair, verts in pair_shared_verts.items():
         if len(verts) < 2:
             continue
-        # Sort vertices by angle from their centroid for path ordering
-        cx = sum(v[0] for v in verts) / len(verts)
-        cy = sum(v[1] for v in verts) / len(verts)
-        sorted_verts = sorted(verts, key=lambda v: math.atan2(v[1] - cy, v[0] - cx))
-        # Sum consecutive edge lengths
+        shared_set = frozenset(verts)
+        # Collect edges from both regions where both endpoints are shared
+        edges_a = region_edges.get(pair[0], set())
+        edges_b = region_edges.get(pair[1], set())
+        all_edges = edges_a | edges_b
         total = 0.0
-        for k in range(len(sorted_verts) - 1):
-            total += _edge_length(sorted_verts[k], sorted_verts[k + 1])
+        for v1, v2 in all_edges:
+            if v1 in shared_set and v2 in shared_set:
+                total += _edge_length(v1, v2)
         if total > tol:
             shared_borders[pair] = total
 
