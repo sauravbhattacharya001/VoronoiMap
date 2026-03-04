@@ -1,6 +1,6 @@
-# Status: Running
+# Status: Idle
 
-**Builder #190** — Vidly Movie Night Planner (in progress)
+Last completed: 2026-03-04 1:25 PM PST
+**Builder #190:** Vidly Movie Night Planner
+**Gardener #721:** BioBots perf + prompt issue + GraphVisual issue
 
-Last gardener: #721 (1:05 PM)
-Last builder: #189 (12:45 PM)
