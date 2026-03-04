@@ -1,5 +1,5 @@
 {
-  "totalRuns": 193,
+  "totalRuns": 194,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -207,7 +207,8 @@
       "Energy Level Tracker -- EnergyEntry model (5-level scale, 6 time slots, 12 energy factors), EnergyTrackerService with time-of-day pattern analysis, factor impact ranking (boosters/drainers), daily summaries, streak tracking, trend detection (linear regression), sleep-energy correlation, stability scoring, recommendation engine (peak scheduling, afternoon crash detection, factor tips), filtering, full report + text summary. 55 tests (2026-03-04)",
       "Water Intake Tracker -- WaterEntry model (9 drink types with hydration factors, 6 container sizes), WaterTrackerService with daily summaries, hourly pacing, streak tracking, 7-day weekly trends (consistency scoring, peak hour, drink breakdown), smart tips engine, full HydrationReport with text summary. Configurable goals, wake/sleep hours. 50 tests (2026-03-04)",
       "Reading List / Book Tracker -- Book model (14 genres, 4 statuses, ReadingSession), ReadingListService with CRUD, status lifecycle, session logging with pace/ETA, filtering (status/genre/author/tag/rating/search), sorting, reading streak tracking, genre/author stats, monthly summaries, annual reading challenge, smart recommendations (genre+author preference), comprehensive ReadingReport with text summary, JSON persistence. 55 tests (2026-03-04)",
-      "Workout Tracker -- WorkoutEntry model (ExerciseSet/ExerciseEntry/WorkoutEntry, 13 MuscleGroup + 4 ExerciseType enums), WorkoutTrackerService with CRUD, date/muscle-group filtering, personal record detection, weekly summaries with grade, muscle balance analysis (neglected/overtrained/upper-lower/push-pull ratios), volume trends, weekly streak tracking, exercise frequency, smart tips engine, full WorkoutReport with text summary, configurable goals, JSON persistence. 1969 lines (326 model + 706 service + 937 test), 55 tests (2026-03-04)"
+      "Workout Tracker -- WorkoutEntry model (ExerciseSet/ExerciseEntry/WorkoutEntry, 13 MuscleGroup + 4 ExerciseType enums), WorkoutTrackerService with CRUD, date/muscle-group filtering, personal record detection, weekly summaries with grade, muscle balance analysis (neglected/overtrained/upper-lower/push-pull ratios), volume trends, weekly streak tracking, exercise frequency, smart tips engine, full WorkoutReport with text summary, configurable goals, JSON persistence. 1969 lines (326 model + 706 service + 937 test), 55 tests (2026-03-04)",
+      "Decision Journal -- DecisionEntry model (10 categories, 5-level confidence/outcome, alternatives with rejection reasons, calibration detection, review scheduling). DecisionJournalService with CRUD, outcome recording, queries (pending/overdue/category/date range/search), analytics (JournalStats, CategoryStats, CalibrationReport with over/underconfidence detection, ReviewStreak, QualityScore composite 0-100, topCategories, allLessonsLearned), persistence. 72 tests. (2026-03-04)"
     ],
     "ai": [
       "Added escape attempt detection system with filesystem, network, process, and code injection monitors",
@@ -296,7 +297,8 @@
       "ReadingQueueManager -- ordered read-later queue with 4 priority levels, estimated reading time (238 WPM), completion tracking, queue position management (move up/down/top/bottom), 3 sort modes (priority/time/date), per-article notes, filtering (status/priority/feed), batch enqueue, queue statistics, estimated time to empty. 57 tests (2026-03-03)",
       "FeedBundleManager -- curated feed bundles by topic (6 built-in: Tech, Dev, Science, Design, AI, News with 27 feeds). One-click subscribe, custom bundle creation with dedup, add/remove feeds, built-in protection, JSON export/import, search, statistics. 48 tests (2026-03-03)",
       "ArticleCollectionManager -- named article collections (playlists for articles). Create/update/delete collections with emoji icons, add/remove/reorder articles, pin, merge with dedup, search, JSON export/import, statistics, bulk ops. O(1) reverse index. 55 tests (2026-03-03)",
-      "FeedAutomationEngine -- rule-based article automation with AND/OR condition groups (title/body/link/feed matching via contains/exact/startsWith/endsWith/regex), 7 action types (tag/star/read/collection/priority/notify/hide), feed-scoped rules, priority ordering, stop-processing, daily rate limiting, dry-run, execution history, 4 preset factories, JSON import/export, rule validation, bulk ops, search/filter. 790 lines, 82 tests (2026-03-03)"
+      "FeedAutomationEngine -- rule-based article automation with AND/OR condition groups (title/body/link/feed matching via contains/exact/startsWith/endsWith/regex), 7 action types (tag/star/read/collection/priority/notify/hide), feed-scoped rules, priority ordering, stop-processing, daily rate limiting, dry-run, execution history, 4 preset factories, JSON import/export, rule validation, bulk ops, search/filter. 790 lines, 82 tests (2026-03-03)",
+      "Article Version Tracker -- content fingerprinting (djb2 hash) for detecting silent article edits. Version history with timestamped snapshots, change significance scoring (0.0-1.0), 6 categories (cosmetic/minor/moderate/major/titleChange/rewrite), Jaccard word-level diff, configurable notification threshold, per-feed modification rates, version comparison, snapshot limit, JSON persistence, text reports. 50 tests (2026-03-04)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
@@ -371,7 +373,7 @@
       "Virtualization Security Audit -- Hyper-V VM isolation (external switch/checkpoints/guest services), WSL (version/root distros/mirrored networking/firewall/interop/systemd), Windows Sandbox (networking/writable mapped folders), Docker (TCP exposure/privileged mode/root containers/content trust/user namespaces/ICC), VBS/Credential Guard/HVCI/Memory Integrity/Secure Boot. VirtualizationState DTO, 66 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "gif-captcha",
-  "lastFeature": "Security Incident Correlator",
+  "lastRepo": "everything",
+  "lastFeature": "Decision Journal",
   "lastRun": "2026-03-04"
 }

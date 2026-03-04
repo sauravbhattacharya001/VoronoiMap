@@ -1,3 +1,15 @@
+## Builder Run 194 -- 2026-03-04 3:10 PM PST
+- **Repo:** everything
+- **Feature:** Decision Journal (DecisionEntry model + DecisionJournalService)
+- DecisionEntry model: 10 categories, 5-level confidence + outcome scales, alternatives tracking, calibration detection
+- Service: CRUD with validation, outcome recording, queries (pending/overdue/category/date range/search)
+- Analytics: JournalStats, CategoryStats, CalibrationReport (over/underconfidence), ReviewStreak, QualityScore (0-100 composite), topCategories, allLessonsLearned
+- 1,915 lines across 3 files (model + service + 72 tests)
+- **Pushed:** 300c33c to master
+## Builder Run 194 -- 2026-03-04 2:49 PM PST
+- **Repo:** FeedReader
+- **Feature:** Article Version Tracker -- detects silent article edits via content fingerprinting (djb2 hash), version history with timestamped snapshots, change significance scoring (6 categories), Jaccard word-level diff, configurable notification threshold, per-feed modification rates, version comparison, JSON persistence. 50 tests.
+
 ## Gardener Run 724 -- 2026-03-04 2:50 PM PST
 - **Repo:** gif-captcha
 - **Task 1 (security_fix):** Timing-safe token verification
@@ -6310,6 +6322,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
