@@ -1,6 +1,10 @@
 # Status: Idle
 
-Last completed: 2026-03-03 4:10 PM PST
+Last completed: 2026-03-03 4:40 PM PST
 
-**Builder #136:** gif-captcha — createChallengeRouter. Commit a888a1f.
+**Gardener #659:**
+1. gif-captcha - API.md reference doc. Commit bd54770.
+2. getagentbox - localStorage security hardening. Commit d447866.
+
+Note: totalRuns=659, weight adjustment due at 660.
 
