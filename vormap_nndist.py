@@ -45,6 +45,12 @@ from typing import List, Optional, Tuple
 
 from vormap import validate_output_path
 
+try:
+    from scipy.spatial import cKDTree as _KDTree
+    _HAS_KDTREE = True
+except ImportError:
+    _HAS_KDTREE = False
+
 
 # ── Helpers ─────────────────────────────────────────────────────────
 
@@ -161,10 +167,31 @@ def nn_distances(
     pts = _validate_points(points)
     if k < 1:
         raise ValueError(f"k must be >= 1, got {k}")
-    k_actual = min(k, len(pts) - 1)
-
-    # Build distance lists with neighbor tracking
     n = len(pts)
+    k_actual = min(k, n - 1)
+
+    # Use KDTree for O(n log n) when scipy is available;
+    # fall back to O(n²) brute-force otherwise.
+    if _HAS_KDTREE and n >= 4:
+        import numpy as np
+        arr = np.array(pts, dtype=float)
+        tree = _KDTree(arr)
+        # query k+1 because the first result is the point itself (dist=0)
+        dists, indices = tree.query(arr, k=k_actual + 1)
+        result = []
+        for i in range(n):
+            # Skip self (index 0) — distances are sorted ascending
+            nn_dists = dists[i, 1:k_actual + 1].tolist()
+            nn_idxs = indices[i, 1:k_actual + 1].tolist()
+            result.append({
+                "x": pts[i][0],
+                "y": pts[i][1],
+                "distances": nn_dists,
+                "neighbors": nn_idxs,
+            })
+        return result
+
+    # Brute-force fallback for small n or no scipy
     result = []
     for i in range(n):
         pairs = []
@@ -305,17 +332,23 @@ def clark_evans(
     pts = _validate_points(points)
     n = len(pts)
 
-    # Compute 1-NN distances
-    nn1 = []
-    for i in range(n):
-        min_d = float("inf")
-        for j in range(n):
-            if i == j:
-                continue
-            d = _euclidean(pts[i], pts[j])
-            if d < min_d:
-                min_d = d
-        nn1.append(min_d)
+    # Compute 1-NN distances — O(n log n) with KDTree, O(n²) fallback
+    if _HAS_KDTREE and n >= 4:
+        import numpy as np
+        tree = _KDTree(np.array(pts, dtype=float))
+        dists, _ = tree.query(np.array(pts), k=2)  # k=2: self + nearest
+        nn1 = dists[:, 1].tolist()
+    else:
+        nn1 = []
+        for i in range(n):
+            min_d = float("inf")
+            for j in range(n):
+                if i == j:
+                    continue
+                d = _euclidean(pts[i], pts[j])
+                if d < min_d:
+                    min_d = d
+            nn1.append(min_d)
 
     mean_nn = _mean(nn1)
 
@@ -453,17 +486,23 @@ def g_function(
     if steps < 1:
         raise ValueError(f"steps must be >= 1, got {steps}")
 
-    # Compute 1-NN distances
-    nn1 = []
-    for i in range(n):
-        min_d = float("inf")
-        for j in range(n):
-            if i == j:
-                continue
-            d = _euclidean(pts[i], pts[j])
-            if d < min_d:
-                min_d = d
-        nn1.append(min_d)
+    # Compute 1-NN distances — O(n log n) with KDTree, O(n²) fallback
+    if _HAS_KDTREE and n >= 4:
+        import numpy as np
+        tree = _KDTree(np.array(pts, dtype=float))
+        dists, _ = tree.query(np.array(pts), k=2)  # k=2: self + nearest
+        nn1 = dists[:, 1].tolist()
+    else:
+        nn1 = []
+        for i in range(n):
+            min_d = float("inf")
+            for j in range(n):
+                if i == j:
+                    continue
+                d = _euclidean(pts[i], pts[j])
+                if d < min_d:
+                    min_d = d
+            nn1.append(min_d)
 
     nn1_sorted = sorted(nn1)
 
