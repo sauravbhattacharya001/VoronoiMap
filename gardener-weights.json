@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-03T19:10:00",
-  "totalRuns": 668,
+  "lastUpdated": "2026-03-03T19:40:00",
+  "totalRuns": 670,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 52,
@@ -23,21 +23,21 @@
     "perf_improvement": {
       "weight": 90,
       "runs": 45,
-      "successes": 48,
+      "successes": 45,
       "totalDone": 1,
       "attempts": 2
     },
     "refactor": {
       "weight": 85,
       "runs": 33,
-      "successes": 35,
+      "successes": 33,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
     "add_tests": {
-      "weight": 94,
-      "runs": 44,
-      "successes": 49,
+      "weight": 96.0,
+      "runs": 45,
+      "successes": 45,
       "description": "Add meaningful tests",
       "attempts": 2
     },
@@ -49,23 +49,23 @@
     },
     "doc_update": {
       "weight": 86,
-      "runs": 37,
-      "successes": 40,
+      "runs": 38,
+      "successes": 38,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
       "weight": 80,
       "runs": 35,
-      "successes": 39,
+      "successes": 35,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 78,
-      "runs": 61,
-      "successes": 64,
+      "runs": 62,
+      "successes": 62,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -73,11 +73,11 @@
     "fix_issue": {
       "weight": 77,
       "runs": 78,
-      "successes": 79,
+      "successes": 78,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
-      "weight": 74,
+      "weight": 50.0,
       "runs": 20,
       "successes": 19,
       "description": "Review and merge open Dependabot PRs â€” PRIORITY: 60+ PRs waiting across all repos"
@@ -685,11 +685,11 @@
       "docs_site"
     ]
   },
-  "notes": "Run 668. perf_improvement on getagentbox (DOM caching), add_tests on Vidly (ReviewService 40 tests).",
-  "lastRepo": "FeedReader",
-  "lastRun": "2026-03-03T19:10:00",
-  "runCount": 19,
-  "lastWeightAdjustment": 662,
+  "notes": "Run 670. doc_update on BioBots (calculator.js JSDoc + CHANGELOG 6 versions), add_tests on BioBots (batch planner 13 to 63 tests), open_issue on BioBots #22. Weight adjustment due.",
+  "lastRepo": "Vidly",
+  "lastRun": "2026-03-03T19:40:00",
+  "runCount": 20,
+  "lastWeightAdjustment": 670,
   "adjustmentHistory": [
     {
       "run": 650,
