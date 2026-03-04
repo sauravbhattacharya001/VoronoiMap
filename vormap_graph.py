@@ -299,31 +299,54 @@ def compute_graph_stats(graph):
 
     is_connected = components == 1
 
-    # Diameter and avg path length (BFS from each node, only if connected)
+    # Diameter (double-BFS approximation) and avg path length (sampled BFS)
+    # Double-BFS: O(V+E) instead of O(V*(V+E)) for diameter.
+    # Sampled BFS: O(K*(V+E)) with K=min(50, V) for avg_path_length.
     diameter = None
     avg_path_length = None
 
+    def _bfs_farthest(start, adj):
+        """BFS from start; return (farthest_node, max_dist, total_dist, count)."""
+        dist = {start: 0}
+        queue = deque([start])
+        farthest = start
+        max_d = 0
+        total = 0
+        cnt = 0
+        while queue:
+            node = queue.popleft()
+            for neigh in adj[node]:
+                if neigh not in dist:
+                    d = dist[node] + 1
+                    dist[neigh] = d
+                    queue.append(neigh)
+                    total += d
+                    cnt += 1
+                    if d > max_d:
+                        max_d = d
+                        farthest = neigh
+        return farthest, max_d, total, cnt
+
     if is_connected and n > 1:
+        import random as _rnd
+
+        # Double-BFS diameter approximation (exact for trees, tight for
+        # sparse planar graphs like Voronoi duals)
+        u = seeds_list[0]
+        v, _, _, _ = _bfs_farthest(u, adjacency)
+        _, diameter_val, _, _ = _bfs_farthest(v, adjacency)
+        diameter = diameter_val
+
+        # Sampled avg path length — pick up to 50 random sources
+        sample_k = min(50, n)
+        sources = _rnd.sample(seeds_list, sample_k)
         total_dist = 0
-        max_dist = 0
         pair_count = 0
+        for src in sources:
+            _, _, t, c = _bfs_farthest(src, adjacency)
+            total_dist += t
+            pair_count += c
 
-        for start in seeds_list:
-            dist = {start: 0}
-            queue = deque([start])
-            while queue:
-                node = queue.popleft()
-                for neigh in adjacency[node]:
-                    if neigh not in dist:
-                        dist[neigh] = dist[node] + 1
-                        queue.append(neigh)
-                        d = dist[neigh]
-                        total_dist += d
-                        if d > max_dist:
-                            max_dist = d
-                        pair_count += 1
-
-        diameter = max_dist
         avg_path_length = round(total_dist / pair_count, 4) if pair_count > 0 else 0.0
 
     return {
