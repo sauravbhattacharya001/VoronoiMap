@@ -1,3 +1,22 @@
+## Gardener Run 726 -- 2026-03-04 3:50 PM PST
+- **Repo:** BioBots
+- **Task 1 (security_fix):** CSV formula injection defense in export.js
+  - escapeCSVValue() now detects dangerous leader chars (= + - @ \t \r) per OWASP
+  - Prefixes with single-quote to force text mode in Excel/Sheets/LibreOffice
+  - Prevents DDE command execution, HYPERLINK injection, formula injection
+  - 9 new tests, all 85 export tests pass
+- **Task 2 (refactor):** Shared data loader (data-loader.js)
+  - Extracted fetch/validate/cache boilerplate duplicated across 9 pages
+  - loadBioprintData({ validate: true }) replaces ~8 lines of copy-paste per page
+  - Deduplicates concurrent fetches, caches data, optional custom filter
+  - Updated: anomaly, calibration, cluster, compare, explorer, reproducibility, spc, trends, wellplate
+  - 19 new tests, all 2210 tests pass
+- **Re-rolled:** merge_dependabot (no Dependabot PRs) -> refactor
+- **Commit:** a170739
+## Gardener Run 729 — 2026-03-04 3:30 PM PST
+- **Status:** All 16 repos have all 29 task types completed. No tasks to execute.
+- **Note:** Repo gardener has fully covered every repo×task combination. Consider adding new repos or task types.
+
 ## Builder Run 195 -- 2026-03-04 3:35 PM PST
 - **Repo:** gif-captcha
 - **Feature:** Adaptive Timeout Manager (createAdaptiveTimeout)
@@ -6354,6 +6373,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
