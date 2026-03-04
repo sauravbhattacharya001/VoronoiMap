@@ -1,5 +1,5 @@
 {
-  "totalRuns": 162,
+  "totalRuns": 164,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -278,7 +278,8 @@
       "Cross-linking Kinetics Analyzer — first-order kinetics (degree-of-crosslinking curves, gel point estimation), Hill equation dose-response, bell-shaped viability model (benefit vs quadratic damage, golden-section optimization), therapeutic dose window, 2D response surface (duration x intensity grid with peak detection), photo-initiator efficiency (Beer-Lambert, radical yield), print data analysis with intensity binning and rate constant estimation. 81 tests (2026-03-03)",
       "Scaffold Porosity Analyzer — volumetric porosity calculation, pore size distribution, interconnectivity estimation, Kozeny-Carman permeability, tissue suitability scoring (6 types), parameter optimization. 62 tests (2026-03-03)",
       "Cell Viability Estimator -- multi-stressor model predicting cell survival through bioprinting. Shear stress (Weissenberg-Rabinowitsch), pressure (logistic), UV crosslink (Hill), thermal (Gaussian), duration (linear) damage models. Combined multiplicative estimation, sensitivity analysis with ranking, optimal window finder from historical data, batch analyze with RMSE/MAE/correlation, 2D parameter sweep, grid-search calibration, comprehensive reports. 72 tests (2026-03-03)",
-      "Bioink Compatibility Matrix -- pairwise multi-material compatibility analysis across 6 dimensions (rheology, crosslinking, thermal, pH, interface adhesion, degradation), 6 built-in bioink profiles, full NxN matrix, multi-material print planning with common windows and print order suggestion. 64 tests (2026-03-04)"
+      "Bioink Compatibility Matrix -- pairwise multi-material compatibility analysis across 6 dimensions (rheology, crosslinking, thermal, pH, interface adhesion, degradation), 6 built-in bioink profiles, full NxN matrix, multi-material print planning with common windows and print order suggestion. 64 tests (2026-03-04)",
+      "Scaffold Degradation Predictor -- 8 material profiles, hydrolytic+enzymatic kinetics with Arrhenius/pH/crystallinity/porosity corrections, mass/MW/mechanical decay curves, functional lifetime estimation, 6 tissue targets with suitability scoring, material recommendation engine, sensitivity analysis, full reports. 59 tests (2026-03-04)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -297,7 +298,8 @@
       "miniKanren logic programming engine -- unification with occurs check, lazy interleaving streams, relational list ops (appendo/membero/reverseo), Peano arithmetic (pluso/multo/leo), map coloring, permutations, reification, 55+ tests (2026-03-03)",
       "Algebraic effects and handlers -- free monads, CPS encoding, State/Exception/Nondeterminism/Writer/Reader/Coroutine effects, effect composition via coproducts, N-Queens solver, Fibonacci generator, 50+ tests (2026-03-03)",
       "Untyped lambda calculus interpreter (lambda.ml) -- named + De Bruijn terms, capture-avoiding substitution, alpha-equivalence, 3 reduction strategies (normal/applicative/CBV), Church booleans/numerals/pairs/lists with extraction, S/K/I/B/C/W/Y/Z/Theta combinators, parser, term metrics. 800 lines, 62 tests (2026-03-03)",
-      "Automatic differentiation (forward & reverse mode) -- dual numbers, tape-based backprop, gradient/Jacobian/Hessian, Adam/momentum optimizers, neural network building blocks, 65+ tests (2026-03-04)"
+      "Automatic differentiation (forward & reverse mode) -- dual numbers, tape-based backprop, gradient/Jacobian/Hessian, Adam/momentum optimizers, neural network building blocks, 65+ tests (2026-03-04)",
+      "Minimax game AI framework -- GAME module type, MakeAI functor (minimax/alpha-beta/transposition table/iterative deepening), Tic-Tac-Toe + Connect Four + Nim implementations, 40+ tests (2026-03-04)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -318,7 +320,11 @@
       "SMB & Network Share Security Audit (SmbShareAudit.cs, 496 lines) -- SMBv1 detection, signing enforcement, encryption status, guest/null session access, anonymous enumeration, hidden shares, permissive permissions. 9 security categories, 39 tests (2026-03-03)",
       "Driver Security Audit -- unsigned driver detection, BYOVD vulnerable driver hash matching (30+ known drivers from loldrivers.io), Secure Boot/HVCI/test signing checks, suspicious path analysis, driver age warnings, DriverState DTO. 67 tests (2026-03-03)",
       "Bluetooth Security Audit -- radio state, discoverability, paired device trust (stale/unauthenticated/unnamed/suspicious type), risky service detection (OBEX/Serial/PAN), SSP/encryption enforcement, adapter name hostname leak, driver age, BluetoothState DTO. 60 tests (2026-03-03)",
-      "Environment Variable Security Audit -- PATH hijacking (T1574.007) via writable/relative/UNC/nonexistent dirs, secret leakage (API keys/tokens/passwords with 15 detection patterns), proxy security (HTTP_PROXY credential embedding, insecure protocol), PATHEXT risk analysis (12 risky extensions), TEMP/TMP shared directory detection. EnvironmentState DTO, 46 tests (2026-03-03)"
+      "Environment Variable Security Audit -- PATH hijacking (T1574.007) via writable/relative/UNC/nonexistent dirs, secret leakage (API keys/tokens/passwords with 15 detection patterns), proxy security (HTTP_PROXY credential embedding, insecure protocol), PATHEXT risk analysis (12 risky extensions), TEMP/TMP shared directory detection. EnvironmentState DTO, 46 tests (2026-03-03)",
+      "Group Policy Security Audit (2026-03-04)"
     ]
-  }
+  },
+  "lastRepo": "WinSentinel",
+  "lastFeature": "Group Policy Security Audit",
+  "lastRun": "2026-03-04"
 }
