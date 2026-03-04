@@ -1,3 +1,15 @@
+## Gardener Run 718 -- 2026-03-04 11:55 AM PST
+- **Repo:** getagentbox
+- **Tasks:** open_issue + perf_improvement
+- **open_issue:** Filed #25 — prefersReducedMotion is static, doesn't react to OS preference changes at runtime (WCAG 2.3.3 gap). If user enables reduced motion after page load, all animations continue.
+- **perf_improvement:** StatusDashboard service lookup O(n) -> O(1) via cached service map. Previously querySelectorAll('.status-service') on every get/set call (6+ DOM traversals per interaction). Also cached ChatDemo scenario buttons. All 365 tests pass.
+- **Pushed:** 624c7c8 to master (+52/-44 lines)
+## Gardener Run 718 -- 2026-03-04 11:30 AM PST
+- **Task 1:** bug_fix on FeedReader → [PR #22](https://github.com/sauravbhattacharya001/FeedReader/pull/22)
+  - Fixed `aggregateStats()` efficiency calculation — was using `consecutiveEmpty` (current streak) instead of counting actual non-empty checks from history
+- **Task 2:** bug_fix on ai → [PR #24](https://github.com/sauravbhattacharya001/ai/pull/24)
+  - Fixed consensus `tally()` using `>` instead of `>=` for approval threshold — votes exactly meeting 2/3 supermajority were incorrectly rejected
+
 ## Builder Run 187 -- 2026-03-04 11:35 AM PST
 - **Repo:** agenticchat
 - **Feature:** Conversation Timeline Minimap
@@ -6118,6 +6130,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
