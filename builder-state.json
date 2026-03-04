@@ -1,5 +1,5 @@
 {
-  "totalRuns": 167,
+  "totalRuns": 168,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -206,7 +206,8 @@
       "Agent Consensus Protocol -- Byzantine fault-tolerant multi-agent voting for safety decisions (quarantine/terminate/escalate). Simple majority + supermajority for critical actions, weighted voting, quorum enforcement, proposal lifecycle, tamper-evident SHA-256 audit chain, voting bloc detection, vote change policy, per-voter rate limiting, CLI demo. 62 tests (2026-03-03)",
       "Agent Self-Modification Detector -- multi-vector detection (code/config/model/prompt/goal), 18 built-in rules with sequence matching, intent profiling (stealth/persistence/sophistication), escalation detection, correlation clustering for coordinated campaigns, 5 agent strategies, composite risk scoring, CLI. 57 tests (2026-03-03)",
       "Agent Game-Theory Analyzer -- models inter-agent interactions as 2x2 symmetric games (Prisoner's Dilemma, Stag Hunt, Chicken, Harmony). Payoff matrix classification, Nash equilibria (pure + mixed), strategy detection (TFT/grudger/pavlov/random/always-C/D), 5-category alert detection (collusion/escalation/free-riding/instability/dominant-defectors), cooperation trend analysis, composite risk scoring (0-100), round-robin tournament simulation with 7 strategies, CLI. 979 lines, 63 tests (2026-03-03)",
-      "Agent Covert Channel Detector -- 5-vector analysis (content entropy/base64/hex/padding, timing regularity/bimodal/decode, protocol deviation, frequency n-gram anomalies, metadata leakage), per-pair profiling with suspicion scoring, incremental drift detection, single-message scanning, configurable thresholds, risk scoring 0-100 with grades and recommendations, CLI demo. 700 lines, 64 tests (2026-03-04)"
+      "Agent Covert Channel Detector -- 5-vector analysis (content entropy/base64/hex/padding, timing regularity/bimodal/decode, protocol deviation, frequency n-gram anomalies, metadata leakage), per-pair profiling with suspicion scoring, incremental drift detection, single-message scanning, configurable thresholds, risk scoring 0-100 with grades and recommendations, CLI demo. 700 lines, 64 tests (2026-03-04)",
+      "Agent Resource Hoarding Detector -- 5-dimension analysis (compute, memory, data, connections, file handles) with configurable thresholds, composite risk scoring, fleet-wide analysis, agent comparison, top-N ranking, recommendation engine. 742 lines, 61 tests (2026-03-04)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -326,10 +327,11 @@
       "Driver Security Audit -- unsigned driver detection, BYOVD vulnerable driver hash matching (30+ known drivers from loldrivers.io), Secure Boot/HVCI/test signing checks, suspicious path analysis, driver age warnings, DriverState DTO. 67 tests (2026-03-03)",
       "Bluetooth Security Audit -- radio state, discoverability, paired device trust (stale/unauthenticated/unnamed/suspicious type), risky service detection (OBEX/Serial/PAN), SSP/encryption enforcement, adapter name hostname leak, driver age, BluetoothState DTO. 60 tests (2026-03-03)",
       "Environment Variable Security Audit -- PATH hijacking (T1574.007) via writable/relative/UNC/nonexistent dirs, secret leakage (API keys/tokens/passwords with 15 detection patterns), proxy security (HTTP_PROXY credential embedding, insecure protocol), PATHEXT risk analysis (12 risky extensions), TEMP/TMP shared directory detection. EnvironmentState DTO, 46 tests (2026-03-03)",
-      "Group Policy Security Audit (2026-03-04)"
+      "Group Policy Security Audit (2026-03-04)",
+      "WiFi Security Audit -- saved profile encryption (Open/WEP/WPA-TKIP), auto-connect risks, hidden network probing, public network matching, MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO, 63 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "Ocaml-sample-code",
-  "lastFeature": "Propositional theorem prover with natural deduction",
+  "lastRepo": "ai",
+  "lastFeature": "Resource hoarding detector for agent containment",
   "lastRun": "2026-03-04"
 }
