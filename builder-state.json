@@ -1,5 +1,5 @@
 {
-  "totalRuns": 195,
+  "totalRuns": 196,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -161,7 +161,8 @@
       "Sliding Window Rate Limiter (createRateLimiter) -- per-client request throttling with sliding window counters, progressive exponential delay, burst detection, allowlist/blocklist, LRU eviction, dry-run/peek, batch check, state persistence, top clients reporting. 44 tests (2026-03-04)",
       "Client Fingerprinter (createClientFingerprinter) -- cookieless browser/device fingerprinting with 10 signal types, djb2 hashing, weighted similarity search, bot pattern detection, IP identity change tracking, composite risk scoring, LRU+TTL storage, state persistence. 43 tests (2026-03-04)",
       "Security Incident Correlator -- createIncidentCorrelator (395 lines). Aggregates cross-system security signals into unified incidents with severity escalation (INFO/WARNING/HIGH/CRITICAL), correlation windowing, weighted signals, alert callbacks, query/filter, LRU eviction, export. 49 tests. (2026-03-04)",
-      "Adaptive Timeout Manager -- createAdaptiveTimeout (330 lines). Dynamic CAPTCHA response windows based on difficulty (easy/medium/hard), client reputation (suspicious/neutral/trusted), historical response time percentiles (90th, 10+ sample threshold), and per-client network latency tracking. Binary-search sorted insert for O(log n) percentiles. LRU eviction, export/import state, full factor breakdown. 43 tests. (2026-03-04)"
+      "Adaptive Timeout Manager -- createAdaptiveTimeout (330 lines). Dynamic CAPTCHA response windows based on difficulty (easy/medium/hard), client reputation (suspicious/neutral/trusted), historical response time percentiles (90th, 10+ sample threshold), and per-client network latency tracking. Binary-search sorted insert for O(log n) percentiles. LRU eviction, export/import state, full factor breakdown. 43 tests. (2026-03-04)",
+      "Audit Trail -- createAuditTrail (265 lines). Structured CAPTCHA lifecycle event logging with ring buffer (10k capacity), 20 event types, flexible querying (type/prefix/client/session/time range), O(1) getById, countByType, timeline bucketing, export/import, onEvent callback. 42 tests. (2026-03-04)"
     ],
     "prompt": [
       "Added CLI tool for managing and testing prompts from the command line with interactive mode",
@@ -209,7 +210,8 @@
       "Water Intake Tracker -- WaterEntry model (9 drink types with hydration factors, 6 container sizes), WaterTrackerService with daily summaries, hourly pacing, streak tracking, 7-day weekly trends (consistency scoring, peak hour, drink breakdown), smart tips engine, full HydrationReport with text summary. Configurable goals, wake/sleep hours. 50 tests (2026-03-04)",
       "Reading List / Book Tracker -- Book model (14 genres, 4 statuses, ReadingSession), ReadingListService with CRUD, status lifecycle, session logging with pace/ETA, filtering (status/genre/author/tag/rating/search), sorting, reading streak tracking, genre/author stats, monthly summaries, annual reading challenge, smart recommendations (genre+author preference), comprehensive ReadingReport with text summary, JSON persistence. 55 tests (2026-03-04)",
       "Workout Tracker -- WorkoutEntry model (ExerciseSet/ExerciseEntry/WorkoutEntry, 13 MuscleGroup + 4 ExerciseType enums), WorkoutTrackerService with CRUD, date/muscle-group filtering, personal record detection, weekly summaries with grade, muscle balance analysis (neglected/overtrained/upper-lower/push-pull ratios), volume trends, weekly streak tracking, exercise frequency, smart tips engine, full WorkoutReport with text summary, configurable goals, JSON persistence. 1969 lines (326 model + 706 service + 937 test), 55 tests (2026-03-04)",
-      "Decision Journal -- DecisionEntry model (10 categories, 5-level confidence/outcome, alternatives with rejection reasons, calibration detection, review scheduling). DecisionJournalService with CRUD, outcome recording, queries (pending/overdue/category/date range/search), analytics (JournalStats, CategoryStats, CalibrationReport with over/underconfidence detection, ReviewStreak, QualityScore composite 0-100, topCategories, allLessonsLearned), persistence. 72 tests. (2026-03-04)"
+      "Decision Journal -- DecisionEntry model (10 categories, 5-level confidence/outcome, alternatives with rejection reasons, calibration detection, review scheduling). DecisionJournalService with CRUD, outcome recording, queries (pending/overdue/category/date range/search), analytics (JournalStats, CategoryStats, CalibrationReport with over/underconfidence detection, ReviewStreak, QualityScore composite 0-100, topCategories, allLessonsLearned), persistence. 72 tests. (2026-03-04)",
+      "Expense Tracker -- ExpenseEntry model (14 categories, 7 payment methods, tags, vendor, recurring flag), ExpenseTrackerService with CRUD, filtering (date/month/range/category/vendor/tag), BudgetConfig with monthly+category limits, daily summaries, monthly reports with budget grading (A-F), spending trends (4-week linear regression), vendor analysis, category percentages, smart insights, logging streaks, JSON persistence, text summary. 55 tests (2026-03-04)"
     ],
     "ai": [
       "Added escape attempt detection system with filesystem, network, process, and code injection monitors",
@@ -376,6 +378,6 @@
     ]
   },
   "lastRepo": "gif-captcha",
-  "lastFeature": "Adaptive Timeout Manager",
+  "lastFeature": "Audit Trail",
   "lastRun": "2026-03-04"
 }
