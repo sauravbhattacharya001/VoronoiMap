@@ -311,6 +311,14 @@ def ripleys_k(points, radii=None, n_radii=20, bounds=None):
     area = _bounding_area(pts, bounds)
     density = n / area
 
+    if not isinstance(n_radii, int) or n_radii < 1:
+        raise ValueError(f"n_radii must be a positive integer, got {n_radii}")
+    if n_radii > 10000:
+        raise ValueError(
+            f"n_radii={n_radii} is excessive — max 10,000. "
+            f"Each radius requires O(n²) computation."
+        )
+
     if radii is None:
         nn_dists = _compute_nn_distances(pts)
         max_r = max(nn_dists) * 2.0

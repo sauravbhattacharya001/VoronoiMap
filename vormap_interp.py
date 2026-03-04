@@ -160,6 +160,8 @@ def grid_interpolate(points, values, nx=50, ny=50, bounds=None,
     """Interpolate values over a regular grid."""
     if not points:
         raise ValueError("points must not be empty")
+    from vormap import validate_grid_size
+    validate_grid_size(nx, ny, caller="grid_interpolate")
     if bounds is None:
         xs = [p[0] for p in points]
         ys = [p[1] for p in points]

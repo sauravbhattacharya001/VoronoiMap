@@ -205,6 +205,7 @@ def kde_grid(
         raise ValueError("No points provided for KDE")
     if nx < 2 or ny < 2:
         raise ValueError("Grid resolution must be at least 2x2")
+    vormap.validate_grid_size(nx, ny, caller="kde_grid")
 
     if bandwidth is not None:
         if bandwidth <= 0:

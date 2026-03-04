@@ -205,6 +205,35 @@ def sanitize_css_value(value):
 # Prevents infinite loops on degenerate point configurations.
 MAX_VERTICES = 50
 
+# Maximum total cells in a grid (nx * ny) to prevent memory exhaustion.
+# At ~8 bytes per float, 4M cells ≈ 32 MB — well within reason.
+# A 2000×2000 grid is sufficient for any practical visualization.
+MAX_GRID_CELLS = 4_000_000
+
+
+def validate_grid_size(nx: int, ny: int, *, caller: str = ""):
+    """Raise ValueError if nx * ny exceeds MAX_GRID_CELLS.
+
+    Prevents denial-of-service via absurdly large grid requests
+    (e.g. nx=100000, ny=100000 → 10 billion cells).
+
+    Parameters
+    ----------
+    nx, ny : int
+        Grid dimensions.
+    caller : str
+        Name of the calling function, for error messages.
+    """
+    total = nx * ny
+    if total > MAX_GRID_CELLS:
+        label = f" in {caller}" if caller else ""
+        raise ValueError(
+            f"Grid size {nx}x{ny} = {total:,} cells exceeds maximum "
+            f"of {MAX_GRID_CELLS:,}{label}. "
+            f"Reduce nx/ny or increase vormap.MAX_GRID_CELLS if you "
+            f"have sufficient memory."
+        )
+
 
 class Oracle:
     __slots__ = ()
