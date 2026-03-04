@@ -1,5 +1,5 @@
 {
-  "totalRuns": 186,
+  "totalRuns": 187,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -138,7 +138,8 @@
       "Added real-time collaboration with WebRTC-based P2P sync, shared cursors, conflict resolution, and session management",
       "MessagePinning -- pin messages to floating bar with jump navigation, localStorage persistence (2026-03-03)",
       "ReadAloud -- text-to-speech for messages with Web Speech Synthesis API, voice/speed/pitch controls, floating control bar (2026-03-03)",
-      "Message Diff Viewer -- LCS-based line-level diff between any two messages. GitHub-style rendering with additions/deletions/unchanged, dual line numbers, stats bar. Two-click workflow with adaptive buttons. 34 tests (2026-03-04)"
+      "Message Diff Viewer -- LCS-based line-level diff between any two messages. GitHub-style rendering with additions/deletions/unchanged, dual line numbers, stats bar. Two-click workflow with adaptive buttons. 34 tests (2026-03-04)",
+      "Conversation Timeline -- visual minimap sidebar for conversation navigation. Proportional colored segments (blue user/green assistant), code/bookmark/pin markers, click-to-scroll, hover preview tooltips, viewport indicator, MutationObserver auto-refresh, ARIA accessible. 32 tests (2026-03-04)"
     ],
     "gif-captcha": [
       "Added difficulty levels (easy/medium/hard) with configurable distortion, speed, and noise parameters",
@@ -200,7 +201,8 @@
       "Cross-Domain Correlation Analyzer -- merges sleep/mood/habits/events into daily snapshots, Pearson correlations between 7 variables, strength classification, activity-mood impact, sleep factor-quality impact, rolling correlation, human-readable insights. 1201 lines, 48 tests (2026-03-04)",
       "Daily Routine Builder -- ordered step sequences for daily workflows (morning/evening/workout/study templates), step-by-step execution with complete/skip, scheduling (day-of-week + 6 time slots), analytics (completion rate, avg duration, streaks, most-skipped/slowest step), daily summary, step reordering, JSON serialization. 931 lines, 55 tests (2026-03-04)",
       "Energy Level Tracker -- EnergyEntry model (5-level scale, 6 time slots, 12 energy factors), EnergyTrackerService with time-of-day pattern analysis, factor impact ranking (boosters/drainers), daily summaries, streak tracking, trend detection (linear regression), sleep-energy correlation, stability scoring, recommendation engine (peak scheduling, afternoon crash detection, factor tips), filtering, full report + text summary. 55 tests (2026-03-04)",
-      "Water Intake Tracker -- WaterEntry model (9 drink types with hydration factors, 6 container sizes), WaterTrackerService with daily summaries, hourly pacing, streak tracking, 7-day weekly trends (consistency scoring, peak hour, drink breakdown), smart tips engine, full HydrationReport with text summary. Configurable goals, wake/sleep hours. 50 tests (2026-03-04)"
+      "Water Intake Tracker -- WaterEntry model (9 drink types with hydration factors, 6 container sizes), WaterTrackerService with daily summaries, hourly pacing, streak tracking, 7-day weekly trends (consistency scoring, peak hour, drink breakdown), smart tips engine, full HydrationReport with text summary. Configurable goals, wake/sleep hours. 50 tests (2026-03-04)",
+      "Reading List / Book Tracker -- Book model (14 genres, 4 statuses, ReadingSession), ReadingListService with CRUD, status lifecycle, session logging with pace/ETA, filtering (status/genre/author/tag/rating/search), sorting, reading streak tracking, genre/author stats, monthly summaries, annual reading challenge, smart recommendations (genre+author preference), comprehensive ReadingReport with text summary, JSON persistence. 55 tests (2026-03-04)"
     ],
     "ai": [
       "Added escape attempt detection system with filesystem, network, process, and code injection monitors",
@@ -359,6 +361,6 @@
     ]
   },
   "lastRepo": "agenticchat",
-  "lastFeature": "MessageDiffViewer",
+  "lastFeature": "ConversationTimeline",
   "lastRun": "2026-03-04"
 }

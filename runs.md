@@ -1,3 +1,15 @@
+## Builder Run 187 -- 2026-03-04 11:35 AM PST
+- **Repo:** agenticchat
+- **Feature:** Conversation Timeline Minimap
+- **What:** Visual sidebar minimap showing conversation structure. Each message rendered as a proportional colored segment (blue=user, green=assistant). Code blocks get purple dot markers, bookmarks orange, pinned red. Click any segment to smooth-scroll to that message with highlight animation. Hover for tooltip (role emoji + first line). Viewport indicator tracks scroll position in real-time. Auto-refreshes via MutationObserver. Toggleable with arrow button on right edge.
+- **Tests:** 32/32 passing
+- **Pushed:** e85e542 to main (706 lines: 414 app.js + 289 test + 3 setup)
+## Builder Run 187 -- 2026-03-04 11:15 AM PST
+- **Repo:** everything (Flutter)
+- **Feature:** Reading List / Book Tracker
+- **Files:** `lib/models/book.dart`, `lib/core/services/reading_list_service.dart`, `test/core/reading_list_service_test.dart` (1501 lines)
+- **Details:** Book model with 14 genres, 4 reading statuses, ReadingSession logging. ReadingListService with full CRUD, status lifecycle, pace tracking, filtering/sorting, reading streaks, genre/author stats, monthly summaries, annual reading challenge, smart recommendations, comprehensive report with text summary, JSON persistence. 55 tests.
+
 ## Gardener Run 717 -- 2026-03-04 11:20 AM PST
 - **Repo:** GraphVisual
 - **Tasks:** perf_improvement + refactor
@@ -6106,6 +6118,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
