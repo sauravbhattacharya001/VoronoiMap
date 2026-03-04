@@ -1,5 +1,5 @@
 {
-  "totalRuns": 156,
+  "totalRuns": 157,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -184,7 +184,8 @@
       "Sleep Tracker with bedtime/wake time logging, 5-level quality rating, 12 sleep factors, awakenings count, duration trends, factor-quality correlations, sleep debt calculator, consistency scoring, streak tracking, 14-day bar chart, 42 tests (2026-03-03)",
       "Eisenhower Matrix Service — 4-quadrant event prioritization (urgency × importance scoring), configurable thresholds, tag weights, balance scoring, recommendations, 45 tests (2026-03-03)",
       "Event Pattern Recognizer — discovers recurring patterns from historical events, detects scheduling habits (time-of-day, busiest day, density, duration), predicts future events with confidence decay, suggests formalizing informal recurrences. 42 tests (2026-03-03)",
-      "Weekly Planner Service — generates structured day-by-day plans from events/goals/habits/free time with urgency-based goal allocation (deadline × progress scoring), habit frequency scheduling, overlap detection, load scoring (free/light/moderate/heavy/overloaded), smart warnings (context switching, unallocated goals, imminent deadlines), configurable working hours/buffer/block sizes, text summary. 48 tests (2026-03-03)"
+      "Weekly Planner Service — generates structured day-by-day plans from events/goals/habits/free time with urgency-based goal allocation (deadline × progress scoring), habit frequency scheduling, overlap detection, load scoring (free/light/moderate/heavy/overloaded), smart warnings (context switching, unallocated goals, imminent deadlines), configurable working hours/buffer/block sizes, text summary. 48 tests (2026-03-03)",
+      "Productivity Score Service -- 6-dimension composite daily scoring (events/habits/goals/sleep/mood/focus), configurable weights (3 presets), 5-tier grading, per-dimension insights, trend analysis with linear regression, weekly summary with week-over-week comparison. 788 lines, 55 tests (2026-03-03)"
     ],
     "ai": [
       "Added escape attempt detection system with filesystem, network, process, and code injection monitors",
@@ -236,7 +237,8 @@
       "Eulerian path/circuit analyzer — Hierholzer's O(V+E) algorithm, degree-based classification, edge connectivity via max-flow, Chinese Postman suggestions, report generation, 38 tests (2026-03-03)",
       "Strongly Connected Components (SCC) Analyzer — Tarjan's and Kosaraju's algorithms, condensation DAG, component classification (source/sink/intermediate), bridge edges, connectivity queries, min-edges-to-connect, 30 tests (2026-03-03)",
       "Planar Graph Analyzer -- planarity testing (Euler bound + K5/K3,3 minor detection with exhaustive contraction), face enumeration via force-directed planar embedding, dual graph construction, Kuratowski subgraph extraction, genus estimation, triangle-free bound, comprehensive PlanarityReport. 47 tests (2026-03-03)",
-      "Cycle Analyzer -- cycle detection (DFS back-edges), girth computation (BFS shortest cycle), fundamental cycle basis (spanning tree), bounded simple cycle enumeration with canonical deduplication, full analysis report (circumference, cyclomatic number, per-vertex participation, most-cyclic vertex). Supports directed and undirected graphs. 51 tests (2026-03-03)"
+      "Cycle Analyzer -- cycle detection (DFS back-edges), girth computation (BFS shortest cycle), fundamental cycle basis (spanning tree), bounded simple cycle enumeration with canonical deduplication, full analysis report (circumference, cyclomatic number, per-vertex participation, most-cyclic vertex). Supports directed and undirected graphs. 51 tests (2026-03-03)",
+      "Dominating Set Analyzer -- greedy/exact/independent/connected dominating sets, k-domination, bounds (ceil(n/(1+Δ)) to n-Δ), coverage analysis, verification, full report. 56 tests (2026-03-03)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",

@@ -1,3 +1,6 @@
+## Builder Run 157 — 2026-03-03 10:45 PM PST
+- **GraphVisual**: Added Dominating Set Analyzer — greedy/exact/independent/connected dominating sets, k-domination, domination number bounds, per-vertex coverage analysis, verification, full report generation. 56 tests, all passing.
+
 ## Gardener Run 683-684 — 2026-03-03 10:30 PM PST
 - **Task 1:** fix_issue — **sauravcode** #26: Imported module functions now capture closure scope at definition time, so they can reference module-level variables when called from the caller's scope.
 - **Task 2:** fix_issue — **GraphVisual** #33: Fixed square participation in MotifAnalyzer — now tracks all 4 vertices of each square and halves participation counts to match corrected squareCount.
@@ -100,6 +103,9 @@
 - **Tests:** 47/47 passing
 - **Highlights:** Planarity testing via Euler bound + K5/K3,3 minor detection (exhaustive contraction for ≤12 vertices, 8 heuristic strategies for larger). Face enumeration using force-directed planar embedding with angle-ordered neighbors. Dual graph construction. Kuratowski subdivision certificates. Triangle-free bound. Genus estimation. Comprehensive PlanarityReport with text output.
 ## 2026-03-03
+### Builder Run #157 (everything) - 11:00 PM PST
+- **Productivity Score Service**: 6-dimension composite daily scoring (events 25%, habits 20%, goals 20%, sleep 15%, mood 10%, focus 10%). Configurable weights with 3 presets (balanced/taskFocused/wellnessFocused). 5-tier grading (Excellent through Needs Work). Per-dimension insights, strength/improvement identification, trend analysis (linear regression slope for rising/stable/declining), weekly summary with week-over-week comparison. 788 lines impl, 55 tests (910 lines). Commit `54b3110`.
+
 ### Gardener Run #684 (BioBots) - 10:55 PM PST
 - **perf_improvement**: Pre-extract record params in `calibrate()` — eliminated (steps+1)^2 redundant full-dataset scans by parsing print records once before grid search. Default 5-step grid: 35 redundant dataset iterations removed. Correlation computed only on new best RMSE. All 1736 Jest + 72 assert tests pass. Commit `969e76a`.
 - **doc_update**: Created ARCHITECTURE.md (153 lines) — project structure, 3-layer architecture (shared computation/dashboard/test), 8 module summary table, 27 dashboard pages by category, data flow diagram, module dependency graph, key algorithms, deployment, contributor guide.
@@ -5145,6 +5151,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
