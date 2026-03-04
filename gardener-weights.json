@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T15:20:00",
-  "totalRuns": 714,
+  "totalRuns": 715,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -686,7 +686,7 @@
     ]
   },
   "notes": "Run 713. bug_fix on getagentbox (decimal missing in Stats animation intermediate frames). refactor on getagentbox (SiteNav + CommandPalette destroy() methods for event handler cleanup). Filed #24 for index.test.js hanging.",
-  "lastRepo": "FeedReader",
+  "lastRepo": "Vidly",
   "lastRun": "2026-03-04",
   "runCount": 28,
   "lastWeightAdjustment": 700,
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "bug_fix",
-    "perf_improvement"
+    "open_issue",
+    "refactor"
   ]
 }
