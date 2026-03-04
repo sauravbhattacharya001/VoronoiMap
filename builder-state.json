@@ -1,5 +1,5 @@
 {
-  "totalRuns": 181,
+  "totalRuns": 183,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -176,7 +176,8 @@
       "Added prompt middleware pipeline with 6 built-in components (validation, logging, caching, retry, metrics, content filter), lambda middleware, variable rendering, 44 tests (2026-03-03)",
       "Added prompt fingerprinting with SHA-256 hashing, 5 normalization levels, Jaccard similarity via shingling, batch dedup detection, FindSimilar search, fingerprint diffing, stop word removal, 53 tests (2026-03-03)",
       "Added Prompt Environment Manager with multi-env config (dev/staging/prod), variable overrides, promotion pipelines, rollback, comparison, deployment matrix, locking, JSON export, 51 tests (2026-03-04)",
-      "Added PromptResponseEvaluator for automated quality assessment of prompt-response pairs (relevance, completeness, format, conciseness, safety) with consistency analysis and A/B comparison"
+      "Added PromptResponseEvaluator for automated quality assessment of prompt-response pairs (relevance, completeness, format, conciseness, safety) with consistency analysis and A/B comparison",
+      "Added PromptTokenOptimizer -- prompt analysis and optimization engine with redundancy detection (Jaccard similarity), filler word removal (14 patterns), section cost analysis, formatting overhead detection, excessive context flagging, over-specification detection, optimization score (0-100), prompt comparison, budget checking with reserve ratio, smart splitting by sections/sentences. 69 tests (2026-03-04)"
     ],
     "everything": [
       "Added calendar view with month grid, event dots, and day-tap to filter events",
@@ -216,7 +217,8 @@
       "Agent Self-Modification Detector -- multi-vector detection (code/config/model/prompt/goal), 18 built-in rules with sequence matching, intent profiling (stealth/persistence/sophistication), escalation detection, correlation clustering for coordinated campaigns, 5 agent strategies, composite risk scoring, CLI. 57 tests (2026-03-03)",
       "Agent Game-Theory Analyzer -- models inter-agent interactions as 2x2 symmetric games (Prisoner's Dilemma, Stag Hunt, Chicken, Harmony). Payoff matrix classification, Nash equilibria (pure + mixed), strategy detection (TFT/grudger/pavlov/random/always-C/D), 5-category alert detection (collusion/escalation/free-riding/instability/dominant-defectors), cooperation trend analysis, composite risk scoring (0-100), round-robin tournament simulation with 7 strategies, CLI. 979 lines, 63 tests (2026-03-03)",
       "Agent Covert Channel Detector -- 5-vector analysis (content entropy/base64/hex/padding, timing regularity/bimodal/decode, protocol deviation, frequency n-gram anomalies, metadata leakage), per-pair profiling with suspicion scoring, incremental drift detection, single-message scanning, configurable thresholds, risk scoring 0-100 with grades and recommendations, CLI demo. 700 lines, 64 tests (2026-03-04)",
-      "Agent Resource Hoarding Detector -- 5-dimension analysis (compute, memory, data, connections, file handles) with configurable thresholds, composite risk scoring, fleet-wide analysis, agent comparison, top-N ranking, recommendation engine. 742 lines, 61 tests (2026-03-04)"
+      "Agent Resource Hoarding Detector -- 5-dimension analysis (compute, memory, data, connections, file handles) with configurable thresholds, composite risk scoring, fleet-wide analysis, agent comparison, top-N ranking, recommendation engine. 742 lines, 61 tests (2026-03-04)",
+      "Agent Privilege Escalation Detector -- 5-vector scope creep detection (filesystem/network/process/API/data), 16 detection rules, 4 agent strategies, stealth inference, risk scoring, chain detection, containment scoring, escalation velocity tracking, configurable permissions, CLI. 80 tests (2026-03-04)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -350,7 +352,7 @@
       "Virtualization Security Audit -- Hyper-V VM isolation (external switch/checkpoints/guest services), WSL (version/root distros/mirrored networking/firewall/interop/systemd), Windows Sandbox (networking/writable mapped folders), Docker (TCP exposure/privileged mode/root containers/content trust/user namespaces/ICC), VBS/Credential Guard/HVCI/Memory Integrity/Secure Boot. VirtualizationState DTO, 66 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "BioBots",
-  "lastFeature": "SterilizationProtocolAnalyzer",
+  "lastRepo": "ai",
+  "lastFeature": "AgentPrivilegeEscalationDetector",
   "lastRun": "2026-03-04"
 }
