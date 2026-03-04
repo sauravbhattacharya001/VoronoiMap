@@ -1,5 +1,5 @@
 {
-  "totalRuns": 157,
+  "totalRuns": 159,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -202,7 +202,8 @@
       "Added agent alignment drift monitor with value tracking, priority ordering (Kendall tau), reward hacking detection, composite scoring, 3 spec presets, 54 tests (2026-03-03)",
       "Agent Goal Inference Engine — Bayesian latent goal detection with 5 goal hypotheses, configurable priors (uniform/skeptical/trust), conflict detection, deception scoring, multi-agent correlation, temporal tracking, CLI demo, 50 tests (2026-03-03)",
       "Agent Consensus Protocol -- Byzantine fault-tolerant multi-agent voting for safety decisions (quarantine/terminate/escalate). Simple majority + supermajority for critical actions, weighted voting, quorum enforcement, proposal lifecycle, tamper-evident SHA-256 audit chain, voting bloc detection, vote change policy, per-voter rate limiting, CLI demo. 62 tests (2026-03-03)",
-      "Agent Self-Modification Detector -- multi-vector detection (code/config/model/prompt/goal), 18 built-in rules with sequence matching, intent profiling (stealth/persistence/sophistication), escalation detection, correlation clustering for coordinated campaigns, 5 agent strategies, composite risk scoring, CLI. 57 tests (2026-03-03)"
+      "Agent Self-Modification Detector -- multi-vector detection (code/config/model/prompt/goal), 18 built-in rules with sequence matching, intent profiling (stealth/persistence/sophistication), escalation detection, correlation clustering for coordinated campaigns, 5 agent strategies, composite risk scoring, CLI. 57 tests (2026-03-03)",
+      "Agent Game-Theory Analyzer -- models inter-agent interactions as 2x2 symmetric games (Prisoner's Dilemma, Stag Hunt, Chicken, Harmony). Payoff matrix classification, Nash equilibria (pure + mixed), strategy detection (TFT/grudger/pavlov/random/always-C/D), 5-category alert detection (collusion/escalation/free-riding/instability/dominant-defectors), cooperation trend analysis, composite risk scoring (0-100), round-robin tournament simulation with 7 strategies, CLI. 979 lines, 63 tests (2026-03-03)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -238,7 +239,8 @@
       "Strongly Connected Components (SCC) Analyzer — Tarjan's and Kosaraju's algorithms, condensation DAG, component classification (source/sink/intermediate), bridge edges, connectivity queries, min-edges-to-connect, 30 tests (2026-03-03)",
       "Planar Graph Analyzer -- planarity testing (Euler bound + K5/K3,3 minor detection with exhaustive contraction), face enumeration via force-directed planar embedding, dual graph construction, Kuratowski subgraph extraction, genus estimation, triangle-free bound, comprehensive PlanarityReport. 47 tests (2026-03-03)",
       "Cycle Analyzer -- cycle detection (DFS back-edges), girth computation (BFS shortest cycle), fundamental cycle basis (spanning tree), bounded simple cycle enumeration with canonical deduplication, full analysis report (circumference, cyclomatic number, per-vertex participation, most-cyclic vertex). Supports directed and undirected graphs. 51 tests (2026-03-03)",
-      "Dominating Set Analyzer -- greedy/exact/independent/connected dominating sets, k-domination, bounds (ceil(n/(1+Δ)) to n-Δ), coverage analysis, verification, full report. 56 tests (2026-03-03)"
+      "Dominating Set Analyzer -- greedy/exact/independent/connected dominating sets, k-domination, bounds (ceil(n/(1+Δ)) to n-Δ), coverage analysis, verification, full report. 56 tests (2026-03-03)",
+      "Vertex Cover Analyzer -- 2-approximation, greedy, exact, weighted algorithms, kernel reduction (degree-0/1/universal rules), LP relaxation bound, cover verification, uncovered edge detection, coverage contribution, full report. 73 tests (2026-03-03)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",
