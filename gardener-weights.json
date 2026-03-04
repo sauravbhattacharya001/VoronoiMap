@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-04T14:35:00",
-  "totalRuns": 705,
+  "lastUpdated": "2026-03-04T15:20:00",
+  "totalRuns": 707,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 20,
-      "runs": 50,
-      "successes": 51
+      "runs": 51,
+      "successes": 52
     },
     "security_fix": {
       "weight": 20,
@@ -64,8 +64,8 @@
     },
     "open_issue": {
       "weight": 20,
-      "runs": 69,
-      "successes": 72,
+      "runs": 70,
+      "successes": 73,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -686,8 +686,8 @@
     ]
   },
   "notes": "Run 700. fix_issue on VoronoiMap #40 (replaced O(V*(V+E)) all-pairs BFS with double-BFS + sampling for diameter/avg_path_length). fix_issue on gif-captcha #16 (resetAll() prototype pollution fix).",
-  "lastRepo": "getagentbox",
-  "lastRun": "2026-03-04T14:35:00",
+  "lastRepo": "BioBots",
+  "lastRun": "2026-03-04T15:20:00",
   "runCount": 27,
   "lastWeightAdjustment": 700,
   "adjustmentHistory": [

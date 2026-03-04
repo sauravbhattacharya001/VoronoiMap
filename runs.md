@@ -1,6 +1,10 @@
 ## Gardener Run 706 — 2026-03-04 7:00 AM PST
 - **Status:** All 17 repos have all 29 task types completed. Nothing to do.
 
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 — 2026-03-04 6:45 AM PST
 - **Repo:** GraphVisual
 - **Feature:** Hamiltonian Path/Cycle Analyzer — exact backtracking solver, Dirac's/Ore's/Chvátal's theorem checks, greedy Warnsdorff heuristic, cycle enumeration, source-target path finding, comprehensive reports. 55 tests.
@@ -20,6 +24,10 @@
 ## Gardener Run 702 — 2026-03-04 6:00 AM PST
 - **Result:** All 16 repos have all 29 task types completed. No eligible tasks. Run skipped.
 
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 -- 2026-03-04 7:10 AM PST
 - **Repo:** agentlens
 - **Feature:** Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools
@@ -35,6 +43,10 @@
 - **Feature:** Tree Analyzer — tree/forest detection, center (leaf peeling), centroid (subtree size), diameter (double BFS), Prüfer sequence encode/decode, LCA engine (Euler tour + sparse table, O(1) queries), tree isomorphism (AHU canonical form), rooted tree info, degree distribution, full report. 750 lines, 55 tests.
 - **Commit:** `c7c5b0f`
 
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 -- 2026-03-04 7:10 AM PST
 - **Repo:** agentlens
 - **Feature:** Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools
@@ -54,6 +66,10 @@
 - **Task 1:** fix_issue on **VoronoiMap** (#40) — Replaced O(V*(V+E)) all-pairs BFS for diameter with double-BFS approximation O(V+E). Avg path length now uses sampled BFS (up to 50 sources). Commit: `06fec60`
 - **Task 2:** fix_issue on **gif-captcha** (#16) — Fixed `resetAll()` prototype pollution: replaced `{}` with `Object.create(null)`. Commit: `1235288`
 
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 -- 2026-03-04 7:10 AM PST
 - **Repo:** agentlens
 - **Feature:** Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools
@@ -83,6 +99,10 @@
 - **Feature:** Client Fingerprinter (`createClientFingerprinter`) — cookieless browser/device fingerprinting for repeat CAPTCHA visitor identification. 10 signal types, djb2 hashing, weighted similarity search, bot pattern detection (headless/phantom/selenium/puppeteer/swiftshader), IP identity change tracking, composite risk scoring (0-100), LRU+TTL storage, state export/import. 43 tests.
 - **Commit:** `1a8cf51`
 
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 -- 2026-03-04 7:10 AM PST
 - **Repo:** agentlens
 - **Feature:** Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools
@@ -123,6 +143,10 @@
 - **Status:** All 17 repos have all 29 task types completed. Nothing to do.
 - **Note:** The gardener has fully covered every repo × task combination. Consider adding new repos or new task types.
 
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 -- 2026-03-04 7:10 AM PST
 - **Repo:** agentlens
 - **Feature:** Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools
@@ -169,6 +193,10 @@
 - **Files:** `Try/scripts/maturation.js` (490 lines), `__tests__/maturation.test.js` (580 lines)
 - **Commit:** `8784a49`
 
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 -- 2026-03-04 7:10 AM PST
 - **Repo:** agentlens
 - **Feature:** Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools
@@ -222,6 +250,10 @@
 - **Repo:** agentlens
 - **Task 1 (doc_update):** Created `docs/sampling.html` -- comprehensive documentation page for the new sampling module. Covers all 7 strategies with API reference tables, quick start guide, production patterns (dev/staging/prod/high-volume), head-vs-tail comparison. Updated sidebar navigation across all 14 existing doc pages. Commit `5ebe20d`.
 - **Task 2 (code_cleanup):** Removed unused imports: `field` from health.py, `contextmanager`/`Generator` from span.py. Registered sampling module exports in `__init__.py` (13 types). All 134 tests pass. Commit `9ea7b24`.
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 -- 2026-03-04 7:10 AM PST
 - **Repo:** agentlens
 - **Feature:** Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools
@@ -238,6 +270,10 @@
 - **Tests:** 51 passing
 - **Commit:** 0871aa1
 
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 -- 2026-03-04 7:10 AM PST
 - **Repo:** agentlens
 - **Feature:** Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools
@@ -277,6 +313,10 @@
 - **Feature:** WiFi Security Audit — saved profile encryption analysis (Open/WEP/WPA-TKIP), auto-connect risk assessment, hidden network probing, public network matching (20+ SSIDs), MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO. 63 tests.
 - **Commit:** `91e4c85`
 
+## Gardener Run 702 -- 2026-03-04 7:20 AM PST
+- **Repo:** BioBots
+- **Task 1 (open_issue):** Filed issue #23 -- GCode analyzer double-counts layers when both comment-based ("; layer N") and Z-change-based detection trigger on the same line.
+- **Task 2 (bug_fix):** Fixed #23 -- added layerSetByComment flag to prevent Z-based increment when comment already set the layer. 1973/1973 tests pass. Commit f68c290.
 ## Builder Run 174 -- 2026-03-04 7:10 AM PST
 - **Repo:** agentlens
 - **Feature:** Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools
@@ -5832,6 +5872,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
