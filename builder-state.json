@@ -1,5 +1,5 @@
 {
-  "totalRuns": 145,
+  "totalRuns": 146,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -166,7 +166,8 @@
       "Added dynamic prompt optimization with gradient-free tuning, Monte Carlo sampling, and automated prompt rewriting",
       "Added prompt dependency graph with DAG visualization, impact analysis, circular dependency detection, and topological ordering",
       "Added prompt playground with side-by-side model comparison, streaming, variable injection, and response diff view",
-      "Added prompt middleware pipeline with 6 built-in components (validation, logging, caching, retry, metrics, content filter), lambda middleware, variable rendering, 44 tests (2026-03-03)"
+      "Added prompt middleware pipeline with 6 built-in components (validation, logging, caching, retry, metrics, content filter), lambda middleware, variable rendering, 44 tests (2026-03-03)",
+      "Added prompt fingerprinting with SHA-256 hashing, 5 normalization levels, Jaccard similarity via shingling, batch dedup detection, FindSimilar search, fingerprint diffing, stop word removal, 53 tests (2026-03-03)"
     ],
     "everything": [
       "Added calendar view with month grid, event dots, and day-tap to filter events",
@@ -248,7 +249,8 @@
       "ArticleDeduplicator -- cross-feed duplicate detection using multi-signal fingerprinting (title 3-gram Jaccard, content term overlap, URL domain+path matching), configurable weights/threshold, canonical selection, human-readable grouping reasons, 48 tests (2026-03-03)",
       "ArticleTrendDetector -- trending topic discovery with time-window keyword frequency tracking, momentum scoring, rising/spike/stable/declining/fading detection, top keywords, topic history, summary, 38 tests (2026-03-03)",
       "ArticleSummarizer -- extractive TF-IDF summarization with title/position boosting, batch and multi-article digest, top keyword extraction, compression ratio, 38 tests (2026-03-03)",
-      "FeedPerformanceAnalyzer -- per-feed report cards with publishing frequency/consistency, Flesch readability, sentiment profiling, engagement tracking, composite 0-100 scoring (3 weight presets), A+ through F grading, actionable recommendations, multi-feed comparison with ranking and summary. 50 tests (2026-03-03)"
+      "FeedPerformanceAnalyzer -- per-feed report cards with publishing frequency/consistency, Flesch readability, sentiment profiling, engagement tracking, composite 0-100 scoring (3 weight presets), A+ through F grading, actionable recommendations, multi-feed comparison with ranking and summary. 50 tests (2026-03-03)",
+      "ReadingQueueManager -- ordered read-later queue with 4 priority levels, estimated reading time (238 WPM), completion tracking, queue position management (move up/down/top/bottom), 3 sort modes (priority/time/date), per-article notes, filtering (status/priority/feed), batch enqueue, queue statistics, estimated time to empty. 57 tests (2026-03-03)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",

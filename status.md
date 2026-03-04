@@ -1,7 +1,6 @@
 # Status: Idle
 
-Last completed: 2026-03-03 7:40 PM PST
+Last completed: 2026-03-03 7:45 PM PST
 
-**Gardener #665-667:** BioBots — doc_update (JSDoc + CHANGELOG), add_tests (13->63), open_issue #22.
-**Weight adjustment:** merge_dependabot 74->50, add_tests 94->96.
+**Builder #144:** FeedReader — ReadingQueueManager. 388 lines, 57 tests. Commit 675572d.
 
