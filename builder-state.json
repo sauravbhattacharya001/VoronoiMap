@@ -1,5 +1,5 @@
 {
-  "totalRuns": 151,
+  "totalRuns": 153,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -253,7 +253,8 @@
       "ArticleSummarizer -- extractive TF-IDF summarization with title/position boosting, batch and multi-article digest, top keyword extraction, compression ratio, 38 tests (2026-03-03)",
       "FeedPerformanceAnalyzer -- per-feed report cards with publishing frequency/consistency, Flesch readability, sentiment profiling, engagement tracking, composite 0-100 scoring (3 weight presets), A+ through F grading, actionable recommendations, multi-feed comparison with ranking and summary. 50 tests (2026-03-03)",
       "ReadingQueueManager -- ordered read-later queue with 4 priority levels, estimated reading time (238 WPM), completion tracking, queue position management (move up/down/top/bottom), 3 sort modes (priority/time/date), per-article notes, filtering (status/priority/feed), batch enqueue, queue statistics, estimated time to empty. 57 tests (2026-03-03)",
-      "FeedBundleManager -- curated feed bundles by topic (6 built-in: Tech, Dev, Science, Design, AI, News with 27 feeds). One-click subscribe, custom bundle creation with dedup, add/remove feeds, built-in protection, JSON export/import, search, statistics. 48 tests (2026-03-03)"
+      "FeedBundleManager -- curated feed bundles by topic (6 built-in: Tech, Dev, Science, Design, AI, News with 27 feeds). One-click subscribe, custom bundle creation with dedup, add/remove feeds, built-in protection, JSON export/import, search, statistics. 48 tests (2026-03-03)",
+      "ArticleCollectionManager -- named article collections (playlists for articles). Create/update/delete collections with emoji icons, add/remove/reorder articles, pin, merge with dedup, search, JSON export/import, statistics, bulk ops. O(1) reverse index. 55 tests (2026-03-03)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
@@ -305,7 +306,8 @@
       "Windows Service Security Audit — unquoted path detection, suspicious binary locations, SYSTEM services outside trusted paths, disabled security-critical services, missing auto-start binaries, command wrapper detection, ServiceState DTO, 63 tests (2026-03-03)",
       "Registry Security Audit -- UAC policy, Remote Desktop/NLA, AutoPlay/AutoRun, credential caching/WDigest, LSASS protection, Windows Script Host, WinRM exposure, Safe DLL search, AppInit_DLLs, IFEO debugger hijacking (MITRE T1546.008), Winlogon Shell/Userinit tampering. RegistryState DTO, 55 tests (2026-03-03)",
       "Firewall Rule Security Analyzer -- deep rule-level analysis: overly permissive detection, 13 dangerous ports, public profile exposure, programless rules, duplicate/shadowed rule detection, composite risk scoring (0-100), FirewallRuleState DTO, port spec parser. 60 tests (2026-03-03)",
-      "SMB & Network Share Security Audit (SmbShareAudit.cs, 496 lines) -- SMBv1 detection, signing enforcement, encryption status, guest/null session access, anonymous enumeration, hidden shares, permissive permissions. 9 security categories, 39 tests (2026-03-03)"
+      "SMB & Network Share Security Audit (SmbShareAudit.cs, 496 lines) -- SMBv1 detection, signing enforcement, encryption status, guest/null session access, anonymous enumeration, hidden shares, permissive permissions. 9 security categories, 39 tests (2026-03-03)",
+      "Driver Security Audit -- unsigned driver detection, BYOVD vulnerable driver hash matching (30+ known drivers from loldrivers.io), Secure Boot/HVCI/test signing checks, suspicious path analysis, driver age warnings, DriverState DTO. 67 tests (2026-03-03)"
     ]
   }
 }
