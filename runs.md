@@ -1,3 +1,7 @@
+## Gardener Run 687-688 — 2026-03-03 11:31 PM PST
+- **fix_issue** on **Vidly**: Fixed #32 — CustomerSegmentationService O(C×R) perf issue. Replaced linear rental scans with `ToLookup` dictionary (O(R)), added targeted `AnalyzeCustomer` path. PR #33.
+- **bug_fix** on **everything**: Found missing `_pairKey` method in EventDeduplicationService — `scan()` calls it but it was never defined, causing NoSuchMethodError at runtime. Added the method. PR #36.
+
 ## Gardener Run 685-686 — 2026-03-03 11:00 PM PST
 - **PR Triage**: Merged 6 PRs, closed 7 redundant/conflicted PRs
 - **Merged**: FeedReader #17 (DateFormatter perf), FeedReader #18 (OPML nested folders), VoronoiMap #39 (hotspot plateau detection), ai #22, GraphVisual #32, Vidly #31
@@ -112,6 +116,10 @@
 - **Tests:** 47/47 passing
 - **Highlights:** Planarity testing via Euler bound + K5/K3,3 minor detection (exhaustive contraction for ≤12 vertices, 8 heuristic strategies for larger). Face enumeration using force-directed planar embedding with angle-ordered neighbors. Dual graph construction. Kuratowski subdivision certificates. Triangle-free bound. Genus estimation. Comprehensive PlanarityReport with text output.
 ## 2026-03-03
+### Gardener Run #688 (FeedReader) - 11:50 PM PST
+- **bug_fix**: Fixed stale recommendation cache in `ArticleRecommendationEngine.buildProfile()`. Cache invalidation only checked `history.count`, missing content changes (revisit-count bumps, time-spent updates, feed renames) that don't alter array length. Replaced with content-aware `Hasher` incorporating link, visitCount, feedName, timeSpentSeconds. 2 new tests. Commit `0d29768`.
+- **refactor**: Removed redundant `feedArticleCounts` dictionary in `buildProfile()` — was always identical to `feedCounts`. Merged feed scores and revisit rates into single loop. Net cleaner code path.
+
 ### Gardener Run #685 (Vidly) - 11:20 PM PST
 - **open_issue**: Filed [#32](https://github.com/sauravbhattacharya001/Vidly/issues/32) — `CustomerSegmentationService.AnalyzeCustomer()` is O(C*R) for single customer lookup. Calls `AnalyzeAll()` then `FirstOrDefault`. Same issue in `CompareSegments()` (2x full computation). Suggested fix: pre-build rental-by-customer dict O(R), targeted single-customer path.
 - **refactor**: Extracted `InsightContext` struct + `LoadSharedContext()` + `BuildInsightFromContext()` in MovieInsightsService. Eliminated 3 independent full-data loads (GetInsight/GetAllInsights/Compare each loaded all repos separately). Compare() now uses single shared context for consistent global maximums. Removed unused scan-everything overload. Updated 8 tests. All 55 MovieInsightsService tests pass. Commit `82a2080`.
@@ -5164,6 +5172,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
