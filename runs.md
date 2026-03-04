@@ -1,3 +1,13 @@
+## Gardener Run 716 -- 2026-03-04 11:00 AM PST
+- **Repo:** GraphVisual
+- **Tasks:** code_cleanup, security_fix
+- **Code cleanup:** addLocation.java — converted 6 manual close() calls to try-with-resources. Previously, if any exception occurred during meeting processing, 2 DB connections + 4 statements leaked (no finally block).
+- **Security fix:** addLocation.java + findMeetings.java — added input validation to getTimeStamp() and getTimeDifference(). Unvalidated time strings caused ArrayIndexOutOfBoundsException on malformed input (null/empty/missing delimiters), crashing the app and leaving partial state.
+- **Pushed:** 637d469 to master
+## Gardener Run 716 — 2026-03-04 10:30 AM PST
+- **Task 1:** fix_issue — **Vidly** #35: Added `DailyRate` to `Clone()` and `Update()` in `InMemoryMovieRepository.cs`. Property was silently dropped causing incorrect rental pricing.
+- **Task 2:** fix_issue — **getagentbox** #24: Fixed Jest test hanging by wrapping `loadPage()` with fake timers during DOM init and adding global `afterAll` cleanup for module destroy methods.
+
 ## Builder Run 185 -- 2026-03-04 10:40 AM PST
 - **Repo:** BioBots
 - **Feature:** Multi-Nozzle Coordination Planner
@@ -6070,6 +6080,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
