@@ -1,5 +1,5 @@
 {
-  "totalRuns": 143,
+  "totalRuns": 145,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -231,7 +231,8 @@
       "Fruchterman-Reingold force-directed layout with repulsive/attractive forces, cooling schedule, gravity, edge-weight awareness, deterministic seeding, convergence detection, quality metrics (crossings, edge length CV, angular resolution, stress), viewport normalization, SVG export, 29 tests (2026-03-03)",
       "Eulerian path/circuit analyzer — Hierholzer's O(V+E) algorithm, degree-based classification, edge connectivity via max-flow, Chinese Postman suggestions, report generation, 38 tests (2026-03-03)",
       "Strongly Connected Components (SCC) Analyzer — Tarjan's and Kosaraju's algorithms, condensation DAG, component classification (source/sink/intermediate), bridge edges, connectivity queries, min-edges-to-connect, 30 tests (2026-03-03)",
-      "Planar Graph Analyzer -- planarity testing (Euler bound + K5/K3,3 minor detection with exhaustive contraction), face enumeration via force-directed planar embedding, dual graph construction, Kuratowski subgraph extraction, genus estimation, triangle-free bound, comprehensive PlanarityReport. 47 tests (2026-03-03)"
+      "Planar Graph Analyzer -- planarity testing (Euler bound + K5/K3,3 minor detection with exhaustive contraction), face enumeration via force-directed planar embedding, dual graph construction, Kuratowski subgraph extraction, genus estimation, triangle-free bound, comprehensive PlanarityReport. 47 tests (2026-03-03)",
+      "Cycle Analyzer -- cycle detection (DFS back-edges), girth computation (BFS shortest cycle), fundamental cycle basis (spanning tree), bounded simple cycle enumeration with canonical deduplication, full analysis report (circumference, cyclomatic number, per-vertex participation, most-cyclic vertex). Supports directed and undirected graphs. 51 tests (2026-03-03)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",
@@ -278,7 +279,8 @@
       "Relational algebra engine with typed tables, full relational operators (select/project/rename/union/intersect/difference/cross/natural-join/theta-join), aggregates (count/sum/avg/min/max/group-by), pipeline DSL, WHERE clause helpers, functional indexes, pretty-printing, 35 tests (2026-03-03)",
       "Optics module -- lenses, prisms, traversals, optionals, isos with |>> composition, nested record/sum type examples, type conversions, 48 tests (2026-03-03)",
       "Computational geometry module (geometry.ml) -- point/segment/polygon types, cross/dot product, orientation test, convex hull (Graham scan O(n log n)), point-in-polygon (ray casting O(n)), point-in-convex-polygon (binary search O(log n)), segment intersection, closest pair (divide and conquer O(n log n)), Shoelace area, perimeter, centroid, is_convex, bounding box. 55 tests (2026-03-03)",
-      "CSP solver -- constraint satisfaction problems with backtracking search, AC-3 arc consistency, MRV/LCV heuristics, forward checking. Applications: N-Queens, graph coloring, Sudoku. 35 tests (2026-03-03)"
+      "CSP solver -- constraint satisfaction problems with backtracking search, AC-3 arc consistency, MRV/LCV heuristics, forward checking. Applications: N-Queens, graph coloring, Sudoku. 35 tests (2026-03-03)",
+      "miniKanren logic programming engine -- unification with occurs check, lazy interleaving streams, relational list ops (appendo/membero/reverseo), Peano arithmetic (pluso/multo/leo), map coloring, permutations, reification, 55+ tests (2026-03-03)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
