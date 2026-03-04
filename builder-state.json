@@ -1,5 +1,5 @@
 {
-  "totalRuns": 169,
+  "totalRuns": 170,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -227,7 +227,8 @@
       "RatingEngineService — Bayesian weighted ratings (IMDb WR formula), global + per-genre rankings with vote-count tiebreaker, trending scores with 30-day half-life exponential decay, controversy detection (stdDev + polarization composite), comprehensive rating reports. DTOs: BayesianRating, TrendingScore, ControversyScore, MovieRatingReport. 48 tests (2026-03-03)",
       "RentalForecastService — day-of-week distribution, monthly trends, genre popularity with momentum, movie velocity, N-day demand forecasting, inventory recommendations (high demand/dead stock/never rented/genre gaps), summary report. 45 tests (2026-03-03)",
       "CustomerSegmentationService — RFM (Recency/Frequency/Monetary) analysis with quintile scoring, 11 marketing segments, segment distribution summary, at-risk customer identification, marketing recommendations, segment migration comparison. 58 tests (2026-03-03)",
-      "ChurnPredictorService -- multi-factor churn risk analysis (recency/frequency-decline/engagement/late-returns/genre-diversity), composite 0-100 scoring, 4 risk levels, configurable weights/thresholds, winnable customer targeting, time-period comparison, smart retention actions. 55 tests (2026-03-04)"
+      "ChurnPredictorService -- multi-factor churn risk analysis (recency/frequency-decline/engagement/late-returns/genre-diversity), composite 0-100 scoring, 4 risk levels, configurable weights/thresholds, winnable customer targeting, time-period comparison, smart retention actions. 55 tests (2026-03-04)",
+      "WatchlistService -- smart ordering (priority+availability+rating), trending movies, watchlist comparison (Dice similarity), insights (genre breakdown, stale items, top pick, avg rating), bulk add with auto new-release promotion. 435 lines + 35 tests (2026-03-04)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
@@ -285,7 +286,8 @@
       "Scaffold Porosity Analyzer — volumetric porosity calculation, pore size distribution, interconnectivity estimation, Kozeny-Carman permeability, tissue suitability scoring (6 types), parameter optimization. 62 tests (2026-03-03)",
       "Cell Viability Estimator -- multi-stressor model predicting cell survival through bioprinting. Shear stress (Weissenberg-Rabinowitsch), pressure (logistic), UV crosslink (Hill), thermal (Gaussian), duration (linear) damage models. Combined multiplicative estimation, sensitivity analysis with ranking, optimal window finder from historical data, batch analyze with RMSE/MAE/correlation, 2D parameter sweep, grid-search calibration, comprehensive reports. 72 tests (2026-03-03)",
       "Bioink Compatibility Matrix -- pairwise multi-material compatibility analysis across 6 dimensions (rheology, crosslinking, thermal, pH, interface adhesion, degradation), 6 built-in bioink profiles, full NxN matrix, multi-material print planning with common windows and print order suggestion. 64 tests (2026-03-04)",
-      "Scaffold Degradation Predictor -- 8 material profiles, hydrolytic+enzymatic kinetics with Arrhenius/pH/crystallinity/porosity corrections, mass/MW/mechanical decay curves, functional lifetime estimation, 6 tissue targets with suitability scoring, material recommendation engine, sensitivity analysis, full reports. 59 tests (2026-03-04)"
+      "Scaffold Degradation Predictor -- 8 material profiles, hydrolytic+enzymatic kinetics with Arrhenius/pH/crystallinity/porosity corrections, mass/MW/mechanical decay curves, functional lifetime estimation, 6 tissue targets with suitability scoring, material recommendation engine, sensitivity analysis, full reports. 59 tests (2026-03-04)",
+      "Tissue Maturation Simulator -- post-print tissue development with logistic cell growth (6 cell types), ECM deposition (collagen/GAGs/elastin/mineral), mechanical evolution, Krogh oxygen diffusion, 4-dimension maturity scoring (A-F), trajectory comparison, optimal culture time finder, full reports. 53 tests (2026-03-04)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -333,7 +335,7 @@
       "WiFi Security Audit -- saved profile encryption (Open/WEP/WPA-TKIP), auto-connect risks, hidden network probing, public network matching, MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO, 63 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "agentlens",
-  "lastFeature": "Trace sampling and rate limiting",
+  "lastRepo": "Vidly",
+  "lastFeature": "WatchlistService",
   "lastRun": "2026-03-04"
 }
