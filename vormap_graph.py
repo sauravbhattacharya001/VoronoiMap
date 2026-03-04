@@ -304,11 +304,39 @@ def compute_graph_stats(graph):
     avg_path_length = None
 
     if is_connected and n > 1:
-        total_dist = 0
-        max_dist = 0
-        pair_count = 0
+        # Double-BFS approximation for diameter: O(V+E) instead of O(V*(V+E))
+        # Exact for trees, tight approximation for sparse planar graphs like
+        # Voronoi duals.
+        def _bfs_farthest(start):
+            """BFS from start; return (farthest_node, max_distance, dist_map)."""
+            dist = {start: 0}
+            queue = deque([start])
+            farthest = start
+            max_d = 0
+            while queue:
+                node = queue.popleft()
+                for neigh in adjacency[node]:
+                    if neigh not in dist:
+                        dist[neigh] = dist[node] + 1
+                        queue.append(neigh)
+                        if dist[neigh] > max_d:
+                            max_d = dist[neigh]
+                            farthest = neigh
+            return farthest, max_d, dist
 
-        for start in seeds_list:
+        u = seeds_list[0]
+        v, _, _ = _bfs_farthest(u)
+        _, diam, _ = _bfs_farthest(v)
+        diameter = diam
+
+        # Sampled average path length: pick up to 50 random sources for a
+        # statistically sound O(K*(V+E)) estimate instead of O(V*(V+E)).
+        import random as _rand
+        sample_k = min(50, n)
+        sample_sources = _rand.sample(seeds_list, sample_k) if n > sample_k else seeds_list
+        total_dist = 0
+        pair_count = 0
+        for start in sample_sources:
             dist = {start: 0}
             queue = deque([start])
             while queue:
@@ -317,13 +345,8 @@ def compute_graph_stats(graph):
                     if neigh not in dist:
                         dist[neigh] = dist[node] + 1
                         queue.append(neigh)
-                        d = dist[neigh]
-                        total_dist += d
-                        if d > max_dist:
-                            max_dist = d
+                        total_dist += dist[neigh]
                         pair_count += 1
-
-        diameter = max_dist
         avg_path_length = round(total_dist / pair_count, 4) if pair_count > 0 else 0.0
 
     return {
