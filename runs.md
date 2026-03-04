@@ -1,3 +1,12 @@
+## Builder Run 174 — 2026-03-04 6:45 AM PST
+- **Repo:** GraphVisual
+- **Feature:** Hamiltonian Path/Cycle Analyzer — exact backtracking solver, Dirac's/Ore's/Chvátal's theorem checks, greedy Warnsdorff heuristic, cycle enumeration, source-target path finding, comprehensive reports. 55 tests.
+- **Commit:** 65d598a
+
+## Gardener Run 704 — 2026-03-04 6:30 AM PST
+- **Result:** All 16 repos have all 29 task types completed. No valid task/repo combinations remain.
+- **Action:** None — the garden is fully tended. Consider adding new repos or new task types.
+
 ## Builder Run 173 — 2026-03-04 6:15 AM PST
 - **Repo:** BioBots
 - **Feature:** Vascularization Planner — vascular channel network design for bioprinted tissue constructs
@@ -8,11 +17,19 @@
 ## Gardener Run 702 — 2026-03-04 6:00 AM PST
 - **Result:** All 16 repos have all 29 task types completed. No eligible tasks. Run skipped.
 
+## Gardener Run 701 -- 2026-03-04 6:35 AM PST
+- **Repo:** getagentbox
+- **Task 1 (open_issue):** Filed issue #23 -- seven modules (Calculator, CommandPalette, ShareFab, ThemeToggle, ScrollProgress, ShortcutsHelp, Playground) assigned to window BEFORE their IIFE definitions execute, so window.X = undefined due to var hoisting.
+- **Task 2 (bug_fix):** Fixed #23 -- moved window exposure block to end of file after all IIFE definitions. Also added missing window.Trust exposure. Commit 2612e19.
 ## Builder Run 172 — 2026-03-04 5:45 AM PST
 - **Repo:** GraphVisual
 - **Feature:** Tree Analyzer — tree/forest detection, center (leaf peeling), centroid (subtree size), diameter (double BFS), Prüfer sequence encode/decode, LCA engine (Euler tour + sparse table, O(1) queries), tree isomorphism (AHU canonical form), rooted tree info, degree distribution, full report. 750 lines, 55 tests.
 - **Commit:** `c7c5b0f`
 
+## Gardener Run 701 -- 2026-03-04 6:35 AM PST
+- **Repo:** getagentbox
+- **Task 1 (open_issue):** Filed issue #23 -- seven modules (Calculator, CommandPalette, ShareFab, ThemeToggle, ScrollProgress, ShortcutsHelp, Playground) assigned to window BEFORE their IIFE definitions execute, so window.X = undefined due to var hoisting.
+- **Task 2 (bug_fix):** Fixed #23 -- moved window exposure block to end of file after all IIFE definitions. Also added missing window.Trust exposure. Commit 2612e19.
 ## Builder Run 172 -- 2026-03-04 6:18 AM PST
 - **Repo:** prompt
 - **Feature:** PromptResponseEvaluator -- automated quality assessment of prompt-response pairs. Five heuristic dimensions (relevance via keyword overlap, completeness via multi-part detection, format adherence for JSON/list/code/table/steps, conciseness via filler/repetition analysis, safety via PII/leakage/refusal detection). Three modes: single eval, consistency analysis (multiple responses), A/B comparison. Three config presets (Default, SafetyFirst, AccuracyFirst). Letter grades A+ to F. 58 xUnit tests, all passing.
@@ -22,6 +39,10 @@
 - **Task 1:** fix_issue on **VoronoiMap** (#40) — Replaced O(V*(V+E)) all-pairs BFS for diameter with double-BFS approximation O(V+E). Avg path length now uses sampled BFS (up to 50 sources). Commit: `06fec60`
 - **Task 2:** fix_issue on **gif-captcha** (#16) — Fixed `resetAll()` prototype pollution: replaced `{}` with `Object.create(null)`. Commit: `1235288`
 
+## Gardener Run 701 -- 2026-03-04 6:35 AM PST
+- **Repo:** getagentbox
+- **Task 1 (open_issue):** Filed issue #23 -- seven modules (Calculator, CommandPalette, ShareFab, ThemeToggle, ScrollProgress, ShortcutsHelp, Playground) assigned to window BEFORE their IIFE definitions execute, so window.X = undefined due to var hoisting.
+- **Task 2 (bug_fix):** Fixed #23 -- moved window exposure block to end of file after all IIFE definitions. Also added missing window.Trust exposure. Commit 2612e19.
 ## Builder Run 172 -- 2026-03-04 6:18 AM PST
 - **Repo:** prompt
 - **Feature:** PromptResponseEvaluator -- automated quality assessment of prompt-response pairs. Five heuristic dimensions (relevance via keyword overlap, completeness via multi-part detection, format adherence for JSON/list/code/table/steps, conciseness via filler/repetition analysis, safety via PII/leakage/refusal detection). Three modes: single eval, consistency analysis (multiple responses), A/B comparison. Three config presets (Default, SafetyFirst, AccuracyFirst). Letter grades A+ to F. 58 xUnit tests, all passing.
@@ -41,6 +62,10 @@
 - **Feature:** Client Fingerprinter (`createClientFingerprinter`) — cookieless browser/device fingerprinting for repeat CAPTCHA visitor identification. 10 signal types, djb2 hashing, weighted similarity search, bot pattern detection (headless/phantom/selenium/puppeteer/swiftshader), IP identity change tracking, composite risk scoring (0-100), LRU+TTL storage, state export/import. 43 tests.
 - **Commit:** `1a8cf51`
 
+## Gardener Run 701 -- 2026-03-04 6:35 AM PST
+- **Repo:** getagentbox
+- **Task 1 (open_issue):** Filed issue #23 -- seven modules (Calculator, CommandPalette, ShareFab, ThemeToggle, ScrollProgress, ShortcutsHelp, Playground) assigned to window BEFORE their IIFE definitions execute, so window.X = undefined due to var hoisting.
+- **Task 2 (bug_fix):** Fixed #23 -- moved window exposure block to end of file after all IIFE definitions. Also added missing window.Trust exposure. Commit 2612e19.
 ## Builder Run 172 -- 2026-03-04 6:18 AM PST
 - **Repo:** prompt
 - **Feature:** PromptResponseEvaluator -- automated quality assessment of prompt-response pairs. Five heuristic dimensions (relevance via keyword overlap, completeness via multi-part detection, format adherence for JSON/list/code/table/steps, conciseness via filler/repetition analysis, safety via PII/leakage/refusal detection). Three modes: single eval, consistency analysis (multiple responses), A/B comparison. Three config presets (Default, SafetyFirst, AccuracyFirst). Letter grades A+ to F. 58 xUnit tests, all passing.
@@ -71,6 +96,10 @@
 - **Status:** All 17 repos have all 29 task types completed. Nothing to do.
 - **Note:** The gardener has fully covered every repo × task combination. Consider adding new repos or new task types.
 
+## Gardener Run 701 -- 2026-03-04 6:35 AM PST
+- **Repo:** getagentbox
+- **Task 1 (open_issue):** Filed issue #23 -- seven modules (Calculator, CommandPalette, ShareFab, ThemeToggle, ScrollProgress, ShortcutsHelp, Playground) assigned to window BEFORE their IIFE definitions execute, so window.X = undefined due to var hoisting.
+- **Task 2 (bug_fix):** Fixed #23 -- moved window exposure block to end of file after all IIFE definitions. Also added missing window.Trust exposure. Commit 2612e19.
 ## Builder Run 172 -- 2026-03-04 6:18 AM PST
 - **Repo:** prompt
 - **Feature:** PromptResponseEvaluator -- automated quality assessment of prompt-response pairs. Five heuristic dimensions (relevance via keyword overlap, completeness via multi-part detection, format adherence for JSON/list/code/table/steps, conciseness via filler/repetition analysis, safety via PII/leakage/refusal detection). Three modes: single eval, consistency analysis (multiple responses), A/B comparison. Three config presets (Default, SafetyFirst, AccuracyFirst). Letter grades A+ to F. 58 xUnit tests, all passing.
@@ -107,6 +136,10 @@
 - **Files:** `Try/scripts/maturation.js` (490 lines), `__tests__/maturation.test.js` (580 lines)
 - **Commit:** `8784a49`
 
+## Gardener Run 701 -- 2026-03-04 6:35 AM PST
+- **Repo:** getagentbox
+- **Task 1 (open_issue):** Filed issue #23 -- seven modules (Calculator, CommandPalette, ShareFab, ThemeToggle, ScrollProgress, ShortcutsHelp, Playground) assigned to window BEFORE their IIFE definitions execute, so window.X = undefined due to var hoisting.
+- **Task 2 (bug_fix):** Fixed #23 -- moved window exposure block to end of file after all IIFE definitions. Also added missing window.Trust exposure. Commit 2612e19.
 ## Builder Run 172 -- 2026-03-04 6:18 AM PST
 - **Repo:** prompt
 - **Feature:** PromptResponseEvaluator -- automated quality assessment of prompt-response pairs. Five heuristic dimensions (relevance via keyword overlap, completeness via multi-part detection, format adherence for JSON/list/code/table/steps, conciseness via filler/repetition analysis, safety via PII/leakage/refusal detection). Three modes: single eval, consistency analysis (multiple responses), A/B comparison. Three config presets (Default, SafetyFirst, AccuracyFirst). Letter grades A+ to F. 58 xUnit tests, all passing.
@@ -160,6 +193,10 @@
 - **Tests:** 51 passing
 - **Commit:** 0871aa1
 
+## Gardener Run 701 -- 2026-03-04 6:35 AM PST
+- **Repo:** getagentbox
+- **Task 1 (open_issue):** Filed issue #23 -- seven modules (Calculator, CommandPalette, ShareFab, ThemeToggle, ScrollProgress, ShortcutsHelp, Playground) assigned to window BEFORE their IIFE definitions execute, so window.X = undefined due to var hoisting.
+- **Task 2 (bug_fix):** Fixed #23 -- moved window exposure block to end of file after all IIFE definitions. Also added missing window.Trust exposure. Commit 2612e19.
 ## Builder Run 172 -- 2026-03-04 6:18 AM PST
 - **Repo:** prompt
 - **Feature:** PromptResponseEvaluator -- automated quality assessment of prompt-response pairs. Five heuristic dimensions (relevance via keyword overlap, completeness via multi-part detection, format adherence for JSON/list/code/table/steps, conciseness via filler/repetition analysis, safety via PII/leakage/refusal detection). Three modes: single eval, consistency analysis (multiple responses), A/B comparison. Three config presets (Default, SafetyFirst, AccuracyFirst). Letter grades A+ to F. 58 xUnit tests, all passing.
@@ -189,6 +226,10 @@
 - **Feature:** WiFi Security Audit — saved profile encryption analysis (Open/WEP/WPA-TKIP), auto-connect risk assessment, hidden network probing, public network matching (20+ SSIDs), MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO. 63 tests.
 - **Commit:** `91e4c85`
 
+## Gardener Run 701 -- 2026-03-04 6:35 AM PST
+- **Repo:** getagentbox
+- **Task 1 (open_issue):** Filed issue #23 -- seven modules (Calculator, CommandPalette, ShareFab, ThemeToggle, ScrollProgress, ShortcutsHelp, Playground) assigned to window BEFORE their IIFE definitions execute, so window.X = undefined due to var hoisting.
+- **Task 2 (bug_fix):** Fixed #23 -- moved window exposure block to end of file after all IIFE definitions. Also added missing window.Trust exposure. Commit 2612e19.
 ## Builder Run 172 -- 2026-03-04 6:18 AM PST
 - **Repo:** prompt
 - **Feature:** PromptResponseEvaluator -- automated quality assessment of prompt-response pairs. Five heuristic dimensions (relevance via keyword overlap, completeness via multi-part detection, format adherence for JSON/list/code/table/steps, conciseness via filler/repetition analysis, safety via PII/leakage/refusal detection). Three modes: single eval, consistency analysis (multiple responses), A/B comparison. Three config presets (Default, SafetyFirst, AccuracyFirst). Letter grades A+ to F. 58 xUnit tests, all passing.
@@ -5734,6 +5775,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
