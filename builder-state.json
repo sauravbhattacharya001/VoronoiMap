@@ -1,5 +1,5 @@
 {
-  "totalRuns": 206,
+  "totalRuns": 208,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -189,7 +189,8 @@
       "Added PromptTokenOptimizer -- prompt analysis and optimization engine with redundancy detection (Jaccard similarity), filler word removal (14 patterns), section cost analysis, formatting overhead detection, excessive context flagging, over-specification detection, optimization score (0-100), prompt comparison, budget checking with reserve ratio, smart splitting by sections/sentences. 69 tests (2026-03-04)",
       "Added PromptRefactorer -- prompt linting and refactoring engine with 9 analysis categories (redundancy/specificity/structure/extract-variable/length/contradiction/persona/format/decomposition), auto-fix support, quality scoring (0-100) with letter grades, prompt comparison, batch analysis, configurable rules. 65 tests (2026-03-04)",
       "PromptMerger -- intelligent multi-prompt merging with section detection, 5 conflict strategies, deduplication, variable consolidation, similarity scoring. 49 tests (2026-03-04)",
-      "PromptGrammarValidator -- LLM output format validation with 11 rule types (Regex/JsonSchema/Enum/StartsWith/EndsWith/Contains/NotContains/Length/LineCount/Structure/Custom), 6 presets, batch validation, auto-fix suggestions, severity levels, text reports. 77 tests (2026-03-04)"
+      "PromptGrammarValidator -- LLM output format validation with 11 rule types (Regex/JsonSchema/Enum/StartsWith/EndsWith/Contains/NotContains/Length/LineCount/Structure/Custom), 6 presets, batch validation, auto-fix suggestions, severity levels, text reports. 77 tests (2026-03-04)",
+      "PromptComplianceChecker -- organizational policy enforcement with 3 built-in policies (enterprise/safety/regulatory), 16 built-in rules, custom rule builders (RequirePattern/ForbidPattern/MaxLength/MinLength/RequireSections), batch checking, compliance scoring. 61 tests."
     ],
     "everything": [
       "Added calendar view with month grid, event dots, and day-tap to filter events",
@@ -238,7 +239,8 @@
       "Agent Covert Channel Detector -- 5-vector analysis (content entropy/base64/hex/padding, timing regularity/bimodal/decode, protocol deviation, frequency n-gram anomalies, metadata leakage), per-pair profiling with suspicion scoring, incremental drift detection, single-message scanning, configurable thresholds, risk scoring 0-100 with grades and recommendations, CLI demo. 700 lines, 64 tests (2026-03-04)",
       "Agent Resource Hoarding Detector -- 5-dimension analysis (compute, memory, data, connections, file handles) with configurable thresholds, composite risk scoring, fleet-wide analysis, agent comparison, top-N ranking, recommendation engine. 742 lines, 61 tests (2026-03-04)",
       "Agent Privilege Escalation Detector -- 5-vector scope creep detection (filesystem/network/process/API/data), 16 detection rules, 4 agent strategies, stealth inference, risk scoring, chain detection, containment scoring, escalation velocity tracking, configurable permissions, CLI. 80 tests (2026-03-04)",
-      "Emergent Behavior Detector -- 8 emergent pattern types (synchronization/flocking/hierarchy/collective monopoly/information cascade/oscillation/deadlock/phase transition), configurable thresholds, Jaccard similarity, Jensen-Shannon divergence, risk scoring (0-100), severity levels, filtering, text reports. 53 tests (2026-03-04)"
+      "Emergent Behavior Detector -- 8 emergent pattern types (synchronization/flocking/hierarchy/collective monopoly/information cascade/oscillation/deadlock/phase transition), configurable thresholds, Jaccard similarity, Jensen-Shannon divergence, risk scoring (0-100), severity levels, filtering, text reports. 53 tests (2026-03-04)",
+      "Agent Behavioral Fingerprinting -- multi-dimensional behavioral signatures (action entropy, timing profiles, resource usage, communication patterns, tool distribution, error rates), pairwise Jensen-Shannon + cosine similarity comparison, fleet-wide clone detection (union-find clustering), behavioral drift detection (sliding window), anomaly flagging, deterministic SHA-256 signature hashing, risk scoring (0-100, A-F), ASCII reports + JSON export, CLI demo. 690 lines, 65 tests (2026-03-04)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -309,7 +311,8 @@
       "ArticleCollectionManager -- named article collections (playlists for articles). Create/update/delete collections with emoji icons, add/remove/reorder articles, pin, merge with dedup, search, JSON export/import, statistics, bulk ops. O(1) reverse index. 55 tests (2026-03-03)",
       "FeedAutomationEngine -- rule-based article automation with AND/OR condition groups (title/body/link/feed matching via contains/exact/startsWith/endsWith/regex), 7 action types (tag/star/read/collection/priority/notify/hide), feed-scoped rules, priority ordering, stop-processing, daily rate limiting, dry-run, execution history, 4 preset factories, JSON import/export, rule validation, bulk ops, search/filter. 790 lines, 82 tests (2026-03-03)",
       "Article Version Tracker -- content fingerprinting (djb2 hash) for detecting silent article edits. Version history with timestamped snapshots, change significance scoring (0.0-1.0), 6 categories (cosmetic/minor/moderate/major/titleChange/rewrite), Jaccard word-level diff, configurable notification threshold, per-feed modification rates, version comparison, snapshot limit, JSON persistence, text reports. 50 tests (2026-03-04)",
-      "Reading Session Tracker -- ReadingSessionTracker (485 lines). Timed reading sessions with start/stop/pause lifecycle, per-article timing, focus tags (commute/research/morning), session summaries (weekly/monthly), top feeds/tags, export (JSON/text). 48 tests. (2026-03-04)"
+      "Reading Session Tracker -- ReadingSessionTracker (485 lines). Timed reading sessions with start/stop/pause lifecycle, per-article timing, focus tags (commute/research/morning), session summaries (weekly/monthly), top feeds/tags, export (JSON/text). 48 tests. (2026-03-04)",
+      "Reading Achievements System -- ReadingAchievementsManager with 41 unlockable badges across 8 categories (volume/streak/diversity/speed/exploration/dedication/social/mastery), 5 rarity tiers with points, secret achievements, ReadingActivitySnapshot-driven progress, nearest-to-unlock, comprehensive reports, JSON export/import, persistence, notifications. 55 tests (2026-03-04)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
@@ -391,7 +394,7 @@
       "Finding Deduplication Service"
     ]
   },
-  "lastRepo": "Ocaml-sample-code",
-  "lastFeature": "Datalog query engine",
+  "lastRepo": "prompt",
+  "lastFeature": "PromptComplianceChecker -- organizational policy enforcement with 3 built-in policies (enterprise, safety, regulatory), custom rule builders, batch checking, compliance scoring",
   "lastRun": "2026-03-04"
 }
