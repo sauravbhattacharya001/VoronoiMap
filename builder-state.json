@@ -1,5 +1,5 @@
 {
-  "totalRuns": 198,
+  "totalRuns": 199,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -352,7 +352,8 @@
       "Propositional theorem prover -- natural deduction backward proof search with 17 inference rules (Axiom/TrueI/FalseE/AndI-E/OrI-E/ImpI-E/NotI-E/DNE/IffI-E), formula parser (multiple syntaxes), NNF, truth tables, counterexamples, 16 classic theorems library, prover-vs-truth-table consistency. 850 lines, 73 tests (2026-03-04)",
       "Functional Reactive Programming -- behaviors (time-varying values), events (timestamped occurrences), push-based signals, reactive cells, event streams with combinators, reactive state machines, animation primitives (easing/spring/keyframes/oscillation). 6 modules, 75+ tests (2026-03-04)",
       "Abstract interpretation with interval domain -- mini abstract interpreter (assignments, if/else, while, assert), interval lattice (join/meet/widening/narrowing), abstract arithmetic, condition filtering, fixed-point loop analysis, div-by-zero/dead-code/assertion detection, trace analysis, 70+ tests (2026-03-04)",
-      "Network flow algorithms -- Edmonds-Karp max flow, min-cut, bipartite matching via flow reduction, multi-source/sink, flow decomposition, min-cost max flow (Bellman-Ford SPFA), edge connectivity, bipartite check. 720 lines, 55+ tests (2026-03-04)"
+      "Network flow algorithms -- Edmonds-Karp max flow, min-cut, bipartite matching via flow reduction, multi-source/sink, flow decomposition, min-cost max flow (Bellman-Ford SPFA), edge connectivity, bipartite check. 720 lines, 55+ tests (2026-03-04)",
+      "Bytecode virtual machine -- stack-based VM with 30+ opcodes, expression compiler, disassembler, 8 native functions, execution tracing. 662 lines, 80+ tests (2026-03-04)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -378,10 +379,11 @@
       "WiFi Security Audit -- saved profile encryption (Open/WEP/WPA-TKIP), auto-connect risks, hidden network probing, public network matching, MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO, 63 tests (2026-03-04)",
       "Remote Access Security Audit -- RDP (NLA/encryption/security layer/idle timeout/port/user group), SSH (password auth/root login/port), 13 third-party tools with risk scoring (TeamViewer/AnyDesk/VNC/Ammyy/etc), WinRM (encryption/basic auth/HTTP vs HTTPS), Remote Registry, Remote Assistance, Telnet, overall exposure scoring. RemoteAccessState DTO, 66 tests (2026-03-04)",
       "Virtualization Security Audit -- Hyper-V VM isolation (external switch/checkpoints/guest services), WSL (version/root distros/mirrored networking/firewall/interop/systemd), Windows Sandbox (networking/writable mapped folders), Docker (TCP exposure/privileged mode/root containers/content trust/user namespaces/ICC), VBS/Credential Guard/HVCI/Memory Integrity/Secure Boot. VirtualizationState DTO, 66 tests (2026-03-04)",
-      "Credential Exposure Audit -- 8-category credential risk analysis (Windows Credential Manager, Git credential storage, SSH key security, plaintext credential files, RDP saved passwords, browser credential stores, cloud CLI tokens, sensitive file permissions). CredentialState DTO, composite risk scoring (0-100) with letter grades, CredentialExposureReport with text summary. 54 tests (2026-03-04)"
+      "Credential Exposure Audit -- 8-category credential risk analysis (Windows Credential Manager, Git credential storage, SSH key security, plaintext credential files, RDP saved passwords, browser credential stores, cloud CLI tokens, sensitive file permissions). CredentialState DTO, composite risk scoring (0-100) with letter grades, CredentialExposureReport with text summary. 54 tests (2026-03-04)",
+      "Incident Response Playbook"
     ]
   },
-  "lastRepo": "BioBots",
-  "lastFeature": "Print Risk Assessor",
+  "lastRepo": "WinSentinel",
+  "lastFeature": "Incident Response Playbook",
   "lastRun": "2026-03-04"
 }

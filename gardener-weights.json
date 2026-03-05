@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T23:50:00",
-  "totalRuns": 732,
+  "totalRuns": 733,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 22,
@@ -22,8 +22,8 @@
     },
     "perf_improvement": {
       "weight": 22,
-      "runs": 56,
-      "successes": 56,
+      "runs": 57,
+      "successes": 57,
       "totalDone": 1,
       "attempts": 2
     },
@@ -108,8 +108,8 @@
     },
     "create_release": {
       "weight": 22,
-      "runs": 19,
-      "successes": 19,
+      "runs": 20,
+      "successes": 20,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
@@ -686,7 +686,7 @@
     ]
   },
   "notes": "Run 732. ai: bug_fix x2 — (1) controller.py deny root depth spoofing instead of silent clamp, (2) consensus.py prevent re-tally tampering on decided proposals. Commit bae188d.",
-  "lastRepo": "GraphVisual",
+  "lastRepo": "ai",
   "lastRun": "2026-03-04",
   "runCount": 33,
   "lastWeightAdjustment": 730,
