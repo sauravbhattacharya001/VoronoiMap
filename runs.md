@@ -1,3 +1,23 @@
+## Gardener Run 761-762 -- 2026-03-05 05:35 AM PST
+- **Repo:** GraphVisual (Java)
+- **Task 1 (add_tests):** 69 tests for RandomWalkAnalyzer (39), LaplacianBuilder (17), EdgePersistenceAnalyzer (13). Fixed pre-existing edge constructor bug in VertexConnectivityAnalyzer/Test. 2197 total tests (13 pre-existing failures).
+- **Task 2 (doc_update):** ALGORITHMS.md -- added 9 missing algorithm entries (CliqueAnalyzer, GraphPartitioner, MaxCutAnalyzer, StructuralHoleAnalyzer, TemporalGraph, EdgePersistenceAnalyzer, GrowthRateAnalyzer, TreewidthAnalyzer, VertexConnectivityAnalyzer), updated LaplacianBuilder entry. Updated ARCHITECTURE.md class/test counts. Updated complexity summary table.
+- **Task 3 (open_issue):** Issue #36 -- pre-existing compilation errors + 13 test failures
+- Commits: ba6a0a6, 766b5dc, pushed.
+
+## Gardener Run 759-760 -- 2026-03-05 05:30 AM PST
+- **Task 1:** fix_issue — VoronoiMap #46
+  - Added `boundary` polygon parameter to `g_function()` and `clark_evans()` for precise intensity estimation via shoelace formula
+  - 5 new tests, all passing. Commit 134e2f9.
+- **Task 2:** fix_issue — FeedReader #23
+  - Replaced `Set<String>` with ordered `Array + Set` for FIFO pruning in `ReadStatusManager`
+  - Recently-read articles no longer randomly lose read status. Commit 55eeb95.
+
+## Builder Run 227 -- 2026-03-05 05:15 AM PST
+- **Repo:** ai (Python)
+- **Feature:** Agent Output Steganography Detector -- 7-vector analysis (zero-width chars, invisible Unicode, acrostic patterns, homoglyph substitution, capitalization encoding, punctuation anomalies, sentence length encoding). Configurable SteganographyDetector, composite risk scoring (0-100, A-F), text comparison, batch analysis, encoding utilities for testing.
+- Commit: 35f75f9, 63 tests, pushed.
+
 ## Builder Run 226 -- 2026-03-05 05:19 AM PST
 - **Repo:** VoronoiMap (Python)
 - **Feature:** Voronoi Temporal Dynamics (vormap_temporal.py) -- track diagram evolution across time snapshots. Detects cell birth, death, migration, growth, and shrinkage events. Greedy closest-first seed matching, cell trajectory tracking with lifespan/migration stats, per-transition Jaccard index, overall stability score, JSON/CSV export, CLI.
@@ -6964,6 +6984,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
