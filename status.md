@@ -1,6 +1,7 @@
-# Status: Gardener #756 complete
+# Status: Complete
 
-Last: 2026-03-05 02:50 AM PST
+**Gardener #757:** FeedReader — security_fix + doc_update
+**Builder #222:** ai — Kill Chain Analyzer
 **Gardener #756:** Ocaml-sample-code — refactor + open_issue
 **Builder #221:** gif-captcha — A/B Experiment Runner
 
