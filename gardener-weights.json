@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-05T06:30:00.000Z",
-  "totalRuns": 746,
+  "totalRuns": 748,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 22,
@@ -56,16 +56,16 @@
     },
     "code_cleanup": {
       "weight": 22,
-      "runs": 42,
-      "successes": 42,
+      "runs": 43,
+      "successes": 43,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 22,
-      "runs": 74,
-      "successes": 77,
+      "runs": 75,
+      "successes": 78,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -685,8 +685,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 742-743. GraphVisual: fix_issue #34 — added temporal graph support (TemporalGraph wrapper, EdgePersistenceAnalyzer, GrowthRateAnalyzer, edge timestamps). prompt: fix_issue #36 — added streaming response support (StreamChunk, GetResponseStreamAsync, SendStreamAsync).",
-  "lastRepo": "prompt",
+  "notes": "Run 747-748. agenticchat: code_cleanup (175 var->const/let, CSS dedup), open_issue #33 (unguarded localStorage crashes app in private browsing).",
+  "lastRepo": "agenticchat",
   "lastRun": "2026-03-04",
   "runCount": 37,
   "lastWeightAdjustment": 730,
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "fix_issue",
-    "fix_issue"
+    "code_cleanup",
+    "open_issue"
   ]
 }
