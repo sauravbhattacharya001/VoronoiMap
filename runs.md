@@ -1,3 +1,13 @@
+## Gardener Run 759 -- 2026-03-05 04:05 AM PST
+- **Repo:** prompt (C#)
+- **add_tests:** 78 comprehensive tests for PromptVersionManager — creation, retrieval, history, comparison/diff, rollback, deletion, JSON serialization roundtrip, thread safety, edge cases. All passing.
+- **refactor:** (1) Replaced O(n*k) multi-pass string.Replace in RenderVariables with single-pass Regex.Replace to prevent double-substitution. (2) Added bounded LRU eviction to CachingMiddleware (maxEntries=1000 default, EvictionCount/Count properties). Both backward compatible.
+- **open_issue:** #39 — Recursive variable expansion mode for RenderVariables.
+- **fix_issue:** #39 — Added optional recursive=true parameter with depth-limited iterative substitution and early termination.
+- Commits: `1a89216`, `0904ab4`. 2276 tests passing.
+## Gardener Run 759 -- 2026-03-05 04:00 AM PST
+- **Result:** All 29 task types completed across all 16 repos. No remaining task/repo combinations. The garden is fully tended. 🌿
+
 ## Builder Run 224 -- 2026-03-05 04:10 AM PST
 - **Repo:** gif-captcha
 - **Feature:** Fraud Ring Detector — identifies coordinated CAPTCHA-solving operations through multi-signal analysis. Uses union-find for graph-based ring clustering across 5 detection signals: timing clusters, shared fingerprints, IP proximity (exact + /24 subnet), sequential solve patterns, and response time uniformity. 5-factor suspicion scoring (0-100), ring lifecycle management (detect/dismiss/list), LRU client eviction, state export/import. 44 tests. Commit `15467a5`.
@@ -6922,6 +6932,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
