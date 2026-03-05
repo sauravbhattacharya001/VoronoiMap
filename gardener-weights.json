@@ -1,69 +1,69 @@
 {
   "lastUpdated": "2026-03-04T23:50:00",
-  "totalRuns": 729,
+  "totalRuns": 730,
   "taskTypes": {
     "setup_copilot_agent": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Set up GitHub Copilot coding agent"
     },
     "bug_fix": {
-      "weight": 20,
+      "weight": 22,
       "runs": 56,
       "successes": 57
     },
     "security_fix": {
-      "weight": 20,
-      "runs": 56,
-      "successes": 56,
+      "weight": 22,
+      "runs": 57,
+      "successes": 57,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
     "perf_improvement": {
-      "weight": 20,
+      "weight": 22,
       "runs": 54,
       "successes": 54,
       "totalDone": 1,
       "attempts": 2
     },
     "refactor": {
-      "weight": 20,
+      "weight": 22,
       "runs": 41,
       "successes": 44,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
     "add_tests": {
-      "weight": 20,
+      "weight": 22,
       "runs": 50,
       "successes": 50,
       "description": "Add meaningful tests",
       "attempts": 2
     },
     "readme_overhaul": {
-      "weight": 20,
+      "weight": 22,
       "runs": 20,
       "successes": 20,
       "description": "Overhaul repo README"
     },
     "doc_update": {
-      "weight": 20,
+      "weight": 22,
       "runs": 45,
       "successes": 47,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
-      "weight": 20,
-      "runs": 41,
-      "successes": 41,
+      "weight": 22,
+      "runs": 42,
+      "successes": 42,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
-      "weight": 20,
+      "weight": 22,
       "runs": 71,
       "successes": 74,
       "description": "Open a thoughtful issue",
@@ -71,7 +71,7 @@
       "attempts": 3
     },
     "fix_issue": {
-      "weight": 20,
+      "weight": 22,
       "runs": 98,
       "successes": 98,
       "description": "Fix an existing open issue"
@@ -83,103 +83,103 @@
       "description": "Review and merge open Dependabot PRs â€” PRIORITY: 60+ PRs waiting across all repos"
     },
     "add_ci_cd": {
-      "weight": 20,
+      "weight": 22,
       "runs": 14,
       "successes": 14,
       "description": "Add GitHub Actions CI/CD workflow"
     },
     "add_codeql": {
-      "weight": 20,
+      "weight": 22,
       "runs": 15,
       "successes": 15,
       "description": "Add CodeQL security scanning"
     },
     "add_dependabot": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
-      "weight": 20,
+      "weight": 22,
       "runs": 15,
       "successes": 15,
       "description": "Deploy to GitHub Pages"
     },
     "create_release": {
-      "weight": 20,
+      "weight": 22,
       "runs": 19,
       "successes": 19,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
-      "weight": 20,
+      "weight": 22,
       "runs": 10,
       "successes": 10,
       "description": "Add Dockerfile"
     },
     "docker_workflow": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
-      "weight": 20,
+      "weight": 22,
       "runs": 17,
       "successes": 17,
       "description": "Set up package publishing (PyPI/npm/NuGet) â€” PRIORITY: PyPI is back online, publish Python packages!"
     },
     "add_badges": {
-      "weight": 20,
+      "weight": 22,
       "runs": 11,
       "successes": 11,
       "description": "Add badges to README"
     },
     "add_license": {
-      "weight": 20,
+      "weight": 22,
       "runs": 7,
       "successes": 7,
       "description": "Add/update LICENSE file"
     },
     "issue_templates": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
-      "weight": 20,
+      "weight": 22,
       "runs": 12,
       "successes": 12,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
-      "weight": 20,
+      "weight": 22,
       "runs": 15,
       "successes": 15,
       "description": "Configure branch protection"
     },
     "code_coverage": {
-      "weight": 20,
+      "weight": 22,
       "runs": 17,
       "successes": 17,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Generate & deploy docs site"
     },
     "auto_labeler": {
-      "weight": 20,
+      "weight": 22,
       "runs": 15,
       "successes": 15,
       "description": "Add auto-labeler or stale bot"
@@ -685,11 +685,11 @@
       "docs_site"
     ]
   },
-  "notes": "Run 726. security_fix: CSV formula injection defense in export.js (prefix = + - @ tab cr with single-quote). refactor: extracted shared data-loader.js from 9 pages of duplicated fetch/validate/cache boilerplate.",
-  "lastRepo": "BioBots",
+  "notes": "Run 726. security_fix: CSV formula injection defense in export.js (prefix = + - @ tab cr with single-quote). refactor: extracted shared data-loader.js from 9 pages of duplicated fetch/validate/cache boilerplate.\nG#727 agentlens: security_fix (CSV formula injection + Content-Disposition header injection), code_cleanup (unused imports in analytics.js, dependencies.js). Commit 5e42710.",
+  "lastRepo": "agentlens",
   "lastRun": "2026-03-04",
   "runCount": 31,
-  "lastWeightAdjustment": 700,
+  "lastWeightAdjustment": 730,
   "adjustmentHistory": [
     {
       "run": 650,
