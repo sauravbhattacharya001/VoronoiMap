@@ -1,3 +1,10 @@
+## Gardener Run 750 -- 2026-03-05 12:35 AM PST
+- **Repo:** ai
+- **Task 1 (refactor):** Eliminated duplication in `SelfModDetector`: refactored `check_action()` to delegate to `_match_rule()` (fixing latent bug where `payload_pattern` was not checked), replaced hand-rolled `severity_order` dict with `ModSeverity.weight`, extracted `_attempt_timestamp()` helper (was duplicated 5x). 57 tests pass. Commit `27c2f51`.
+- **Task 2 (doc_update):** Added API reference pages for 5 undocumented analysis modules: threats, selfmod, forensics, chaos, game_theory. Each with quick-start examples and key class summaries. Updated API index and mkdocs.yml nav. Commit `aea63f7`.
+## Gardener Run 750 -- 2026-03-05 12:30 AM PST
+- **Result:** All 17 repos have all 29 task types completed. No tasks remaining. The gardener has finished its work! 🎉
+
 ## Gardener Run 749 -- 2026-03-05 12:05 AM PST
 - **Repo:** everything
 - **Task 1 (perf_improvement):** Optimized EventSearchService hot paths — extracted _PreparedFilters to pre-lowercase tag names once per search call (was per-event), eliminated duplicate tag set construction, cached whitespace regex, Schwartzian transform for titleAscending sort. 41 tests pass. Commit `9b6ca93`.
@@ -6791,6 +6798,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

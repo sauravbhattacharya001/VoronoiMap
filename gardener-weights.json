@@ -1,61 +1,61 @@
 {
   "lastUpdated": "2026-03-05T08:00:00.000Z",
-  "totalRuns": 749,
+  "totalRuns": 750,
   "taskTypes": {
     "setup_copilot_agent": {
-      "weight": 22,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Set up GitHub Copilot coding agent"
     },
     "bug_fix": {
-      "weight": 22,
+      "weight": 20,
       "runs": 61,
       "successes": 62
     },
     "security_fix": {
-      "weight": 22,
+      "weight": 20,
       "runs": 59,
       "successes": 59,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
     "perf_improvement": {
-      "weight": 22,
+      "weight": 20,
       "runs": 60,
       "successes": 60,
       "totalDone": 1,
       "attempts": 2
     },
     "refactor": {
-      "weight": 22,
-      "runs": 41,
-      "successes": 44,
+      "weight": 20,
+      "runs": 42,
+      "successes": 45,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
     "add_tests": {
-      "weight": 22,
+      "weight": 20,
       "runs": 51,
       "successes": 51,
       "description": "Add meaningful tests",
       "attempts": 2
     },
     "readme_overhaul": {
-      "weight": 22,
+      "weight": 20,
       "runs": 20,
       "successes": 20,
       "description": "Overhaul repo README"
     },
     "doc_update": {
-      "weight": 22,
-      "runs": 46,
-      "successes": 48,
+      "weight": 20,
+      "runs": 47,
+      "successes": 49,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
-      "weight": 22,
+      "weight": 20,
       "runs": 43,
       "successes": 43,
       "description": "Remove dead code, unused deps",
@@ -63,7 +63,7 @@
       "attempts": 4
     },
     "open_issue": {
-      "weight": 22,
+      "weight": 20,
       "runs": 76,
       "successes": 79,
       "description": "Open a thoughtful issue",
@@ -71,7 +71,7 @@
       "attempts": 3
     },
     "fix_issue": {
-      "weight": 22,
+      "weight": 20,
       "runs": 110,
       "successes": 109,
       "description": "Fix an existing open issue"
@@ -83,103 +83,103 @@
       "description": "Review and merge open Dependabot PRs â€” PRIORITY: 60+ PRs waiting across all repos"
     },
     "add_ci_cd": {
-      "weight": 22,
+      "weight": 20,
       "runs": 14,
       "successes": 14,
       "description": "Add GitHub Actions CI/CD workflow"
     },
     "add_codeql": {
-      "weight": 22,
+      "weight": 20,
       "runs": 15,
       "successes": 15,
       "description": "Add CodeQL security scanning"
     },
     "add_dependabot": {
-      "weight": 22,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
-      "weight": 22,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Deploy to GitHub Pages"
     },
     "create_release": {
-      "weight": 22,
+      "weight": 20,
       "runs": 20,
       "successes": 20,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
-      "weight": 22,
+      "weight": 20,
       "runs": 10,
       "successes": 10,
       "description": "Add Dockerfile"
     },
     "docker_workflow": {
-      "weight": 22,
+      "weight": 20,
       "runs": 17,
       "successes": 17,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
-      "weight": 22,
+      "weight": 20,
       "runs": 17,
       "successes": 17,
       "description": "Set up package publishing (PyPI/npm/NuGet) â€” PRIORITY: PyPI is back online, publish Python packages!"
     },
     "add_badges": {
-      "weight": 22,
+      "weight": 20,
       "runs": 11,
       "successes": 11,
       "description": "Add badges to README"
     },
     "add_license": {
-      "weight": 22,
+      "weight": 20,
       "runs": 8,
       "successes": 8,
       "description": "Add/update LICENSE file"
     },
     "issue_templates": {
-      "weight": 22,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
-      "weight": 22,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
-      "weight": 22,
+      "weight": 20,
       "runs": 12,
       "successes": 12,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
-      "weight": 22,
+      "weight": 20,
       "runs": 15,
       "successes": 15,
       "description": "Configure branch protection"
     },
     "code_coverage": {
-      "weight": 22,
+      "weight": 20,
       "runs": 19,
       "successes": 19,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
-      "weight": 22,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Generate & deploy docs site"
     },
     "auto_labeler": {
-      "weight": 22,
+      "weight": 20,
       "runs": 15,
       "successes": 15,
       "description": "Add auto-labeler or stale bot"
@@ -685,8 +685,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 749. everything: perf (EventSearchService filter/sort optimization), open_issue #37 (routine streak ignores schedule).",
-  "lastRepo": "everything",
+  "notes": "Run 750. ai: refactor (selfmod.py duplication + bug fix), doc_update (5 API reference pages for analysis modules).",
+  "lastRepo": "ai",
   "lastRun": "2026-03-05",
   "runCount": 37,
   "lastWeightAdjustment": 750,
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "perf_improvement",
-    "open_issue"
+    "refactor",
+    "doc_update"
   ]
 }
