@@ -1,3 +1,46 @@
+## Gardener Run 763-764, Builder Run 228 -- 2026-03-05 06:05 AM PST
+
+### Gardener #763 -- GraphVisual (Java)
+- **Fix:** Resolved all 13 test failures across 8 analyzers (issue #36)
+  - InfluenceSpreadSimulator: NPE on non-graph seeds + directed graph back-propagation
+  - SteinerTreeAnalyzer: DP reconstruction missing edges in base case
+  - TreeAnalyzer: diameter path normalization + LCA distance test fix
+  - HamiltonianAnalyzer: undirected cycle deduplication
+  - AnalysisTask: timeout race condition
+  - MaxCutAnalyzer: Edwards bound fix
+  - IndependentSetAnalyzer + SCC test corrections
+- All 2197 tests pass. Issue #36 closed.
+
+### Gardener #764 -- gif-captcha (JS)
+- **Fix:** Added missing node:test imports to ab-experiment.test.js and fraud-ring-detector.test.js
+- Added lightweight expect shim for Jest-style assertions
+- All 1968 tests pass. Issue #18 filed+closed.
+
+### Builder #228 -- Ocaml-sample-code
+- **Feature:** PEG Parser Engine (peg.ml) -- packrat-memoized PEG parser with full operator set, parse tree construction, grammar analysis, 5 example grammars, 75 tests.
+
+## Gardener Run 764 -- 2026-03-05 06:30 AM PST
+- **Repo:** ai
+- **Task:** add_tests (compliance module)
+- **PR:** https://github.com/sauravbhattacharya001/ai/pull/25
+- **Details:** Added 32 new tests to test_compliance.py (12 → 44), covering all threshold boundaries for NIST/EU AI Act/Internal checks, data model serialization, FrameworkResult verdict logic, AuditResult score calculation, and CLI edge cases. All 44 tests pass.
+
+## Gardener Run 763 -- 2026-03-05 06:30 AM PST
+- **Repo:** Vidly
+- **Task:** bug_fix (revenue double-counting)
+- **PR:** https://github.com/sauravbhattacharya001/Vidly/pull/38
+- **Details:** Fixed critical bug where `Rental.TotalCost` (which already includes `LateFee`) was being summed as `r.TotalCost + r.LateFee` throughout RevenueAnalyticsService, double-counting late fees in all 9 revenue calculation methods. Affected reports, forecasts, peak day, day-of-week, genre/membership/monthly breakdowns, and top rankings.
+
+## Builder Run 228 -- 2026-03-05 06:15 AM PST
+- **Repo:** BioBots
+- **Feature:** Print Parameter Optimizer
+- **Details:** Multi-objective bioprinting parameter optimization engine with 4 objective functions (cell viability, structural integrity, resolution, throughput), grid search, sensitivity analysis with ranking, Pareto front extraction, 6 bioink presets (GelMA/Alginate/Collagen/HA/Pluronic/Silk Fibroin), parameter comparison, text reports. 35 tests, all passing.
+- **Files:** `Try/scripts/parameterOptimizer.js`, `__tests__/parameterOptimizer.test.js`
+
+## Gardener Run 763-764 -- 2026-03-05 06:00 AM PST
+- **Result:** All 16 repos × 29 task types = fully covered. No actionable tasks remain.
+- **Action:** None. Consider adding new repos or new task types.
+
 ## Builder Run 227 -- 2026-03-05 05:48 AM PST
 - **Repo:** BioBots (JS)
 - **Feature:** Bioprint Cost Estimator (costEstimator.js) -- 5-category print job costing: materials (12 bioinks, 4 crosslinkers, 3 media + waste factor), machine time (5 profiles + warmup/cooldown), energy (wattage kWh), consumables (auto-detect from needle gauge/volume), labor (5 roles, auto-detect setup/monitor/post-process). Batch costing, config comparison, scale projection, custom pricing. 45 tests.
@@ -6995,6 +7038,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

@@ -1,6 +1,6 @@
 # Status: Complete
 
-**Builder #227:** BioBots -- Bioprint Cost Estimator
-**Gardener #761-762:** GraphVisual -- 69 tests + 9 algo docs + issue #36
-**Builder #226:** VoronoiMap -- Voronoi Temporal Dynamics
+**Gardener #763:** GraphVisual -- 13 test failures fixed (issue #36)
+**Gardener #764:** gif-captcha -- 2 test failures fixed (issue #18)
+**Builder #228:** Ocaml-sample-code -- PEG Parser Engine
 

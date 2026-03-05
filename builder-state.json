@@ -1,5 +1,5 @@
 {
-  "totalRuns": 227,
+  "totalRuns": 228,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -358,7 +358,8 @@
       "Bioink Shelf Life Tracker -- shelfLife.js (560 lines). Q10 temp degradation model with humidity/light/container/freeze-thaw factors. 10 bioink materials across 4 categories. Batch registration, usage tracking, FEFO inventory, expiration alerts, storage recommendations, degradation curves. 52 tests. (2026-03-04)",
       "Print Risk Assessor -- pre-print 8-dimension risk evaluation (nozzle clogging/cell viability/structural collapse/layer adhesion/over-crosslinking/dehydration/contamination/pressure damage), weighted composite scoring, GO/CAUTION/NO-GO recommendations, shear stress estimation, batch assessment, configuration comparison, improvement suggestions, historical analysis, text reports. 65 tests. (2026-03-04)",
       "Bioink Formulation Calculator -- multi-component recipe builder with C1V1=C2V2 dilution, serial dilution, cell suspension, 8 base materials, 8 additives, 6 recipe templates, tissue recommendations, cost estimation, blend viscosity, mixing order, JSON persistence. 62 tests (2026-03-04)",
-      "Bioprint Cost Estimator -- 5-category print job costing (materials/machine time/energy/consumables/labor), 12 bioinks + 4 crosslinkers + 3 media, 5 machine profiles, auto-detect consumables + labor from params, batch costing, config comparison, scale projection, custom pricing. 45 tests. (2026-03-05)"
+      "Bioprint Cost Estimator -- 5-category print job costing (materials/machine time/energy/consumables/labor), 12 bioinks + 4 crosslinkers + 3 media, 5 machine profiles, auto-detect consumables + labor from params, batch costing, config comparison, scale projection, custom pricing. 45 tests. (2026-03-05)",
+      "Print Parameter Optimizer -- multi-objective optimization (viability/structural/resolution/throughput), grid search, sensitivity analysis, Pareto front, 6 bioink presets, parameter comparison, text reports. 35 tests (2026-03-05)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -389,7 +390,8 @@
       "Earley parser for context-free grammars (earley.ml) -- chart-based Earley algorithm for ANY CFG (ambiguous, left-recursive). Predict/Scan/Complete, Aycock-Horspool nullable optimization, parse tree extraction, arithmetic eval, FIRST sets, ambiguity detection, grammar cleaning, string generation. 5 built-in grammars (arithmetic/parens/palindrome/dangling-else/JSON). 93 tests (2026-03-04)",
       "Garbage Collector Simulator (gc_simulator.ml) -- 4 classic GC algorithms (mark-and-sweep, Cheney copying, reference counting with cycle detection, generational). Heap/RootSet abstractions, fragmentation analysis, ASCII heap viz, reference graph viz, benchmark suite with 3 scenarios. 81 tests (2026-03-05)",
       "CTL Model Checker (model_checker.ml) -- labeling-based CTL model checking (Clarke-Emerson-Sistla), full temporal operators, fixpoint algorithms, formula parser, witness generation, fairness, 2 example models. 809 lines, 75+ tests (2026-03-05)",
-      "Finite Automata Toolkit (automata.ml) -- DFA/NFA types, subset construction, Hopcroft minimization, product construction (intersection/union/difference/symmetric difference), complement, language equivalence/inclusion, NFA concat/union/star/reverse, string generation, DOT export, statistics. 1030 lines, 65+ tests (2026-03-05)"
+      "Finite Automata Toolkit (automata.ml) -- DFA/NFA types, subset construction, Hopcroft minimization, product construction (intersection/union/difference/symmetric difference), complement, language equivalence/inclusion, NFA concat/union/star/reverse, string generation, DOT export, statistics. 1030 lines, 65+ tests (2026-03-05)",
+      "PEG Parser Engine (peg.ml) -- Packrat-memoized PEG parser with full operator set, parse tree construction, grammar analysis (left recursion/undefined/unused detection), 5 example grammars (arithmetic/JSON/CSV/identifier/balanced parens), convenience builders. 75 tests. (2026-03-05)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -421,8 +423,8 @@
       "Backup Security Audit"
     ]
   },
-  "lastRepo": "Ocaml-sample-code",
-  "lastFeature": "Finite Automata Toolkit",
+  "lastRepo": "BioBots",
+  "lastFeature": "Print Parameter Optimizer",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
