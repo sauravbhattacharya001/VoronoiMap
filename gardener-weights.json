@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T23:50:00",
-  "totalRuns": 731,
+  "totalRuns": 732,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 22,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 22,
-      "runs": 57,
-      "successes": 58
+      "runs": 59,
+      "successes": 60
     },
     "security_fix": {
       "weight": 22,
@@ -22,8 +22,8 @@
     },
     "perf_improvement": {
       "weight": 22,
-      "runs": 55,
-      "successes": 55,
+      "runs": 56,
+      "successes": 56,
       "totalDone": 1,
       "attempts": 2
     },
@@ -49,8 +49,8 @@
     },
     "doc_update": {
       "weight": 22,
-      "runs": 45,
-      "successes": 47,
+      "runs": 46,
+      "successes": 48,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 726. security_fix: CSV formula injection defense in export.js (prefix = + - @ tab cr with single-quote). refactor: extracted shared data-loader.js from 9 pages of duplicated fetch/validate/cache boilerplate.\nG#727 agentlens: security_fix (CSV formula injection + Content-Disposition header injection), code_cleanup (unused imports in analytics.js, dependencies.js). Commit 5e42710.\nG#728 Ocaml-sample-code: bug_fix (LRU shared-hashtable mutation), perf_improvement (quicksort median tortoise-and-hare). fix_issue re-rolled to bug_fix (no open issues). Commit db498fb.",
-  "lastRepo": "Ocaml-sample-code",
+  "notes": "Run 732. ai: bug_fix x2 — (1) controller.py deny root depth spoofing instead of silent clamp, (2) consensus.py prevent re-tally tampering on decided proposals. Commit bae188d.",
+  "lastRepo": "GraphVisual",
   "lastRun": "2026-03-04",
-  "runCount": 31,
+  "runCount": 33,
   "lastWeightAdjustment": 730,
   "adjustmentHistory": [
     {
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "security_fix",
-    "refactor"
+    "bug_fix",
+    "bug_fix"
   ]
 }
