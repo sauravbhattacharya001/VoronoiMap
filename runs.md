@@ -1,3 +1,27 @@
+## Gardener Run 739 -- 2026-03-04 9:45 PM PST
+- **Repo:** prompt
+- **Task 1: fix_bug (7 pre-existing test failures)**
+  - PromptGuard.Sanitize: xUnit DoesNotContain uses CurrentCulture comparison which treats \x00 as weightless — fixed assertions to char-level checks. Added StringBuilder belt-and-suspenders filtering.
+  - PromptTemplate.Render: case-insensitive variable lookup broken when no defaults set — caller's case-sensitive dict used directly. Fixed with OrdinalIgnoreCase wrapper.
+  - ChainResult.Steps: AsReadOnly() wraps without copying — callers could mutate. Fixed with defensive copy.
+  - Conversation.LoadFromJson: ConversationData.Messages default initializer prevented null check. Changed to nullable.
+  - ExtendedEdgeCaseTests: large message count test exceeded DefaultMaxMessages (1000). Fixed to set MaxMessages = 2000.
+- **Result:** 2234/2234 tests pass (was 2227/2234)
+- **Pushed:** 07d6329 to main
+## Builder Run 209 -- 2026-03-04 9:15 PM PST
+- **Repo:** BioBots
+- **Feature:** Bioink Formulation Calculator -- `createFormulationCalculator()` for multi-component bioink recipe design. C1V1=C2V2 dilution, serial dilution, cell suspension calc, 8 base materials, 8 additives, 6 recipe templates, tissue-specific recommendations, scaling, comparison, cost estimation, blend viscosity, mixing order, JSON export/import, text reports. 62 tests.
+
+## Gardener Run 740 -- 2026-03-04 9:00 PM PST
+- **Task 1:** fix_issue on **agenticchat** (#32)
+  - Fixed 2 failing tests: role label assertion changed to `toContain()` to handle TTS 🔊 icon appended to `.msg-role`, and slash command count updated from 20 to 21
+  - All 909 tests pass
+- **Task 2:** fix_issue on **GraphVisual** (#35)
+  - Added `AnalysisTask<T>` wrapper with timeout, progress (0-100), and cooperative cancellation
+  - Added `AnalysisResult<T>` with status enum (COMPLETED/TIMEOUT/CANCELLED/ERROR) and partial result support
+  - 10 comprehensive tests covering all code paths
+  - Designed for exponential-complexity analyzers (Hamiltonian, clique, isomorphism)
+
 ## Builder Run 208 -- 2026-03-04 9:05 PM PST
 - **Repo:** prompt
 - **Feature:** PromptComplianceChecker -- organizational policy enforcement
@@ -6656,6 +6680,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
