@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-05T05:02:00.000Z",
-  "totalRuns": 743,
+  "totalRuns": 744,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 22,
@@ -22,8 +22,8 @@
     },
     "perf_improvement": {
       "weight": 22,
-      "runs": 58,
-      "successes": 58,
+      "runs": 59,
+      "successes": 59,
       "totalDone": 1,
       "attempts": 2
     },
@@ -36,8 +36,8 @@
     },
     "add_tests": {
       "weight": 22,
-      "runs": 50,
-      "successes": 50,
+      "runs": 51,
+      "successes": 51,
       "description": "Add meaningful tests",
       "attempts": 2
     },
@@ -686,7 +686,7 @@
     ]
   },
   "notes": "Run 740-741. agenticchat: fix_issue #32 — fixed 2 failing tests (TTS icon in role label + command count 20→21). GraphVisual: fix_issue #35 — added AnalysisTask wrapper with timeout/progress/cancellation.",
-  "lastRepo": "Vidly",
+  "lastRepo": "gif-captcha",
   "lastRun": "2026-03-04",
   "runCount": 37,
   "lastWeightAdjustment": 730,
