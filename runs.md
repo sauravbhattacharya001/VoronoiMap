@@ -1,3 +1,37 @@
+## Gardener Run 807-808 -- 2026-03-05 3:55 PM PST
+
+### Gardener #807 -- Ocaml-sample-code
+- **Task:** bug_fix
+- Fixed Issue #21: calculus.ml simplification guards against 0/0 and 0^0
+- Div(a,b) when a=b now checks a <> Const 0.0
+- Pow(base, Const 0.0) now checks base <> Const 0.0
+- Commit f02dba5
+
+### Gardener #808 -- gif-captcha
+- **Task:** security_fix
+- Removed insecure Math.random() fallback in secureRandomInt()
+- CAPTCHA library now throws if no crypto RNG available instead of silently degrading
+- Predictable RNG would allow attackers to forecast challenges
+- Commit d28c0fe
+
+## Gardener Run 777-778 -- 2026-03-05 3:30 PM PST
+
+**No tasks executed.** All 16 repos have all 29 task types completed in repoState. The gardener has fully covered every repo×task combination. Consider adding new repos or new task types to continue gardening.
+
+## Builder Run 248 -- 2026-03-05 3:15 PM PST
+
+### everything: Subscription Tracker
+- SubscriptionEntry model with BillingCycle (6 types), SubscriptionCategory (13 types), SubscriptionStatus (5 types), PriceChange history
+- SubscriptionTrackerService: CRUD (add/update/remove/cancel/pause/resume), filtering (status/category/tag/search)
+- Analytics: monthly/annual/daily spend, category breakdown with percentages, cost ranking
+- Billing alerts, trial expiration alerts, renewal calendar projection
+- Duplicate detection (same-category similar-price + name overlap)
+- Price increase tracking and analysis
+- Optimization suggestions (annual billing, expensive subs, trials, category concentration)
+- Full text summary report, JSON persistence
+- 55 tests
+- Commit: 6feec94
+
 ## Builder Run 247 -- 2026-03-05 3:30 PM PST
 
 ### FeedReader: Article Flashcard Generator
@@ -7150,6 +7184,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
