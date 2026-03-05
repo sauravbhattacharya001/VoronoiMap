@@ -275,8 +275,10 @@ def find_hotspots(
     if not all_vals:
         return []
 
-    idx = int(len(all_vals) * threshold_pct / 100.0)
-    idx = min(idx, len(all_vals) - 1)
+    # Use (n-1) * pct/100 for standard percentile indexing, matching
+    # the convention in vormap_geometry.percentile().  Fixes #47.
+    idx = int((len(all_vals) - 1) * threshold_pct / 100.0)
+    idx = max(0, min(idx, len(all_vals) - 1))
     threshold = all_vals[idx]
 
     candidates = []

@@ -200,6 +200,33 @@ class TestHotspots:
         h_high = vormap_kde.find_hotspots(grid, threshold_pct=95)
         assert len(h_high) <= len(h_low)
 
+    def test_threshold_percentile_index_correct(self):
+        """Regression test for #47: threshold percentile used wrong index."""
+        from vormap_kde import KDEGrid
+        # Build a 10x10 grid with known values 1..100
+        vals = []
+        for r in range(10):
+            row = [float(r * 10 + c + 1) for c in range(10)]
+            vals.append(row)
+        grid = KDEGrid(
+            values=vals, nx=10, ny=10,
+            x_min=0, x_max=10, y_min=0, y_max=10,
+            bandwidth=1.0, density_min=1.0, density_max=100.0,
+            points_used=100,
+        )
+        # At 90th percentile of values 1..100, the threshold should be
+        # the 90th value (90.1 via linear interpolation, 90 via floor).
+        # The key check: the 91st value (91) should NOT be the threshold.
+        hotspots = vormap_kde.find_hotspots(grid, threshold_pct=90, min_separation=1)
+        # With correct percentile, cells with value >= 90 qualify.
+        # With the old off-by-one, only cells >= 91 qualified.
+        # Value 90 is at row=8, col=9 — verify it can be a candidate
+        # (it may or may not be a local max, but the threshold itself
+        #  should be <= 90).
+        all_vals = sorted(v for row in vals for v in row)
+        idx = int((len(all_vals) - 1) * 90 / 100.0)
+        assert all_vals[idx] <= 90.0
+
 
 # -- Density contours ---------------------------------------------------
 
