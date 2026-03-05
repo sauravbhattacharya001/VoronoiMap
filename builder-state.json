@@ -1,5 +1,5 @@
 {
-  "totalRuns": 247,
+  "totalRuns": 249,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -24,7 +24,8 @@
       "Added keyboard shortcuts help dialog (?) with all available shortcuts listed",
       "Added interactive chat playground with pattern-matched responses and typing indicators",
       "Added live agent activity feed with simulated real-time actions. 20 activity types, Fisher-Yates shuffle, IntersectionObserver visibility, slide-in/out animations, live counters, pulse indicator, light/dark mode, reduced motion support, ARIA log region. 30 Jest tests. (2026-03-04)",
-      "Interactive Prompt Gallery"
+      "Interactive Prompt Gallery",
+      "Expanded Comparison Table -- replaced 3-column/8-feature table with 5-competitor/16-feature dynamic table (ChatGPT, Google Assistant, Alexa, Siri). Responsive scroll, hover highlights, light/dark theme. Commit b24f320 (2026-03-05)"
     ],
     "agentlens": [
       "Added CLI entry point with rich terminal dashboard for trace inspection",
@@ -227,7 +228,8 @@
       "Expense Tracker -- ExpenseEntry model (14 categories, 7 payment methods, tags, vendor, recurring flag), ExpenseTrackerService with CRUD, filtering (date/month/range/category/vendor/tag), BudgetConfig with monthly+category limits, daily summaries, monthly reports with budget grading (A-F), spending trends (4-week linear regression), vendor analysis, category percentages, smart insights, logging streaks, JSON persistence, text summary. 55 tests (2026-03-04)",
       "Contact/People Tracker -- Contact model (9 relationship categories, 7 contact methods, 7 frequencies), Interaction logging with duration, ContactTrackerService with CRUD, archive, search (name/nickname/company/notes/tags), overdue follow-up detection with urgency scoring, birthday tracking with year wrap-around, interaction trend analysis, network health scoring (0-100, A-F), category breakdown, contact method distribution, full report generation, JSON persistence. 65 tests (2026-03-04)",
       "Gratitude Journal -- GratitudeEntry model (8 categories, 5 intensity levels), GratitudeJournalService with CRUD, toggleFavorite, filtering, daily summaries, streak tracking, weekly reports with grading, 20 gratitude prompts, insight engine, full report, JSON persistence. 55 tests (2026-03-04)",
-      "Learning/Skill Tracker -- SkillEntry model (12 categories, 7 proficiency levels, PracticeSession, SkillMilestone), SkillTrackerService with CRUD, practice logging, milestone management, level progression, filtering/search, neglected skill detection, weekly goal tracking, practice streaks, weekly summaries, topic analysis, skill reports with A-F grading and insights, portfolio reports, text summary, JSON persistence. 55 tests (2026-03-05)"
+      "Learning/Skill Tracker -- SkillEntry model (12 categories, 7 proficiency levels, PracticeSession, SkillMilestone), SkillTrackerService with CRUD, practice logging, milestone management, level progression, filtering/search, neglected skill detection, weekly goal tracking, practice streaks, weekly summaries, topic analysis, skill reports with A-F grading and insights, portfolio reports, text summary, JSON persistence. 55 tests (2026-03-05)",
+      "Subscription Tracker -- SubscriptionEntry model (BillingCycle/SubscriptionCategory/SubscriptionStatus enums, PriceChange history), SubscriptionTrackerService with CRUD, filtering, analytics (spend/category breakdown/cost ranking), billing alerts, trial expiration, renewal calendar, duplicate detection, price increase analysis, optimization suggestions, text summary, JSON persistence. 55 tests (2026-03-05)"
     ],
     "ai": [
       "Added escape attempt detection system with filesystem, network, process, and code injection monitors",
@@ -426,8 +428,8 @@
       "Backup Security Audit"
     ]
   },
-  "lastRepo": "FeedReader",
-  "lastFeature": "Article Flashcard Generator",
+  "lastRepo": "getagentbox",
+  "lastFeature": "Expanded Comparison Table",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
