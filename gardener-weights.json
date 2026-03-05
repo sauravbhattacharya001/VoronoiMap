@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-05T10:00:00.000Z",
-  "totalRuns": 757,
+  "totalRuns": 758,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 20,
-      "runs": 63,
-      "successes": 64
+      "runs": 65,
+      "successes": 66
     },
     "security_fix": {
       "weight": 20,
@@ -64,16 +64,16 @@
     },
     "open_issue": {
       "weight": 20,
-      "runs": 77,
-      "successes": 80,
+      "runs": 80,
+      "successes": 83,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
     },
     "fix_issue": {
       "weight": 20,
-      "runs": 112,
-      "successes": 111,
+      "runs": 113,
+      "successes": 112,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 757. FeedReader: security_fix (SSRF prevention - reject non-HTTP feed URLs) + doc_update (architecture tree 30+ missing modules, test badge 614->1941).",
-  "lastRepo": "FeedReader",
+  "notes": "Run 758. sauravcode: open_issue (#28 escape sequences not processed) + fix_issue (implemented escape processing with 14 new tests, 1796 total pass).",
+  "lastRepo": "sauravcode",
   "lastRun": "2026-03-05",
-  "runCount": 37,
+  "runCount": 39,
   "lastWeightAdjustment": 750,
   "adjustmentHistory": [
     {
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "security_fix",
-    "doc_update"
+    "open_issue",
+    "fix_issue"
   ]
 }
