@@ -1,3 +1,57 @@
+## Gardener Run 732 -- 2026-03-04 6:48 PM PST
+- **Repo:** getagentbox
+- **Task 1: perf_improvement**
+  - Nav scroll handler: fast-path early exit in updateActiveLink() when scroll position is within same section — avoids O(n) offset scan and classList ops during continuous scrolling
+- **Task 2: deploy_pages**
+  - Slimmed Pages workflow: deploy only web assets (index.html, styles.css, app.js, vendor/, docs/) instead of entire repo. Added path filter to skip deploys on non-web changes.
+- **Tests:** 14 suites pass
+- **Pushed:** 619f0be to master
+## Builder Run 202 -- 2026-03-04 6:35 PM PST
+- **Repo:** WinSentinel
+- **Feature:** Finding Deduplication Service
+- **What:** Cross-module finding deduplication via multi-signal similarity scoring (n-gram title matching, description similarity, category/severity matching, fix command equivalence). Union-Find grouping, highest-severity representative selection, configurable threshold. Reduces report noise when multiple audit modules flag the same underlying issue.
+- **Tests:** 37 passed
+- **Pushed:** d083d6a to main
+## Gardener Run 735 -- 2026-03-04 7:00 PM PST
+- **Status:** All 16 repos have all 29 task types completed. No eligible tasks remain. Gardener is fully saturated.
+
+## Gardener Run 731 -- 2026-03-04 6:28 PM PST
+- **Repo:** BioBots
+- **Task 1: open_issue**
+  - Filed #24: Nozzle planner adds phantom 2-second dwell time on zero-delta temperature transitions
+- **Task 2: fix_issue**
+  - Fixed #24: Short-circuit planTempTransition() when delta=0, return all-zero time fields. Strengthened test to verify dwellTime and totalTime are also zero.
+- **Tests:** 69 passed (nozzlePlanner)
+- **Pushed:** 0e6463d to master
+## Builder Run 201 -- 2026-03-04 6:45 PM PST
+- **Repo:** ai
+- **Feature:** Emergent Behavior Detector
+- **Details:** 8 emergent pattern types (synchronization, flocking, hierarchy formation, collective monopoly, information cascade, oscillation, deadlock, phase transition). Configurable thresholds, Jaccard similarity for flocking, Jensen-Shannon divergence for phase transitions, composite risk scoring, severity levels, filtering, text reports. 53 tests, all passing.
+- **Files:** `src/replication/emergent.py` (620 lines), `tests/test_emergent.py` (560 lines)
+
+## Builder Run 200 -- 2026-03-04 6:18 PM PST
+- **Repo:** getagentbox
+- **Feature:** Interactive Prompt Gallery
+- **What:** "What can I ask?" section with 15 example prompts across 5 categories (Productivity, Learning, Coding, Creative, Daily Life). Filterable by category, searchable, click-to-reveal response modal. Keyboard accessible, ARIA roles, responsive grid, backdrop blur animation. CTA to Telegram bot.
+- **Tests:** 14 test suites pass (all existing)
+- **Pushed:** 67f5077 to master
+## Gardener Run 735 -- 2026-03-04 6:30 PM PST
+- **Repo:** prompt
+- **Task:** fix_issue #36 — Streaming response support
+- **Changes:** Added `StreamChunk` and `ChainStreamUpdate` types. New streaming methods: `Main.GetResponseStreamAsync()`, `Conversation.SendStreamAsync()`, `PromptChain.ExecuteStreamAsync()`. Uses `CompleteChatStreamingAsync` from Azure.AI.OpenAI SDK.
+- **PR:** #38
+
+## Builder Run 200 -- 2026-03-04 6:15 PM PST
+- **Repo:** gif-captcha
+- **Feature:** Session Recorder (`createSessionRecorder`) — full CAPTCHA interaction recording with 16 event types, session lifecycle, input capture toggle, tag system, query engine, step-by-step replay, session comparison, aggregate analytics, merged timeline, LRU eviction, export/import persistence. 54 tests.
+- **Commit:** 01ec2a2
+
+## Gardener Run 734 -- 2026-03-04 6:00 PM PST
+- **Repo:** agentlens
+- **Task 1: security_fix** — API key auth in middleware.js had a timing side-channel: `timingSafeEqual` requires equal-length buffers, but the `||` short-circuit on length mismatch returned early, leaking key length via response timing. Fixed by hashing both values with SHA-256 before comparison (always 32-byte digests).
+- **Task 2: bug_fix** — `errorsByModel` and `errorRateDaily` in errors.js used correlated subqueries that (a) re-scanned the entire events table per group (O(n*m) performance), and (b) weren't scoped to any time window. Replaced with efficient JOIN-based queries.
+- **Commit:** bafc0e4
+
 ## Gardener Run 730 -- 2026-03-04 5:55 PM PST
 - **Repo:** ai
 - **Task 1: perf_improvement**
@@ -6504,6 +6558,10 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
+
+
+
 
 
 
