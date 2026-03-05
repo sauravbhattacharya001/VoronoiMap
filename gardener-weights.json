@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-04T23:50:00",
-  "totalRuns": 730,
+  "totalRuns": 731,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 22,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 22,
-      "runs": 56,
-      "successes": 57
+      "runs": 57,
+      "successes": 58
     },
     "security_fix": {
       "weight": 22,
@@ -22,8 +22,8 @@
     },
     "perf_improvement": {
       "weight": 22,
-      "runs": 54,
-      "successes": 54,
+      "runs": 55,
+      "successes": 55,
       "totalDone": 1,
       "attempts": 2
     },
@@ -72,7 +72,7 @@
     },
     "fix_issue": {
       "weight": 22,
-      "runs": 98,
+      "runs": 99,
       "successes": 98,
       "description": "Fix an existing open issue"
     },
@@ -685,8 +685,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 726. security_fix: CSV formula injection defense in export.js (prefix = + - @ tab cr with single-quote). refactor: extracted shared data-loader.js from 9 pages of duplicated fetch/validate/cache boilerplate.\nG#727 agentlens: security_fix (CSV formula injection + Content-Disposition header injection), code_cleanup (unused imports in analytics.js, dependencies.js). Commit 5e42710.",
-  "lastRepo": "agentlens",
+  "notes": "Run 726. security_fix: CSV formula injection defense in export.js (prefix = + - @ tab cr with single-quote). refactor: extracted shared data-loader.js from 9 pages of duplicated fetch/validate/cache boilerplate.\nG#727 agentlens: security_fix (CSV formula injection + Content-Disposition header injection), code_cleanup (unused imports in analytics.js, dependencies.js). Commit 5e42710.\nG#728 Ocaml-sample-code: bug_fix (LRU shared-hashtable mutation), perf_improvement (quicksort median tortoise-and-hare). fix_issue re-rolled to bug_fix (no open issues). Commit db498fb.",
+  "lastRepo": "Ocaml-sample-code",
   "lastRun": "2026-03-04",
   "runCount": 31,
   "lastWeightAdjustment": 730,
