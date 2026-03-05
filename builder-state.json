@@ -1,5 +1,5 @@
 {
-  "totalRuns": 210,
+  "totalRuns": 211,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -289,7 +289,8 @@
       "Signed Graph Analyzer -- structural balance theory (Heider/Harary/Davis), triangle census (+++/++-/+--/---), strong/weak balance check, frustration index (exact+greedy), coalition detection, vertex polarization, sign prediction via triadic closure, status consistency, comprehensive reports. 55 tests (2026-03-04)",
       "Feedback Vertex Set Analyzer -- greedy/exact FVS (backtracking with pruning), feedback edge set via spanning forest, cycle rank, vertex criticality scoring, disjoint cycle packing for lower bounds, approximation ratio, comprehensive FVSReport + text report. 55 tests (2026-03-04)",
       "Steiner Tree Analyzer -- minimum Steiner tree with 3 algorithms (shortest-path heuristic, MST heuristic, exact Dreyfus-Wagner DP), Steiner ratio, bottleneck detection, Steiner point importance, terminal reachability, comprehensive reports. 55 tests (2026-03-04)",
-      "Graph Coloring Analyzer -- greedy coloring (4 orderings: natural/largest-first/smallest-last/DSatur), chromatic number bounds (greedy clique lower + greedy upper), k-colorability (heuristic + backtracking), coloring verification, color class analysis with balance metrics, edge chromatic bounds (Vizing's theorem). ~580 lines, 75 tests (2026-03-04)"
+      "Graph Coloring Analyzer -- greedy coloring (4 orderings: natural/largest-first/smallest-last/DSatur), chromatic number bounds (greedy clique lower + greedy upper), k-colorability (heuristic + backtracking), coloring verification, color class analysis with balance metrics, edge chromatic bounds (Vizing's theorem). ~580 lines, 75 tests (2026-03-04)",
+      "Treewidth Analyzer -- tree decomposition with greedy degree/min-fill heuristics, exact treewidth (<=15 vertices), degeneracy/MMD lower bounds, nice tree decomposition, pathwidth, graph classification, bag analysis, text reports. 69 tests (2026-03-04)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",
@@ -365,7 +366,8 @@
       "Abstract interpretation with interval domain -- mini abstract interpreter (assignments, if/else, while, assert), interval lattice (join/meet/widening/narrowing), abstract arithmetic, condition filtering, fixed-point loop analysis, div-by-zero/dead-code/assertion detection, trace analysis, 70+ tests (2026-03-04)",
       "Network flow algorithms -- Edmonds-Karp max flow, min-cut, bipartite matching via flow reduction, multi-source/sink, flow decomposition, min-cost max flow (Bellman-Ford SPFA), edge connectivity, bipartite check. 720 lines, 55+ tests (2026-03-04)",
       "Bytecode virtual machine -- stack-based VM with 30+ opcodes, expression compiler, disassembler, 8 native functions, execution tracing. 662 lines, 80+ tests (2026-03-04)",
-      "Datalog query engine -- bottom-up evaluation, semi-naive optimization, stratified negation, builtins, aggregation, parser, magic sets, 75+ tests (2026-03-04)"
+      "Datalog query engine -- bottom-up evaluation, semi-naive optimization, stratified negation, builtins, aggregation, parser, magic sets, 75+ tests (2026-03-04)",
+      "Earley parser for context-free grammars (earley.ml) -- chart-based Earley algorithm for ANY CFG (ambiguous, left-recursive). Predict/Scan/Complete, Aycock-Horspool nullable optimization, parse tree extraction, arithmetic eval, FIRST sets, ambiguity detection, grammar cleaning, string generation. 5 built-in grammars (arithmetic/parens/palindrome/dangling-else/JSON). 93 tests (2026-03-04)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -396,7 +398,7 @@
       "Finding Deduplication Service"
     ]
   },
-  "lastRepo": "FeedReader",
-  "lastFeature": "Article Citation Generator",
+  "lastRepo": "Ocaml-sample-code",
+  "lastFeature": "Earley Parser",
   "lastRun": "2026-03-04"
 }
