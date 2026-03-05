@@ -1,8 +1,12 @@
-"""Shared geometry helpers used across VoronoiMap extension modules.
+"""Shared geometry and statistics helpers used across VoronoiMap extension modules.
 
 Extracted to eliminate copy-pasted implementations of the Shoelace formula,
 polygon perimeter, centroid, and related computations that were duplicated
 in 4+ modules.
+
+Statistics helpers (``mean``, ``std``, ``percentile``, ``normal_cdf``) were
+likewise copied into vormap_nndist, vormap_outlier, vormap_autocorr, and
+vormap_pattern.  They now live here as the single source of truth.
 """
 
 import math
@@ -155,3 +159,100 @@ def build_data_index(data):
         if key not in lookup:
             lookup[key] = i
     return lookup
+
+
+# ── Statistics helpers ─────────────────────────────────────────────
+
+
+def mean(values):
+    """Arithmetic mean, returning 0.0 for empty sequences.
+
+    Parameters
+    ----------
+    values : list[float]
+
+    Returns
+    -------
+    float
+    """
+    if not values:
+        return 0.0
+    return sum(values) / len(values)
+
+
+def std(values, population=True, mean_val=None):
+    """Standard deviation.
+
+    Parameters
+    ----------
+    values : list[float]
+    population : bool
+        If True (default) use population (N) denominator.
+        If False use sample (N-1) denominator.
+    mean_val : float or None
+        Pre-computed mean to avoid redundant computation. When None the
+        mean is calculated internally.
+
+    Returns
+    -------
+    float
+        Returns 0.0 when fewer than 2 values are provided.
+    """
+    n = len(values)
+    if n < 2:
+        return 0.0
+    m = mean_val if mean_val is not None else mean(values)
+    denom = n if population else (n - 1)
+    return math.sqrt(sum((v - m) ** 2 for v in values) / denom)
+
+
+def percentile(sorted_vals, p):
+    """Compute the *p*-th percentile (0–100) via linear interpolation.
+
+    Parameters
+    ----------
+    sorted_vals : list[float]
+        **Must** be pre-sorted in ascending order.
+    p : float
+        Percentile in [0, 100].
+
+    Returns
+    -------
+    float
+    """
+    if not sorted_vals:
+        return 0.0
+    idx = (p / 100.0) * (len(sorted_vals) - 1)
+    lo = int(idx)
+    hi = min(lo + 1, len(sorted_vals) - 1)
+    frac = idx - lo
+    return sorted_vals[lo] + frac * (sorted_vals[hi] - sorted_vals[lo])
+
+
+def normal_cdf(x):
+    """Approximate the standard normal CDF.
+
+    Uses the Abramowitz & Stegun 7.1.26 rational approximation, accurate
+    to ~1.5 × 10⁻⁷ for all *x*.
+
+    Parameters
+    ----------
+    x : float
+
+    Returns
+    -------
+    float
+        Cumulative probability Φ(x).
+    """
+    if x < 0:
+        return 1.0 - normal_cdf(-x)
+    p = 0.2316419
+    b1 = 0.319381530
+    b2 = -0.356563782
+    b3 = 1.781477937
+    b4 = -1.821255978
+    b5 = 1.330274429
+    t = 1.0 / (1.0 + p * x)
+    pdf = math.exp(-0.5 * x * x) / math.sqrt(2.0 * math.pi)
+    poly = t * (b1 + t * (b2 + t * (b3 + t * (b4 + t * b5))))
+    return 1.0 - pdf * poly

@@ -37,6 +37,7 @@ import math
 from collections import namedtuple
 
 from vormap import eudist_pts
+from vormap_geometry import normal_cdf as _normal_cdf
 
 
 # -- Result types ----------------------------------------------------
@@ -140,32 +141,6 @@ def _bounding_area(points, bounds=None):
     else:
         xmin, xmax, ymin, ymax = _compute_bounds(points)
     return max((xmax - xmin) * (ymax - ymin), 1e-10)
-
-
-def _normal_cdf(z):
-    """Approximate cumulative distribution function for standard normal.
-
-    Uses the Abramowitz and Stegun approximation (error < 7.5e-8).
-    """
-    if z < -8:
-        return 0.0
-    if z > 8:
-        return 1.0
-    a1 = 0.254829592
-    a2 = -0.284496736
-    a3 = 1.421413741
-    a4 = -1.453152027
-    a5 = 1.061405429
-    p = 0.3275911
-
-    sign = 1
-    if z < 0:
-        sign = -1
-        z = -z
-
-    t = 1.0 / (1.0 + p * z)
-    y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * math.exp(-z * z / 2)
-    return 0.5 * (1.0 + sign * y)
 
 
 def _chi2_survival(x, k):

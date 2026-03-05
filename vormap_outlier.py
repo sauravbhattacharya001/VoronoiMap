@@ -40,6 +40,8 @@ import math
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 
+from vormap_geometry import mean as _mean, std as _std, percentile as _percentile
+
 
 # ── Result container ────────────────────────────────────────────────
 
@@ -145,32 +147,6 @@ def _extract_values(stats, metric):
     return [float(s.get(metric, 0)) for s in stats]
 
 
-def _mean(values):
-    if not values:
-        return 0.0
-    return sum(values) / len(values)
-
-
-def _std(values, mean_val=None):
-    if len(values) < 2:
-        return 0.0
-    if mean_val is None:
-        mean_val = _mean(values)
-    variance = sum((v - mean_val) ** 2 for v in values) / len(values)
-    return math.sqrt(variance)
-
-
-def _percentile(sorted_vals, p):
-    """Compute the p-th percentile (0-100) via linear interpolation."""
-    if not sorted_vals:
-        return 0.0
-    idx = (p / 100.0) * (len(sorted_vals) - 1)
-    lo = int(idx)
-    hi = min(lo + 1, len(sorted_vals) - 1)
-    frac = idx - lo
-    return sorted_vals[lo] + frac * (sorted_vals[hi] - sorted_vals[lo])
-
-
 def _quartiles(values):
     """Return (Q1, median, Q3) for a list of floats."""
     s = sorted(values)
@@ -232,7 +208,7 @@ def detect_outliers(stats, metrics=None, method="zscore", threshold=None):
     for metric in metrics:
         values = _extract_values(stats, metric)
         mean_val = _mean(values)
-        std_val = _std(values, mean_val)
+        std_val = _std(values, mean_val=mean_val)
         q1, median_val, q3 = _quartiles(values)
         iqr_val = q3 - q1
 

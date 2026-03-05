@@ -44,6 +44,7 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
 from vormap import validate_output_path
+from vormap_geometry import mean as _mean, std as _std, percentile as _percentile_sorted, normal_cdf as _normal_cdf
 
 try:
     from scipy.spatial import cKDTree as _KDTree
@@ -54,24 +55,19 @@ except ImportError:
 
 # ── Helpers ─────────────────────────────────────────────────────────
 
+# _mean, _std, _normal_cdf are re-exported from vormap_geometry via the
+# import aliases above.  _percentile wraps the shared sorted-input version
+# to preserve the original unsorted-input interface used by callers.
+
+
+def _percentile(values: list, p: float) -> float:
+    """Percentile (0–100) via linear interpolation.  Accepts unsorted input."""
+    return _percentile_sorted(sorted(values), p) if values else 0.0
+
+
 def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
     """Euclidean distance between two 2D points."""
     return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
-
-
-def _mean(values: list) -> float:
-    """Arithmetic mean, returning 0.0 for empty lists."""
-    if not values:
-        return 0.0
-    return sum(values) / len(values)
-
-
-def _std(values: list) -> float:
-    """Population standard deviation."""
-    if len(values) < 2:
-        return 0.0
-    m = _mean(values)
-    return math.sqrt(sum((v - m) ** 2 for v in values) / len(values))
 
 
 def _median(values: list) -> float:
@@ -285,26 +281,6 @@ class ClarkEvansResult:
             "density": self.density,
             "interpretation": self.interpretation,
         }
-
-
-def _normal_cdf(x: float) -> float:
-    """Approximate the standard normal CDF using Abramowitz & Stegun 7.1.26.
-
-    Accurate to ~1.5 × 10⁻⁷ for all x.
-    """
-    if x < 0:
-        return 1.0 - _normal_cdf(-x)
-    # Constants from A&S
-    p = 0.2316419
-    b1 = 0.319381530
-    b2 = -0.356563782
-    b3 = 1.781477937
-    b4 = -1.821255978
-    b5 = 1.330274429
-    t = 1.0 / (1.0 + p * x)
-    pdf = math.exp(-0.5 * x * x) / math.sqrt(2.0 * math.pi)
-    poly = t * (b1 + t * (b2 + t * (b3 + t * (b4 + t * b5))))
-    return 1.0 - pdf * poly
 
 
 def clark_evans(
@@ -612,18 +588,6 @@ class DistanceSummary:
             "histogram": self.histogram,
             "distances": self.distances,
         }
-
-
-def _percentile(values: list, p: float) -> float:
-    """Linear interpolation percentile (0–100)."""
-    if not values:
-        return 0.0
-    s = sorted(values)
-    k = (len(s) - 1) * (p / 100.0)
-    lo = int(math.floor(k))
-    hi = min(lo + 1, len(s) - 1)
-    frac = k - lo
-    return s[lo] + frac * (s[hi] - s[lo])
 
 
 def distance_summary(

@@ -53,9 +53,10 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Dict
 
 import vormap
+from vormap_geometry import mean as _mean, std as _std_pop
 
 
-# ── Result containers ───────────────────────────────────────────────
+# ── Result containers ─────────────────────────────────────────────
 
 @dataclass
 class GlobalMoranResult:
@@ -153,20 +154,6 @@ def _row_standardize_weights(
 
 
 # ── Helpers ─────────────────────────────────────────────────────────
-
-def _mean(values: list) -> float:
-    if not values:
-        return 0.0
-    return sum(values) / len(values)
-
-
-def _std_pop(values: list) -> float:
-    """Population standard deviation."""
-    if len(values) < 2:
-        return 0.0
-    m = _mean(values)
-    return math.sqrt(sum((v - m) ** 2 for v in values) / len(values))
-
 
 def _z_to_p_two_tailed(z: float) -> float:
     """Approximate two-tailed p-value from z-score using error function."""
