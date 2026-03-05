@@ -1,5 +1,5 @@
 {
-  "totalRuns": 228,
+  "totalRuns": 231,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -252,7 +252,8 @@
       "Emergent Behavior Detector -- 8 emergent pattern types (synchronization/flocking/hierarchy/collective monopoly/information cascade/oscillation/deadlock/phase transition), configurable thresholds, Jaccard similarity, Jensen-Shannon divergence, risk scoring (0-100), severity levels, filtering, text reports. 53 tests (2026-03-04)",
       "Agent Behavioral Fingerprinting -- multi-dimensional behavioral signatures (action entropy, timing profiles, resource usage, communication patterns, tool distribution, error rates), pairwise Jensen-Shannon + cosine similarity comparison, fleet-wide clone detection (union-find clustering), behavioral drift detection (sliding window), anomaly flagging, deterministic SHA-256 signature hashing, risk scoring (0-100, A-F), ASCII reports + JSON export, CLI demo. 690 lines, 65 tests (2026-03-04)",
       "Kill Chain Analyzer -- MITRE ATT&CK-inspired 7-stage kill chain analysis for AI agents. 34 action catalog, 4 strategy profiles (opportunistic/linear/apt/mixed), risk scoring, sophistication assessment, pattern detection, transition analysis, disruption modeling, ASCII timeline, JSON export, CLI. 56 tests. (2026-03-05)",
-      "Agent Output Steganography Detector -- 7-vector analysis (zero-width chars, invisible Unicode, acrostic patterns, homoglyph substitution, capitalization encoding, punctuation anomalies, sentence length encoding), configurable SteganographyDetector, composite risk scoring (0-100, A-F grades), text comparison for diff-based detection, batch analysis, encoding utilities for testing (zero-width + homoglyph). 63 tests (2026-03-05)"
+      "Agent Output Steganography Detector -- 7-vector analysis (zero-width chars, invisible Unicode, acrostic patterns, homoglyph substitution, capitalization encoding, punctuation anomalies, sentence length encoding), configurable SteganographyDetector, composite risk scoring (0-100, A-F grades), text comparison for diff-based detection, batch analysis, encoding utilities for testing (zero-width + homoglyph). 63 tests (2026-03-05)",
+      "Agent Threat Intelligence Feed -- IOC aggregation from all safety modules, dedup, source-weight scoring, 7 IOC types, query engine, correlation engine, score decay/age-out, alert rules, STIX 2.1-lite export, per-agent risk profiling, trend analysis, persistence. 49 tests (2026-03-05)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -391,7 +392,8 @@
       "Garbage Collector Simulator (gc_simulator.ml) -- 4 classic GC algorithms (mark-and-sweep, Cheney copying, reference counting with cycle detection, generational). Heap/RootSet abstractions, fragmentation analysis, ASCII heap viz, reference graph viz, benchmark suite with 3 scenarios. 81 tests (2026-03-05)",
       "CTL Model Checker (model_checker.ml) -- labeling-based CTL model checking (Clarke-Emerson-Sistla), full temporal operators, fixpoint algorithms, formula parser, witness generation, fairness, 2 example models. 809 lines, 75+ tests (2026-03-05)",
       "Finite Automata Toolkit (automata.ml) -- DFA/NFA types, subset construction, Hopcroft minimization, product construction (intersection/union/difference/symmetric difference), complement, language equivalence/inclusion, NFA concat/union/star/reverse, string generation, DOT export, statistics. 1030 lines, 65+ tests (2026-03-05)",
-      "PEG Parser Engine (peg.ml) -- Packrat-memoized PEG parser with full operator set, parse tree construction, grammar analysis (left recursion/undefined/unused detection), 5 example grammars (arithmetic/JSON/CSV/identifier/balanced parens), convenience builders. 75 tests. (2026-03-05)"
+      "PEG Parser Engine (peg.ml) -- Packrat-memoized PEG parser with full operator set, parse tree construction, grammar analysis (left recursion/undefined/unused detection), 5 example grammars (arithmetic/JSON/CSV/identifier/balanced parens), convenience builders. 75 tests. (2026-03-05)",
+      "Symbolic Integration Engine (integration.ml) -- pattern-based antiderivatives (20+ rules), linearity, linear substitution, u-substitution, integration by parts (LIATE), definite integration (FTC), Simpson's rule numerical fallback, verification via differentiation, standard integral table. 65+ tests (2026-03-05)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -423,8 +425,8 @@
       "Backup Security Audit"
     ]
   },
-  "lastRepo": "BioBots",
-  "lastFeature": "Print Parameter Optimizer",
+  "lastRepo": "ai",
+  "lastFeature": "Agent Threat Intelligence Feed",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [

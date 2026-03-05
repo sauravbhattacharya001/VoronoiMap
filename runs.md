@@ -1,3 +1,33 @@
+## Builder Run 230 -- 2026-03-05 06:48 AM PST
+
+### GraphVisual — Graph Entropy Analyzer
+- **Feature:** GraphEntropyAnalyzer — 9 information-theoretic measures
+  - Degree distribution entropy, Von Neumann entropy, neighbourhood entropy
+  - Edge type entropy, topological info content, random walk entropy rate
+  - Chromatic entropy, degree-CC mutual information, complexity classification
+  - Jacobi eigenvalue algorithm for Laplacian spectrum
+- **Tests:** 57 new tests (2254 total, all passing)
+- **Issue:** #37 opened for graph similarity measures using entropy comparison
+
+## Builder Run 230 -- 2026-03-05 7:15 AM PST
+- **Repo:** ai (AI agent replication safety sandbox)
+- **Feature:** Agent Threat Intelligence Feed (`threat_intel.py`)
+- **What:** IOC aggregation from all safety modules with dedup, source-weight scoring, 7 IOC types, query/filter engine, correlation engine (shared keys + time proximity), exponential score decay, alert rules (critical spike, multi-agent correlation, volume surge), STIX 2.1-lite export, per-agent risk profiling, trend analysis, JSON persistence, CLI.
+- **Tests:** 49 passed
+- **Commit:** acba384
+
+## Gardener Run 769-770 -- 2026-03-05 07:00 AM PST
+
+### Gardener #769 -- FeedReader bug_fix
+- **Repo:** FeedReader (Swift)
+- **Fix:** `FeedUpdateScheduler.aggregateStats()` efficiency calculation was wrong — subtracted `consecutiveEmpty` (current streak per feed) from total checks, but `consecutiveEmpty` resets to 0 when articles are found, causing efficiency to report ~100% even when most checks were empty. Fixed to count productive checks directly from `checkHistory` records.
+- **PR:** #22 (merged)
+
+### Gardener #770 -- Vidly bug_fix
+- **Repo:** Vidly (C#)
+- **Fix:** `ReservationService.NotifyNextInQueue()` expired overdue Ready reservations but didn't compact the queue afterwards, leaving gaps in positions. This caused `GetQueuePosition` to return stale positions and `GetQueueSummary` to display misleading numbering. Added `CompactQueue()` call after expiration, matching the pattern in `CancelReservation` and `FulfillReservation`.
+- **PR:** #39 (merged)
+
 ## Gardener Run 765-766 -- 2026-03-05 06:35 AM PST
 
 ### Gardener #765 -- PR Review Sweep
@@ -7062,6 +7092,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
