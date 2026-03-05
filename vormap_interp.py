@@ -155,6 +155,48 @@ def natural_neighbor_interp(points, values, query, fallback_idw=True):
     return sum(weights[i] * values[i] for i in weights) / w_sum
 
 
+def _natural_neighbor_interp_precomputed(pts_array, areas_orig, values, query):
+    """Natural neighbor interpolation with precomputed original areas.
+
+    Avoids recomputing the original Voronoi diagram on every query,
+    cutting the per-query cost roughly in half for grid interpolation.
+    """
+    import numpy as np
+    qx, qy = query
+    n = len(values)
+
+    # Exact-point short-circuit
+    for i in range(n):
+        if abs(pts_array[i, 0] - qx) < 1e-12 and abs(pts_array[i, 1] - qy) < 1e-12:
+            return values[i]
+
+    pts_new = np.vstack([pts_array, [[qx, qy]]])
+    areas_new = _voronoi_cell_areas(pts_new)
+
+    query_area = areas_new.get(n)
+    if query_area is None or query_area < 1e-15:
+        return idw_interp(
+            [(pts_array[i, 0], pts_array[i, 1]) for i in range(n)],
+            values, query)
+
+    weights = {}
+    for i in range(n):
+        orig = areas_orig.get(i)
+        new = areas_new.get(i)
+        if orig is not None and new is not None:
+            stolen = orig - new
+            if stolen > 1e-15:
+                weights[i] = stolen
+
+    if not weights:
+        return idw_interp(
+            [(pts_array[i, 0], pts_array[i, 1]) for i in range(n)],
+            values, query)
+
+    w_sum = sum(weights.values())
+    return sum(weights[i] * values[i] for i in weights) / w_sum
+
+
 def grid_interpolate(points, values, nx=50, ny=50, bounds=None,
                      method='natural', power=2.0):
     """Interpolate values over a regular grid."""
@@ -176,11 +218,22 @@ def grid_interpolate(points, values, nx=50, ny=50, bounds=None,
     x_coords = [xmin + i * dx for i in range(nx)]
     y_coords = [ymin + j * dy for j in range(ny)]
 
-    interp_fn = {
-        'natural': lambda q: natural_neighbor_interp(points, values, q),
-        'idw': lambda q: idw_interp(points, values, q, power=power),
-        'nearest': lambda q: nearest_interp(points, values, q),
-    }.get(method)
+    # For natural neighbor interpolation, precompute the original Voronoi
+    # diagram once instead of rebuilding it for every grid cell.
+    # On a 50x50 grid this eliminates 2,500 redundant Voronoi constructions.
+    if method == 'natural' and _HAS_SCIPY and len(points) >= 3:
+        import numpy as np
+        pts_array = np.array(points, dtype=float)
+        areas_orig = _voronoi_cell_areas(pts_array)
+        interp_fn = lambda q: _natural_neighbor_interp_precomputed(
+            pts_array, areas_orig, values, q)
+    else:
+        interp_fn = {
+            'natural': lambda q: natural_neighbor_interp(points, values, q),
+            'idw': lambda q: idw_interp(points, values, q, power=power),
+            'nearest': lambda q: nearest_interp(points, values, q),
+        }.get(method)
+
     if interp_fn is None:
         raise ValueError("method must be 'natural', 'idw', or 'nearest'")
 
