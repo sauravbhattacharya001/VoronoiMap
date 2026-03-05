@@ -162,21 +162,26 @@ def extract_neighborhood_graph(regions, data=None, *, tol=0.5):
             adjacency = {seed: [] for seed in sorted_seeds}
             edge_set = set()
 
-    # --- Fallback: polygon edge matching ---
+    # --- Fallback: polygon edge matching via inverted edge index ---
+    # Instead of comparing every pair of seeds O(n²), we build an
+    # inverted index: polygon_edge -> list of seeds that contain it.
+    # Two seeds sharing an edge appear in the same list.  This runs in
+    # O(E) where E is total polygon edges across all regions.
     if not edge_set:
-        seed_edges = {}
+        edge_to_seeds: dict = {}  # polygon edge -> list of owning seeds
         for seed in sorted_seeds:
-            seed_edges[seed] = _edges_from_region_approx(
-                regions[seed], tol=tol
-            )
+            for poly_edge in _edges_from_region_approx(regions[seed], tol=tol):
+                if poly_edge not in edge_to_seeds:
+                    edge_to_seeds[poly_edge] = []
+                edge_to_seeds[poly_edge].append(seed)
 
-        seeds_list = list(sorted_seeds)
-        for i in range(len(seeds_list)):
-            for j in range(i + 1, len(seeds_list)):
-                s1 = seeds_list[i]
-                s2 = seeds_list[j]
-                shared = seed_edges[s1] & seed_edges[s2]
-                if shared:
+        for _poly_edge, owners in edge_to_seeds.items():
+            if len(owners) < 2:
+                continue
+            # Typically exactly 2 seeds share a Voronoi edge
+            for ii in range(len(owners)):
+                for jj in range(ii + 1, len(owners)):
+                    s1, s2 = owners[ii], owners[jj]
                     edge = (min(s1, s2), max(s1, s2))
                     if edge not in edge_set:
                         edge_set.add(edge)

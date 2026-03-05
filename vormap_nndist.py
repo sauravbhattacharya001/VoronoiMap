@@ -39,6 +39,7 @@ CLI::
 """
 
 import json
+import bisect
 import math
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
@@ -123,19 +124,46 @@ def _validate_points(points: list) -> List[Tuple[float, float]]:
 
 # ── Core: k-Nearest Neighbor Distances ──────────────────────────────
 
-def _knn_brute(points: List[Tuple[float, float]], k: int) -> List[List[float]]:
-    """Brute-force kNN — O(n² log k).  No dependencies."""
+def _knn_brute(points, k):
+    """Brute-force kNN — O(n² log k).  No external dependencies.
+
+    Returns a list of ``(distances, indices)`` tuples, one per point.
+    Each distances/indices pair is sorted by ascending distance.
+    """
     n = len(points)
     k_actual = min(k, n - 1)
     result = []
     for i in range(n):
-        dists = []
+        pairs = []
         for j in range(n):
             if i == j:
                 continue
-            dists.append(_euclidean(points[i], points[j]))
-        dists.sort()
-        result.append(dists[:k_actual])
+            pairs.append((_euclidean(points[i], points[j]), j))
+        pairs.sort(key=lambda p: p[0])
+        top_k = pairs[:k_actual]
+        result.append(([p[0] for p in top_k], [p[1] for p in top_k]))
+    return result
+
+
+def _nn1_brute(points):
+    """Brute-force 1-nearest-neighbor distances — O(n²).
+
+    Returns a list of floats: the nearest-neighbor distance for each
+    point.  Specialised single-purpose helper used by ``clark_evans()``
+    and ``g_function()`` to avoid the overhead of full kNN when only
+    the 1-NN distance is needed.
+    """
+    n = len(points)
+    result = []
+    for i in range(n):
+        min_d = float("inf")
+        for j in range(n):
+            if i == j:
+                continue
+            d = _euclidean(points[i], points[j])
+            if d < min_d:
+                min_d = d
+        result.append(min_d)
     return result
 
 
@@ -188,20 +216,15 @@ def nn_distances(
         return result
 
     # Brute-force fallback for small n or no scipy
+    brute = _knn_brute(pts, k_actual)
     result = []
     for i in range(n):
-        pairs = []
-        for j in range(n):
-            if i == j:
-                continue
-            pairs.append((_euclidean(pts[i], pts[j]), j))
-        pairs.sort(key=lambda p: p[0])
-        top_k = pairs[:k_actual]
+        nn_dists, nn_idxs = brute[i]
         result.append({
             "x": pts[i][0],
             "y": pts[i][1],
-            "distances": [p[0] for p in top_k],
-            "neighbors": [p[1] for p in top_k],
+            "distances": nn_dists,
+            "neighbors": nn_idxs,
         })
     return result
 
@@ -315,16 +338,7 @@ def clark_evans(
         dists, _ = tree.query(np.array(pts), k=2)  # k=2: self + nearest
         nn1 = dists[:, 1].tolist()
     else:
-        nn1 = []
-        for i in range(n):
-            min_d = float("inf")
-            for j in range(n):
-                if i == j:
-                    continue
-                d = _euclidean(pts[i], pts[j])
-                if d < min_d:
-                    min_d = d
-            nn1.append(min_d)
+        nn1 = _nn1_brute(pts)
 
     mean_nn = _mean(nn1)
 
@@ -469,16 +483,7 @@ def g_function(
         dists, _ = tree.query(np.array(pts), k=2)  # k=2: self + nearest
         nn1 = dists[:, 1].tolist()
     else:
-        nn1 = []
-        for i in range(n):
-            min_d = float("inf")
-            for j in range(n):
-                if i == j:
-                    continue
-                d = _euclidean(pts[i], pts[j])
-                if d < min_d:
-                    min_d = d
-            nn1.append(min_d)
+        nn1 = _nn1_brute(pts)
 
     nn1_sorted = sorted(nn1)
 
@@ -508,8 +513,8 @@ def g_function(
     empirical = []
     theoretical = []
     for d in d_values:
-        # Empirical: proportion of NN distances <= d
-        count = sum(1 for dist in nn1_sorted if dist <= d)
+        # Empirical: proportion of NN distances <= d (binary search on sorted list)
+        count = bisect.bisect_right(nn1_sorted, d)
         g_emp = count / n
         empirical.append({"d": d, "G": g_emp})
 
