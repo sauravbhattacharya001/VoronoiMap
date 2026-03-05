@@ -1,5 +1,5 @@
 {
-  "totalRuns": 208,
+  "totalRuns": 210,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -312,7 +312,8 @@
       "FeedAutomationEngine -- rule-based article automation with AND/OR condition groups (title/body/link/feed matching via contains/exact/startsWith/endsWith/regex), 7 action types (tag/star/read/collection/priority/notify/hide), feed-scoped rules, priority ordering, stop-processing, daily rate limiting, dry-run, execution history, 4 preset factories, JSON import/export, rule validation, bulk ops, search/filter. 790 lines, 82 tests (2026-03-03)",
       "Article Version Tracker -- content fingerprinting (djb2 hash) for detecting silent article edits. Version history with timestamped snapshots, change significance scoring (0.0-1.0), 6 categories (cosmetic/minor/moderate/major/titleChange/rewrite), Jaccard word-level diff, configurable notification threshold, per-feed modification rates, version comparison, snapshot limit, JSON persistence, text reports. 50 tests (2026-03-04)",
       "Reading Session Tracker -- ReadingSessionTracker (485 lines). Timed reading sessions with start/stop/pause lifecycle, per-article timing, focus tags (commute/research/morning), session summaries (weekly/monthly), top feeds/tags, export (JSON/text). 48 tests. (2026-03-04)",
-      "Reading Achievements System -- ReadingAchievementsManager with 41 unlockable badges across 8 categories (volume/streak/diversity/speed/exploration/dedication/social/mastery), 5 rarity tiers with points, secret achievements, ReadingActivitySnapshot-driven progress, nearest-to-unlock, comprehensive reports, JSON export/import, persistence, notifications. 55 tests (2026-03-04)"
+      "Reading Achievements System -- ReadingAchievementsManager with 41 unlockable badges across 8 categories (volume/streak/diversity/speed/exploration/dedication/social/mastery), 5 rarity tiers with points, secret achievements, ReadingActivitySnapshot-driven progress, nearest-to-unlock, comprehensive reports, JSON export/import, persistence, notifications. 55 tests (2026-03-04)",
+      "Article Citation Generator -- 6 academic formats (APA/MLA/Chicago/IEEE/Harvard/BibTeX), smart author parsing, DOI support, quality scoring, batch generation, bibliography formatting, BibTeX file export, JSON persistence. 55 tests (2026-03-04)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
@@ -336,7 +337,8 @@
       "Sterilization Protocol Analyzer -- D-value kill kinetics for 7 methods (autoclave 121/134°C, UV-C, ethanol, gamma, EtO, H₂O₂ plasma), 8 pathogen profiles, 12 material compatibility profiles, protocol recommendation engine, multi-step planning, cycle optimization, method comparison, validation tracking, comprehensive reports. 88 tests (2026-03-04)",
       "Multi-Nozzle Coordination Planner -- multi-material print planning with 5 nozzle profiles, 6 material presets, layer-by-layer scheduling, purge/prime sequences, temperature transitions, collision detection, material compatibility analysis, print time estimation, plan optimization with ping-pong detection, text reports. 69 tests (2026-03-04)",
       "Bioink Shelf Life Tracker -- shelfLife.js (560 lines). Q10 temp degradation model with humidity/light/container/freeze-thaw factors. 10 bioink materials across 4 categories. Batch registration, usage tracking, FEFO inventory, expiration alerts, storage recommendations, degradation curves. 52 tests. (2026-03-04)",
-      "Print Risk Assessor -- pre-print 8-dimension risk evaluation (nozzle clogging/cell viability/structural collapse/layer adhesion/over-crosslinking/dehydration/contamination/pressure damage), weighted composite scoring, GO/CAUTION/NO-GO recommendations, shear stress estimation, batch assessment, configuration comparison, improvement suggestions, historical analysis, text reports. 65 tests. (2026-03-04)"
+      "Print Risk Assessor -- pre-print 8-dimension risk evaluation (nozzle clogging/cell viability/structural collapse/layer adhesion/over-crosslinking/dehydration/contamination/pressure damage), weighted composite scoring, GO/CAUTION/NO-GO recommendations, shear stress estimation, batch assessment, configuration comparison, improvement suggestions, historical analysis, text reports. 65 tests. (2026-03-04)",
+      "Bioink Formulation Calculator -- multi-component recipe builder with C1V1=C2V2 dilution, serial dilution, cell suspension, 8 base materials, 8 additives, 6 recipe templates, tissue recommendations, cost estimation, blend viscosity, mixing order, JSON persistence. 62 tests (2026-03-04)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -394,7 +396,7 @@
       "Finding Deduplication Service"
     ]
   },
-  "lastRepo": "prompt",
-  "lastFeature": "PromptComplianceChecker -- organizational policy enforcement with 3 built-in policies (enterprise, safety, regulatory), custom rule builders, batch checking, compliance scoring",
+  "lastRepo": "FeedReader",
+  "lastFeature": "Article Citation Generator",
   "lastRun": "2026-03-04"
 }
