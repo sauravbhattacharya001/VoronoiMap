@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-05T10:00:00.000Z",
-  "totalRuns": 755,
+  "totalRuns": 756,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -29,8 +29,8 @@
     },
     "refactor": {
       "weight": 20,
-      "runs": 43,
-      "successes": 46,
+      "runs": 44,
+      "successes": 47,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
@@ -64,8 +64,8 @@
     },
     "open_issue": {
       "weight": 20,
-      "runs": 76,
-      "successes": 79,
+      "runs": 77,
+      "successes": 80,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -685,8 +685,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 755. WinSentinel: code_cleanup (consolidate 3 parallel category dicts into CategoryRiskProfile record) + add_tests (17 new AuditEngine tests, 10->27).",
-  "lastRepo": "WinSentinel",
+  "notes": "Run 756. Ocaml-sample-code: refactor (extract row_key helpers, fix pipe-separator collision bug in relational.ml) + open_issue (#19: Poisson/geometric O(n) perf).",
+  "lastRepo": "Ocaml-sample-code",
   "lastRun": "2026-03-05",
   "runCount": 37,
   "lastWeightAdjustment": 750,
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "code_cleanup",
-    "add_tests"
+    "refactor",
+    "open_issue"
   ]
 }

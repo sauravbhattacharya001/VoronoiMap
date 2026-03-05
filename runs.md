@@ -1,3 +1,11 @@
+## Gardener Run 756 -- 2026-03-05 02:50 AM PST
+- **Repo:** Ocaml-sample-code
+- **Task 1 (refactor):** Extracted `row_key_of_values`, `row_key_of_indices`, `row_key` helpers in relational.ml — eliminated 6x code duplication across project/union/intersect/difference/natural_join/group_by. Fixed latent key collision bug (pipe character in values caused false matches). Added 2 new tests. Commit `37b3987`.
+- **Task 2 (open_issue):** Filed #19 — Poisson and geometric samplers degrade to O(n) for large parameters. Detailed the problem (Knuth's algorithm O(λ) per sample, geometric O(1/p)), impact, and provided O(1) replacement algorithms (rejection method + inverse CDF).
+## Gardener Run 756 -- 2026-03-05 02:30 AM PST
+- **Status:** All 16 repos have all 29 task types completed. No new tasks available.
+- **Note:** The gardener has fully saturated all repos. Consider adding new repos or new task types.
+
 ## Builder Run 221 -- 2026-03-05 02:50 AM PST
 - **Repo:** gif-captcha
 - **Feature:** A/B Experiment Runner (`createABExperimentRunner`)
@@ -6861,6 +6869,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
