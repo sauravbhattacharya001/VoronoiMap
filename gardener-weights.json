@@ -1,61 +1,61 @@
 {
-  "lastUpdated": "2026-03-05T13:00:00.000Z",
-  "totalRuns": 761,
+  "lastUpdated": "2026-03-05T10:00:00.000Z",
+  "totalRuns": 758,
   "taskTypes": {
     "setup_copilot_agent": {
-      "weight": 17,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Set up GitHub Copilot coding agent"
     },
     "bug_fix": {
-      "weight": 22,
+      "weight": 20,
       "runs": 65,
       "successes": 66
     },
     "security_fix": {
-      "weight": 22,
+      "weight": 20,
       "runs": 60,
       "successes": 60,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
     "perf_improvement": {
-      "weight": 22,
+      "weight": 20,
       "runs": 61,
       "successes": 61,
       "totalDone": 1,
       "attempts": 2
     },
     "refactor": {
-      "weight": 22,
+      "weight": 20,
       "runs": 44,
       "successes": 47,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
     "add_tests": {
-      "weight": 22,
+      "weight": 20,
       "runs": 52,
       "successes": 52,
       "description": "Add meaningful tests",
       "attempts": 2
     },
     "readme_overhaul": {
-      "weight": 17,
+      "weight": 20,
       "runs": 20,
       "successes": 20,
       "description": "Overhaul repo README"
     },
     "doc_update": {
-      "weight": 22,
+      "weight": 20,
       "runs": 49,
       "successes": 51,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
-      "weight": 22,
+      "weight": 20,
       "runs": 45,
       "successes": 45,
       "description": "Remove dead code, unused deps",
@@ -63,123 +63,123 @@
       "attempts": 4
     },
     "open_issue": {
-      "weight": 22,
-      "runs": 81,
-      "successes": 84,
+      "weight": 20,
+      "runs": 80,
+      "successes": 83,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
     },
     "fix_issue": {
-      "weight": 22,
-      "runs": 116,
-      "successes": 115,
+      "weight": 20,
+      "runs": 113,
+      "successes": 112,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
-      "weight": 22,
+      "weight": 20,
       "runs": 22,
       "successes": 19,
       "description": "Review and merge open Dependabot PRs â€” PRIORITY: 60+ PRs waiting across all repos"
     },
     "add_ci_cd": {
-      "weight": 17,
+      "weight": 20,
       "runs": 14,
       "successes": 14,
       "description": "Add GitHub Actions CI/CD workflow"
     },
     "add_codeql": {
-      "weight": 17,
+      "weight": 20,
       "runs": 15,
       "successes": 15,
       "description": "Add CodeQL security scanning"
     },
     "add_dependabot": {
-      "weight": 17,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
-      "weight": 17,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Deploy to GitHub Pages"
     },
     "create_release": {
-      "weight": 17,
+      "weight": 20,
       "runs": 20,
       "successes": 20,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
-      "weight": 17,
+      "weight": 20,
       "runs": 10,
       "successes": 10,
       "description": "Add Dockerfile"
     },
     "docker_workflow": {
-      "weight": 17,
+      "weight": 20,
       "runs": 17,
       "successes": 17,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
-      "weight": 17,
+      "weight": 20,
       "runs": 17,
       "successes": 17,
       "description": "Set up package publishing (PyPI/npm/NuGet) â€” PRIORITY: PyPI is back online, publish Python packages!"
     },
     "add_badges": {
-      "weight": 17,
+      "weight": 20,
       "runs": 11,
       "successes": 11,
       "description": "Add badges to README"
     },
     "add_license": {
-      "weight": 17,
+      "weight": 20,
       "runs": 8,
       "successes": 8,
       "description": "Add/update LICENSE file"
     },
     "issue_templates": {
-      "weight": 17,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
-      "weight": 17,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
-      "weight": 17,
+      "weight": 20,
       "runs": 12,
       "successes": 12,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
-      "weight": 17,
+      "weight": 20,
       "runs": 15,
       "successes": 15,
       "description": "Configure branch protection"
     },
     "code_coverage": {
-      "weight": 17,
+      "weight": 20,
       "runs": 19,
       "successes": 19,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
-      "weight": 17,
+      "weight": 20,
       "runs": 16,
       "successes": 16,
       "description": "Generate & deploy docs site"
     },
     "auto_labeler": {
-      "weight": 17,
+      "weight": 20,
       "runs": 15,
       "successes": 15,
       "description": "Add auto-labeler or stale bot"
@@ -685,39 +685,12 @@
       "docs_site"
     ]
   },
-  "notes": "Run 761. Vidly: fix_issue (#37 JsonSerializer escaping) + FeedReader: open_issue (#23 ReadStatusManager pruning).",
-  "lastRepo": "FeedReader",
+  "notes": "Run 758. sauravcode: open_issue (#28 escape sequences not processed) + fix_issue (implemented escape processing with 14 new tests, 1796 total pass).",
+  "lastRepo": "sauravcode",
   "lastRun": "2026-03-05",
-  "runCount": 41,
-  "lastWeightAdjustment": 760,
+  "runCount": 39,
+  "lastWeightAdjustment": 750,
   "adjustmentHistory": [
-    {
-      "run": 760,
-      "changes": {
-        "add_ci_cd": "20→17 (all repos done)",
-        "add_codeql": "20→17 (all repos done)",
-        "add_dependabot": "20→17 (all repos done)",
-        "deploy_pages": "20→17 (all repos done)",
-        "add_dockerfile": "20→17 (all repos done)",
-        "docker_workflow": "20→17 (all repos done)",
-        "add_badges": "20→17 (all repos done)",
-        "add_license": "20→17 (all repos done)",
-        "issue_templates": "20→17 (all repos done)",
-        "contributing_md": "20→17 (all repos done)",
-        "repo_topics": "20→17 (all repos done)",
-        "branch_protection": "20→17 (all repos done)",
-        "code_coverage": "20→17 (all repos done)",
-        "docs_site": "20→17 (all repos done)",
-        "auto_labeler": "20→17 (all repos done)",
-        "readme_overhaul": "20→17 (all repos done)",
-        "setup_copilot_agent": "20→17 (all repos done)",
-        "create_release": "20→17 (all repos done)",
-        "package_publish": "20→17 (all repos done)",
-        "fix_issue": "20→22 (>80% success, always repeatable)",
-        "bug_fix": "20→22 (>80% success, always repeatable)",
-        "open_issue": "20→22 (>80% success, always repeatable)"
-      }
-    },
     {
       "run": 650,
       "changes": {
@@ -731,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "fix_issue",
-    "open_issue"
+    "open_issue",
+    "fix_issue"
   ]
 }
