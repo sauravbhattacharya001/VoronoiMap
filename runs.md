@@ -1,3 +1,23 @@
+## Gardener Run 775-776 -- 2026-03-05 08:10 AM PST
+
+### Gardener #775 -- GraphVisual (Java)
+- **Add tests:** 32 comprehensive tests for GrowthRateAnalyzer (constructor validation, analyze() snapshots, edgeGrowthRate() linear regression, density, clustering coefficient, edge cases)
+- 2296 total tests pass
+
+### Gardener #776 -- WinSentinel (C#/.NET)
+- **Bug fix:** FindingDeduplicator similarity reasons showed wrong percentages (0.73 displayed as '1%' instead of '73%') — NgramSimilarity returns 0-1, format string didn't multiply by 100
+- 2 regression tests, all dedup tests pass
+- **Issue:** WinSentinel #35 — TrendAnalyzer.CalculateMedian uses integer division
+- **Issue:** FeedReader #24 — aggregateStats efficiency bug (from run 774)
+
+## Gardener Run 775-776 -- 2026-03-05 08:00 AM PST
+- **FeedReader** (fix_issue #24): Fixed `aggregateStats` efficiency metric — was dividing history-window productive checks by lifetime `totalChecks`, producing increasingly inaccurate results as feeds age. Now both numerator and denominator use the history window. Added regression test.
+- **VoronoiMap** (bug_fix, issue #47): Fixed off-by-one in `find_hotspots` percentile threshold — `int(n * pct/100)` mapped to the (pct+1)th percentile. Changed to `int((n-1) * pct/100)` matching `vormap_geometry.percentile()` convention. Added regression test.
+
+## Builder Run 232 -- 2026-03-05 07:45 AM PST
+- **Repo:** sauravcode | **Feature:** Static Analysis Linter (sauravlint)
+- sauravlint.py (520 lines) -- 18 lint rules across 3 severity levels (error/warning/style). Detects unreachable code, division by zero, duplicate functions, break outside loops, unused vars/params, shadowing, self-comparison, constant conditions, empty blocks, deep nesting, mixed indentation, long lines, trailing whitespace. CLI with --check/--json/--severity/--disable flags, directory recursive scanning. 67 tests. All 1888 repo tests pass.
+
 ## Gardener Run 773-774 -- 2026-03-05 07:35 AM PST
 
 ### Gardener #773 -- prompt (C#)
@@ -7120,6 +7140,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

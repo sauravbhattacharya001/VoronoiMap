@@ -1,6 +1,6 @@
 # Status: Complete
 
-**Gardener #773:** prompt — RecordCompletion concurrent corruption fix + 2 tests
-**Gardener #774:** BioBots — Cartridge auto-detection fix + 4 tests
-**Issue:** FeedReader #24
+**Gardener #775:** GraphVisual — 32 GrowthRateAnalyzer tests
+**Gardener #776:** WinSentinel — Similarity percentage display fix + 2 tests
+**Issues:** WinSentinel #35, FeedReader #24
 

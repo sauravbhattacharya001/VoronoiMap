@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-05T15:00:00.000Z",
-  "totalRuns": 774,
+  "totalRuns": 776,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 20,
-      "runs": 69,
-      "successes": 70
+      "runs": 70,
+      "successes": 71
     },
     "security_fix": {
       "weight": 20,
@@ -72,8 +72,8 @@
     },
     "fix_issue": {
       "weight": 20,
-      "runs": 116,
-      "successes": 115,
+      "runs": 117,
+      "successes": 116,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,8 +685,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 771-772. GraphVisual: implemented GraphSimilarityAnalyzer (JSD, Von Neumann divergence, entropy profile distance) closing issue #37. prompt: fixed RecordCompletion replacing wrong token record under concurrency \u2014 added acquireTimestamp for precise record lookup.",
-  "lastRepo": "prompt",
+  "notes": "Run 775-776. FeedReader: fixed aggregateStats efficiency calculation mixing history window with lifetime counts (issue #24). VoronoiMap: fixed off-by-one in find_hotspots percentile threshold calculation (issue #47).",
+  "lastRepo": "VoronoiMap",
   "lastRun": "2026-03-05",
   "runCount": 44,
   "lastWeightAdjustment": 770,
