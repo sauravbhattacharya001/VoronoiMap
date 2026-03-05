@@ -1,6 +1,5 @@
 # Status: Complete
 
-**Gardener #763:** GraphVisual -- 13 test failures fixed (issue #36)
-**Gardener #764:** gif-captcha -- 2 test failures fixed (issue #18)
-**Builder #228:** Ocaml-sample-code -- PEG Parser Engine
+**Gardener #765:** PR sweep — 7 merged, 6 closed across 5 repos
+**Gardener #766:** agentlens — Fixed 2 test suites (48 tests recovered)
 

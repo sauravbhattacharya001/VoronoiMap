@@ -1,3 +1,27 @@
+## Gardener Run 765-766 -- 2026-03-05 06:35 AM PST
+
+### Gardener #765 -- PR Review Sweep
+- **Merged 7 PRs:** gif-captcha #17 (prototype pollution fix), ai #24 (approval threshold), ai #25 (test coverage), Vidly #38 (double-counting fix), Vidly #36 (redundant GetAll), everything #36 (missing _pairKey), sauravcode #27 (generator functions)
+- **Closed 6 conflicted PRs:** VoronoiMap #41/#42, Vidly #34, everything #33/#34, prompt #37/#38
+
+### Gardener #766 -- agentlens (Node.js)
+- **Fix:** Converted db.test.js and webhooks.test.js from node:test to Jest compatibility
+  - Replaced node:test imports with Jest globals
+  - jest.resetModules() instead of delete require.cache
+  - Fixed EBUSY cleanup on Windows, cross-realm deepStrictEqual
+- 585 tests pass (was 537 with 2 failing suites). Issue #31 filed+closed.
+
+## Builder Run 229 -- 2026-03-05 06:45 AM PST
+
+### Ocaml-sample-code — Symbolic Integration Engine
+- **File:** `integration.ml` (1026 lines)
+- **What:** Companion to `calculus.ml` (which does differentiation). Adds symbolic antiderivative computation.
+- **Features:** 20+ pattern-based integration rules, linearity, linear substitution (f(ax+b)), u-substitution, integration by parts (LIATE heuristic), definite integration via FTC, Simpson's rule numerical fallback, verification via differentiation, standard integral table
+- **Tests:** 65+ self-contained tests with numerical cross-validation
+- **Commit:** `06e6ace` pushed to master
+
+---
+
 ## Gardener Run 763-764, Builder Run 228 -- 2026-03-05 06:05 AM PST
 
 ### Gardener #763 -- GraphVisual (Java)
@@ -7038,6 +7062,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
