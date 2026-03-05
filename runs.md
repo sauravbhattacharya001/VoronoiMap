@@ -1,3 +1,14 @@
+## Gardener Run 763 -- 2026-03-05 05:06 AM PST
+- **Repo:** VoronoiMap (Python)
+- **refactor:** Deduplicated 3 inline brute-force O(n2) kNN fallback blocks in vormap_nndist.py. Refactored _knn_brute to return (distances, indices) tuples. Added _nn1_brute helper for clark_evans/g_function. Replaced O(n*s) linear scan in g_function with bisect.bisect_right.
+- **perf_improvement:** Replaced O(n2) pairwise polygon-edge comparison in vormap_graph.py fallback with inverted edge index (O(E)). Shared Voronoi edges found by mapping each polygon edge to owning seeds.
+- **open_issue:** #46 -- g_function theoretical curve uses point density instead of intensity parameter.
+- Commit: f1faa31, 1516 tests passing, pushed.
+
+## Gardener Run 762 -- 2026-03-05 05:00 AM PST
+- **Repo:** Vidly | **fix_issue:** Fixed #37 — escaped property names in JsonSerializer, added `char` type support, escape U+2028/U+2029. Commit `8d2888c`.
+- **Repo:** FeedReader | **open_issue:** Opened #23 — ReadStatusManager.pruneIfNeeded() removes arbitrary entries from Set instead of oldest, causing recently-read articles to flip back to unread.
+
 ## Gardener Run 761 -- 2026-03-05 04:35 AM PST
 - **Repo:** Vidly (C# ASP.NET MVC)
 - **security_fix:** (1) Added missing `[ValidateAntiForgeryToken]` to `BundlesController.Calculator` POST — CSRF vulnerability. (2) Rewrote `JsonSerializer.EscapeString` from chained `string.Replace` to single-pass `StringBuilder` with RFC 8259 compliance — now escapes `\b`, `\f`, `/` (XSS prevention), and all control characters U+0000–U+001F.
@@ -6948,6 +6959,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
