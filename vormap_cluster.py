@@ -441,6 +441,10 @@ def cluster_regions(region_stats, regions, data, *,
     if metric not in ("area", "density", "compactness", "vertices"):
         raise ValueError("Unknown metric: %s" % metric)
 
+    # Guard: return empty result for degenerate input (fixes #45)
+    if not region_stats or not regions:
+        return ClusterResult(method=method, metric=metric)
+
     stats_lookup = _build_stats_lookup(region_stats)
     adjacency = _build_adjacency(regions, data)
 
