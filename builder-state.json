@@ -1,5 +1,5 @@
 {
-  "totalRuns": 197,
+  "totalRuns": 198,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -326,7 +326,8 @@
       "Vascularization Planner -- vascular channel network design with Krogh O2 diffusion, Murray's law branching trees, channel spacing (parallel/hexagonal), perfusion adequacy (O2 delivery, shear stress), Hagen-Poiseuille flow distribution, printability assessment, complete network planner with feasibility scoring, 6 tissue presets, multi-tissue comparison. 61 tests (2026-03-04)",
       "Sterilization Protocol Analyzer -- D-value kill kinetics for 7 methods (autoclave 121/134°C, UV-C, ethanol, gamma, EtO, H₂O₂ plasma), 8 pathogen profiles, 12 material compatibility profiles, protocol recommendation engine, multi-step planning, cycle optimization, method comparison, validation tracking, comprehensive reports. 88 tests (2026-03-04)",
       "Multi-Nozzle Coordination Planner -- multi-material print planning with 5 nozzle profiles, 6 material presets, layer-by-layer scheduling, purge/prime sequences, temperature transitions, collision detection, material compatibility analysis, print time estimation, plan optimization with ping-pong detection, text reports. 69 tests (2026-03-04)",
-      "Bioink Shelf Life Tracker -- shelfLife.js (560 lines). Q10 temp degradation model with humidity/light/container/freeze-thaw factors. 10 bioink materials across 4 categories. Batch registration, usage tracking, FEFO inventory, expiration alerts, storage recommendations, degradation curves. 52 tests. (2026-03-04)"
+      "Bioink Shelf Life Tracker -- shelfLife.js (560 lines). Q10 temp degradation model with humidity/light/container/freeze-thaw factors. 10 bioink materials across 4 categories. Batch registration, usage tracking, FEFO inventory, expiration alerts, storage recommendations, degradation curves. 52 tests. (2026-03-04)",
+      "Print Risk Assessor -- pre-print 8-dimension risk evaluation (nozzle clogging/cell viability/structural collapse/layer adhesion/over-crosslinking/dehydration/contamination/pressure damage), weighted composite scoring, GO/CAUTION/NO-GO recommendations, shear stress estimation, batch assessment, configuration comparison, improvement suggestions, historical analysis, text reports. 65 tests. (2026-03-04)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -376,10 +377,11 @@
       "Group Policy Security Audit (2026-03-04)",
       "WiFi Security Audit -- saved profile encryption (Open/WEP/WPA-TKIP), auto-connect risks, hidden network probing, public network matching, MAC randomization, WiFi Sense/hotspot sharing, password exposure, hosted network, driver age, current connection safety. WifiState DTO, 63 tests (2026-03-04)",
       "Remote Access Security Audit -- RDP (NLA/encryption/security layer/idle timeout/port/user group), SSH (password auth/root login/port), 13 third-party tools with risk scoring (TeamViewer/AnyDesk/VNC/Ammyy/etc), WinRM (encryption/basic auth/HTTP vs HTTPS), Remote Registry, Remote Assistance, Telnet, overall exposure scoring. RemoteAccessState DTO, 66 tests (2026-03-04)",
-      "Virtualization Security Audit -- Hyper-V VM isolation (external switch/checkpoints/guest services), WSL (version/root distros/mirrored networking/firewall/interop/systemd), Windows Sandbox (networking/writable mapped folders), Docker (TCP exposure/privileged mode/root containers/content trust/user namespaces/ICC), VBS/Credential Guard/HVCI/Memory Integrity/Secure Boot. VirtualizationState DTO, 66 tests (2026-03-04)"
+      "Virtualization Security Audit -- Hyper-V VM isolation (external switch/checkpoints/guest services), WSL (version/root distros/mirrored networking/firewall/interop/systemd), Windows Sandbox (networking/writable mapped folders), Docker (TCP exposure/privileged mode/root containers/content trust/user namespaces/ICC), VBS/Credential Guard/HVCI/Memory Integrity/Secure Boot. VirtualizationState DTO, 66 tests (2026-03-04)",
+      "Credential Exposure Audit -- 8-category credential risk analysis (Windows Credential Manager, Git credential storage, SSH key security, plaintext credential files, RDP saved passwords, browser credential stores, cloud CLI tokens, sensitive file permissions). CredentialState DTO, composite risk scoring (0-100) with letter grades, CredentialExposureReport with text summary. 54 tests (2026-03-04)"
     ]
   },
-  "lastRepo": "FeedReader",
-  "lastFeature": "Reading Session Tracker",
+  "lastRepo": "BioBots",
+  "lastFeature": "Print Risk Assessor",
   "lastRun": "2026-03-04"
 }

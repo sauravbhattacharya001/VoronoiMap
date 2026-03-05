@@ -1,3 +1,26 @@
+## Builder Run 198 -- 2026-03-04 5:05 PM PST
+- **Repo:** BioBots
+- **Feature:** Print Risk Assessor
+  - Pre-print 8-dimension risk evaluation: nozzle clogging, cell viability, structural collapse, layer adhesion, over-crosslinking, dehydration, contamination, pressure damage
+  - Weighted composite scoring with GO/CAUTION/NO-GO recommendations
+  - Shear stress estimation from pressure + nozzle gauge, compounding risk detection
+  - Batch assessment, configuration comparison, improvement suggestions, historical analysis
+  - Text report with ASCII risk bars
+  - 65 tests
+- **Pushed:** 46b1527 to master
+## Gardener Run #732 -- 2026-03-04 5:00 PM PST
+- **Repo:** ai (Python)
+- **Tasks:** bug_fix × 2
+- **Bug 1:** controller.py `issue_manifest` silently clamped root depth spoofing instead of denying — audit said "deny" but nothing was denied. Now raises `ReplicationDenied`.
+- **Bug 2:** consensus.py `tally()` allowed re-tallying decided proposals, enabling result tampering via late vote injection. Now returns cached result for DECIDED/EXECUTED proposals.
+- **Tests:** Updated 2 existing tests, added 2 new `TestTallyIdempotency` tests. 137/137 passing.
+- **Commit:** bae188d
+
+## Builder Run 198 -- 2026-03-04 4:45 PM PST
+- **Repo:** WinSentinel
+- **Feature:** Credential Exposure Audit
+- **Details:** 8-category credential risk analysis module — Windows Credential Manager (stale/visible/excessive), Git credential storage (plaintext store, embedded config), SSH key security (passphrase, algorithm, permissions), plaintext credential files, RDP saved passwords, browser credential stores (master password), cloud CLI tokens (AWS/Azure/GCP + MFA), sensitive file permissions. CredentialState DTO, composite risk scoring (0-100, A-F grades), CredentialExposureReport with text summary. 54 tests, all passing.
+
 ## Gardener Run 728 -- 2026-03-04 4:55 PM PST
 - **Repo:** Ocaml-sample-code
 - **Task 1: bug_fix** (re-rolled from fix_issue, no open issues)
@@ -6445,6 +6468,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
