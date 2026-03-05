@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-05T08:00:00.000Z",
-  "totalRuns": 750,
+  "totalRuns": 752,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 20,
-      "runs": 61,
-      "successes": 62
+      "runs": 62,
+      "successes": 63
     },
     "security_fix": {
       "weight": 20,
@@ -56,8 +56,8 @@
     },
     "code_cleanup": {
       "weight": 20,
-      "runs": 43,
-      "successes": 43,
+      "runs": 44,
+      "successes": 44,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
@@ -72,8 +72,8 @@
     },
     "fix_issue": {
       "weight": 20,
-      "runs": 110,
-      "successes": 109,
+      "runs": 112,
+      "successes": 111,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,8 +685,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 750. ai: refactor (selfmod.py duplication + bug fix), doc_update (5 API reference pages for analysis modules).",
-  "lastRepo": "ai",
+  "notes": "Run 751. VoronoiMap: code_cleanup (extract stats helpers into geometry), fix_issue (#45 cluster_regions empty input crash).",
+  "lastRepo": "VoronoiMap",
   "lastRun": "2026-03-05",
   "runCount": 37,
   "lastWeightAdjustment": 750,
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "refactor",
-    "doc_update"
+    "code_cleanup",
+    "fix_issue"
   ]
 }

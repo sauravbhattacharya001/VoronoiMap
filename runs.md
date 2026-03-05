@@ -1,3 +1,15 @@
+## Gardener Run 751 -- 2026-03-05 01:45 AM PST
+- **Repo:** VoronoiMap
+- **Task 1 (code_cleanup):** Extracted duplicated `_mean`/`_std`/`_percentile`/`_normal_cdf` from 4 modules (nndist, outlier, autocorr, pattern) into shared `vormap_geometry.py`. Single source of truth, -60 lines of duplication. Backward-compatible imports with aliasing. 1457 tests pass. Commit `0aa31d4`.
+- **Task 2 (fix_issue):** Fixed #45 — `cluster_regions()` crashed with confusing internal errors on empty input. Added early validation to return empty `ClusterResult`. 41 cluster tests pass. Commit `1f4d528`.
+## Gardener Run 752 -- 2026-03-05 1:00 AM PST
+- **Task 1:** fix_issue on **everything** — Fixed #37: streak calculation for non-daily routines. Added `_maxScheduledGap()` that computes max gap between scheduled `activeDays`, so Mon/Wed/Fri routines no longer break streaks on 2-day gaps. Added test. Commit `248e040`.
+- **Task 2:** bug_fix on **agenticchat** — Fixed critical `SafeStorage` IIFE bug where all methods recursively called themselves instead of `localStorage`. Detection always silently failed, making all storage ops no-ops (settings/conversations never persisted). Commit `225ac4a`.
+
+## Builder Run 217 -- 2026-03-05 12:45 AM PST
+- **Repo:** Vidly
+- **Feature:** Membership Tier Service — dynamic tier evaluation (Basic/Silver/Gold/Platinum) based on rental activity (count, spend, late %), configurable thresholds, tier benefits (discounts, concurrent limits, grace days, free reservations, priority new releases), tier change tracking with history, discounted rate calculator, concurrent rental enforcement, near-upgrade/at-risk detection, tier distribution analytics, full membership reports. 55 tests. Commit `7962a37`.
+
 ## Builder Run 216 -- 2026-03-05 12:50 AM PST
 - **Repo:** agentlens
 - **Feature:** Response Quality Evaluator — heuristic-based LLM response scoring across 6 dimensions (relevance, coherence, completeness, conciseness, safety, formatting). Composite weighted score with letter grade (A-F), batch evaluation, trend analysis, worst-dimension identification, text reports. 75 tests. Commit `81524c1`.
@@ -6801,6 +6813,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
