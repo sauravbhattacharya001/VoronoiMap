@@ -1,7 +1,6 @@
 # Status: Complete
 
-**Gardener #759:** prompt — 78 tests + refactor (RenderVariables regex, CachingMiddleware LRU)
+**Gardener #761:** Vidly — CSRF fix + JSON escape hardening
+**Gardener #759:** prompt — 78 tests + refactor
 **Builder #224:** gif-captcha — Fraud Ring Detector
-**Gardener #758:** sauravcode — open_issue + fix_issue (escape sequences)
-**Builder #223:** GraphVisual — Structural Hole Analyzer
 

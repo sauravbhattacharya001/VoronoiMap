@@ -1,3 +1,19 @@
+## Gardener Run 761 -- 2026-03-05 04:35 AM PST
+- **Repo:** Vidly (C# ASP.NET MVC)
+- **security_fix:** (1) Added missing `[ValidateAntiForgeryToken]` to `BundlesController.Calculator` POST — CSRF vulnerability. (2) Rewrote `JsonSerializer.EscapeString` from chained `string.Replace` to single-pass `StringBuilder` with RFC 8259 compliance — now escapes `\b`, `\f`, `/` (XSS prevention), and all control characters U+0000–U+001F.
+- **open_issue:** #37 — JsonSerializer property names not escaped, potential injection risk.
+- Commit: `df643dc`, pushed.
+## Gardener Run 759 -- 2026-03-05 04:30 AM PST
+- **Task 1:** fix_issue on **WinSentinel** (C#) — Fixed #34: race condition in AutoRemediator.Undo(). Added per-record ConcurrentDictionary locking to prevent concurrent undo of the same remediation. Removed redundant PersistHistory() call.
+- **Task 2:** fix_issue on **Ocaml-sample-code** (OCaml) — Fixed #19: O(n) degradation in Poisson/geometric samplers. Replaced Knuth's O(lambda) Poisson with PTRD rejection method (O(1)) for lambda>30. Replaced trial-loop geometric with inverse CDF (O(1)). Added tests for large parameters (lambda=100/500, p=0.001).
+
+## Builder Run 225 -- 2026-03-05 04:15 AM PST
+- **Repo:** BioBots (JS)
+- **Feature:** Print Parameter Optimizer (`parameterOptimizer.js`)
+- **What:** Multi-objective optimization engine for bioprinting parameters. Grid search + local refinement finds optimal pressure/speed/temperature/nozzle/layer/crosslink settings balancing 5 objectives (cell viability, resolution, speed, structural integrity, material efficiency). Pareto front extraction, 6 material presets (GelMA/Alginate/Collagen/HA/Fibrin/PCL), constraint system (range/forbidden/ratio), sensitivity analysis, config comparison, batch optimization, text reports.
+- **Tests:** 55 passing
+- **Lines:** ~1,063
+
 ## Gardener Run 759 -- 2026-03-05 04:05 AM PST
 - **Repo:** prompt (C#)
 - **add_tests:** 78 comprehensive tests for PromptVersionManager — creation, retrieval, history, comparison/diff, rollback, deletion, JSON serialization roundtrip, thread safety, edge cases. All passing.
@@ -6932,6 +6948,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
