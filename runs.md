@@ -1,3 +1,6 @@
+## Builder Run 217 -- 2026-03-05 01:55 AM PST
+- **Repo:** agenticchat
+- **Feature:** Message Annotations — private notes on messages with 6 color-coded labels (Note/Important/Correction/Question/To-Do/Reference). Badge overlay, tooltip preview, annotations panel, JSON export, localStorage persistence. 71 tests. Commit `27d0f2a`.
 ## Gardener Run 751 -- 2026-03-05 01:45 AM PST
 - **Repo:** VoronoiMap
 - **Task 1 (code_cleanup):** Extracted duplicated `_mean`/`_std`/`_percentile`/`_normal_cdf` from 4 modules (nndist, outlier, autocorr, pattern) into shared `vormap_geometry.py`. Single source of truth, -60 lines of duplication. Backward-compatible imports with aliasing. 1457 tests pass. Commit `0aa31d4`.
@@ -6813,6 +6816,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
