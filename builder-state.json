@@ -1,5 +1,5 @@
 {
-  "totalRuns": 221,
+  "totalRuns": 222,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -225,7 +225,8 @@
       "Decision Journal -- DecisionEntry model (10 categories, 5-level confidence/outcome, alternatives with rejection reasons, calibration detection, review scheduling). DecisionJournalService with CRUD, outcome recording, queries (pending/overdue/category/date range/search), analytics (JournalStats, CategoryStats, CalibrationReport with over/underconfidence detection, ReviewStreak, QualityScore composite 0-100, topCategories, allLessonsLearned), persistence. 72 tests. (2026-03-04)",
       "Expense Tracker -- ExpenseEntry model (14 categories, 7 payment methods, tags, vendor, recurring flag), ExpenseTrackerService with CRUD, filtering (date/month/range/category/vendor/tag), BudgetConfig with monthly+category limits, daily summaries, monthly reports with budget grading (A-F), spending trends (4-week linear regression), vendor analysis, category percentages, smart insights, logging streaks, JSON persistence, text summary. 55 tests (2026-03-04)",
       "Contact/People Tracker -- Contact model (9 relationship categories, 7 contact methods, 7 frequencies), Interaction logging with duration, ContactTrackerService with CRUD, archive, search (name/nickname/company/notes/tags), overdue follow-up detection with urgency scoring, birthday tracking with year wrap-around, interaction trend analysis, network health scoring (0-100, A-F), category breakdown, contact method distribution, full report generation, JSON persistence. 65 tests (2026-03-04)",
-      "Gratitude Journal -- GratitudeEntry model (8 categories, 5 intensity levels), GratitudeJournalService with CRUD, toggleFavorite, filtering, daily summaries, streak tracking, weekly reports with grading, 20 gratitude prompts, insight engine, full report, JSON persistence. 55 tests (2026-03-04)"
+      "Gratitude Journal -- GratitudeEntry model (8 categories, 5 intensity levels), GratitudeJournalService with CRUD, toggleFavorite, filtering, daily summaries, streak tracking, weekly reports with grading, 20 gratitude prompts, insight engine, full report, JSON persistence. 55 tests (2026-03-04)",
+      "Learning/Skill Tracker -- SkillEntry model (12 categories, 7 proficiency levels, PracticeSession, SkillMilestone), SkillTrackerService with CRUD, practice logging, milestone management, level progression, filtering/search, neglected skill detection, weekly goal tracking, practice streaks, weekly summaries, topic analysis, skill reports with A-F grading and insights, portfolio reports, text summary, JSON persistence. 55 tests (2026-03-05)"
     ],
     "ai": [
       "Added escape attempt detection system with filesystem, network, process, and code injection monitors",
@@ -248,7 +249,8 @@
       "Agent Resource Hoarding Detector -- 5-dimension analysis (compute, memory, data, connections, file handles) with configurable thresholds, composite risk scoring, fleet-wide analysis, agent comparison, top-N ranking, recommendation engine. 742 lines, 61 tests (2026-03-04)",
       "Agent Privilege Escalation Detector -- 5-vector scope creep detection (filesystem/network/process/API/data), 16 detection rules, 4 agent strategies, stealth inference, risk scoring, chain detection, containment scoring, escalation velocity tracking, configurable permissions, CLI. 80 tests (2026-03-04)",
       "Emergent Behavior Detector -- 8 emergent pattern types (synchronization/flocking/hierarchy/collective monopoly/information cascade/oscillation/deadlock/phase transition), configurable thresholds, Jaccard similarity, Jensen-Shannon divergence, risk scoring (0-100), severity levels, filtering, text reports. 53 tests (2026-03-04)",
-      "Agent Behavioral Fingerprinting -- multi-dimensional behavioral signatures (action entropy, timing profiles, resource usage, communication patterns, tool distribution, error rates), pairwise Jensen-Shannon + cosine similarity comparison, fleet-wide clone detection (union-find clustering), behavioral drift detection (sliding window), anomaly flagging, deterministic SHA-256 signature hashing, risk scoring (0-100, A-F), ASCII reports + JSON export, CLI demo. 690 lines, 65 tests (2026-03-04)"
+      "Agent Behavioral Fingerprinting -- multi-dimensional behavioral signatures (action entropy, timing profiles, resource usage, communication patterns, tool distribution, error rates), pairwise Jensen-Shannon + cosine similarity comparison, fleet-wide clone detection (union-find clustering), behavioral drift detection (sliding window), anomaly flagging, deterministic SHA-256 signature hashing, risk scoring (0-100, A-F), ASCII reports + JSON export, CLI demo. 690 lines, 65 tests (2026-03-04)",
+      "Kill Chain Analyzer -- MITRE ATT&CK-inspired 7-stage kill chain analysis for AI agents. 34 action catalog, 4 strategy profiles (opportunistic/linear/apt/mixed), risk scoring, sophistication assessment, pattern detection, transition analysis, disruption modeling, ASCII timeline, JSON export, CLI. 56 tests. (2026-03-05)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -413,7 +415,7 @@
       "Backup Security Audit"
     ]
   },
-  "lastRepo": "gif-captcha",
-  "lastFeature": "A/B Experiment Runner",
+  "lastRepo": "ai",
+  "lastFeature": "Kill Chain Analyzer",
   "lastRun": "2026-03-05"
 }
