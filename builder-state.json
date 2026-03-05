@@ -1,5 +1,5 @@
 {
-  "totalRuns": 202,
+  "totalRuns": 204,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -187,7 +187,8 @@
       "Added Prompt Environment Manager with multi-env config (dev/staging/prod), variable overrides, promotion pipelines, rollback, comparison, deployment matrix, locking, JSON export, 51 tests (2026-03-04)",
       "Added PromptResponseEvaluator for automated quality assessment of prompt-response pairs (relevance, completeness, format, conciseness, safety) with consistency analysis and A/B comparison",
       "Added PromptTokenOptimizer -- prompt analysis and optimization engine with redundancy detection (Jaccard similarity), filler word removal (14 patterns), section cost analysis, formatting overhead detection, excessive context flagging, over-specification detection, optimization score (0-100), prompt comparison, budget checking with reserve ratio, smart splitting by sections/sentences. 69 tests (2026-03-04)",
-      "Added PromptRefactorer -- prompt linting and refactoring engine with 9 analysis categories (redundancy/specificity/structure/extract-variable/length/contradiction/persona/format/decomposition), auto-fix support, quality scoring (0-100) with letter grades, prompt comparison, batch analysis, configurable rules. 65 tests (2026-03-04)"
+      "Added PromptRefactorer -- prompt linting and refactoring engine with 9 analysis categories (redundancy/specificity/structure/extract-variable/length/contradiction/persona/format/decomposition), auto-fix support, quality scoring (0-100) with letter grades, prompt comparison, batch analysis, configurable rules. 65 tests (2026-03-04)",
+      "PromptMerger -- intelligent multi-prompt merging with section detection, 5 conflict strategies, deduplication, variable consolidation, similarity scoring. 49 tests (2026-03-04)"
     ],
     "everything": [
       "Added calendar view with month grid, event dots, and day-tap to filter events",
@@ -213,7 +214,8 @@
       "Reading List / Book Tracker -- Book model (14 genres, 4 statuses, ReadingSession), ReadingListService with CRUD, status lifecycle, session logging with pace/ETA, filtering (status/genre/author/tag/rating/search), sorting, reading streak tracking, genre/author stats, monthly summaries, annual reading challenge, smart recommendations (genre+author preference), comprehensive ReadingReport with text summary, JSON persistence. 55 tests (2026-03-04)",
       "Workout Tracker -- WorkoutEntry model (ExerciseSet/ExerciseEntry/WorkoutEntry, 13 MuscleGroup + 4 ExerciseType enums), WorkoutTrackerService with CRUD, date/muscle-group filtering, personal record detection, weekly summaries with grade, muscle balance analysis (neglected/overtrained/upper-lower/push-pull ratios), volume trends, weekly streak tracking, exercise frequency, smart tips engine, full WorkoutReport with text summary, configurable goals, JSON persistence. 1969 lines (326 model + 706 service + 937 test), 55 tests (2026-03-04)",
       "Decision Journal -- DecisionEntry model (10 categories, 5-level confidence/outcome, alternatives with rejection reasons, calibration detection, review scheduling). DecisionJournalService with CRUD, outcome recording, queries (pending/overdue/category/date range/search), analytics (JournalStats, CategoryStats, CalibrationReport with over/underconfidence detection, ReviewStreak, QualityScore composite 0-100, topCategories, allLessonsLearned), persistence. 72 tests. (2026-03-04)",
-      "Expense Tracker -- ExpenseEntry model (14 categories, 7 payment methods, tags, vendor, recurring flag), ExpenseTrackerService with CRUD, filtering (date/month/range/category/vendor/tag), BudgetConfig with monthly+category limits, daily summaries, monthly reports with budget grading (A-F), spending trends (4-week linear regression), vendor analysis, category percentages, smart insights, logging streaks, JSON persistence, text summary. 55 tests (2026-03-04)"
+      "Expense Tracker -- ExpenseEntry model (14 categories, 7 payment methods, tags, vendor, recurring flag), ExpenseTrackerService with CRUD, filtering (date/month/range/category/vendor/tag), BudgetConfig with monthly+category limits, daily summaries, monthly reports with budget grading (A-F), spending trends (4-week linear regression), vendor analysis, category percentages, smart insights, logging streaks, JSON persistence, text summary. 55 tests (2026-03-04)",
+      "Contact/People Tracker -- Contact model (9 relationship categories, 7 contact methods, 7 frequencies), Interaction logging with duration, ContactTrackerService with CRUD, archive, search (name/nickname/company/notes/tags), overdue follow-up detection with urgency scoring, birthday tracking with year wrap-around, interaction trend analysis, network health scoring (0-100, A-F), category breakdown, contact method distribution, full report generation, JSON persistence. 65 tests (2026-03-04)"
     ],
     "ai": [
       "Added escape attempt detection system with filesystem, network, process, and code injection monitors",
@@ -387,7 +389,7 @@
       "Finding Deduplication Service"
     ]
   },
-  "lastRepo": "WinSentinel",
-  "lastFeature": "Finding Deduplication Service",
+  "lastRepo": "everything",
+  "lastFeature": "Contact/People Tracker",
   "lastRun": "2026-03-04"
 }
