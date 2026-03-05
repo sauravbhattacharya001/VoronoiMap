@@ -1,5 +1,5 @@
 {
-  "totalRuns": 222,
+  "totalRuns": 223,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -383,7 +383,8 @@
       "Bytecode virtual machine -- stack-based VM with 30+ opcodes, expression compiler, disassembler, 8 native functions, execution tracing. 662 lines, 80+ tests (2026-03-04)",
       "Datalog query engine -- bottom-up evaluation, semi-naive optimization, stratified negation, builtins, aggregation, parser, magic sets, 75+ tests (2026-03-04)",
       "Earley parser for context-free grammars (earley.ml) -- chart-based Earley algorithm for ANY CFG (ambiguous, left-recursive). Predict/Scan/Complete, Aycock-Horspool nullable optimization, parse tree extraction, arithmetic eval, FIRST sets, ambiguity detection, grammar cleaning, string generation. 5 built-in grammars (arithmetic/parens/palindrome/dangling-else/JSON). 93 tests (2026-03-04)",
-      "Garbage Collector Simulator (gc_simulator.ml) -- 4 classic GC algorithms (mark-and-sweep, Cheney copying, reference counting with cycle detection, generational). Heap/RootSet abstractions, fragmentation analysis, ASCII heap viz, reference graph viz, benchmark suite with 3 scenarios. 81 tests (2026-03-05)"
+      "Garbage Collector Simulator (gc_simulator.ml) -- 4 classic GC algorithms (mark-and-sweep, Cheney copying, reference counting with cycle detection, generational). Heap/RootSet abstractions, fragmentation analysis, ASCII heap viz, reference graph viz, benchmark suite with 3 scenarios. 81 tests (2026-03-05)",
+      "CTL Model Checker (model_checker.ml) -- labeling-based CTL model checking (Clarke-Emerson-Sistla), full temporal operators, fixpoint algorithms, formula parser, witness generation, fairness, 2 example models. 809 lines, 75+ tests (2026-03-05)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -415,7 +416,12 @@
       "Backup Security Audit"
     ]
   },
-  "lastRepo": "ai",
-  "lastFeature": "Kill Chain Analyzer",
-  "lastRun": "2026-03-05"
+  "lastRepo": "GraphVisual",
+  "lastFeature": "CTL Model Checker",
+  "lastRun": "2026-03-05",
+  "features": {
+    "GraphVisual": [
+      "Structural Hole Analyzer"
+    ]
+  }
 }
