@@ -1,6 +1,5 @@
 # Status: Complete
 
-**Gardener #775:** GraphVisual — 32 GrowthRateAnalyzer tests
-**Gardener #776:** WinSentinel — Similarity percentage display fix + 2 tests
-**Issues:** WinSentinel #35, FeedReader #24
+Builder #247: FeedReader (Article Flashcard Generator)
+Gardener #805-806: Ocaml-sample-code (open_issue), ai (code_cleanup)
 

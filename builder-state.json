@@ -1,5 +1,5 @@
 {
-  "totalRuns": 231,
+  "totalRuns": 247,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -333,7 +333,8 @@
       "Reading Achievements System -- ReadingAchievementsManager with 41 unlockable badges across 8 categories (volume/streak/diversity/speed/exploration/dedication/social/mastery), 5 rarity tiers with points, secret achievements, ReadingActivitySnapshot-driven progress, nearest-to-unlock, comprehensive reports, JSON export/import, persistence, notifications. 55 tests (2026-03-04)",
       "Article Citation Generator -- 6 academic formats (APA/MLA/Chicago/IEEE/Harvard/BibTeX), smart author parsing, DOI support, quality scoring, batch generation, bibliography formatting, BibTeX file export, JSON persistence. 55 tests (2026-03-04)",
       "Feed Merge Manager -- virtual merged feeds combining multiple sources into unified streams. CRUD, 4 sort orders, cross-feed title deduplication, max article limit, search, stats, JSON export/import, text reports. 55 tests (2026-03-05)",
-      "Reading Time Budget -- daily/weekly minute budgets, session tracking, pace analysis, article fit recommendations, A-F grading, weekly reports with adherence scoring and streaks, JSON persistence. 55 tests (2026-03-05)"
+      "Reading Time Budget -- daily/weekly minute budgets, session tracking, pace analysis, article fit recommendations, A-F grading, weekly reports with adherence scoring and streaks, JSON persistence. 55 tests (2026-03-05)",
+      "Article Flashcard Generator -- auto-extraction (definitions/statistics/comparisons/processes/facts), SM-2 spaced repetition scheduling, deck management, custom cards, review sessions with difficulty ratings, mastery progression, streaks, review forecast, JSON persistence. 55 tests (2026-03-05)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
@@ -425,8 +426,8 @@
       "Backup Security Audit"
     ]
   },
-  "lastRepo": "ai",
-  "lastFeature": "Agent Threat Intelligence Feed",
+  "lastRepo": "FeedReader",
+  "lastFeature": "Article Flashcard Generator",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
