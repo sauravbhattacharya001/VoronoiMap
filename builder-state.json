@@ -1,5 +1,5 @@
 {
-  "totalRuns": 226,
+  "totalRuns": 227,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -251,7 +251,8 @@
       "Agent Privilege Escalation Detector -- 5-vector scope creep detection (filesystem/network/process/API/data), 16 detection rules, 4 agent strategies, stealth inference, risk scoring, chain detection, containment scoring, escalation velocity tracking, configurable permissions, CLI. 80 tests (2026-03-04)",
       "Emergent Behavior Detector -- 8 emergent pattern types (synchronization/flocking/hierarchy/collective monopoly/information cascade/oscillation/deadlock/phase transition), configurable thresholds, Jaccard similarity, Jensen-Shannon divergence, risk scoring (0-100), severity levels, filtering, text reports. 53 tests (2026-03-04)",
       "Agent Behavioral Fingerprinting -- multi-dimensional behavioral signatures (action entropy, timing profiles, resource usage, communication patterns, tool distribution, error rates), pairwise Jensen-Shannon + cosine similarity comparison, fleet-wide clone detection (union-find clustering), behavioral drift detection (sliding window), anomaly flagging, deterministic SHA-256 signature hashing, risk scoring (0-100, A-F), ASCII reports + JSON export, CLI demo. 690 lines, 65 tests (2026-03-04)",
-      "Kill Chain Analyzer -- MITRE ATT&CK-inspired 7-stage kill chain analysis for AI agents. 34 action catalog, 4 strategy profiles (opportunistic/linear/apt/mixed), risk scoring, sophistication assessment, pattern detection, transition analysis, disruption modeling, ASCII timeline, JSON export, CLI. 56 tests. (2026-03-05)"
+      "Kill Chain Analyzer -- MITRE ATT&CK-inspired 7-stage kill chain analysis for AI agents. 34 action catalog, 4 strategy profiles (opportunistic/linear/apt/mixed), risk scoring, sophistication assessment, pattern detection, transition analysis, disruption modeling, ASCII timeline, JSON export, CLI. 56 tests. (2026-03-05)",
+      "Agent Output Steganography Detector -- 7-vector analysis (zero-width chars, invisible Unicode, acrostic patterns, homoglyph substitution, capitalization encoding, punctuation anomalies, sentence length encoding), configurable SteganographyDetector, composite risk scoring (0-100, A-F grades), text comparison for diff-based detection, batch analysis, encoding utilities for testing (zero-width + homoglyph). 63 tests (2026-03-05)"
     ],
     "Vidly": [
       "Added advanced search with multi-criteria filtering, sorting, and pagination for the video catalog",
@@ -356,7 +357,8 @@
       "Multi-Nozzle Coordination Planner -- multi-material print planning with 5 nozzle profiles, 6 material presets, layer-by-layer scheduling, purge/prime sequences, temperature transitions, collision detection, material compatibility analysis, print time estimation, plan optimization with ping-pong detection, text reports. 69 tests (2026-03-04)",
       "Bioink Shelf Life Tracker -- shelfLife.js (560 lines). Q10 temp degradation model with humidity/light/container/freeze-thaw factors. 10 bioink materials across 4 categories. Batch registration, usage tracking, FEFO inventory, expiration alerts, storage recommendations, degradation curves. 52 tests. (2026-03-04)",
       "Print Risk Assessor -- pre-print 8-dimension risk evaluation (nozzle clogging/cell viability/structural collapse/layer adhesion/over-crosslinking/dehydration/contamination/pressure damage), weighted composite scoring, GO/CAUTION/NO-GO recommendations, shear stress estimation, batch assessment, configuration comparison, improvement suggestions, historical analysis, text reports. 65 tests. (2026-03-04)",
-      "Bioink Formulation Calculator -- multi-component recipe builder with C1V1=C2V2 dilution, serial dilution, cell suspension, 8 base materials, 8 additives, 6 recipe templates, tissue recommendations, cost estimation, blend viscosity, mixing order, JSON persistence. 62 tests (2026-03-04)"
+      "Bioink Formulation Calculator -- multi-component recipe builder with C1V1=C2V2 dilution, serial dilution, cell suspension, 8 base materials, 8 additives, 6 recipe templates, tissue recommendations, cost estimation, blend viscosity, mixing order, JSON persistence. 62 tests (2026-03-04)",
+      "Bioprint Cost Estimator -- 5-category print job costing (materials/machine time/energy/consumables/labor), 12 bioinks + 4 crosslinkers + 3 media, 5 machine profiles, auto-detect consumables + labor from params, batch costing, config comparison, scale projection, custom pricing. 45 tests. (2026-03-05)"
     ],
     "Ocaml-sample-code": [
       "Added interactive OCaml tutorial runner with step-by-step examples, challenges, and progress tracking",
@@ -386,7 +388,8 @@
       "Datalog query engine -- bottom-up evaluation, semi-naive optimization, stratified negation, builtins, aggregation, parser, magic sets, 75+ tests (2026-03-04)",
       "Earley parser for context-free grammars (earley.ml) -- chart-based Earley algorithm for ANY CFG (ambiguous, left-recursive). Predict/Scan/Complete, Aycock-Horspool nullable optimization, parse tree extraction, arithmetic eval, FIRST sets, ambiguity detection, grammar cleaning, string generation. 5 built-in grammars (arithmetic/parens/palindrome/dangling-else/JSON). 93 tests (2026-03-04)",
       "Garbage Collector Simulator (gc_simulator.ml) -- 4 classic GC algorithms (mark-and-sweep, Cheney copying, reference counting with cycle detection, generational). Heap/RootSet abstractions, fragmentation analysis, ASCII heap viz, reference graph viz, benchmark suite with 3 scenarios. 81 tests (2026-03-05)",
-      "CTL Model Checker (model_checker.ml) -- labeling-based CTL model checking (Clarke-Emerson-Sistla), full temporal operators, fixpoint algorithms, formula parser, witness generation, fairness, 2 example models. 809 lines, 75+ tests (2026-03-05)"
+      "CTL Model Checker (model_checker.ml) -- labeling-based CTL model checking (Clarke-Emerson-Sistla), full temporal operators, fixpoint algorithms, formula parser, witness generation, fairness, 2 example models. 809 lines, 75+ tests (2026-03-05)",
+      "Finite Automata Toolkit (automata.ml) -- DFA/NFA types, subset construction, Hopcroft minimization, product construction (intersection/union/difference/symmetric difference), complement, language equivalence/inclusion, NFA concat/union/star/reverse, string generation, DOT export, statistics. 1030 lines, 65+ tests (2026-03-05)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -418,8 +421,8 @@
       "Backup Security Audit"
     ]
   },
-  "lastRepo": "gif-captcha",
-  "lastFeature": "Reading Time Budget",
+  "lastRepo": "Ocaml-sample-code",
+  "lastFeature": "Finite Automata Toolkit",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [

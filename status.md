@@ -1,5 +1,6 @@
 # Status: Complete
 
-**Gardener #761-762:** GraphVisual -- add_tests (69 tests) + doc_update (9 algo entries) + open_issue (#36)
+**Builder #227:** BioBots -- Bioprint Cost Estimator
+**Gardener #761-762:** GraphVisual -- 69 tests + 9 algo docs + issue #36
 **Builder #226:** VoronoiMap -- Voronoi Temporal Dynamics
 
