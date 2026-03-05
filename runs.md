@@ -1,3 +1,31 @@
+## Gardener Run 773-774 -- 2026-03-05 07:35 AM PST
+
+### Gardener #773 -- prompt (C#)
+- **Bug fix:** RecordCompletion no longer corrupts unrelated concurrent requests when timestamp lookup fails (record pruned after 60s window)
+- **Build fix:** PromptSection class name collision (PromptRefactorer internal vs PromptTokenOptimizer public) — renamed to RefactorerSection
+- 2 new regression tests, 2347 total pass
+
+### Gardener #774 -- BioBots (Node.js)
+- **Bug fix:** Cartridge auto-detection used total volume across all bioinks instead of max single bioink volume — each bioink gets its own cartridge
+- Added 30mL cartridge threshold
+- 4 new regression tests, 2421 total pass
+- **Issue:** FeedReader #24 — aggregateStats efficiency mixes history window with lifetime counts
+
+## Gardener Run 771-772 -- 2026-03-05 07:30 AM PST
+
+### GraphVisual — fix_issue #37: Graph Similarity Analyzer
+- **Feature:** GraphSimilarityAnalyzer — entropy-based graph comparison
+  - Jensen-Shannon Divergence between degree distributions (bounded [0,1])
+  - Von Neumann Divergence comparing normalised Laplacian spectra
+  - Entropy Profile Distance (L2 between normalised entropy vectors)
+  - Combined similarity score, comprehensive text report
+  - 9 tests covering identity, symmetry, bounds, edge cases
+- Closes #37
+
+### prompt — bug_fix: RecordCompletion concurrency bug
+- **Bug:** Under concurrent requests, RecordCompletion always replaced the *last* token record — wrong request's estimate got swapped
+- **Fix:** Added acquireTimestamp parameter for precise record lookup; RateLimitResult now exposes AcquireTimestamp; backward compatible fallback
+
 ## Builder Run 230 -- 2026-03-05 06:48 AM PST
 
 ### GraphVisual — Graph Entropy Analyzer
@@ -7092,6 +7120,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
