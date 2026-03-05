@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-05T06:30:00.000Z",
-  "totalRuns": 748,
+  "lastUpdated": "2026-03-05T08:00:00.000Z",
+  "totalRuns": 749,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 22,
@@ -22,8 +22,8 @@
     },
     "perf_improvement": {
       "weight": 22,
-      "runs": 59,
-      "successes": 59,
+      "runs": 60,
+      "successes": 60,
       "totalDone": 1,
       "attempts": 2
     },
@@ -64,16 +64,16 @@
     },
     "open_issue": {
       "weight": 22,
-      "runs": 75,
-      "successes": 78,
+      "runs": 76,
+      "successes": 79,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
     },
     "fix_issue": {
       "weight": 22,
-      "runs": 108,
-      "successes": 107,
+      "runs": 110,
+      "successes": 109,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,11 +685,11 @@
       "docs_site"
     ]
   },
-  "notes": "Run 747-748. agenticchat: code_cleanup (175 var->const/let, CSS dedup), open_issue #33 (unguarded localStorage crashes app in private browsing).",
-  "lastRepo": "agenticchat",
-  "lastRun": "2026-03-04",
+  "notes": "Run 749. everything: perf (EventSearchService filter/sort optimization), open_issue #37 (routine streak ignores schedule).",
+  "lastRepo": "everything",
+  "lastRun": "2026-03-05",
   "runCount": 37,
-  "lastWeightAdjustment": 730,
+  "lastWeightAdjustment": 750,
   "adjustmentHistory": [
     {
       "run": 650,
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "code_cleanup",
+    "perf_improvement",
     "open_issue"
   ]
 }

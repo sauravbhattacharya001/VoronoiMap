@@ -1,3 +1,10 @@
+## Gardener Run 749 -- 2026-03-05 12:05 AM PST
+- **Repo:** everything
+- **Task 1 (perf_improvement):** Optimized EventSearchService hot paths — extracted _PreparedFilters to pre-lowercase tag names once per search call (was per-event), eliminated duplicate tag set construction, cached whitespace regex, Schwartzian transform for titleAscending sort. 41 tests pass. Commit `9b6ca93`.
+- **Task 2 (open_issue):** Filed #37 — routine streak calculation uses absolute day diff (`<= 1`), breaks streaks for non-daily routines (M/W/F workout gets streak=1 despite perfect compliance). Suggested schedule-aware gap calculation.
+## Gardener Run 749-750 -- 2026-03-05 12:00 AM PST
+- **Task 1 (fix_issue):** agenticchat #33 — Added `SafeStorage` wrapper module that detects localStorage availability at startup, wraps all 57 direct `localStorage` calls with try-catch fallbacks. Prevents crashes in private browsing / restricted storage. Commit `fbf4f66`.
+- **Task 2 (fix_issue):** ai — Fixed `>=` vs `>` bug in `ConsensusProtocol.tally()`: approval at exactly the threshold (e.g., 2/3 supermajority with exactly 2 of 3 votes) was incorrectly rejected. Also closed stale VoronoiMap #44 (test coverage already at 1457 tests). Commit `c96227f`.
 ## Gardener Run 747-748 -- 2026-03-04 11:05 PM PST
 - **Repo:** agenticchat
 - **Task 1 (code_cleanup):** Modernized 175 `var` declarations to `const` (58) / `let` (117). Merged duplicate `#blackbox` CSS rule. 909/909 tests pass. Commit `0e9fb90`.
@@ -6784,6 +6791,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
