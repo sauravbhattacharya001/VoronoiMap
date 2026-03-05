@@ -82,6 +82,31 @@ def _median(values: list) -> float:
     return (s[n // 2 - 1] + s[n // 2]) / 2.0
 
 
+def _polygon_area_shoelace(vertices: List[Tuple[float, float]]) -> float:
+    """Compute polygon area using the shoelace formula (unsigned).
+
+    Parameters
+    ----------
+    vertices : list of (x, y)
+        Polygon vertices in order (clockwise or counter-clockwise).
+        The polygon is implicitly closed.
+
+    Returns
+    -------
+    float
+        Unsigned area of the polygon.
+    """
+    n = len(vertices)
+    if n < 3:
+        return 0.0
+    area = 0.0
+    for i in range(n):
+        j = (i + 1) % n
+        area += vertices[i][0] * vertices[j][1]
+        area -= vertices[j][0] * vertices[i][1]
+    return abs(area) / 2.0
+
+
 def _validate_points(points: list) -> List[Tuple[float, float]]:
     """Validate and normalize a list of (x, y) points.
 
@@ -309,6 +334,7 @@ class ClarkEvansResult:
 def clark_evans(
     points: list,
     area: Optional[float] = None,
+    boundary: Optional[List[Tuple[float, float]]] = None,
 ) -> ClarkEvansResult:
     """Compute the Clark–Evans nearest-neighbor index.
 
@@ -320,8 +346,11 @@ def clark_evans(
     points : list of (x, y)
         2D point coordinates.
     area : float or None
-        Study area in square units.  If None, estimated from the
-        bounding box of the points (with 5% padding).
+        Study area in square units.  If ``boundary`` is provided,
+        area is computed from it.  If neither is given, estimated
+        from the bounding box with 5% padding.
+    boundary : list of (x, y) or None
+        Polygon vertices defining the study region for precise area.
 
     Returns
     -------
@@ -342,16 +371,24 @@ def clark_evans(
 
     mean_nn = _mean(nn1)
 
-    # Estimate area from bounding box if not provided
+    # Estimate area: boundary polygon > explicit area > bounding box
     if area is None:
-        xs = [p[0] for p in pts]
-        ys = [p[1] for p in pts]
-        w = max(xs) - min(xs)
-        h = max(ys) - min(ys)
-        # 5% padding on each side
-        w = max(w * 1.1, 1e-10)
-        h = max(h * 1.1, 1e-10)
-        area = w * h
+        if boundary is not None:
+            area = _polygon_area_shoelace(boundary)
+            if area <= 0:
+                raise ValueError(
+                    "boundary polygon has zero or negative area; "
+                    "check vertex order/coordinates"
+                )
+        else:
+            xs = [p[0] for p in pts]
+            ys = [p[1] for p in pts]
+            w = max(xs) - min(xs)
+            h = max(ys) - min(ys)
+            # 5% padding on each side
+            w = max(w * 1.1, 1e-10)
+            h = max(h * 1.1, 1e-10)
+            area = w * h
 
     if area <= 0:
         raise ValueError(f"Study area must be positive, got {area}")
@@ -446,6 +483,7 @@ def g_function(
     points: list,
     steps: int = 50,
     area: Optional[float] = None,
+    boundary: Optional[List[Tuple[float, float]]] = None,
 ) -> GFunctionResult:
     """Compute the empirical G-function (NN cumulative distribution).
 
@@ -462,8 +500,15 @@ def g_function(
     steps : int
         Number of distance bins (default 50).
     area : float or None
-        Study area for the theoretical CSR curve.  Estimated from
-        bounding box if not provided.
+        Study area for the theoretical CSR curve.  If ``boundary`` is
+        provided, area is computed from it via the shoelace formula.
+        If neither is given, area is estimated from the bounding box
+        with 5% padding.
+    boundary : list of (x, y) or None
+        Polygon vertices defining the study region boundary.  When
+        provided, enables precise intensity (λ) estimation instead of
+        the padded bounding-box approximation, which can overestimate
+        the area for irregular point patterns.
 
     Returns
     -------
@@ -496,13 +541,21 @@ def g_function(
         "max": nn1_sorted[-1] if nn1_sorted else 0.0,
     }
 
-    # Estimate area if not provided
+    # Estimate area: boundary polygon > explicit area > bounding box
     if area is None:
-        xs = [p[0] for p in pts]
-        ys = [p[1] for p in pts]
-        w = max(max(xs) - min(xs), 1e-10) * 1.1
-        h = max(max(ys) - min(ys), 1e-10) * 1.1
-        area = w * h
+        if boundary is not None:
+            area = _polygon_area_shoelace(boundary)
+            if area <= 0:
+                raise ValueError(
+                    "boundary polygon has zero or negative area; "
+                    "check vertex order/coordinates"
+                )
+        else:
+            xs = [p[0] for p in pts]
+            ys = [p[1] for p in pts]
+            w = max(max(xs) - min(xs), 1e-10) * 1.1
+            h = max(max(ys) - min(ys), 1e-10) * 1.1
+            area = w * h
 
     density = n / area if area > 0 else 0.0
 

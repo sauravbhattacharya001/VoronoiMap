@@ -633,3 +633,52 @@ class TestPathValidation:
             assert os.path.exists(written)
         finally:
             os.unlink(path)
+
+
+class TestBoundaryParameter:
+    """Tests for the boundary polygon parameter in g_function and clark_evans."""
+
+    POINTS = [(1, 1), (2, 3), (4, 2), (5, 5), (3, 4)]
+    # A square boundary enclosing all points
+    BOUNDARY = [(0, 0), (6, 0), (6, 6), (0, 6)]
+
+    def test_g_function_with_boundary(self):
+        """boundary parameter should compute area via shoelace (6*6=36)."""
+        result = g_function(self.POINTS, steps=10, boundary=self.BOUNDARY)
+        assert len(result.steps) == 11
+        assert len(result.theoretical) == 11
+        # With boundary area=36, density=5/36 ≈ 0.1389
+        # Verify theoretical uses correct density
+        d = result.steps[5]["d"]
+        expected_g = 1.0 - math.exp(-(5.0 / 36.0) * math.pi * d * d)
+        assert abs(result.theoretical[5]["G"] - expected_g) < 1e-10
+
+    def test_g_function_boundary_vs_explicit_area(self):
+        """boundary-computed area should match explicit area=36."""
+        r_boundary = g_function(self.POINTS, steps=10, boundary=self.BOUNDARY)
+        r_explicit = g_function(self.POINTS, steps=10, area=36.0)
+        for b, e in zip(r_boundary.theoretical, r_explicit.theoretical):
+            assert abs(b["G"] - e["G"]) < 1e-10
+
+    def test_clark_evans_with_boundary(self):
+        """clark_evans should accept boundary parameter."""
+        result = clark_evans(self.POINTS, boundary=self.BOUNDARY)
+        assert result.n == 5
+        assert abs(result.density - 5.0 / 36.0) < 1e-10
+
+    def test_boundary_triangle(self):
+        """Non-rectangular boundary should compute correct area."""
+        triangle = [(0, 0), (10, 0), (5, 10)]
+        # Area = 0.5 * 10 * 10 = 50
+        pts = [(3, 2), (5, 4), (4, 3)]
+        result = g_function(pts, steps=5, boundary=triangle)
+        density = 3.0 / 50.0
+        d = result.steps[3]["d"]
+        expected_g = 1.0 - math.exp(-density * math.pi * d * d)
+        assert abs(result.theoretical[3]["G"] - expected_g) < 1e-10
+
+    def test_invalid_boundary_raises(self):
+        """Degenerate boundary (line) should raise ValueError."""
+        line = [(0, 0), (1, 1)]
+        with pytest.raises(ValueError, match="zero or negative area"):
+            g_function(self.POINTS, boundary=line)
