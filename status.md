@@ -1,6 +1,5 @@
 # Status: Complete
 
+Gardener #823-824: VoronoiMap (add_tests, code_cleanup, open_issue)
 Builder #254: agentlens -- Incident Postmortem Generator
-Gardener #819-820: sauravcode (open_issue), ai (security_fix)
-Builder #253: getagentbox -- Interactive Onboarding Wizard
 

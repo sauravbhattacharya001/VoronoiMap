@@ -1,3 +1,23 @@
+## Gardener Run 823-824 -- 2026-03-05 6:35 PM PST
+
+### VoronoiMap -- add_tests + code_cleanup + open_issue
+- **test (f7eb7a6):** Comprehensive KML export tests (5 -> 44 tests) -- basic export, folder structure, region placemarks, seed placemarks, styles, color schemes, custom naming, error handling, edge cases
+- **cleanup (e72ccc9):** Remove 138 lines of dead code from vormap_power.py -- _clip_to_bounds, _line_intersect, _weighted_bisector_line (never called anywhere)
+- **issue #50:** vormap_graph circular import with vormap_viz breaks direct import -- module-level imports labeled 'late-style' are not actually late
+
+## Gardener Run 821-822 -- 2026-03-05 6:30 PM PST
+
+### sauravcode -- fix_issue (#33)
+- Added `pop` keyword handler to interpreter, fixing feature parity gap with compiler
+- Implemented PopNode class, parse_pop(), statement dispatch (_interp_pop), and expression dispatch (_eval_pop)
+- `pop` works as statement (`pop mylist`) and expression (`x = pop mylist`), with empty-list error handling
+- PR #34: https://github.com/sauravbhattacharya001/sauravcode/pull/34 (closes #33)
+
+### WinSentinel -- open_issue
+- Found unused `_connectionBursts` ConcurrentDictionary and `ConnectionBurst` class in NetworkMonitorModule
+- Allocated but never read/written — dead code with misleading intent
+- Issue #38: https://github.com/sauravbhattacharya001/WinSentinel/issues/38
+
 ## Builder Run 254 -- 2026-03-05 7:00 PM PST
 
 ### agentlens -- Incident Postmortem Generator
@@ -7460,6 +7480,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
