@@ -1,5 +1,5 @@
 {
-  "totalRuns": 272,
+  "totalRuns": 273,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -157,7 +157,8 @@
       "Conversation Timeline -- visual minimap sidebar for conversation navigation. Proportional colored segments (blue user/green assistant), code/bookmark/pin markers, click-to-scroll, hover preview tooltips, viewport indicator, MutationObserver auto-refresh, ARIA accessible. 32 tests (2026-03-04)",
       "Message Annotations",
       "Word Cloud -- interactive topic visualization with frequency-based word sizing, stop word filtering, role filtering (all/user/assistant), configurable minCount/maxWords, JSON/CSV export, Alt+W shortcut. 36 tests (2026-03-05)",
-      "ConversationTags -- colored label tags for sessions. Add/remove/rename/delete tags (up to 5 per session, 30 char max, 12 deterministic colors). Tag pills on session cards (click=filter, right-click=remove, inline input). Filter session list by tag. Tag manager modal (view counts, rename, delete, filter). /tags slash command. Integrated with SessionManager card rendering, refresh, and session delete cleanup. localStorage persistence. 44 tests. Commit f49ba52 (2026-03-05)"
+      "ConversationTags -- colored label tags for sessions. Add/remove/rename/delete tags (up to 5 per session, 30 char max, 12 deterministic colors). Tag pills on session cards (click=filter, right-click=remove, inline input). Filter session list by tag. Tag manager modal (view counts, rename, delete, filter). /tags slash command. Integrated with SessionManager card rendering, refresh, and session delete cleanup. localStorage persistence. 44 tests. Commit f49ba52 (2026-03-05)",
+      "FormattingToolbar -- markdown formatting buttons (bold/italic/code/codeblock/link/heading/bullet/numbered/strike/quote) above chat input. Wraps selection or inserts placeholder. Ctrl+E for code, Ctrl+Shift+M toggle. localStorage persistence. 49 tests. (2026-03-06)"
     ],
     "gif-captcha": [
       "Added difficulty levels (easy/medium/hard) with configurable distortion, speed, and noise parameters",
@@ -458,8 +459,8 @@
       "Project Search & Category Filter -- text search (debounced, matches title/desc/repo/tags) + category filter pills (AI & Agents, Security, etc.) with AND combination. No-results message. 18 new tests (87 total). Commit 38d8e42 (2026-03-06)"
     ]
   },
-  "lastRepo": "GraphVisual",
-  "lastFeature": "Tournament Analyzer",
+  "lastRepo": "agenticchat",
+  "lastFeature": "Formatting Toolbar",
   "lastRun": "2026-03-06",
   "features": {
     "GraphVisual": [
