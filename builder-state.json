@@ -1,5 +1,5 @@
 {
-  "totalRuns": 271,
+  "totalRuns": 272,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -328,7 +328,8 @@
       "MaxCut Analyzer -- greedy/local-search/random-restart/exact partition optimization for NP-hard maximum cut. 5 algorithms, weighted/unweighted, Edwards bound, vertex contributions, balanced cuts, algorithm comparison, text reports. 55 tests (2026-03-04)",
       "Vertex Connectivity Analyzer -- vertex/edge connectivity (Edmonds-Karp max-flow), minimum vertex/edge cuts, pairwise connectivity, vertex/edge-disjoint paths (Menger's theorem), k-connectivity testing, Whitney's inequality, all min cuts enumeration, vertex criticality, text reports. 55 tests (2026-03-05)",
       "Line Graph Analyzer -- constructs L(G), Vizing edge coloring bounds, Whitney theorem, iterated line graphs, matching via independent set, vertex edge-cliques. 60 tests (2026-03-05)",
-      "Metric Dimension Analyzer -- minimum resolving sets for vertex identification. Exact branch-and-bound (BitSet pruning, <=30 vertices), greedy heuristic, BFS distance matrix, twin detection, metric representation, vertex identification, resolving power ranking, pigeonhole+twin lower bounds, diameter upper bound. Verified: paths beta=1, cycles beta=2, Kn beta=n-1, stars beta=n-1, Petersen beta=3. 49 tests. Commit 660ea9e (2026-03-05)"
+      "Metric Dimension Analyzer -- minimum resolving sets for vertex identification. Exact branch-and-bound (BitSet pruning, <=30 vertices), greedy heuristic, BFS distance matrix, twin detection, metric representation, vertex identification, resolving power ranking, pigeonhole+twin lower bounds, diameter upper bound. Verified: paths beta=1, cycles beta=2, Kn beta=n-1, stars beta=n-1, Petersen beta=3. 49 tests. Commit 660ea9e (2026-03-05)",
+      "Tournament Analyzer -- directed complete graph analysis for round-robin competitions. Score sequence (Landau criterion), Copeland ranking, Condorcet winner/loser, king vertices (Maurer), Hamiltonian path (Redei O(n^2) insertion), transitivity analysis, 2-step dominance matrix/scores, Kosaraju SCC, upset detection, Slater ranking (exact for n<=10, greedy local-swap), comprehensive report. 76 tests. 2554 total (2026-03-06)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",
@@ -457,8 +458,8 @@
       "Project Search & Category Filter -- text search (debounced, matches title/desc/repo/tags) + category filter pills (AI & Agents, Security, etc.) with AND combination. No-results message. 18 new tests (87 total). Commit 38d8e42 (2026-03-06)"
     ]
   },
-  "lastRepo": "VoronoiMap",
-  "lastFeature": "Voronoi Path Planner",
+  "lastRepo": "GraphVisual",
+  "lastFeature": "Tournament Analyzer",
   "lastRun": "2026-03-06",
   "features": {
     "GraphVisual": [
