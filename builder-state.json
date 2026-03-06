@@ -1,5 +1,5 @@
 {
-  "totalRuns": 261,
+  "totalRuns": 262,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -26,7 +26,8 @@
       "Added live agent activity feed with simulated real-time actions. 20 activity types, Fisher-Yates shuffle, IntersectionObserver visibility, slide-in/out animations, live counters, pulse indicator, light/dark mode, reduced motion support, ARIA log region. 30 Jest tests. (2026-03-04)",
       "Interactive Prompt Gallery",
       "Expanded Comparison Table -- replaced 3-column/8-feature table with 5-competitor/16-feature dynamic table (ChatGPT, Google Assistant, Alexa, Siri). Responsive scroll, hover highlights, light/dark theme. Commit b24f320 (2026-03-05)",
-      "Interactive Onboarding Wizard -- floating 3-step guided setup: role selection (dev/student/pro/casual), goal picker (role-specific, pick 2), personalized recommendation with tailored features, pro tips, plan suggestion, and Telegram CTA. localStorage persistence, dark mode, mobile responsive, keyboard accessible, reduced motion. Commit 79a2eb9 (2026-03-05)"
+      "Interactive Onboarding Wizard -- floating 3-step guided setup: role selection (dev/student/pro/casual), goal picker (role-specific, pick 2), personalized recommendation with tailored features, pro tips, plan suggestion, and Telegram CTA. localStorage persistence, dark mode, mobile responsive, keyboard accessible, reduced motion. Commit 79a2eb9 (2026-03-05)",
+      "Interactive Feature Tour \u2014 guided walkthrough overlay with spotlight. 8 stops (Chat Demo, Testimonials, Pricing, Use Cases, Integrations, Playground, Prompt Gallery, Trust). Prev/Next/Skip controls, progress dots, keyboard nav (Arrow keys, Escape), localStorage persistence, reduced-motion support, graceful skip of missing sections. 36 tests. Commit c322f71 (2026-03-05)"
     ],
     "agentlens": [
       "Added CLI entry point with rich terminal dashboard for trace inspection",
@@ -445,8 +446,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "FeedReader",
-  "lastFeature": "ArticleClipboard",
+  "lastRepo": "getagentbox",
+  "lastFeature": "FeatureTour",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [

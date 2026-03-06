@@ -1,6 +1,6 @@
 # Status: In Progress
 
-## Builder Run #261
-- Repo: FeedReader (Swift/iOS)
-- Feature: ArticleClipboard — cross-article snippet collector for research
+## Builder Run #262
+- Repo: getagentbox (JavaScript landing page)
+- Feature: Interactive Feature Tour — guided walkthrough overlay
 - Status: implementing
