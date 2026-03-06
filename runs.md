@@ -1,3 +1,23 @@
+### Gardener #867 -- VoronoiMap: refactor
+- O(1) KDTree reverse lookup in get_NN via _tree_by_data_id dict (was O(n) scan per call)
+- Extracted _between(a,b,v) helper — replaced 8 duplicated range-check patterns in isect()
+- Cleaned up isect_B: direct returns, extend(), inline comments for boundary edges
+- 1789 tests pass. Commit `9bc13a7`.
+
+### Gardener #868 -- prompt: doc_update
+- New docs/articles/testing.md — Testing & Quality Assurance guide (436 lines)
+- Covers 5 undocumented classes: PromptDebugger, PromptTestSuite, PromptResponseEvaluator, PromptGrammarValidator, PromptFuzzer
+- Added 4 classes to README Full Class Library table
+- Updated toc.yml. Commit `2feed5d`.
+### Builder #284 -- FeedReader: Reading Mood Tracker
+- 5-level mood scale (terrible→great) with emoji
+- Log mood before/after reading sessions, tied to feeds and categories
+- Mood shift analysis: identify which feeds are "mood boosters" vs "mood drainers"
+- Mood-based feed suggestions (low mood → recommend boosters)
+- Time-of-day and day-of-week mood patterns
+- Mood streaks, summary reports, CSV/JSON export
+- Singleton pattern with JSON persistence
+
 ### Builder #283 -- Vidly: Parental Controls / Content Rating Service
 - ContentRating enum (G/PG/PG-13/R/NC-17/Unrated) + ContentAdvisory flags (8 types)
 - Per-movie content profiles with rating, advisories, custom notes
@@ -7975,6 +7995,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
