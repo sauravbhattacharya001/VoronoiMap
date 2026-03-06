@@ -1,3 +1,25 @@
+## Builder Run 252 -- 2026-03-05 6:00 PM PST
+
+### gif-captcha -- Trust Score Engine
+- Added createTrustScoreEngine for unified client trust scoring
+- Aggregates signals from multiple providers (reputation, bot detection, fingerprint, rate limiting, etc.) into a single 0.0-1.0 trust score
+- Pluggable providers, confidence-weighted aggregation, manual overrides
+- 4-action classification: block/challenge/softChallenge/pass
+- Configurable thresholds and signal weights (hot-swappable)
+- Per-client caching with TTL, historical score blending with decay factor
+- Score trend analysis with linear regression (improving/stable/declining)
+- Batch evaluation, client comparison, low-score monitoring
+- LRU eviction, export/import state, aggregate statistics
+- 54 tests, all passing
+- Commit c03c341
+
+## Builder Run 252 -- 2026-03-05 5:15 PM PST
+- **Repo:** agenticchat
+- **Feature:** Word Cloud — interactive conversation topic visualization
+- **PR:** https://github.com/sauravbhattacharya001/agenticchat/pull/35
+- **Tests:** 36 new, 1126 total (all pass)
+- **Details:** WordCloud IIFE module with frequency-based word sizing, stop word/code/URL filtering, role filtering (all/user/assistant), configurable minCount/maxWords, modal panel with refresh/JSON/CSV export, Alt+W shortcut, accessible (role=dialog, aria-label)
+
 ## Gardener Run 813-814 -- 2026-03-05 5:40 PM PST
 
 ### Gardener #813 -- sauravcode
@@ -7327,6 +7349,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

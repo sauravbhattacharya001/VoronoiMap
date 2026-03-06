@@ -1,5 +1,5 @@
 {
-  "totalRuns": 251,
+  "totalRuns": 252,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -148,7 +148,8 @@
       "ReadAloud -- text-to-speech for messages with Web Speech Synthesis API, voice/speed/pitch controls, floating control bar (2026-03-03)",
       "Message Diff Viewer -- LCS-based line-level diff between any two messages. GitHub-style rendering with additions/deletions/unchanged, dual line numbers, stats bar. Two-click workflow with adaptive buttons. 34 tests (2026-03-04)",
       "Conversation Timeline -- visual minimap sidebar for conversation navigation. Proportional colored segments (blue user/green assistant), code/bookmark/pin markers, click-to-scroll, hover preview tooltips, viewport indicator, MutationObserver auto-refresh, ARIA accessible. 32 tests (2026-03-04)",
-      "Message Annotations"
+      "Message Annotations",
+      "Word Cloud -- interactive topic visualization with frequency-based word sizing, stop word filtering, role filtering (all/user/assistant), configurable minCount/maxWords, JSON/CSV export, Alt+W shortcut. 36 tests (2026-03-05)"
     ],
     "gif-captcha": [
       "Added difficulty levels (easy/medium/hard) with configurable distortion, speed, and noise parameters",
@@ -172,7 +173,8 @@
       "Audit Trail -- createAuditTrail (265 lines). Structured CAPTCHA lifecycle event logging with ring buffer (10k capacity), 20 event types, flexible querying (type/prefix/client/session/time range), O(1) getById, countByType, timeline bucketing, export/import, onEvent callback. 42 tests. (2026-03-04)",
       "Session Recorder -- createSessionRecorder. Full interaction recording with session lifecycle, 16 event types, input capture toggle, tag system, query engine, step-by-step replay, session comparison, aggregate analytics, merged timeline, LRU eviction, export/import. 54 tests. (2026-03-04)",
       "CAPTCHA Load Tester (createLoadTester) -- stress-test simulation with concurrent virtual users. Integrates PoolManager, RateLimiter, TokenVerifier, BotDetector, ResponseAnalyzer under load. Human/bot profiles, per-user + aggregate metrics, percentile latencies, challenge distribution, early stop. 50 tests (2026-03-04)",
-      "A/B Experiment Runner (createABExperimentRunner) -- full experiment lifecycle: create experiments with control+variants, deterministic user assignment (djb2), event tracking (solve/fail/abandon), chi-squared + z-test statistical analysis, early stopping, winner detection, lift calculation, export/import, text reports. 53 tests (2026-03-05)"
+      "A/B Experiment Runner (createABExperimentRunner) -- full experiment lifecycle: create experiments with control+variants, deterministic user assignment (djb2), event tracking (solve/fail/abandon), chi-squared + z-test statistical analysis, early stopping, winner detection, lift calculation, export/import, text reports. 53 tests (2026-03-05)",
+      "Trust Score Engine (createTrustScoreEngine) -- unified client trust scoring aggregating multiple signal providers into 0.0-1.0 score. Pluggable providers, confidence-weighted aggregation, 4-action classification, configurable thresholds/weights, per-client caching with TTL, historical score blending, trend analysis (linear regression), batch evaluation, client comparison, low-score monitoring, LRU eviction, export/import. 54 tests. Commit c03c341 (2026-03-05)"
     ],
     "prompt": [
       "Added CLI tool for managing and testing prompts from the command line with interactive mode",
@@ -432,8 +434,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "WinSentinel",
-  "lastFeature": "PeerBenchmarkService",
+  "lastRepo": "gif-captcha",
+  "lastFeature": "Trust Score Engine",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
