@@ -1,5 +1,5 @@
 {
-  "totalRuns": 253,
+  "totalRuns": 254,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -60,7 +60,8 @@
       "Added agent health scoring system with composite health index, trend tracking, and predictive degradation alerts",
       "Added trace sampling and rate limiting with 7 strategies (Probabilistic, RateLimited, Priority, Tail, Composite, Always, Never). Deterministic hash sampling, sliding-window rate cap, tag-based rules, thread-safe stats. 466 lines, 63 tests (2026-03-04)",
       "Service Dependency Map -- analyzes tool_call events to build dependency graphs of external services/tools, per-service reliability/latency/token stats, critical dependency identification (volume/error/latency thresholds), per-agent dependency profiles, co-occurrence pattern detection, temporal trend analysis. 5 REST endpoints, 280-line lib + 175-line route, 59 tests (2026-03-04)",
-      "Response Quality Evaluator"
+      "Response Quality Evaluator",
+      "Incident Postmortem Generator -- SDK (postmortem.py) + backend (/postmortem) auto-generates structured postmortem docs from session events: incident timeline with phase classification, root cause analysis (tool/model/cascade/timeout/rate-limit/repeated), impact assessment (severity, blast radius, token waste, cost), remediation actions (immediate/short/long-term), lessons learned, contributing factors, what went well. Markdown + JSON export. Backend: POST /postmortem/:sessionId, GET /postmortem/candidates. 55 tests, 1650 lines. Commit 5da336f (2026-03-05)"
     ],
     "VoronoiMap": [
       "Added interactive mode with click-to-add points and real-time diagram updates",
@@ -403,7 +404,8 @@
       "CTL Model Checker (model_checker.ml) -- labeling-based CTL model checking (Clarke-Emerson-Sistla), full temporal operators, fixpoint algorithms, formula parser, witness generation, fairness, 2 example models. 809 lines, 75+ tests (2026-03-05)",
       "Finite Automata Toolkit (automata.ml) -- DFA/NFA types, subset construction, Hopcroft minimization, product construction (intersection/union/difference/symmetric difference), complement, language equivalence/inclusion, NFA concat/union/star/reverse, string generation, DOT export, statistics. 1030 lines, 65+ tests (2026-03-05)",
       "PEG Parser Engine (peg.ml) -- Packrat-memoized PEG parser with full operator set, parse tree construction, grammar analysis (left recursion/undefined/unused detection), 5 example grammars (arithmetic/JSON/CSV/identifier/balanced parens), convenience builders. 75 tests. (2026-03-05)",
-      "Symbolic Integration Engine (integration.ml) -- pattern-based antiderivatives (20+ rules), linearity, linear substitution, u-substitution, integration by parts (LIATE), definite integration (FTC), Simpson's rule numerical fallback, verification via differentiation, standard integral table. 65+ tests (2026-03-05)"
+      "Symbolic Integration Engine (integration.ml) -- pattern-based antiderivatives (20+ rules), linearity, linear substitution, u-substitution, integration by parts (LIATE), definite integration (FTC), Simpson's rule numerical fallback, verification via differentiation, standard integral table. 65+ tests (2026-03-05)",
+      "Myers Diff Algorithm (diff.ml) -- O(ND) shortest edit script, LCS extraction, hunk grouping, unified/side-by-side/ANSI output, patch apply/reverse, char/word/line diffing, patience diff with unique-line anchors+LIS, three-way merge with conflict detection, edit statistics. 70 tests (2026-03-05)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -436,8 +438,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "sauravcode",
-  "lastFeature": "Code Complexity Analyzer",
+  "lastRepo": "agentlens",
+  "lastFeature": "Incident Postmortem Generator",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
