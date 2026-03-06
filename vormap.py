@@ -1762,7 +1762,136 @@ def main():
         help='Custom title for the HTML report (default: auto-generated).',
     )
 
+    # ── Synthetic point pattern generator ──────────────────────────────
+    parser.add_argument(
+        '--generate',
+        metavar='PATTERN',
+        choices=['poisson', 'clustered', 'regular', 'inhibitory',
+                 'gradient', 'mixed'],
+        help='Generate a synthetic point dataset instead of loading '
+             'from a file. Writes to --generate-output (or stdout). '
+             'Patterns: poisson, clustered, regular, inhibitory, '
+             'gradient, mixed.',
+    )
+    parser.add_argument(
+        '--generate-n',
+        type=int,
+        default=200,
+        help='Number of points to generate (default: 200).',
+    )
+    parser.add_argument(
+        '--generate-output',
+        metavar='OUTPUT',
+        help='Output file for generated points (default: stdout). '
+             'Format detected from extension (.csv, .json, .txt).',
+    )
+    parser.add_argument(
+        '--generate-seed',
+        type=int,
+        default=None,
+        help='Random seed for reproducible generation.',
+    )
+    parser.add_argument(
+        '--generate-parents',
+        type=int,
+        default=None,
+        help='Number of cluster centres (clustered/mixed patterns).',
+    )
+    parser.add_argument(
+        '--generate-radius',
+        type=float,
+        default=50.0,
+        help='Cluster scatter radius (clustered/mixed, default: 50).',
+    )
+    parser.add_argument(
+        '--generate-jitter',
+        type=float,
+        default=0.15,
+        help='Jitter fraction for regular grid (0-1, default: 0.15).',
+    )
+    parser.add_argument(
+        '--generate-min-dist',
+        type=float,
+        default=None,
+        help='Minimum inter-point distance for inhibitory process.',
+    )
+    parser.add_argument(
+        '--generate-direction',
+        default='horizontal',
+        choices=['horizontal', 'vertical', 'diagonal'],
+        help='Gradient direction (default: horizontal).',
+    )
+    parser.add_argument(
+        '--generate-cluster-fraction',
+        type=float,
+        default=0.5,
+        help='Fraction of clustered points for mixed pattern (default: 0.5).',
+    )
+    parser.add_argument(
+        '--generate-stats',
+        action='store_true',
+        help='Print summary statistics (centroid, spread, NNI) for '
+             'the generated pattern.',
+    )
+
     args = parser.parse_args()
+
+    # ── Handle --generate before normal flow ─────────────────────────
+    if args.generate:
+        import vormap_generate
+
+        gen_bounds = tuple(args.bounds) if args.bounds else (0, 1000, 0, 2000)
+
+        gen_kwargs = {}
+        if args.generate in ('clustered', 'mixed'):
+            gen_kwargs['parents'] = args.generate_parents
+            gen_kwargs['radius'] = args.generate_radius
+        if args.generate == 'regular':
+            gen_kwargs['jitter'] = args.generate_jitter
+        if args.generate == 'inhibitory':
+            gen_kwargs['min_dist'] = args.generate_min_dist
+        if args.generate == 'gradient':
+            gen_kwargs['direction'] = args.generate_direction
+        if args.generate == 'mixed':
+            gen_kwargs['cluster_fraction'] = args.generate_cluster_fraction
+
+        points = vormap_generate.generate_pattern(
+            args.generate, n=args.generate_n, bounds=gen_bounds,
+            seed=args.generate_seed, **gen_kwargs)
+
+        if args.generate_stats:
+            summary = vormap_generate.pattern_summary(points, args.generate)
+            print('Pattern: %s' % summary['pattern'])
+            print('Points:  %d' % summary['count'])
+            if summary.get('centroid'):
+                print('Centroid: (%.2f, %.2f)' % summary['centroid'])
+            if summary.get('spread'):
+                print('Spread:  %.2f x %.2f' % summary['spread'])
+            if summary.get('nni') is not None:
+                nni = summary['nni']
+                label = ('clustered' if nni < 0.8
+                         else 'regular' if nni > 1.2
+                         else 'random')
+                print('NNI:     %.4f (%s)' % (nni, label))
+            print()
+
+        if args.generate_output:
+            ext = args.generate_output.rsplit('.', 1)[-1].lower()
+            if ext == 'csv':
+                vormap_generate.export_csv(points, args.generate_output,
+                                           allow_absolute=True)
+            elif ext == 'json':
+                vormap_generate.export_json(points, args.generate_output,
+                                            allow_absolute=True)
+            else:
+                vormap_generate.export_txt(points, args.generate_output,
+                                           allow_absolute=True)
+            print('Generated %d %s points -> %s'
+                  % (len(points), args.generate, args.generate_output))
+        else:
+            for x, y in points:
+                print('%.6f %.6f' % (x, y))
+        return
 
     # Apply explicit bounds if given (disables auto-detection)
     if args.bounds:
