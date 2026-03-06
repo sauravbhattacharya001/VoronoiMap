@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-06T09:40:41.332639Z",
-  "totalRuns": 848,
+  "lastUpdated": "2026-03-06T10:11:17.910083Z",
+  "totalRuns": 850,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 24,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 24,
-      "runs": 77,
-      "successes": 78
+      "runs": 78,
+      "successes": 79
     },
     "security_fix": {
       "weight": 23,
@@ -29,8 +29,8 @@
     },
     "refactor": {
       "weight": 24,
-      "runs": 45,
-      "successes": 48,
+      "runs": 46,
+      "successes": 49,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
@@ -685,8 +685,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 847-848. sauravbhattacharya001 profile: sanitizeURL control-char bypass fix (CWE-116), Object.create(null) prototype pollution fix (CWE-1321), 17 new tests (52->69).",
-  "lastRepo": "sauravbhattacharya001",
+  "notes": "Run 849-850. VoronoiMap: refactor assign_weights shared dsq + fix circular import #50.",
+  "lastRepo": "VoronoiMap",
   "lastRun": "2026-03-06",
   "runCount": 50,
   "lastWeightAdjustment": 834,
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "add_tests",
-    "security_fix"
+    "refactor",
+    "bug_fix"
   ]
 }
