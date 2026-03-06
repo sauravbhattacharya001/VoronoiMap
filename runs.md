@@ -1,3 +1,19 @@
+## Builder Run 258 -- 2026-03-05 8:18 PM PST
+
+### Ocaml-sample-code -- Property Graph Query Engine
+- In-memory property graph database with Cypher-inspired query DSL
+- Labeled nodes + typed relationships with property maps
+- MATCH patterns (node, relationship, multi-hop), WHERE filters (comparisons, AND/OR/NOT, CONTAINS, STARTS WITH, IS NULL, HAS LABEL)
+- RETURN projections with ORDER BY, LIMIT, SKIP, DISTINCT
+- 7 aggregations: COUNT, SUM, AVG, MIN, MAX, COLLECT
+- BFS shortest path, all simple paths (DFS), variable-length path expansion
+- Graph mutations: add/delete nodes/edges, update properties
+- Label and relationship type indexes for fast lookups
+- Graph statistics: degree distribution, density, counts
+- Pretty-printed table output
+- Social network demo (people, companies, friendships, employment)
+- 100+ tests in test_graph_db.ml
+- Commit fb66193
 ## Gardener Run 829-830 -- 2026-03-05 8:05 PM PST
 
 ### ai -- perf_improvement + doc_update
@@ -7552,6 +7568,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

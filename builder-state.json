@@ -1,5 +1,5 @@
 {
-  "totalRuns": 257,
+  "totalRuns": 258,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -408,7 +408,8 @@
       "Finite Automata Toolkit (automata.ml) -- DFA/NFA types, subset construction, Hopcroft minimization, product construction (intersection/union/difference/symmetric difference), complement, language equivalence/inclusion, NFA concat/union/star/reverse, string generation, DOT export, statistics. 1030 lines, 65+ tests (2026-03-05)",
       "PEG Parser Engine (peg.ml) -- Packrat-memoized PEG parser with full operator set, parse tree construction, grammar analysis (left recursion/undefined/unused detection), 5 example grammars (arithmetic/JSON/CSV/identifier/balanced parens), convenience builders. 75 tests. (2026-03-05)",
       "Symbolic Integration Engine (integration.ml) -- pattern-based antiderivatives (20+ rules), linearity, linear substitution, u-substitution, integration by parts (LIATE), definite integration (FTC), Simpson's rule numerical fallback, verification via differentiation, standard integral table. 65+ tests (2026-03-05)",
-      "Myers Diff Algorithm (diff.ml) -- O(ND) shortest edit script, LCS extraction, hunk grouping, unified/side-by-side/ANSI output, patch apply/reverse, char/word/line diffing, patience diff with unique-line anchors+LIS, three-way merge with conflict detection, edit statistics. 70 tests (2026-03-05)"
+      "Myers Diff Algorithm (diff.ml) -- O(ND) shortest edit script, LCS extraction, hunk grouping, unified/side-by-side/ANSI output, patch apply/reverse, char/word/line diffing, patience diff with unique-line anchors+LIS, three-way merge with conflict detection, edit statistics. 70 tests (2026-03-05)",
+      "Property Graph Query Engine (graph_db.ml) -- in-memory property graph database with Cypher-inspired DSL: MATCH/WHERE/RETURN patterns, multi-hop queries, variable-length paths, 7 aggregations, BFS shortest path, all paths, mutations, indexes, pretty tables. 100+ tests. Commit fb66193 (2026-03-05)"
     ],
     "WinSentinel": [
       "Added USB device monitoring with allowlist/blocklist, auto-eject, device history, and real-time alerts",
@@ -441,8 +442,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "Vidly",
-  "lastFeature": "RentalReturnService",
+  "lastRepo": "Ocaml-sample-code",
+  "lastFeature": "Property Graph Query Engine",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
