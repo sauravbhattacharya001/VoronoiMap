@@ -1,3 +1,17 @@
+### Gardener #885 -- gif-captcha: code_cleanup
+- Extracted `_buildGroupMap()` helper to deduplicate findSharedFingerprints/findIPClusters iteration
+- Replaced O(n) `indexOf` lookups with O(1) `Object.create(null)` sets in findTimingClusters + findSequentialPatterns
+- 2225/2225 tests pass. Commit `326091e`.
+
+### Gardener #886 -- Vidly: security_fix
+- New `RateLimitAttribute` — sliding-window per-IP rate limiting with HTTP 429 + Retry-After headers
+- Applied to GiftCards/Balance (10/min), GiftCards/TopUp (5/min), Rentals/Checkout (15/min)
+- Thread-safe via ConcurrentDictionary, periodic cleanup, X-Forwarded-For rightmost-IP parsing
+- +176 lines. Commit `d32f94d`.
+### Gardener Run 885-886 | 2026-03-06 1:30 PM PST
+- **Status:** All 16 repos have all 29 task types completed. No tasks to execute.
+- **Note:** The gardener has fully covered every repo × task combination. Consider adding new repos or new task types to continue.
+
 ### Builder #291 -- prompt: PromptFallbackChain
 - Resilient multi-model execution: priority-ordered Azure OpenAI tiers with automatic fallback
 - Per-tier endpoint/key/model overrides, timeout, retry config
@@ -8215,6 +8229,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
