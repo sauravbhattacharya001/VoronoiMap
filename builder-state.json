@@ -1,5 +1,5 @@
 {
-  "totalRuns": 270,
+  "totalRuns": 271,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -91,7 +91,8 @@
       "Added Voronoi-based spatial sampling (vormap_sample.py) with 6 strategies: stratified_random, systematic_grid, centroid_based, boundary_focused, density_weighted, adaptive. Largest-remainder allocation, coverage analysis, CSV/GeoJSON export. SpatialSampler class with SamplePlan/SamplePoint data classes. 52 pytest tests. (2026-03-04)",
       "Voronoi Entropy & Regularity Analysis (vormap_regularity.py) -- Shannon entropy of side-count distribution, Lewis law area-vs-sides regression, Aboav-Weaire topological neighbour correlation, polygon distribution histogram, composite 0-100 regularity score, JSON export, text report. 59 tests (2026-03-05)",
       "Added Voronoi temporal dynamics (vormap_temporal.py) -- track diagram evolution across time snapshots with cell birth/death/migration/growth detection, greedy seed matching, trajectory tracking, Jaccard stability index, JSON/CSV export, CLI. 44 tests. (2026-03-05)",
-      "Voronoi Mosaic Image Filter (vormap_mosaic.py) -- transforms images into stained-glass mosaic effects. 4 seed placements (grid/random/Poisson disk/edge-aware), 3 color modes (mean/median/dominant), cell borders, pure-Python PNG I/O, KDTree acceleration, CLI. 61 tests. Commit 5aac44a (2026-03-05)"
+      "Voronoi Mosaic Image Filter (vormap_mosaic.py) -- transforms images into stained-glass mosaic effects. 4 seed placements (grid/random/Poisson disk/edge-aware), 3 color modes (mean/median/dominant), cell borders, pure-Python PNG I/O, KDTree acceleration, CLI. 61 tests. Commit 5aac44a (2026-03-05)",
+      "Voronoi Path Planner (vormap_pathplan.py) -- obstacle-aware max-clearance navigation. Builds Voronoi-edge roadmap with per-node clearance. A* with two modes: shortest (Euclidean) and safest (max min-clearance). 13 path stats. Export: SVG (obstacles+roadmap+path), JSON, CSV. Text report with distance/clearance/waypoint tables. CLI with --mode/--svg/--json/--csv. 42 tests. Commit ba4f58e (2026-03-06)"
     ],
     "sauravcode": [
       "Added REPL (Read-Eval-Print Loop) interactive mode for the sauravcode language",
@@ -456,8 +457,8 @@
       "Project Search & Category Filter -- text search (debounced, matches title/desc/repo/tags) + category filter pills (AI & Agents, Security, etc.) with AND combination. No-results message. 18 new tests (87 total). Commit 38d8e42 (2026-03-06)"
     ]
   },
-  "lastRepo": "everything",
-  "lastFeature": "Time Audit Service",
+  "lastRepo": "VoronoiMap",
+  "lastFeature": "Voronoi Path Planner",
   "lastRun": "2026-03-06",
   "features": {
     "GraphVisual": [
