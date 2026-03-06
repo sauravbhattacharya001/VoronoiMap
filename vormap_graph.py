@@ -30,14 +30,9 @@ try:
 except ImportError:
     _HAS_SCIPY = False
 
-# Imports from vormap_viz needed by export_graph_svg / generate_graph.
-# These are intentionally late-style to avoid circular imports at
-# module level — vormap_viz re-exports our symbols.
-from vormap_viz import (
-    compute_regions,
-    _COLOR_SCHEMES,
-    DEFAULT_COLOR_SCHEME,
-)
+# Imports from vormap_viz are deferred to function bodies that need
+# them (export_graph_svg, generate_graph) to break the circular
+# dependency — vormap_viz imports from us at module level.
 
 
 # ── Private helpers ──────────────────────────────────────────────────
@@ -570,7 +565,7 @@ def export_graph_svg(
     width=800,
     height=600,
     margin=40,
-    color_scheme=DEFAULT_COLOR_SCHEME,
+    color_scheme=None,
     show_voronoi=True,
     show_graph=True,
     show_degree_labels=False,
@@ -622,6 +617,12 @@ def export_graph_svg(
     str
         Path to the generated SVG file.
     """
+    # Lazy import to break circular dependency with vormap_viz.
+    from vormap_viz import _COLOR_SCHEMES, DEFAULT_COLOR_SCHEME
+
+    if color_scheme is None:
+        color_scheme = DEFAULT_COLOR_SCHEME
+
     if color_scheme not in _COLOR_SCHEMES:
         raise ValueError(
             "Unknown color scheme '%s'. Available: %s"
@@ -785,6 +786,8 @@ def generate_graph(datafile, output_path=None, *, fmt="table"):
         or dict (json without output_path).
     """
     data = vormap.load_data(datafile)
+    # Lazy import to break circular dependency with vormap_viz.
+    from vormap_viz import compute_regions
     regions = compute_regions(data)
     graph = extract_neighborhood_graph(regions, data)
 
