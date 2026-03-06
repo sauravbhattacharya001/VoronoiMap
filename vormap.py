@@ -246,6 +246,11 @@ class Oracle:
 # to stale cache hits returning wrong KDTrees.  (Fixes #28)
 _file_cache = {}
 
+# O(1) reverse lookup: id(points_list) → KDTree.
+# Eliminates the O(n) scan in get_NN that iterated through every
+# _file_cache entry on every single nearest-neighbor call.
+_tree_by_data_id = {}
+
 
 # ---------------------------------------------------------------------------
 # Backward-compatible cache views
@@ -276,6 +281,7 @@ class _DataCacheView(dict):
 
     def clear(self):
         _file_cache.clear()
+        _tree_by_data_id.clear()
 
 
 class _KDTreeCacheView(dict):
@@ -623,6 +629,11 @@ def load_data(filename, auto_bounds=True):
 
     _file_cache[filename] = {'points': points, 'tree': tree}
 
+    # Register in the O(1) reverse-lookup cache so get_NN can find the
+    # KDTree for a data list without scanning _file_cache.
+    if tree is not None:
+        _tree_by_data_id[id(points)] = tree
+
     return points
 
 
@@ -642,14 +653,15 @@ def get_NN(data, lng, lat):
 
     # --- Fast path: KDTree lookup ---
     if _HAS_SCIPY:
-        # Look up tree from unified cache by finding the entry whose
-        # points list matches.  Since load_data() always returns the
-        # cached list object, identity comparison (`is`) is O(1).
-        tree = None
-        for entry in _file_cache.values():
-            if entry['points'] is data:
-                tree = entry['tree']
-                break
+        # O(1) lookup via identity-keyed reverse cache.  Falls back to
+        # the old linear scan only if the data list was created outside
+        # load_data() (e.g. in tests).
+        tree = _tree_by_data_id.get(id(data))
+        if tree is None:
+            for entry in _file_cache.values():
+                if entry['points'] is data:
+                    tree = entry['tree']
+                    break
 
         if tree is not None:
             # Query the 2 closest points — if the nearest is the query point
@@ -784,25 +796,32 @@ def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
     return m
 
 
-def isect(x1, y1, x2, y2, x3, y3, x4, y4):
+def _between(a, b, v):
+    """True if *v* lies between *a* and *b* (inclusive, either order)."""
+    return (a >= v and b <= v) or (a <= v and b >= v)
 
+
+def isect(x1, y1, x2, y2, x3, y3, x4, y4):
+    """Find the intersection of segments (x1,y1)-(x2,y2) and (x3,y3)-(x4,y4).
+
+    Returns the intersection point as ``(x, y)`` or ``(-1, -1)`` when
+    the segments do not intersect (or are parallel/coincident).
+    """
     if (x1 == x2 and x3 == x4):
         return -1, -1
 
     if (x1 == x2 and x3 != x4):
         m = float(y4 - y3) / (x4 - x3)
         y_test = m * (x1 - x3) + y3
-        if (y1 >= y_test and y2 <= y_test) or (y1 <= y_test and y2 >= y_test):
-            if (y3 >= y_test and y4 <= y_test) or (y3 <= y_test and y4 >= y_test):
-                return x1, y_test
+        if _between(y1, y2, y_test) and _between(y3, y4, y_test):
+            return x1, y_test
         return -1, -1
 
     if (x1 != x2 and x3 == x4):
         m = float(y2 - y1) / (x2 - x1)
         y_test = m * (x3 - x1) + y1
-        if (y1 >= y_test and y2 <= y_test) or (y1 <= y_test and y2 >= y_test):
-            if (y3 >= y_test and y4 <= y_test) or (y3 <= y_test and y4 >= y_test):
-                return x3, y_test
+        if _between(y1, y2, y_test) and _between(y3, y4, y_test):
+            return x3, y_test
         return -1, -1
 
     m1 = float(y2 - y1) / (x2 - x1)
@@ -822,54 +841,45 @@ def isect(x1, y1, x2, y2, x3, y3, x4, y4):
     y_test1 = m1 * (x_test - x1) + y1
     y_test2 = m2 * (x_test - x3) + y3
 
-    if ((x1 >= x_test and x2 <= x_test) or (x1 <= x_test and x2 >= x_test)):
-        if (x3 >= x_test and x4 <= x_test) or (x3 <= x_test and x4 >= x_test):
-            if ((y1 >= y_test1 and y2 <= y_test1) or (y1 <= y_test1 and y2 >= y_test1)):
-                if (y3 >= y_test2 and y4 <= y_test2) or (y3 <= y_test2 and y4 >= y_test2):
-                    return round(x_test, 2), round(y_test1, 2)
+    if (_between(x1, x2, x_test) and _between(x3, x4, x_test)
+            and _between(y1, y2, y_test1) and _between(y3, y4, y_test2)):
+        return round(x_test, 2), round(y_test1, 2)
     return -1, -1
 
 
 def isect_B(alng, alat, dirn):
-    """Find two boundary intersection points for a line through (alng, alat)."""
-    ret = []
+    """Find two boundary intersection points for a line through (alng, alat).
+
+    Returns a flat list ``[x1, y1, x2, y2]`` of the two intersection
+    points with the search boundary ``[IND_W, IND_E] × [IND_S, IND_N]``.
+    """
     if math.isinf(dirn):
-        ret.append(alng)
-        ret.append(IND_N)
-        ret.append(alng)
-        ret.append(IND_S)
-        return ret
-    elif dirn == 0:
-        ret.append(IND_W)
-        ret.append(alat)
-        ret.append(IND_E)
-        ret.append(alat)
-        return ret
-    else:
-        xt = float(IND_N - alat) / dirn + alng
-        xb = float(IND_S - alat) / dirn + alng
-        yr = dirn * (IND_E - alng) + alat
-        yl = dirn * (IND_W - alng) + alat
+        return [alng, IND_N, alng, IND_S]
+    if dirn == 0:
+        return [IND_W, alat, IND_E, alat]
 
+    # Compute intersections with all four boundary edges
+    xt = float(IND_N - alat) / dirn + alng  # top edge (y = IND_N)
+    xb = float(IND_S - alat) / dirn + alng  # bottom edge (y = IND_S)
+    yr = dirn * (IND_E - alng) + alat       # right edge (x = IND_E)
+    yl = dirn * (IND_W - alng) + alat       # left edge (x = IND_W)
+
+    # Collect points that actually lie on the boundary
+    ret = []
     if IND_W <= xt <= IND_E:
-        ret.append(xt)
-        ret.append(IND_N)
+        ret.extend((xt, IND_N))
     if IND_W <= xb <= IND_E:
-        ret.append(xb)
-        ret.append(IND_S)
-
+        ret.extend((xb, IND_S))
     if IND_S <= yl <= IND_N:
-        ret.append(IND_W)
-        ret.append(yl)
+        ret.extend((IND_W, yl))
     if IND_S <= yr <= IND_N:
-        ret.append(IND_E)
-        ret.append(yr)
+        ret.extend((IND_E, yr))
 
     if len(ret) == 4:
         return ret
-    else:
-        raise RuntimeError(
-            "Line from (%s, %s) with slope %s does not intersect search "
+
+    raise RuntimeError(
+        "Line from (%s, %s) with slope %s does not intersect search "
             "boundary [%s,%s]x[%s,%s]"
             % (alng, alat, dirn, IND_W, IND_E, IND_S, IND_N)
         )
