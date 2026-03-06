@@ -104,17 +104,20 @@ def assign_weights(seeds, method='uniform', *, value=1.0, min_w=0.1,
         cy = sum(s[1] for s in seeds) / n
         center = (cx, cy)
 
+    # Distance-based methods share a common distance-from-center list.
+    if method in ('proportional', 'inverse', 'gaussian'):
+        dsq = [(s[0] - center[0]) ** 2 + (s[1] - center[1]) ** 2
+               for s in seeds]
+
     if method == 'proportional':
         # Weight proportional to distance from center
-        dists = [math.sqrt((s[0] - center[0]) ** 2 +
-                           (s[1] - center[1]) ** 2) for s in seeds]
+        dists = [math.sqrt(d) for d in dsq]
         max_d = max(dists) if max(dists) > 0 else 1.0
         return [max(min_w, (d / max_d) * max_w) for d in dists]
 
     if method == 'inverse':
         # Weight inversely proportional to distance from center
-        dists = [math.sqrt((s[0] - center[0]) ** 2 +
-                           (s[1] - center[1]) ** 2) for s in seeds]
+        dists = [math.sqrt(d) for d in dsq]
         max_d = max(dists) if max(dists) > 0 else 1.0
         return [max(min_w, (1.0 - d / max_d) * max_w) for d in dists]
 
@@ -126,12 +129,9 @@ def assign_weights(seeds, method='uniform', *, value=1.0, min_w=0.1,
             diag = math.sqrt((max(xs) - min(xs)) ** 2 +
                              (max(ys) - min(ys)) ** 2)
             sigma = max(diag / 2.0, 1.0)
-        weights = []
-        for s in seeds:
-            dsq = (s[0] - center[0]) ** 2 + (s[1] - center[1]) ** 2
-            w = max_w * math.exp(-dsq / (2.0 * sigma * sigma))
-            weights.append(max(min_w, w))
-        return weights
+        two_sigma_sq = 2.0 * sigma * sigma
+        return [max(min_w, max_w * math.exp(-d / two_sigma_sq))
+                for d in dsq]
 
     if method == 'linear_gradient':
         if direction not in ('x', 'y', 'diagonal'):
