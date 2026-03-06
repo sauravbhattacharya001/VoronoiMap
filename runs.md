@@ -1,3 +1,15 @@
+## Gardener Run 831-832 -- 2026-03-05 8:35 PM PST
+
+### gif-captcha -- Code Cleanup (Bug Fix: Broken Tests)
+- Fixed compliance.test.js and metrics-aggregator.test.js: both used Jest/Mocha globals (describe, expect().toBe(), toHaveProperty, toEqual) without importing from node:test/node:assert
+- ReferenceError: describe is not defined — 133 tests were silently failing
+- Ported all assertions to node:assert/strict, all describe/it/beforeEach to node:test
+- Result: 2155 tests pass (up from 2022/2024), 0 failures
+- Commit 29d12d3
+
+### gif-captcha -- Issue Opened
+- #21: Replace O(n) indexOf+splice LRU tracking with Map-based approach
+- 5 subsystems affected: TrustScoreEngine, SessionManager, ABExperimentRunner, AuditTrail, AdaptiveTimeout
 ## Builder Run 258 -- 2026-03-05 8:18 PM PST
 
 ### Ocaml-sample-code -- Property Graph Query Engine
@@ -7568,6 +7580,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
