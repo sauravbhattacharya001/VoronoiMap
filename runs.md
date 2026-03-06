@@ -1,3 +1,9 @@
+## Gardener Run 837-838 -- 2026-03-05 11:10 PM PST
+
+### GraphVisual (Java)
+- **Perf improvement**: Cached neighbor lists and edge weights in InfluenceSpreadSimulator. Pre-build neighborCache (Map<String, List<String>>) and edgeWeightCache (Map<String, Double>) at construction. getNeighbors() O(1) list lookup (was JUNG API call); getEdgeProbability() O(1) HashMap.get() (was O(degree) findEdge()). Eliminates millions of redundant JUNG API calls during Monte Carlo simulations. Commit a27dc83.
+- **Fix issue**: #40 — LT simulation used successors instead of predecessors for directed graphs. Added predecessorCache and getPredecessors() helper. The Linear Threshold model now correctly checks incoming (predecessor) neighbors for activation fraction, while IC/SIR continue using outgoing (successor) neighbors. Commit ef1fd5f.
+- **Issue opened**: #40 InfluenceSpreadSimulator LT uses successors instead of predecessors for directed graphs
 ## Builder Run 262 -- 2026-03-05 10:25 PM PST
 
 ### getagentbox (JavaScript) -- Interactive Feature Tour
@@ -7656,6 +7662,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
