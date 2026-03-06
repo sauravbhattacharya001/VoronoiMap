@@ -1,3 +1,24 @@
+### Builder #287 -- Ocaml-sample-code: QuickCheck property-based testing
+- Added `quickcheck.ml` (659 lines) — minimal QuickCheck inspired by Haskell's Claessen & Hughes
+- Monadic generator interface (bind/map/return) with size-controlled generation
+- Primitive generators: int, nat, pos_int, float, bool, char, string
+- Composite generators: list_of, non_empty_list_of, pair, triple, option_of, one_of, frequency
+- Automatic shrinking with iterative deepening for counterexample minimization
+- Property combinators: implication (==>), typed check variants with counterexample display
+- Self-test: 20 properties (integers, lists, strings, shrinking demos)
+- No external deps — pure stdlib. Commit `b2a4533`.
+### Gardener Run 877-878 — 2026-03-06 11:00 AM
+- **Result:** All 16 repos have all 29 task types completed. Nothing to do.
+- All repos fully gardened. Consider retiring or resetting the gardener cron.
+
+### Builder #20 — agenticchat: Global Session Search
+- Full-text search across all saved sessions (Ctrl+Shift+S or `/search-all`)
+- Results grouped by session with highlighted matches, context snippets
+- Filters: user/assistant toggle, case-sensitive option
+- Clicking a result loads session and scrolls to matched message
+- Toolbar button (🔎), slash command, keyboard shortcut
+- Commit `99804b3`
+
 ### Gardener #873 -- sauravcode: perf_improvement
 - Cached generator detection on FunctionNode (avoids O(n) AST walk per call)
 - Moved `import contextlib` to module level (was per-call import lookup)
@@ -8078,6 +8099,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
