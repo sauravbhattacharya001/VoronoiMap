@@ -38,6 +38,18 @@ import vormap
 from vormap_viz import compute_regions, compute_region_stats
 
 
+def _recompute_bounds(data):
+    """Recompute and set global bounds from *data* so that
+    ``compute_regions`` works correctly for any point set.
+
+    Without this, perturbed points that fall outside the original bounds
+    produce silently incorrect Voronoi diagrams — cells near the boundary
+    get clipped to the stale search space.
+    """
+    s, n, w, e = vormap.compute_bounds(data)
+    vormap.set_bounds(s, n, w, e)
+
+
 # ── Data classes ─────────────────────────────────────────────────────
 
 @dataclass
@@ -263,7 +275,8 @@ def stability_analysis(
 
     rng = random.Random(seed)
 
-    # Compute baseline diagram
+    # Compute baseline diagram — set bounds from the actual data
+    _recompute_bounds(data)
     base_regions = compute_regions(data)
     base_stats = compute_region_stats(base_regions, data)
     base_lookup = {}
@@ -280,6 +293,11 @@ def stability_analysis(
     for _ in range(iterations):
         perturbed = _perturb_points(data, noise_radius, rng)
         try:
+            # Recompute bounds for the perturbed point set so the Voronoi
+            # diagram covers all displaced seeds.  Without this, seeds
+            # pushed outside the original bounding box produce clipped /
+            # missing cells.
+            _recompute_bounds(perturbed)
             p_regions = compute_regions(perturbed)
         except Exception:
             # If the entire diagram fails, skip this trial
