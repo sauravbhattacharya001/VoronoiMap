@@ -1,3 +1,17 @@
+## Builder Run 261 -- 2026-03-05 9:55 PM PST
+
+### FeedReader (Swift/iOS) -- ArticleClipboard
+- Cross-article snippet collector for research and note-taking
+- ClipboardSnippet: sourceURL, sourceTitle, text, note, tags, clippedDate, word count
+- NSSecureCoding persistence, tag sanitization (lowercase, dedup, max 10)
+- ArticleClipboard manager: clip/remove/removeAll CRUD
+- Query: by article URL, by tag, search (text/title/note/tags), all/count/isEmpty/isFull
+- Update: note, add/remove tags per snippet
+- Export: Markdown (grouped by source), plain text (numbered), JSON (ISO8601 dates)
+- Stats: snippet/source/word/tag counts, top tags, date range
+- Notification on changes (articleClipboardDidChange)
+- 72 tests covering snippets, clipboard, search, export, stats, notifications
+- Commit 44d4887
 ## Builder Run 260 -- 2026-03-05 9:18 PM PST
 
 ### prompt (.NET) -- PromptContextBuilder
@@ -7622,6 +7636,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

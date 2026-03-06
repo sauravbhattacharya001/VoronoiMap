@@ -1,5 +1,5 @@
 {
-  "totalRuns": 260,
+  "totalRuns": 261,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -348,7 +348,8 @@
       "Article Citation Generator -- 6 academic formats (APA/MLA/Chicago/IEEE/Harvard/BibTeX), smart author parsing, DOI support, quality scoring, batch generation, bibliography formatting, BibTeX file export, JSON persistence. 55 tests (2026-03-04)",
       "Feed Merge Manager -- virtual merged feeds combining multiple sources into unified streams. CRUD, 4 sort orders, cross-feed title deduplication, max article limit, search, stats, JSON export/import, text reports. 55 tests (2026-03-05)",
       "Reading Time Budget -- daily/weekly minute budgets, session tracking, pace analysis, article fit recommendations, A-F grading, weekly reports with adherence scoring and streaks, JSON persistence. 55 tests (2026-03-05)",
-      "Article Flashcard Generator -- auto-extraction (definitions/statistics/comparisons/processes/facts), SM-2 spaced repetition scheduling, deck management, custom cards, review sessions with difficulty ratings, mastery progression, streaks, review forecast, JSON persistence. 55 tests (2026-03-05)"
+      "Article Flashcard Generator -- auto-extraction (definitions/statistics/comparisons/processes/facts), SM-2 spaced repetition scheduling, deck management, custom cards, review sessions with difficulty ratings, mastery progression, streaks, review forecast, JSON persistence. 55 tests (2026-03-05)",
+      "ArticleClipboard -- cross-article snippet collector for research. ClipboardSnippet model with NSSecureCoding, tags (add/remove/sanitize/dedup), word count. ArticleClipboard manager: clip/remove/removeAll, query by article/tag, search (text/title/note/tag), update note/tags, export Markdown/plain text/JSON grouped by source, stats (snippet/source/word/tag counts, date range). 72 tests. Commit 44d4887 (2026-03-05)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
@@ -444,8 +445,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "prompt",
-  "lastFeature": "PromptContextBuilder",
+  "lastRepo": "FeedReader",
+  "lastFeature": "ArticleClipboard",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
