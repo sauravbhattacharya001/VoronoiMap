@@ -1,5 +1,5 @@
 {
-  "totalRuns": 267,
+  "totalRuns": 268,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -293,7 +293,8 @@
       "Revenue Analytics Service (RevenueAnalyticsService.cs) -- period-based revenue reports, genre/membership breakdowns, monthly trends with growth rates, top customers/movies, period comparisons, linear regression forecasting with confidence intervals, peak day and day-of-week analysis. 42 tests (2026-03-04)",
       "Membership Tier Service -- dynamic tier evaluation (Basic/Silver/Gold/Platinum) based on rental activity (count, spend, late %), configurable thresholds, tier benefits (discounts, concurrent limits, grace days, free reservations, priority new releases), tier change tracking with history, discounted rate calculator, concurrent rental enforcement, near-upgrade/at-risk detection, tier distribution analytics, full membership reports. 55 tests (2026-03-05)",
       "RentalReturnService -- movie return processing with tier-based late fees, condition/damage charges, loyalty points, batch returns, overdue management, customer profiles, self-service fee estimation. 57 tests, 1388 lines. Commit 6d96f49 (2026-03-05)",
-      "Dispute Resolution Service -- full lifecycle for customer disputes against rental charges (late fees, damage, overcharges). Submit with validation (ownership, status, window, max open, duplicates). Priority by tier+amount. Auto-resolution for first-time Silver+ small late fees. Manual review workflow (Open->Review->Approve/Partial/Deny). Batch stale expiration. Analytics (summary, type breakdown, top disputers, customer history). 47 tests. Commit 701aaac (2026-03-06)"
+      "Dispute Resolution Service -- full lifecycle for customer disputes against rental charges (late fees, damage, overcharges). Submit with validation (ownership, status, window, max open, duplicates). Priority by tier+amount. Auto-resolution for first-time Silver+ small late fees. Manual review workflow (Open->Review->Approve/Partial/Deny). Batch stale expiration. Analytics (summary, type breakdown, top disputers, customer history). 47 tests. Commit 701aaac (2026-03-06)",
+      "Seasonal Promotion Engine (SeasonalPromotionService) -- calendar-driven automatic discounts. 3 discount types (Percentage/FlatAmount/BOGO), genre+movie filtering, stackable/non-stackable with best-pick logic, 5 seasonal templates (Summer/Holiday/Spooky/Oscar/Valentines), redemption tracking, analytics. 54 tests. Commit 02ee7d4 (2026-03-06)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
@@ -451,8 +452,8 @@
       "Security Knowledge Base -- 26 built-in entries mapping findings to CWE/MITRE ATT&CK. Finding matching (exact/substring/keyword). Per-finding + full report enrichment with CWE/ATT&CK distribution, impact ratings, best practices, references. Free-text search, custom registration, text report generation. 47 tests. Commit 4c5c882 (2026-03-06)"
     ]
   },
-  "lastRepo": "FeedReader",
-  "lastFeature": "ReadingDataExporter",
+  "lastRepo": "Vidly",
+  "lastFeature": "SeasonalPromotionService",
   "lastRun": "2026-03-06",
   "features": {
     "GraphVisual": [
