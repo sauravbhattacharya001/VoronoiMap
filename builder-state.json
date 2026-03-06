@@ -1,5 +1,5 @@
 {
-  "totalRuns": 258,
+  "totalRuns": 259,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -319,7 +319,8 @@
       "Treewidth Analyzer -- tree decomposition with greedy degree/min-fill heuristics, exact treewidth (<=15 vertices), degeneracy/MMD lower bounds, nice tree decomposition, pathwidth, graph classification, bag analysis, text reports. 69 tests (2026-03-04)",
       "MaxCut Analyzer -- greedy/local-search/random-restart/exact partition optimization for NP-hard maximum cut. 5 algorithms, weighted/unweighted, Edwards bound, vertex contributions, balanced cuts, algorithm comparison, text reports. 55 tests (2026-03-04)",
       "Vertex Connectivity Analyzer -- vertex/edge connectivity (Edmonds-Karp max-flow), minimum vertex/edge cuts, pairwise connectivity, vertex/edge-disjoint paths (Menger's theorem), k-connectivity testing, Whitney's inequality, all min cuts enumeration, vertex criticality, text reports. 55 tests (2026-03-05)",
-      "Line Graph Analyzer -- constructs L(G), Vizing edge coloring bounds, Whitney theorem, iterated line graphs, matching via independent set, vertex edge-cliques. 60 tests (2026-03-05)"
+      "Line Graph Analyzer -- constructs L(G), Vizing edge coloring bounds, Whitney theorem, iterated line graphs, matching via independent set, vertex edge-cliques. 60 tests (2026-03-05)",
+      "Metric Dimension Analyzer -- minimum resolving sets for vertex identification. Exact branch-and-bound (BitSet pruning, <=30 vertices), greedy heuristic, BFS distance matrix, twin detection, metric representation, vertex identification, resolving power ranking, pigeonhole+twin lower bounds, diameter upper bound. Verified: paths beta=1, cycles beta=2, Kn beta=n-1, stars beta=n-1, Petersen beta=3. 49 tests. Commit 660ea9e (2026-03-05)"
     ],
     "FeedReader": [
       "Added offline reading with article caching, read-state tracking, and configurable retention policy",
@@ -442,8 +443,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "Ocaml-sample-code",
-  "lastFeature": "Property Graph Query Engine",
+  "lastRepo": "GraphVisual",
+  "lastFeature": "Metric Dimension Analyzer",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [

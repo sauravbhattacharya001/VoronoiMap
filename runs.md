@@ -1,3 +1,16 @@
+## Builder Run 259 -- 2026-03-05 8:48 PM PST
+
+### GraphVisual -- Metric Dimension Analyzer
+- Minimum resolving sets for vertex identification (robot navigation, sensor placement, network monitoring)
+- Exact metric dimension via branch-and-bound with BitSet pruning (<=30 vertices)
+- Greedy resolving set heuristic for larger graphs
+- All-pairs BFS distance matrix, twin detection (open + closed)
+- Metric representation (distance vectors), vertex identification from vectors
+- Resolving power ranking, resolving pairs enumeration
+- Pigeonhole + twin-class lower bounds, diameter-based upper bound
+- Verified known results: P_n beta=1, C_n beta=2, K_n beta=n-1, K_{1,n} beta=n-1, Petersen beta=3
+- 49 tests, all 2462 repo tests pass
+- Commit 660ea9e
 ## Gardener Run 831-832 -- 2026-03-05 8:35 PM PST
 
 ### gif-captcha -- Code Cleanup (Bug Fix: Broken Tests)
@@ -7580,6 +7593,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
