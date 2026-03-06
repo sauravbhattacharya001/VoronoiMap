@@ -1,3 +1,37 @@
+### Gardener #879 -- agentlens: security_fix
+- SSRF bypass hardening: embedded creds, IPv6-mapped IPv4, non-standard IP formats
+- SQL LIKE wildcard injection: `escapeLikeWildcards()` helper + ESCAPE clause on 4 search paths
+- Correlation engine DoS: lookback cap (7 days) + event cap (50K)
+- Commit `b469cf3`. +57/-13 lines. 130 tests pass.
+
+### Gardener #880 -- gif-captcha: code_cleanup
+- Replaced 19 verbose option-parsing blocks with `_posOpt`/`_nnOpt` helpers
+- Net -23 lines across 6 modules (AttemptTracker, SessionManager, ChallengePool, TokenVerifier, ReputationTracker, LoadTester)
+- Fixed pre-existing test failure (Math.floor lost in maxAttempts)
+- Commit `f7b5a1c`. 2225/2225 tests pass.
+## 2026-03-06
+
+### Builder Run #25 — VoronoiMap: Synthetic Point Pattern Generator
+- **Repo:** VoronoiMap
+- **Feature:** `vormap_generate.py` — synthetic point pattern generator
+- **Patterns:** poisson, clustered, regular, inhibitory, gradient, mixed
+- **Includes:** Unified API (`generate_pattern()`), standalone CLI, txt/csv/json export, Clark-Evans NNI stats, seed reproducibility
+- **Integration:** Added `--generate` flags to main `vormap.py` CLI
+- **Tests:** 19 tests, all passing
+- **Commit:** `b871d57` pushed to master
+
+### Run 881-882 — All repos fully gardened ✅
+- All 16 repos (excluding forks and zalenix-memory) have all 29 task types completed
+- No remaining tasks to execute — repo gardening is complete
+- Consider adding new repos or new task types to continue
+
+### Builder #24 — ai: Unified CLI entry point
+- Added `__main__.py` dispatching 36 subcommands under `python -m replication`
+- Covers simulate, threats, compliance, chaos, montecarlo, scorecard, drift, forensics, policy, templates, export, topology, lineage, escalation, killchain, watermark, game-theory, covert-channels, selfmod, consensus, scenarios, sensitivity, optimizer, regression, quarantine, report, alignment, capacity, honeypot, goal-inference, hoarding, influence, prompt-injection, threat-intel, comparator, info
+- Added `console_scripts` entry point (`replication` command after pip install)
+- Updated README with unified CLI docs
+- Commit `c8f42f9`
+
 ### Gardener #877 -- Vidly: doc_update
 - Updated ARCHITECTURE.md: 12 services→32, 12 controllers→15, 6 repos→12
 - Reorganized services into 5 categories (Core, Analytics/ML, Operations, Commerce, Content)
@@ -8149,6 +8183,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
