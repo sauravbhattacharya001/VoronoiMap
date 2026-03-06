@@ -1,3 +1,6 @@
+### Gardener #851 (add_tests) + #852 (doc_update) -- GraphVisual (Java)
+- **add_tests:** 15 new tests for GraphSimilarityAnalyzer (11 → 26). Coverage ratio was 0.28 (lowest in repo). Tests cover: single-vertex/disconnected/different-sized graphs, lazy compute, idempotency, defensive cloning, bounds checking, triangle inequality, report contents, isomorphic graphs, symmetry properties. Commit `2ee5905`. 2478 total tests pass.
+- **doc_update:** Updated README — added 7 missing source files to architecture tree (AdjacencyMatrixHeatmap, GraphRenderers, GraphSparsificationAnalyzer, LaplacianBuilder, LineGraphAnalyzer, MetricDimensionAnalyzer, TemporalGraph). Fixed stale counts: 58→66 classes, 38→42 analyzers, 52→57 test files, 2275→2475+ tests. Commit `2ecde69`.
 ## Builder Run 269 -- 2026-03-06 02:30 AM PST
 
 ### sauravbhattacharya001 (JS portfolio) -- Project Search & Category Filter
@@ -7826,6 +7829,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
