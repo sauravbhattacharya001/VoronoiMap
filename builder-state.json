@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-03-06T09:35:00-08:00",
-  "runsCompleted": 16,
-  "lastRepo": "FeedReader",
-  "lastFeature": "Reading Speed Tracker",
+  "lastRun": "2026-03-06T09:55:00-08:00",
+  "runsCompleted": 18,
+  "lastRepo": "sauravcode",
+  "lastFeature": "VS Code extension - syntax highlighting, snippets, language config",
   "lastPR": "",
   "repoFeatures": {
     "Ocaml-sample-code": [
@@ -18,7 +18,8 @@
       "Self-contained HTML analysis report with stats, heatmap, histograms, and region table (--report flag)"
     ],
     "sauravcode": [
-      "AST visualizer tool (sauravast.py) \u2014 pretty tree, JSON, Graphviz DOT, and statistics modes"
+      "AST visualizer tool (sauravast.py) \u2014 pretty tree, JSON, Graphviz DOT, and statistics modes",
+      "VS Code extension \u2014 TextMate grammar, 25 snippets, language config"
     ],
     "BioBots": [
       "Interactive Cost Estimator \u2014 material, machine, energy, consumable, labor breakdown with donut chart and batch scaling"
@@ -41,6 +42,9 @@
     "FeedReader": [
       "Reading Mood Tracker \u2014 mood logging, feed impact analysis, mood-based suggestions, patterns, export",
       "Reading Speed Tracker \u2014 personalized WPM, length-adjusted estimates, trend analysis, feed/category breakdowns, population percentile"
+    ],
+    "prompt": [
+      "PromptConditional \u2014 if/else/switch/case conditional logic for prompt templates (7 operators, nesting, validation, 33 tests)"
     ]
   }
 }

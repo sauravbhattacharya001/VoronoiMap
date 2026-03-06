@@ -1,3 +1,16 @@
+### Builder #285 -- sauravcode: VS Code Extension
+- Full VS Code language extension in `editors/vscode/` (586 lines, 6 files)
+- TextMate grammar covering all constructs: keywords, control flow, declarations, 40+ builtins, types, operators, strings, f-strings with embedded expressions, comments, numbers
+- 25 code snippets (fn, if/ife/ifei, while, for, foreach, class, try, match, enum, lambda, print, pipe, map, list, import, assert, gen, fs, prf)
+- Language config: bracket matching, auto-close, indentation rules, code folding
+- Ready for VSIX packaging. Commit `5ee2db1`.
+### Builder #17 — prompt: PromptConditional
+- Added `PromptConditional` static class with if/else/switch/case syntax for dynamic prompt templates
+- 7 operators: exists, ==, !=, contains, startsWith, endsWith, matches (regex)
+- Supports negation (!var), nested conditionals, multi-way switch/case/default
+- APIs: Render, ParseExpression, Evaluate, ExtractConditions, ExtractConditionalVariables, Validate, ToJson
+- 33 unit tests, all passing. Commit `44d682f`.
+
 ### Gardener #869 -- gif-captcha: doc_update
 - Documented 15/36 previously undocumented API exports in API.md (+461 lines)
 - Covers: loadGifWithRetry, installRoundRectPolyfill, createRateLimiter, createClientFingerprinter, createIncidentCorrelator, createAdaptiveTimeout, createAuditTrail, createSessionRecorder, createLoadTester, createABExperimentRunner, createFraudRingDetector, createComplianceReporter, createMetricsAggregator, createTrustScoreEngine, createEventEmitter
@@ -8017,6 +8030,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
