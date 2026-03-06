@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-06T16:30:00.000Z",
-  "totalRuns": 868,
+  "totalRuns": 870,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 24,
@@ -15,8 +15,8 @@
     },
     "security_fix": {
       "weight": 23,
-      "runs": 65,
-      "successes": 65,
+      "runs": 66,
+      "successes": 66,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
@@ -49,8 +49,8 @@
     },
     "doc_update": {
       "weight": 24,
-      "runs": 56,
-      "successes": 58,
+      "runs": 57,
+      "successes": 59,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
@@ -71,13 +71,13 @@
       "attempts": 3
     },
     "fix_issue": {
-      "weight": 24,
+      "weight": 23,
       "runs": 127,
       "successes": 126,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
-      "weight": 24,
+      "weight": 25,
       "runs": 22,
       "successes": 19,
       "description": "Review and merge open Dependabot PRs \u00e2\u20ac\u201d PRIORITY: 60+ PRs waiting across all repos"
@@ -107,7 +107,7 @@
       "description": "Deploy to GitHub Pages"
     },
     "create_release": {
-      "weight": 24,
+      "weight": 25,
       "runs": 21,
       "successes": 21,
       "description": "Create GitHub Release with tag + changelog"
@@ -689,7 +689,7 @@
   "lastRepo": "WinSentinel",
   "lastRun": "2026-03-06",
   "runCount": 54,
-  "lastWeightAdjustment": 860,
+  "lastWeightAdjustment": 870,
   "adjustmentHistory": [
     {
       "run": 650,

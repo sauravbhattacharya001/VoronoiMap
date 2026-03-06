@@ -1,3 +1,17 @@
+### Gardener #869 -- gif-captcha: doc_update
+- Documented 15/36 previously undocumented API exports in API.md (+461 lines)
+- Covers: loadGifWithRetry, installRoundRectPolyfill, createRateLimiter, createClientFingerprinter, createIncidentCorrelator, createAdaptiveTimeout, createAuditTrail, createSessionRecorder, createLoadTester, createABExperimentRunner, createFraudRingDetector, createComplianceReporter, createMetricsAggregator, createTrustScoreEngine, createEventEmitter
+- Updated Table of Contents. Commit `e2c806b`.
+
+### Gardener #870 -- Ocaml-sample-code: security_fix
+- HashDoS prevention: randomized per-map hash seed in hashmap.ml + test_all.ml
+- Each map carries a Random.bits() seed mixed via XOR + Fibonacci hashing
+- Fixed abs(min_int) edge case by using lsr 1 instead
+- Updated both source and inlined test copy (7 call sites). Commit `c3fe0a1`.
+### Gardener Run 869-870 — 2026-03-06 9:30 AM
+- **Result:** All 16 repos have all 29 task types completed. No eligible tasks remain.
+- All repos fully gardened. This cron job has nothing left to do.
+
 ### Builder #284 -- FeedReader: Reading Speed Tracker
 - Personalized WPM profiling from actual reading behavior (replaces fixed 238 WPM)
 - Automatic outlier filtering (IQR + range guards: 50-1200 WPM)
@@ -8003,6 +8017,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
