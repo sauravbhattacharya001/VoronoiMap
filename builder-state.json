@@ -1,5 +1,5 @@
 {
-  "totalRuns": 259,
+  "totalRuns": 260,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -206,7 +206,8 @@
       "PromptGrammarValidator -- LLM output format validation with 11 rule types (Regex/JsonSchema/Enum/StartsWith/EndsWith/Contains/NotContains/Length/LineCount/Structure/Custom), 6 presets, batch validation, auto-fix suggestions, severity levels, text reports. 77 tests (2026-03-04)",
       "PromptComplianceChecker -- organizational policy enforcement with 3 built-in policies (enterprise/safety/regulatory), 16 built-in rules, custom rule builders (RequirePattern/ForbidPattern/MaxLength/MinLength/RequireSections), batch checking, compliance scoring. 61 tests.",
       "PromptDocGenerator -- auto-documentation from prompt templates with variable/section/metadata extraction, complexity rating, Markdown/JSON output, catalog generation, prompt comparison. 55 tests (2026-03-04)",
-      "Prompt Migration Assistant -- cross-provider prompt adaptation. 73 tests, 1692 lines. Commit 3dc447e (2026-03-05)"
+      "Prompt Migration Assistant -- cross-provider prompt adaptation. 73 tests, 1692 lines. Commit 3dc447e (2026-03-05)",
+      "PromptContextBuilder -- priority-based prompt context assembly with token budgeting. 5 truncation strategies (KeepStart/KeepEnd/KeepStartAndEnd/DropIfOverBudget/Never), per-block maxTokens/minTokens, labels, tag filtering, smart break points, detailed build results, allocation summary report. 59 tests. Commit 374686e (2026-03-05)"
     ],
     "everything": [
       "Added calendar view with month grid, event dots, and day-tap to filter events",
@@ -443,8 +444,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "GraphVisual",
-  "lastFeature": "Metric Dimension Analyzer",
+  "lastRepo": "prompt",
+  "lastFeature": "PromptContextBuilder",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
