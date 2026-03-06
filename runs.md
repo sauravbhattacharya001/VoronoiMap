@@ -1,3 +1,11 @@
+### Builder #283 -- Vidly: Parental Controls / Content Rating Service
+- ContentRating enum (G/PG/PG-13/R/NC-17/Unrated) + ContentAdvisory flags (8 types)
+- Per-movie content profiles with rating, advisories, custom notes
+- Per-customer parental control profiles with max rating, warn/block advisories, 4-digit PIN
+- Access checking (Allowed/AllowedWithWarnings/Blocked) + PIN override
+- Genre-based auto-rating suggestions + bulk auto-rate
+- Family-friendly filtering, rating/advisory queries, distribution stats
+- 63 tests. Commit `c69f62a` pushed to master.
 ### Gardener #863 -- agenticchat: security_fix (CSV injection + CSP hardening)
 - Fixed CSV injection (DDE/formula injection) in csvEscape — cells starting with =,+,-,@,\t,\r now prefixed with single-quote. OWASP-referenced.
 - CSP hardened: added object-src 'none', worker-src 'none', form-action 'self', base-uri 'self', frame-ancestors 'none'. Removed unused blob: from frame-src.
@@ -7967,6 +7975,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

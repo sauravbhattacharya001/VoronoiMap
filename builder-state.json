@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-03-06T08:18:00-08:00",
-  "runsCompleted": 12,
-  "lastRepo": "everything",
-  "lastFeature": "Achievement System \u2014 gamification across all trackers",
+  "lastRun": "2026-03-06T08:48:00-08:00",
+  "runsCompleted": 14,
+  "lastRepo": "Vidly",
+  "lastFeature": "Parental Controls / Content Rating Service",
   "lastPR": "",
   "repoFeatures": {
     "Ocaml-sample-code": [
@@ -31,6 +31,12 @@
     ],
     "everything": [
       "Achievement System \u2014 40 badges, 12 categories, 5 tiers, level system, progress tracking"
+    ],
+    "gif-captcha": [
+      "Event Emitter \u2014 lightweight pub/sub for CAPTCHA lifecycle hooks (on/once/off/emit/pipe/wildcard)"
+    ],
+    "Vidly": [
+      "Parental Controls \u2014 MPAA ratings, content advisories, per-customer profiles, PIN override, family filtering"
     ]
   }
 }
