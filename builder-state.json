@@ -1,5 +1,5 @@
 {
-  "totalRuns": 268,
+  "totalRuns": 269,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -450,10 +450,13 @@
       "Backup Security Audit",
       "PeerBenchmarkService",
       "Security Knowledge Base -- 26 built-in entries mapping findings to CWE/MITRE ATT&CK. Finding matching (exact/substring/keyword). Per-finding + full report enrichment with CWE/ATT&CK distribution, impact ratings, best practices, references. Free-text search, custom registration, text report generation. 47 tests. Commit 4c5c882 (2026-03-06)"
+    ],
+    "sauravbhattacharya001": [
+      "Project Search & Category Filter -- text search (debounced, matches title/desc/repo/tags) + category filter pills (AI & Agents, Security, etc.) with AND combination. No-results message. 18 new tests (87 total). Commit 38d8e42 (2026-03-06)"
     ]
   },
-  "lastRepo": "Vidly",
-  "lastFeature": "SeasonalPromotionService",
+  "lastRepo": "sauravbhattacharya001",
+  "lastFeature": "Project Search & Category Filter",
   "lastRun": "2026-03-06",
   "features": {
     "GraphVisual": [
