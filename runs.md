@@ -1,3 +1,44 @@
+### Gardener #863 -- agenticchat: security_fix (CSV injection + CSP hardening)
+- Fixed CSV injection (DDE/formula injection) in csvEscape — cells starting with =,+,-,@,\t,\r now prefixed with single-quote. OWASP-referenced.
+- CSP hardened: added object-src 'none', worker-src 'none', form-action 'self', base-uri 'self', frame-ancestors 'none'. Removed unused blob: from frame-src.
+- 1181/1183 tests pass (2 pre-existing failures). Commit `9543f74`.
+
+### Gardener #864 -- WinSentinel: add_tests (SecurityScorer + FindingDeduplicator)
+- 56 new tests covering SecurityScorer (22) and FindingDeduplicator (34)
+- Both had zero prior test coverage
+- Tests cover scoring, grading, colors, n-gram similarity, dedup grouping, cross-module dedup, edge cases
+- 169 total tests pass. Commit `ada1f98`.
+### Repo Gardener Run 865-866 — 2026-03-06 9:00 AM PST
+
+**Status:** No tasks executed — all 16 repos have all 29 task types completed. No open Dependabot PRs or issues found across checked repos. Garden is fully saturated.
+
+---
+
+### Feature Builder Run 13 — 2026-03-06 08:45 AM PST
+
+**Repo:** gif-captcha
+**Feature:** Event Emitter — `createEventEmitter()` factory for CAPTCHA lifecycle hooks
+**What:** Added a zero-dependency pub/sub system. Supports `on/once/off/emit`, wildcard `*` listeners, `pipe()` for composing emitters, `maxListeners` cap, and `onError` exception handling. 16 tests, all passing.
+**Commit:** adad4f4 on main
+
+---
+
+### Gardener Run 863-864 — 2026-03-06 08:30 AM PST
+
+**Task 1: fix_issue → sauravcode**
+- Partially addressed issue #32 (compiler missing interpreter features)
+- Added `assert` statement support to the compiler (`sauravcc.py`)
+- Implemented: AssertNode class, parse_assert, compile_statement handler, AST walker
+- Compiles to C conditional with `fprintf(stderr)` + `exit(1)` on failure
+- Supports `assert condition`, `assert condition "message"`, and f-string messages
+- Tested both passing and failing assertions
+
+**Task 2: bug_fix → WinSentinel**
+- Fixed duplicate network alerts in `NetworkMonitorModule`
+- Overlapping IP ranges in `KnownBadIpPrefixes` and `TorExitNodePrefixes` caused the same connection to generate 2-3 separate alerts
+- Added per-poll-cycle `alertedRemoteIps` tracking to deduplicate across `CheckKnownBadIps`, `CheckTorConnections`, and `CheckSuspiciousPorts`
+- Higher-severity rules take priority (Critical > High > Medium)
+
 ### Builder #282 -- everything: Achievement System
 - 40 built-in achievements across 12 categories (habits, events, goals, mood, sleep, fitness, nutrition, productivity, social, learning, streaks, special) and 5 tiers (bronze→diamond)
 - Progress tracking, threshold evaluation, repeatable achievements (streaks)
@@ -7926,6 +7967,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
