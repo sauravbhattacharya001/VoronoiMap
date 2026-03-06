@@ -1,5 +1,6 @@
-# Status: Complete
+# Status: In Progress
 
-Builder #260: prompt -- PromptContextBuilder
-Gardener #833-834: agentlens -- refactor + tests
-Builder #259: GraphVisual -- Metric Dimension Analyzer
+## Builder Run #261
+- Repo: FeedReader (Swift/iOS)
+- Feature: ArticleClipboard — cross-article snippet collector for research
+- Status: implementing
