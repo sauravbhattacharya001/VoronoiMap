@@ -1,3 +1,51 @@
+## Gardener Run 819-820 -- 2026-03-05 6:50 PM PST
+
+### Gardener #819 -- sauravcode
+- **Task:** open_issue
+- Filed issue #33: Interpreter missing pop keyword handler
+- pop is a keyword in both interpreter and compiler, but only compiler has PopNode/parse_pop/code generation
+- Using pop in interpreted mode crashes with SyntaxError despite being a valid keyword
+
+### Gardener #820 -- ai
+- **Task:** security_fix
+- Fixed URL-encoding bypass in filesystem escalation rules (FS-002, FS-003, FS-004)
+- Only FS-001 (traversal) decoded percent-encoded paths; blocked path, scope, and credential checks operated on raw targets
+- An agent could bypass blocked paths with %2Fetc%2Fshadow, credential detection with %2Essh, scope checks with %2F encoding
+- Extracted shared _decode_percent_encoding() helper, applied to all 4 filesystem rules
+- Added 14 bypass tests, all 2433 tests pass
+- Commit f442bfc
+
+## Gardener Run 817-818 — 2026-03-05 6:00 PM PST
+
+### agentlens — fix_issue (#35)
+- Fixed `BudgetTracker._session_index` collision: changed from `dict[str, str]` to `dict[str, list[str]]`
+- `record_for_session`/`report_for_session` now target latest budget; `remove_budget` only removes specific entry
+- Added `reports_for_session()` method + 6 regression tests. All 62 tests pass.
+- PR #37 (updated existing branch)
+
+### Vidly — fix_issue (#44)
+- Added MaxConcurrentRentals enforcement in `RentalsController.Checkout`
+- Checks active rental count against tier limit before atomic checkout
+- Added test for Basic tier (max 2) blocking third rental
+- PR #45
+
+## Builder Run 254 -- 2026-03-05 5:45 PM PST
+
+### sauravcode -- Code Complexity Analyzer (sauravcomplex.py)
+- Cyclomatic complexity (McCabe: decision point counting)
+- Cognitive complexity (Sonar-style nesting-aware)
+- Halstead metrics (vocabulary, volume, difficulty, effort, time estimate, bug estimate)
+- Maintainability Index (Microsoft variant, 0-100, A-F grading)
+- Per-function and file-level analysis
+- Risk function flagging with configurable threshold
+- Refactoring recommendations (critical/warning/info)
+- File comparison with improvement/degradation verdict
+- Recursive directory analysis
+- Text report with box-drawing + JSON output
+- CLI: `python sauravcomplex.py program.srv [--json] [--threshold N] [--compare] [--details]`
+- 107 tests, all 1943+107 existing tests pass
+- Commit: 604cf12
+
 ## Builder Run 253 -- 2026-03-05 6:30 PM PST
 
 ### getagentbox -- Interactive Onboarding Wizard
@@ -7388,6 +7436,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
