@@ -1,3 +1,12 @@
+### Gardener #883 -- BioBots: code_cleanup
+- Consolidated 4 duplicated stats functions (mean, stddev, median, percentile) from `porosity.js` into shared `scriptUtils.js`
+- Replaced inline mean/stddev in `vascularization.js` with imported `_mean()`
+- Net +23/-28 lines. 2665/2665 tests pass. Commit `813da30`.
+
+### Gardener #884 -- ai: add_tests
+- 66 new tests for `incident.py` (test ratio was 0.23, lowest in codebase)
+- Covers ResponseStep lifecycle, Playbook progress/serialisation, IncidentConfig, all 4 responder generators, severity mapping, management methods, enums, step ordering
+- 78 total incident tests (12 existing + 66 new). Commit `e68b4ca`.
 ### Builder #290 -- agenticchat: Cost Dashboard
 - Persistent API spend tracker (module #39) with localStorage persistence
 - Summary cards, 14-day daily chart, per-model breakdown table
@@ -8193,6 +8202,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
