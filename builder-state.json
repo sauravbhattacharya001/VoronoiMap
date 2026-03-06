@@ -1,5 +1,5 @@
 {
-  "totalRuns": 266,
+  "totalRuns": 267,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -353,7 +353,8 @@
       "Feed Merge Manager -- virtual merged feeds combining multiple sources into unified streams. CRUD, 4 sort orders, cross-feed title deduplication, max article limit, search, stats, JSON export/import, text reports. 55 tests (2026-03-05)",
       "Reading Time Budget -- daily/weekly minute budgets, session tracking, pace analysis, article fit recommendations, A-F grading, weekly reports with adherence scoring and streaks, JSON persistence. 55 tests (2026-03-05)",
       "Article Flashcard Generator -- auto-extraction (definitions/statistics/comparisons/processes/facts), SM-2 spaced repetition scheduling, deck management, custom cards, review sessions with difficulty ratings, mastery progression, streaks, review forecast, JSON persistence. 55 tests (2026-03-05)",
-      "ArticleClipboard -- cross-article snippet collector for research. ClipboardSnippet model with NSSecureCoding, tags (add/remove/sanitize/dedup), word count. ArticleClipboard manager: clip/remove/removeAll, query by article/tag, search (text/title/note/tag), update note/tags, export Markdown/plain text/JSON grouped by source, stats (snippet/source/word/tag counts, date range). 72 tests. Commit 44d4887 (2026-03-05)"
+      "ArticleClipboard -- cross-article snippet collector for research. ClipboardSnippet model with NSSecureCoding, tags (add/remove/sanitize/dedup), word count. ArticleClipboard manager: clip/remove/removeAll, query by article/tag, search (text/title/note/tag), update note/tags, export Markdown/plain text/JSON grouped by source, stats (snippet/source/word/tag counts, date range). 72 tests. Commit 44d4887 (2026-03-05)",
+      "Reading Data Exporter -- full backup/import system. Exports bookmarks, highlights, notes, reading history, collections, streaks, feeds to JSON archive. Selective export (ExportOptions), 3 import conflict strategies (skip/overwrite/mergeKeepNewer), archive validation, preview. 42 tests. Commit 75687af (2026-03-06)"
     ],
     "BioBots": [
       "Added print job queue with priority scheduling, status tracking, time estimation, and batch management",
@@ -450,8 +451,8 @@
       "Security Knowledge Base -- 26 built-in entries mapping findings to CWE/MITRE ATT&CK. Finding matching (exact/substring/keyword). Per-finding + full report enrichment with CWE/ATT&CK distribution, impact ratings, best practices, references. Free-text search, custom registration, text report generation. 47 tests. Commit 4c5c882 (2026-03-06)"
     ]
   },
-  "lastRepo": "WinSentinel",
-  "lastFeature": "SecurityKnowledgeBase",
+  "lastRepo": "FeedReader",
+  "lastFeature": "ReadingDataExporter",
   "lastRun": "2026-03-06",
   "features": {
     "GraphVisual": [
