@@ -1,3 +1,16 @@
+### Builder #291 -- prompt: PromptFallbackChain
+- Resilient multi-model execution: priority-ordered Azure OpenAI tiers with automatic fallback
+- Per-tier endpoint/key/model overrides, timeout, retry config
+- Quality gate delegate to reject low-quality responses and try next tier
+- Full telemetry: responding tier, fallback count, per-attempt latency/errors
+- JSON serialisation for auditing. Fluent API.
+- +1000 lines (453 source + 547 tests). 41 new tests, 2615 total pass. Commit `4d0c2cf`.
+### Builder #27 — everything: Meditation Tracker
+- Added `MeditationEntry` model (9 technique types, pre/post mood, duration, interrupted flag)
+- Added `MeditationTrackerService` with CRUD, daily/weekly summaries, streak tracking, technique mood impact analysis, completion rate, full report with insights
+- 25+ tests in `meditation_tracker_service_test.dart`
+- Commit `5a9b5ef`, pushed to master
+
 ### Gardener #883 -- BioBots: code_cleanup
 - Consolidated 4 duplicated stats functions (mean, stddev, median, percentile) from `porosity.js` into shared `scriptUtils.js`
 - Replaced inline mean/stddev in `vascularization.js` with imported `_mean()`
@@ -8202,6 +8215,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
