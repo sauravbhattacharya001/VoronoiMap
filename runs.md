@@ -1,3 +1,27 @@
+### Gardener #877 -- Vidly: doc_update
+- Updated ARCHITECTURE.md: 12 services→32, 12 controllers→15, 6 repos→12
+- Reorganized services into 5 categories (Core, Analytics/ML, Operations, Commerce, Content)
+- Added all new models, ViewModels, test files, and new Utilities section
+- Commit `5eb9e41`. +170/-30 lines.
+
+### Gardener #878 -- BioBots: add_tests
+- Added 73 new tests across 2 files for previously untested modules
+- `scriptUtils.test.js` (25 tests): clamp, validatePositive, validateNonNegative
+- `utils.test.js` (48 tests): escapeHtml, getMetricValue, formatNum, percentile, computeStats
+- Uses eval() + jsdom for browser-global script loading in tests
+- 2665/2665 tests pass. Commit `280b28c`.
+### Gardener Run 879-880 — 2026-03-06 12:00 PM
+- **Result:** All 16 repos have all 29 task types completed. No work remaining.
+- **Note:** The gardener has fully covered every repo × task combination. Consider adding new repos or new task types to continue.
+
+### Builder #23 — agentlens: Agent Baselines
+- Added `/baselines` API for regression detection against rolling per-agent averages
+- Endpoints: record (POST), check (POST), list (GET), get (GET), delete (DELETE)
+- Tracks tokens, events, errors, processing time with running averages
+- Check classifies deltas as healthy/warning/regression/improvement
+- 11 tests, all passing
+- Commit: a31c45a
+
 ### Gardener #875 -- Vidly: refactor
 - Extracted `SortHelper<T>` utility to deduplicate controller sorting
 - 3 controllers had identical switch-over-sort-key patterns (~60 lines duplicated)
@@ -8125,6 +8149,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
