@@ -1,7 +1,5 @@
-# Status: In Progress
-
-## Gardener Run #837-838
-- Repo: GraphVisual (Java)
-- Task 1: perf_improvement
-- Task 2: fix_issue
-- Status: cloned repo, surveying
+# Status: Gardener Run #859-860
+## Task 1: fix_issue — sauravcode #33 (pop keyword crash)
+Cloning and investigating...
+## Task 2: fix_issue — agentlens #35 (BudgetTracker collision)
+Pending...
