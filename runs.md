@@ -1,3 +1,20 @@
+## Gardener Run 845-846 -- 2026-03-06 12:40 AM PST -- BioBots (JavaScript)
+
+### Task 845 (code_cleanup): Extract duplicated utility functions
+- `clamp()` duplicated across 3 files (compatibility.js, degradation.js, parameterOptimizer.js)
+- `validatePositive()` and `validateNonNegative()` duplicated across 2 files (degradation.js, maturation.js)
+- Created `Try/scripts/scriptUtils.js` shared module, replaced local definitions with `require()`
+- Updated `parameterOptimizer.js` 4 call sites from default args to explicit bounds
+- 211 tests pass across 4 refactored modules, 2592 total
+- Commit `b186308`
+
+### Task 846 (security_fix): CSV formula injection in sessionLogger (CWE-1236)
+- `sessionLogger.js` CSV export only escaped double-quotes, did not defend against formula injection
+- Messages starting with `=`, `+`, `-`, `@`, `\t`, `\r` could be interpreted as formulas by spreadsheet apps
+- Added `csvSafe()` function: OWASP dangerous leader prefix + RFC-4180 quoting
+- Added 7 new tests (formula neutralization, quoting, null handling, end-to-end export)
+- 54 sessionLogger tests pass (47 existing + 7 new)
+- Commit `b063d2b`
 ## Builder Run 265 -- 2026-03-06 12:30 AM PST
 
 ### Vidly (ASP.NET MVC) -- Dispute Resolution Service
@@ -7752,6 +7769,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
