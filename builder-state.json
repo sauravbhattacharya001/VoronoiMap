@@ -1,5 +1,5 @@
 {
-  "totalRuns": 256,
+  "totalRuns": 257,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -287,7 +287,8 @@
       "FranchiseTrackerService -- movie series management with CRUD, ordered viewing sequence, customer progress tracking (completion %, next movie, started/completed dates), drop-off analysis, genre-affinity recommendations, discovery by movie/tag, popularity ranking, text reports. 64 tests (2026-03-04)",
       "Movie Night Planner -- MovieNightPlannerService (432 lines). 8 themes (GenreFocus/Mix, DecadeFocus, CriticsChoice, FanFavorites, HiddenGems, NewReleases, SurpriseMe). Per-slot scheduling, genre snack suggestions, availability checking, customer personalization (excludes rented), input clamping. 45 tests (433 lines). All pass. (2026-03-04)",
       "Revenue Analytics Service (RevenueAnalyticsService.cs) -- period-based revenue reports, genre/membership breakdowns, monthly trends with growth rates, top customers/movies, period comparisons, linear regression forecasting with confidence intervals, peak day and day-of-week analysis. 42 tests (2026-03-04)",
-      "Membership Tier Service -- dynamic tier evaluation (Basic/Silver/Gold/Platinum) based on rental activity (count, spend, late %), configurable thresholds, tier benefits (discounts, concurrent limits, grace days, free reservations, priority new releases), tier change tracking with history, discounted rate calculator, concurrent rental enforcement, near-upgrade/at-risk detection, tier distribution analytics, full membership reports. 55 tests (2026-03-05)"
+      "Membership Tier Service -- dynamic tier evaluation (Basic/Silver/Gold/Platinum) based on rental activity (count, spend, late %), configurable thresholds, tier benefits (discounts, concurrent limits, grace days, free reservations, priority new releases), tier change tracking with history, discounted rate calculator, concurrent rental enforcement, near-upgrade/at-risk detection, tier distribution analytics, full membership reports. 55 tests (2026-03-05)",
+      "RentalReturnService -- movie return processing with tier-based late fees, condition/damage charges, loyalty points, batch returns, overdue management, customer profiles, self-service fee estimation. 57 tests, 1388 lines. Commit 6d96f49 (2026-03-05)"
     ],
     "GraphVisual": [
       "Added graph metrics panel with degree distribution, clustering coefficient, PageRank, and betweenness centrality",
@@ -440,8 +441,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "VoronoiMap",
-  "lastFeature": "Voronoi Mosaic Image Filter",
+  "lastRepo": "Vidly",
+  "lastFeature": "RentalReturnService",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [

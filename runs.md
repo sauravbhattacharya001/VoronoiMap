@@ -1,3 +1,17 @@
+## Builder Run 257 -- 2026-03-05 7:48 PM PST
+
+### Vidly -- RentalReturnService
+- Movie return processing orchestrator (missing service-layer for existing IRentalRepository.ReturnRental)
+- Late-fee calculation with tier-based grace periods (Basic 1d, Silver 2d, Gold 3d, Platinum 5d) + percentage discounts + $25 cap
+- Condition assessment with damage charges ($5/$15/$29.99)
+- Loyalty point awards (on-time bonus, perfect condition bonus, very-late penalty, tier multipliers)
+- Batch returns with partial failure handling and aggregate totals
+- Overdue management with escalating actions (reminder > warning > final notice > account hold)
+- Customer return profile with reliability rating
+- Self-service late-fee estimation with friendly messages
+- 57 tests, all pass (13 pre-existing failures in other tests)
+- Commit 6d96f49
+
 ## Gardener Run 827-828 -- 2026-03-05 7:35 PM PST
 
 ### agenticchat -- perf_improvement + open_issue
@@ -7524,6 +7538,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
