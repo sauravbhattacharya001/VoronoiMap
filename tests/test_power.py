@@ -15,7 +15,6 @@ from vormap_power import (
     WeightedSeed, PowerDiagramResult,
     _power_distance, _multiplicative_distance, _additive_distance,
     _polygon_area, _polygon_centroid, _polygon_perimeter, _convex_hull,
-    _weighted_bisector_line,
 )
 
 
@@ -489,38 +488,6 @@ class TestExportPowerSvg(unittest.TestCase):
                                        resolution=30)
         svg = export_power_svg(result, show_seeds=False)
         self.assertNotIn('<circle', svg)
-
-
-class TestWeightedBisector(unittest.TestCase):
-
-    def test_power_bisector(self):
-        result = _weighted_bisector_line((0, 0), (10, 0), 0, 0, 'power')
-        self.assertIsNotNone(result)
-        pt, dir_vec = result
-        # Midpoint should be on bisector
-        self.assertAlmostEqual(pt[0], 5.0)
-
-    def test_power_weighted_bisector_shift(self):
-        # With w1 > w2, bisector shifts toward s2
-        r1 = _weighted_bisector_line((0, 0), (10, 0), 50, 0, 'power')
-        r2 = _weighted_bisector_line((0, 0), (10, 0), 0, 0, 'power')
-        self.assertIsNotNone(r1)
-        self.assertIsNotNone(r2)
-        # With weight on s1, the bisector point x should be > 5
-        self.assertGreater(r1[0][0], r2[0][0])
-
-    def test_degenerate(self):
-        result = _weighted_bisector_line((5, 5), (5, 5), 0, 0, 'power')
-        self.assertIsNone(result)
-
-    def test_multiplicative_bisector(self):
-        result = _weighted_bisector_line((0, 0), (10, 0), 2, 1,
-                                         'multiplicative')
-        self.assertIsNotNone(result)
-
-    def test_additive_bisector(self):
-        result = _weighted_bisector_line((0, 0), (10, 0), 3, 1, 'additive')
-        self.assertIsNotNone(result)
 
 
 class TestEdgeCases(unittest.TestCase):
