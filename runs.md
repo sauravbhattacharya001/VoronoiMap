@@ -1,3 +1,17 @@
+## Gardener Run 833-834 -- 2026-03-05 9:05 PM PST
+
+### agentlens (Python) -- Refactor + Add Tests
+- **Refactor**: Extracted Transport HTTP helpers (get/post/put/delete) + _resolve_session helper
+  - 30 direct _client accesses -> 0 (moved to Transport convenience methods)
+  - 30 manual auth header constructions -> 0 (handled internally)
+  - 14 session resolution patterns -> 10 migrated to _resolve_session()
+  - tracker.py reduced from 1366 to 1240 lines (-9%)
+  - Commit c1c7596
+- **Tests**: 32 new tests for Transport convenience methods
+  - TestAuthHeaders (3), TestGet (6), TestPost (6), TestPut (5), TestDelete (5), Edge cases (7)
+  - Total tests: 1226 -> 1258
+  - Commit 6660e18
+- **Issue opened**: #38 -- Extract remaining inline session resolution into _resolve_session()
 ## Builder Run 259 -- 2026-03-05 8:48 PM PST
 
 ### GraphVisual -- Metric Dimension Analyzer
@@ -7593,6 +7607,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-06T02:36:04.277Z",
-  "totalRuns": 826,
+  "totalRuns": 828,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 22,
@@ -686,7 +686,7 @@
     ]
   },
   "notes": "Run 829-830. ai: eliminated O(n^2) scans in ForensicAnalyzer (parent-child index, prefix-max depth, reuse precomputed active counts). Added API docs for simulator, topology, drift detector + mkdocs nav fixes.",
-  "lastRepo": "gif-captcha",
+  "lastRepo": "agentlens",
   "lastRun": "2026-03-05",
   "runCount": 50,
   "lastWeightAdjustment": 820,
