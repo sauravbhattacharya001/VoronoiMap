@@ -1,3 +1,18 @@
+## Gardener Run 841-842 -- 2026-03-05 11:55 PM PST
+
+### WinSentinel (.NET/C#)
+
+**Task 841 (security_fix):** ChatHandler IP validation and ignore input sanitization (commit `7a63e8a`)
+- `block` command: replaced weak regex-only `ExtractIp()` with `InputSanitizer.SanitizeIpAddress()` (proper IPAddress.TryParse + canonical form)
+- Natural language `block 192.x.x.x` path: added `ExtractAndSanitizeIp()` wrapper (regex extract + sanitize validation)
+- `ignore` command: added length (256 max), empty, and control character validation before `AddUserOverride()`
+- Previously: raw user input passed directly to firewall commands and policy JSON serialization
+- All 3164 tests pass
+
+**Task 842 (open_issue):** Opened issue #39 — ThreatCorrelator `CheckDefenderPlusUnsigned` pairs wrong event
+- First correlation branch checks `suspiciousProcess` (any window event) but pairs `newEvent` (may be benign)
+- False attribution: operators investigate innocent process while actual suspicious one goes unexamined
+- Misleading threat scores: computed against benign event severity instead of suspicious event's Medium+
 ## Builder Run 264 -- 2026-03-05 11:45 PM PST
 
 ### sauravcode (Python) -- Code Coverage Tool (sauravcov.py)
@@ -7706,6 +7721,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
