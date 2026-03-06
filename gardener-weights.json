@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-06T10:42:20.868297Z",
-  "totalRuns": 854,
+  "totalRuns": 856,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 24,
@@ -29,8 +29,8 @@
     },
     "refactor": {
       "weight": 24,
-      "runs": 47,
-      "successes": 50,
+      "runs": 48,
+      "successes": 51,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
@@ -64,8 +64,8 @@
     },
     "open_issue": {
       "weight": 24,
-      "runs": 87,
-      "successes": 90,
+      "runs": 88,
+      "successes": 91,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
@@ -685,8 +685,8 @@
       "docs_site"
     ]
   },
-  "notes": "Run 853-854. agenticchat: module header 19->37 + JSDoc for ChatConfig/MessageAnnotations, SessionManager cache refactor (fixes #36).",
-  "lastRepo": "agenticchat",
+  "notes": "Run 855-856. FeedReader: ContentFilterManager batch/regex dedup, DateFormatter caching issue #26.",
+  "lastRepo": "FeedReader",
   "lastRun": "2026-03-06",
   "runCount": 50,
   "lastWeightAdjustment": 834,
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "doc_update",
-    "refactor"
+    "refactor",
+    "open_issue"
   ]
 }
