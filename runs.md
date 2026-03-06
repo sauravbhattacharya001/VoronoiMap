@@ -1,3 +1,13 @@
+### Builder #290 -- agenticchat: Cost Dashboard
+- Persistent API spend tracker (module #39) with localStorage persistence
+- Summary cards, 14-day daily chart, per-model breakdown table
+- Budget alerts with visual progress bar (green→yellow→red gradient)
+- CSV export, reset with confirmation, XSS-safe rendering
+- Commit `268674d`. +752 lines, 29 tests all pass.
+### Gardener #883-884 -- SKIPPED
+- All 16 repos have all 29 task types completed in repoState. No eligible tasks remain.
+- The gardener has fully covered every repo × task combination.
+
 ### Gardener #879 -- agentlens: security_fix
 - SSRF bypass hardening: embedded creds, IPv6-mapped IPv4, non-standard IP formats
 - SQL LIKE wildcard injection: `escapeLikeWildcards()` helper + ESCAPE clause on 4 search paths
@@ -8183,6 +8193,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

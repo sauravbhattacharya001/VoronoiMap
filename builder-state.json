@@ -1,55 +1,59 @@
 {
-  "lastRun": "2026-03-06T10:55:00-08:00",
-  "runsCompleted": 21,
-  "lastRepo": "Ocaml-sample-code",
-  "lastFeature": "QuickCheck - property-based testing framework with generators, shrinking, and monadic combinators",
-  "lastPR": "",
+  "lastRun": "2026-03-06T13:15:00-08:00",
+  "runsCompleted": 26,
+  "lastRepo": "agenticchat",
+  "lastFeature": "Cost Dashboard \u2014 persistent API spend tracker with budget alerts, daily chart, per-model breakdown",
   "repoFeatures": {
     "Ocaml-sample-code": [
-      "Zipper \u2014 functional cursor (list/tree/filesystem)",
+      "Zipper \u00e2\u20ac\u201d functional cursor (list/tree/filesystem)",
       "QuickCheck - property-based testing framework (generators, shrinking, monadic combinators)"
     ],
     "agenticchat": [
       "CSV export for conversations with timestamps and response times",
-      "Global Session Search \u2014 full-text search across all saved sessions"
+      "Global Session Search \u00e2\u20ac\u201d full-text search across all saved sessions",
+      "Cost Dashboard \u2014 persistent API spend tracker with budget alerts, daily chart, model breakdown"
     ],
     "ai": [
-      "Watermark \u2014 agent state provenance fingerprinting (4 strategies)"
+      "Watermark \u00e2\u20ac\u201d agent state provenance fingerprinting (4 strategies)",
+      "Unified CLI entry point (python -m replication) \u00e2\u20ac\u201d 36 subcommands under one dispatcher"
     ],
     "VoronoiMap": [
-      "Self-contained HTML analysis report with stats, heatmap, histograms, and region table (--report flag)"
+      "Self-contained HTML analysis report with stats, heatmap, histograms, and region table (--report flag)",
+      "Synthetic point pattern generator (vormap_generate) \u00e2\u20ac\u201d 6 patterns, CLI, export, NNI stats"
     ],
     "sauravcode": [
-      "AST visualizer tool (sauravast.py) \u2014 pretty tree, JSON, Graphviz DOT, and statistics modes",
-      "VS Code extension \u2014 TextMate grammar, 25 snippets, language config"
+      "AST visualizer tool (sauravast.py) \u00e2\u20ac\u201d pretty tree, JSON, Graphviz DOT, and statistics modes",
+      "VS Code extension \u00e2\u20ac\u201d TextMate grammar, 25 snippets, language config",
+      "sauravtest \u00e2\u20ac\u201d built-in test runner for .srv files (discovery, colored output, filtering, fail-fast)"
     ],
     "BioBots": [
-      "Interactive Cost Estimator \u2014 material, machine, energy, consumable, labor breakdown with donut chart and batch scaling"
+      "Interactive Cost Estimator \u00e2\u20ac\u201d material, machine, energy, consumable, labor breakdown with donut chart and batch scaling"
     ],
     "GraphVisual": [
-      "Ego Network search panel \u2014 search by node ID, highlights 1-hop neighborhood, shows degree/type breakdown/neighbor list"
+      "Ego Network search panel \u00e2\u20ac\u201d search by node ID, highlights 1-hop neighborhood, shows degree/type breakdown/neighbor list"
     ],
     "agentlens": [
-      "Session bookmarks \u2014 star/unstar sessions, filter by bookmarks, bookmark notes, cascade delete"
+      "Session bookmarks \u00e2\u20ac\u201d star/unstar sessions, filter by bookmarks, bookmark notes, cascade delete",
+      "Agent Baselines \u00e2\u20ac\u201d track and check session performance against rolling averages (regression detection)"
     ],
     "everything": [
-      "Achievement System \u2014 40 badges, 12 categories, 5 tiers, level system, progress tracking"
+      "Achievement System \u00e2\u20ac\u201d 40 badges, 12 categories, 5 tiers, level system, progress tracking"
     ],
     "gif-captcha": [
-      "Event Emitter \u2014 lightweight pub/sub for CAPTCHA lifecycle hooks (on/once/off/emit/pipe/wildcard)"
+      "Event Emitter \u00e2\u20ac\u201d lightweight pub/sub for CAPTCHA lifecycle hooks (on/once/off/emit/pipe/wildcard)"
     ],
     "Vidly": [
-      "Parental Controls \u2014 MPAA ratings, content advisories, per-customer profiles, PIN override, family filtering"
+      "Parental Controls \u00e2\u20ac\u201d MPAA ratings, content advisories, per-customer profiles, PIN override, family filtering"
     ],
     "FeedReader": [
-      "Reading Mood Tracker \u2014 mood logging, feed impact analysis, mood-based suggestions, patterns, export",
-      "Reading Speed Tracker \u2014 personalized WPM, length-adjusted estimates, trend analysis, feed/category breakdowns, population percentile"
+      "Reading Mood Tracker \u00e2\u20ac\u201d mood logging, feed impact analysis, mood-based suggestions, patterns, export",
+      "Reading Speed Tracker \u00e2\u20ac\u201d personalized WPM, length-adjusted estimates, trend analysis, feed/category breakdowns, population percentile"
     ],
     "prompt": [
-      "PromptConditional \u2014 if/else/switch/case conditional logic for prompt templates (7 operators, nesting, validation, 33 tests)"
+      "PromptConditional \u00e2\u20ac\u201d if/else/switch/case conditional logic for prompt templates (7 operators, nesting, validation, 33 tests)"
     ],
     "getagentbox": [
-      "Interactive Commands Cheat Sheet \u2014 searchable, filterable, copy-to-clipboard command reference"
+      "Interactive Commands Cheat Sheet \u00e2\u20ac\u201d searchable, filterable, copy-to-clipboard command reference"
     ]
   }
 }
