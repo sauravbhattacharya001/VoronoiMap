@@ -1,3 +1,31 @@
+## Gardener Run 815-816 -- 2026-03-05 6:15 PM PST
+
+### Gardener #815 -- gif-captcha
+- **Task:** bug_fix
+- Fixed insertSorted eviction bias in createAdaptiveTimeout
+- arr.shift() on sorted array always removed the smallest value (fastest response time), systematically biasing percentile calculations upward
+- Fix: evict from array midpoint to avoid skewing either tail
+- All 1342 tests pass
+- Commit 8f19dcb
+
+### Gardener #816 -- sauravcode
+- **Task:** open_issue
+- Filed issue #32: Compiler (sauravcc) missing throw, assert, lambda, import, match/case, enum, yield/next
+- 9 keywords in interpreter but absent from compiler -- code using these features crashes at compile time
+- Most critical: throw is missing despite try/catch being implemented (half-finished feature)
+
+## Gardener Run 815-816 -- 2026-03-05 5:30 PM PST
+
+### VoronoiMap -- bug_fix
+- **PR #49**: Fixed bounds recomputation in `vormap_stability.py` and `vormap_temporal.py`
+- Both modules call `compute_regions()` on perturbed/shifted point sets without updating global bounds (`IND_S/N/W/E`), causing silently clipped cells and corrupted area measurements
+- Added `_recompute_bounds()` helper and calls before every `compute_regions()` on derived data
+
+### Vidly -- open_issue
+- **Issue #44**: `RentalsController.Checkout` doesn't enforce `MaxConcurrentRentals` from membership tier
+- `PricingService` defines per-tier limits (Basic: 2, Silver: 3, Gold: 5, Platinum: 10) but checkout never checks them
+- A Basic member can rent unlimited movies simultaneously
+
 ## Builder Run 252 -- 2026-03-05 6:00 PM PST
 
 ### gif-captcha -- Trust Score Engine
@@ -7349,6 +7377,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
