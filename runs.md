@@ -1,3 +1,11 @@
+### Builder #284 -- FeedReader: Reading Speed Tracker
+- Personalized WPM profiling from actual reading behavior (replaces fixed 238 WPM)
+- Automatic outlier filtering (IQR + range guards: 50-1200 WPM)
+- Length-adjusted estimates (short/medium/long articles tracked separately)
+- Trend analysis (improving/declining/steady), per-feed & per-category breakdowns
+- Population percentile ranking, speed labels (Slow to Speed Reader)
+- JSON export/import, 5000-sample cap, UserDefaults persistence
+- 46 tests. Commit `5d5c540` pushed to master.
 ### Gardener #867 -- VoronoiMap: refactor
 - O(1) KDTree reverse lookup in get_NN via _tree_by_data_id dict (was O(n) scan per call)
 - Extracted _between(a,b,v) helper — replaced 8 duplicated range-check patterns in isect()
@@ -7995,6 +8003,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

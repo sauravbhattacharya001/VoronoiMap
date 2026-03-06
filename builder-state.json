@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-03-06T08:48:00-08:00",
-  "runsCompleted": 14,
-  "lastRepo": "Vidly",
-  "lastFeature": "Parental Controls / Content Rating Service",
+  "lastRun": "2026-03-06T09:35:00-08:00",
+  "runsCompleted": 16,
+  "lastRepo": "FeedReader",
+  "lastFeature": "Reading Speed Tracker",
   "lastPR": "",
   "repoFeatures": {
     "Ocaml-sample-code": [
@@ -37,6 +37,10 @@
     ],
     "Vidly": [
       "Parental Controls \u2014 MPAA ratings, content advisories, per-customer profiles, PIN override, family filtering"
+    ],
+    "FeedReader": [
+      "Reading Mood Tracker \u2014 mood logging, feed impact analysis, mood-based suggestions, patterns, export",
+      "Reading Speed Tracker \u2014 personalized WPM, length-adjusted estimates, trend analysis, feed/category breakdowns, population percentile"
     ]
   }
 }
