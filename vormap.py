@@ -1736,6 +1736,22 @@ def main():
              'diameter line, centroid).',
     )
 
+    # ── HTML analysis report ────────────────────────────────────────
+    parser.add_argument(
+        '--report',
+        metavar='OUTPUT',
+        help='Generate a self-contained HTML analysis report combining '
+             'summary statistics, density heatmap, area distribution, '
+             'degree distribution, and per-region details table. '
+             'Provide the output file path (e.g. report.html).',
+    )
+    parser.add_argument(
+        '--report-title',
+        default=None,
+        metavar='TITLE',
+        help='Custom title for the HTML report (default: auto-generated).',
+    )
+
     args = parser.parse_args()
 
     # Apply explicit bounds if given (disables auto-detection)
@@ -1766,6 +1782,7 @@ def main():
         args.edge_network, args.edge_csv, args.edge_json, args.edge_svg,
         args.cluster, args.cluster_svg, args.cluster_json,
         args.autocorr, args.autocorr_json, args.lisa_svg,
+        args.report,
     ])
 
     data = None
@@ -2154,6 +2171,24 @@ def main():
                       % (args.autocorr_metric, args.datafile, len(data)),
             )
             print('LISA SVG saved to %s' % args.lisa_svg)
+
+    # ── HTML analysis report ─────────────────────────────────────────
+    if args.report:
+        import vormap_report
+
+        report_title = (
+            args.report_title
+            or 'Voronoi Analysis Report — %s (%d points)'
+               % (args.datafile, len(data))
+        )
+        vormap_report.generate_report(
+            data, regions,
+            (IND_S, IND_N, IND_W, IND_E),
+            args.report,
+            title=report_title,
+            allow_absolute=True,
+        )
+        print('HTML report saved to %s' % args.report)
 
     # ── Convex hull & bounding geometry ──────────────────────────────
     if args.hull or args.hull_json or args.hull_svg:
