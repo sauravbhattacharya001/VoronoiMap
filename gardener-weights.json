@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-06T18:10:00.000Z",
-  "totalRuns": 876,
+  "totalRuns": 878,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 24,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 24,
-      "runs": 80,
-      "successes": 81
+      "runs": 81,
+      "successes": 82
     },
     "security_fix": {
       "weight": 23,
@@ -29,8 +29,8 @@
     },
     "refactor": {
       "weight": 24,
-      "runs": 50,
-      "successes": 53,
+      "runs": 51,
+      "successes": 54,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
