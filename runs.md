@@ -1,3 +1,6 @@
+### Gardener #857 (code_cleanup) + #858 (fix_issue) -- getagentbox (JS)
+- **code_cleanup:** PersonalityConfigurator slider DOM caching. Four slider elements (`sliderFormality`, `sliderHumor`, `sliderDetail`, `sliderEmoji`) were individually queried via `getElementById` in 3 functions (`getSliderValues`, `applyPreset`, `init`). Added `_sliders` cache + `_getSliders()` helper — resolved once, reused everywhere. Commit `9e05489`.
+- **fix_issue:** ScrollProgress listener leak (closes #30). Added `destroy()` method with `removeEventListener` for scroll + click handlers, DOM reference cleanup, and ticking reset. `init()` now calls `destroy()` first to prevent listener accumulation. `update()` guards against stale DOM (`offsetParent` null check). Commit `8a69696`.
 ### Builder #272 -- GraphVisual (Java): Tournament Analyzer
 - **Feature:** TournamentAnalyzer — directed complete graph analysis for round-robin competitions, paired comparisons, and social choice/voting theory.
 - **Algorithms:** Score sequence (Landau's criterion), Copeland ranking with tie-handling, Condorcet winner/loser detection, king vertex identification (Maurer 1980, 2-step reachability), Hamiltonian path construction (Redei 1934, O(n²) insertion), transitivity analysis (intransitive triple detection), 2-step dominance matrix and dominance scores, strong connectivity via Kosaraju's algorithm with SCC condensation, upset detection (sorted by magnitude), Slater ranking (exact permutation for n≤10, greedy local-swap for larger), comprehensive text report generation.
@@ -7870,6 +7873,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
