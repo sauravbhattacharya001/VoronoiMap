@@ -1,3 +1,18 @@
+## Builder Run 255 -- 2026-03-05 7:30 PM PST
+
+### prompt -- Prompt Migration Assistant
+- Cross-provider prompt adaptation between LLM providers (OpenAI, Anthropic, Google, Meta, Mistral, Generic)
+- Provider detection: auto-detects source provider from prompt patterns with confidence scoring
+- Migration analysis: 10 issue categories (formatting, token limits, system prompts, role conventions, output format, unsupported features, safety, API syntax, parameters, tool calling)
+- Auto-migration: rewrites provider-specific patterns while preserving content
+- Provider profiles with context window sizes, feature flags, conventions
+- Batch analysis with aggregate stats, category breakdowns
+- Target comparison across multiple providers
+- Compatibility scoring (0-100 with letter grades)
+- Text report generation
+- 73 tests, all 2482 tests pass
+- Commit 3dc447e
+
 ## Gardener Run 823-824 -- 2026-03-05 6:35 PM PST
 
 ### VoronoiMap -- add_tests + code_cleanup + open_issue
@@ -7480,6 +7495,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

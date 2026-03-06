@@ -1,5 +1,5 @@
 {
-  "totalRuns": 254,
+  "totalRuns": 255,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -204,7 +204,8 @@
       "PromptMerger -- intelligent multi-prompt merging with section detection, 5 conflict strategies, deduplication, variable consolidation, similarity scoring. 49 tests (2026-03-04)",
       "PromptGrammarValidator -- LLM output format validation with 11 rule types (Regex/JsonSchema/Enum/StartsWith/EndsWith/Contains/NotContains/Length/LineCount/Structure/Custom), 6 presets, batch validation, auto-fix suggestions, severity levels, text reports. 77 tests (2026-03-04)",
       "PromptComplianceChecker -- organizational policy enforcement with 3 built-in policies (enterprise/safety/regulatory), 16 built-in rules, custom rule builders (RequirePattern/ForbidPattern/MaxLength/MinLength/RequireSections), batch checking, compliance scoring. 61 tests.",
-      "PromptDocGenerator -- auto-documentation from prompt templates with variable/section/metadata extraction, complexity rating, Markdown/JSON output, catalog generation, prompt comparison. 55 tests (2026-03-04)"
+      "PromptDocGenerator -- auto-documentation from prompt templates with variable/section/metadata extraction, complexity rating, Markdown/JSON output, catalog generation, prompt comparison. 55 tests (2026-03-04)",
+      "Prompt Migration Assistant -- cross-provider prompt adaptation. 73 tests, 1692 lines. Commit 3dc447e (2026-03-05)"
     ],
     "everything": [
       "Added calendar view with month grid, event dots, and day-tap to filter events",
@@ -438,8 +439,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "agentlens",
-  "lastFeature": "Incident Postmortem Generator",
+  "lastRepo": "prompt",
+  "lastFeature": "Prompt Migration Assistant",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
