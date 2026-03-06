@@ -1,61 +1,61 @@
 {
-  "lastUpdated": "2026-03-05T15:00:00.000Z",
-  "totalRuns": 808,
+  "lastUpdated": "2026-03-06T00:00:00.000Z",
+  "totalRuns": 810,
   "taskTypes": {
     "setup_copilot_agent": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Set up GitHub Copilot coding agent"
     },
     "bug_fix": {
-      "weight": 20,
-      "runs": 71,
-      "successes": 72
+      "weight": 22,
+      "runs": 72,
+      "successes": 73
     },
     "security_fix": {
-      "weight": 20,
+      "weight": 22,
       "runs": 61,
       "successes": 61,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
     "perf_improvement": {
-      "weight": 20,
-      "runs": 61,
-      "successes": 61,
+      "weight": 22,
+      "runs": 62,
+      "successes": 62,
       "totalDone": 1,
       "attempts": 2
     },
     "refactor": {
-      "weight": 20,
+      "weight": 22,
       "runs": 44,
       "successes": 47,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
     "add_tests": {
-      "weight": 20,
+      "weight": 22,
       "runs": 54,
       "successes": 54,
       "description": "Add meaningful tests",
       "attempts": 2
     },
     "readme_overhaul": {
-      "weight": 20,
+      "weight": 22,
       "runs": 20,
       "successes": 20,
       "description": "Overhaul repo README"
     },
     "doc_update": {
-      "weight": 20,
+      "weight": 22,
       "runs": 50,
       "successes": 52,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
-      "weight": 20,
+      "weight": 22,
       "runs": 45,
       "successes": 45,
       "description": "Remove dead code, unused deps",
@@ -63,123 +63,123 @@
       "attempts": 4
     },
     "open_issue": {
-      "weight": 20,
-      "runs": 81,
-      "successes": 84,
+      "weight": 22,
+      "runs": 82,
+      "successes": 85,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
     },
     "fix_issue": {
-      "weight": 20,
-      "runs": 117,
-      "successes": 116,
+      "weight": 22,
+      "runs": 118,
+      "successes": 117,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
-      "weight": 20,
+      "weight": 22,
       "runs": 22,
       "successes": 19,
       "description": "Review and merge open Dependabot PRs \u00e2\u20ac\u201d PRIORITY: 60+ PRs waiting across all repos"
     },
     "add_ci_cd": {
-      "weight": 20,
+      "weight": 22,
       "runs": 14,
       "successes": 14,
       "description": "Add GitHub Actions CI/CD workflow"
     },
     "add_codeql": {
-      "weight": 20,
+      "weight": 22,
       "runs": 15,
       "successes": 15,
       "description": "Add CodeQL security scanning"
     },
     "add_dependabot": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Deploy to GitHub Pages"
     },
     "create_release": {
-      "weight": 20,
-      "runs": 20,
-      "successes": 20,
+      "weight": 22,
+      "runs": 21,
+      "successes": 21,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
-      "weight": 20,
+      "weight": 22,
       "runs": 10,
       "successes": 10,
       "description": "Add Dockerfile"
     },
     "docker_workflow": {
-      "weight": 20,
+      "weight": 22,
       "runs": 17,
       "successes": 17,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
-      "weight": 20,
+      "weight": 22,
       "runs": 17,
       "successes": 17,
       "description": "Set up package publishing (PyPI/npm/NuGet) \u00e2\u20ac\u201d PRIORITY: PyPI is back online, publish Python packages!"
     },
     "add_badges": {
-      "weight": 20,
+      "weight": 22,
       "runs": 11,
       "successes": 11,
       "description": "Add badges to README"
     },
     "add_license": {
-      "weight": 20,
+      "weight": 22,
       "runs": 8,
       "successes": 8,
       "description": "Add/update LICENSE file"
     },
     "issue_templates": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
-      "weight": 20,
+      "weight": 22,
       "runs": 12,
       "successes": 12,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
-      "weight": 20,
+      "weight": 22,
       "runs": 15,
       "successes": 15,
       "description": "Configure branch protection"
     },
     "code_coverage": {
-      "weight": 20,
+      "weight": 22,
       "runs": 19,
       "successes": 19,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
-      "weight": 20,
+      "weight": 22,
       "runs": 16,
       "successes": 16,
       "description": "Generate & deploy docs site"
     },
     "auto_labeler": {
-      "weight": 20,
+      "weight": 22,
       "runs": 15,
       "successes": 15,
       "description": "Add auto-labeler or stale bot"
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 775-776. FeedReader: fixed aggregateStats efficiency calculation mixing history window with lifetime counts (issue #24). VoronoiMap: fixed off-by-one in find_hotspots percentile threshold calculation (issue #47).",
-  "lastRepo": "VoronoiMap",
+  "notes": "Run 809-810. getagentbox: merged PR #29 fixing XSS in Calculator innerHTML (issue #28). agentlens: filed issue #35 and opened PR #36 fixing BudgetTracker session_index collision when multiple budgets share a session_id.",
+  "lastRepo": "agentlens",
   "lastRun": "2026-03-05",
-  "runCount": 44,
+  "runCount": 46,
   "lastWeightAdjustment": 770,
   "adjustmentHistory": [
     {

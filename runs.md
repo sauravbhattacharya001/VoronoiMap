@@ -1,3 +1,44 @@
+## Gardener Run 809-810 -- 2026-03-05 4:20 PM PST
+
+### Gardener #809 -- Ocaml-sample-code
+- **Task:** create_release
+- Created v1.1.0 release -- 108 commits since v1.0.0
+- 15+ new modules (PEG parser, Earley parser, Datalog, VM, GC sim, etc.)
+- Multiple bug fixes (calculus 0/0, LRU cache, Poisson samplers)
+
+### Gardener #810 -- gif-captcha
+- **Task:** perf_improvement
+- Replaced O(n) Array.shift() with O(1) index pointer in incident correlator eviction
+- Replaced 3x JSON.parse(JSON.stringify(...)) with manual shallow copy
+- Only iterate live portion of incidentOrder in getStats/exportState
+- All 133 tests pass. Commit faeeeac
+- **Weight adjustment at run 810:** all 29 task types +2 (all >80% success rate)
+
+## Gardener Run 809-810 -- 2026-03-05 4:00 PM PST
+
+### getagentbox: fix_issue #28 (XSS in Calculator)
+- Reviewed and merged PR #29 (squash merge with --admin)
+- Replaced innerHTML with safe DOM construction using createElement/textContent
+- Issue #28 auto-closed on merge
+
+### agentlens: bug_fix (BudgetTracker session_index collision)
+- Found bug: creating two budgets for the same session_id silently overwrites _session_index
+- remove_budget() could incorrectly delete the index entry belonging to a different budget
+- Filed issue #35, opened PR #36 with fix + tests
+- Fix: raise ValueError on duplicate session, guard remove_budget index deletion
+
+## Builder Run 249 -- 2026-03-05 3:55 PM PST
+
+### GraphVisual: Line Graph Analyzer
+- Constructs L(G) where edges become vertices, adjacent if sharing endpoints
+- Vizing's theorem edge coloring bounds with Class 1/2 heuristic classification
+- Whitney's theorem check with K₃/K_{1,3} exception detection
+- Iterated line graphs L²(G), L³(G) with convergence analysis
+- Maximal matching via L(G) independent set (greedy)
+- Vertex edge-clique decomposition
+- Comprehensive stats and text report
+- 60 tests, all passing
+
 ## Builder Run 248 -- 2026-03-05 4:00 PM PST
 
 ### getagentbox: Expanded Comparison Table
@@ -7193,6 +7234,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
