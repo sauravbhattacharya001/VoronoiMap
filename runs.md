@@ -1,3 +1,33 @@
+## Gardener Run 811-812 -- 2026-03-05 4:55 PM PST
+
+### Gardener #811 -- getagentbox
+- **Task:** bug_fix
+- Fixed missing light-mode CSS for comparison table .highlight-cell class
+- Old CSS only targeted .highlight-col (thead) but not .highlight-cell (tbody)
+- Added 11 new light-mode rules for comp-yes/no/partial, hover states, wrapper border
+- Commit 1b1d744
+
+### Gardener #812 -- FeedReader
+- **Task:** add_tests
+- Added 26 tests for Feed.swift data model (had zero tests)
+- Covers: init, identifier, equality, hash, NSSecureCoding, presets, mutability
+- Commit 03b565c
+
+## Gardener Run 811-812 -- 2026-03-05 4:31 PM PST
+
+### Vidly: Fix percentage coupon validation (PR #43)
+- **Task:** bug_fix
+- CouponsController validated FixedAmount max ($100) but had no cap for Percentage coupons
+- Could create >100% discount coupons, resulting in negative pricing
+- Added percentage cap (100%) and zero-value check to both Create and Edit actions
+
+### sauravcode: Add process_escapes test coverage (PR #31)
+- **Task:** add_tests
+- process_escapes() had zero direct test coverage
+- Added 16 unit tests (all 6 escape sequences, unknown escapes, edge cases)
+- Added 6 integration tests (escapes through full interpreter pipeline)
+- All 22 tests pass
+
 ## Builder Run 250 -- 2026-03-05 4:35 PM PST
 
 ### BioBots: Print Session Logger
@@ -7249,6 +7279,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
