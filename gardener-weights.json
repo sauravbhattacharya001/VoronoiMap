@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-06T10:42:20.868297Z",
-  "totalRuns": 858,
+  "totalRuns": 862,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 24,
@@ -15,8 +15,8 @@
     },
     "security_fix": {
       "weight": 23,
-      "runs": 63,
-      "successes": 63,
+      "runs": 64,
+      "successes": 64,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
@@ -49,8 +49,8 @@
     },
     "doc_update": {
       "weight": 24,
-      "runs": 54,
-      "successes": 56,
+      "runs": 55,
+      "successes": 57,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
@@ -72,8 +72,8 @@
     },
     "fix_issue": {
       "weight": 24,
-      "runs": 124,
-      "successes": 123,
+      "runs": 126,
+      "successes": 125,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,11 +685,11 @@
       "docs_site"
     ]
   },
-  "notes": "Run 857-858. getagentbox: PersonalityConfigurator slider cache, ScrollProgress.destroy() closes #30.",
-  "lastRepo": "getagentbox",
+  "notes": "Run 861-862. getagentbox: CSP hardening + SRI + vote cap + email validation. gif-captcha: documented all 21 interactive tools in README (15 were missing).",
+  "lastRepo": "gif-captcha",
   "lastRun": "2026-03-06",
-  "runCount": 50,
-  "lastWeightAdjustment": 834,
+  "runCount": 52,
+  "lastWeightAdjustment": 860,
   "adjustmentHistory": [
     {
       "run": 650,
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "code_cleanup",
-    "fix_issue"
+    "security_fix",
+    "doc_update"
   ]
 }

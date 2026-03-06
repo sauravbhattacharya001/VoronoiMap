@@ -1,3 +1,42 @@
+### Gardener #861 -- getagentbox: security_fix (CSP + SRI + input hardening)
+- Tightened CSP: form-action 'none', added object-src 'none' and worker-src 'none'
+- Added SRI integrity hash + crossorigin=anonymous to vendored GoatCounter script
+- Vote count overflow cap (MAX_VOTES=999999 matching restoreVotes validation)
+- Email validation: 320-char RFC 5321 length cap + subscriber list max 1000
+- Commit `fb70f61` pushed to master. 118 relevant tests pass.
+
+### Gardener #862 -- gif-captcha: doc_update (15 missing pages documented)
+- README had only 6 of 21 HTML tools documented — added sections for all 15 missing:
+  benchmark, cognitive-load, comparison, effectiveness, heatmap, abtest, accessibility,
+  batch, daily, embed, frame-inspector, leaderboard, playground, streak, timing
+- Updated project structure tree (21 HTML files, 43 test files)
+- Commit `4d52a04` pushed to main. +163 lines.
+## 2026-03-06
+
+### Run 11 — agentlens: Session Bookmarks
+- **Feature:** Star/unstar sessions with optional notes, filter dashboard by bookmarks
+- **Changes:** New `session_bookmarks` table, REST API (PUT/GET/DELETE /bookmarks), dashboard star icons + filter button
+- **Tests:** 6 tests passing (CRUD, cascade delete, upsert, FK constraint, join query)
+- **Commit:** `ecd7258` pushed to master
+
+### Run 859 — everything (Dart): fix_issue #39
+- **Fix:** TimeBudgetService multi-day events now split across calendar days proportionally
+- **Fix:** Negative duration guard added to all duration consumers (_totalHours, _analyzeByTag, _analyzeByPriority, _computeDailyHours, _computeWeekdayHours)
+- **Doc:** Multi-tag counting semantics documented in _analyzeByTag
+
+### Run 860 — agentlens (JS): fix_issue #39
+- **Fix:** events/search endpoint no longer loads all events into memory for full-text search
+- **Fix:** q param search pushed to SQL via LIKE, LIMIT/OFFSET always applied in DB query
+- **Fix:** matched count computed via COUNT(*) with same WHERE clause
+
+### Builder #10 — GraphVisual (Java): Ego Network Search Panel
+- **Feature:** Ego Network search panel — search for any node to visualize its 1-hop ego network
+- **Highlights:** Center node (cyan), neighbors (blue), inter-neighbor edges; dims non-ego elements
+- **Details:** Degree count, edge type breakdown, sorted neighbor list (capped at 20)
+- **Search:** Exact → case-insensitive → partial match; Enter key support
+- **Files:** `GraphRenderers.java` (+44 lines ego overlay in all 4 transformers), `Main.java` (+195 lines panel + search logic)
+- **Commit:** `ebe0b95` pushed to `master`
+
 ### Builder #273 -- agenticchat (JS): Formatting Toolbar
 - **Feature:** FormattingToolbar — markdown formatting buttons above chat input (38th module).
 - **Buttons:** Bold, Italic, Inline Code, Code Block, Link, Heading, Bullet List, Numbered List, Strikethrough, Block Quote.
@@ -7880,6 +7919,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
