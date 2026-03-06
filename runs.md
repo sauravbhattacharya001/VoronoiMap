@@ -1,3 +1,18 @@
+## Builder Run 266 -- 2026-03-06 12:48 AM PST
+
+### WinSentinel (C#/.NET) -- Security Knowledge Base
+- Built-in security intelligence: 26 knowledge entries mapping findings to CWE IDs and MITRE ATT&CK techniques
+- Coverage: firewall, SMB, encryption, accounts, remote access, Defender, updates, privacy,
+  UAC, PowerShell, scheduled tasks, services, drivers, DNS, credentials, WiFi, Bluetooth,
+  environment, browser, virtualization, certificates, application security
+- Finding matching: exact title, substring, 2+ keyword fallback
+- Per-finding enrichment with CWE, ATT&CK technique, impact rating, explanation, best practices, references
+- Full report enrichment: CWE/ATT&CK distribution, impact distribution, category coverage, top 5 CWEs/techniques
+- Free-text search, CWE/ATT&CK/category lookup, custom entry registration
+- Text report generation with formatted output
+- 2 new files: SecurityKnowledgeBase.cs (1174 lines), SecurityKnowledgeBaseTests.cs (560 lines)
+- 47 tests, all pass
+- Commit 4c5c882
 ## Gardener Run 845-846 -- 2026-03-06 12:40 AM PST -- BioBots (JavaScript)
 
 ### Task 845 (code_cleanup): Extract duplicated utility functions
@@ -7769,6 +7784,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

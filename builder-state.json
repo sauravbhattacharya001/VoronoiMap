@@ -1,5 +1,5 @@
 {
-  "totalRuns": 265,
+  "totalRuns": 266,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -446,11 +446,12 @@
       "Incident Response Playbook",
       "Finding Deduplication Service",
       "Backup Security Audit",
-      "PeerBenchmarkService"
+      "PeerBenchmarkService",
+      "Security Knowledge Base -- 26 built-in entries mapping findings to CWE/MITRE ATT&CK. Finding matching (exact/substring/keyword). Per-finding + full report enrichment with CWE/ATT&CK distribution, impact ratings, best practices, references. Free-text search, custom registration, text report generation. 47 tests. Commit 4c5c882 (2026-03-06)"
     ]
   },
-  "lastRepo": "Vidly",
-  "lastFeature": "DisputeResolutionService",
+  "lastRepo": "WinSentinel",
+  "lastFeature": "SecurityKnowledgeBase",
   "lastRun": "2026-03-06",
   "features": {
     "GraphVisual": [
