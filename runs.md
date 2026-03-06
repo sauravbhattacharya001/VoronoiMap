@@ -1,3 +1,21 @@
+## Builder Run 251 -- 2026-03-05 5:05 PM PST
+
+### Builder #251 -- WinSentinel
+- **Feature:** PeerBenchmarkService
+- Compares system security posture against synthesized peer-group benchmarks (Home/Developer/Enterprise/Server)
+- 30 categories with IQR data, percentile ranking, strengths/weaknesses, improvement suggestions
+- CompareAll, SuggestPeerGroup, GetBenchmark, ToSummary
+- 42 tests, all passing
+- 351 lines service + 443 lines tests = 794 lines
+- Commit cabb2c5
+
+## Run 251 -- 2026-03-05 4:45 PM PST
+- **Repo:** everything (Flutter)
+- **Feature:** Screen Time Tracker
+- **Files:** lib/models/screen_time_entry.dart, lib/core/services/screen_time_tracker_service.dart, test/core/screen_time_tracker_service_test.dart (940 lines)
+- **Commit:** 96e7476 → sauravbhattacharya001/everything
+- **Note:** Had clone redirection issues (workspace .git interference); fixed with --depth 1
+
 ## Gardener Run 811-812 -- 2026-03-05 4:55 PM PST
 
 ### Gardener #811 -- getagentbox
@@ -7279,6 +7297,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
