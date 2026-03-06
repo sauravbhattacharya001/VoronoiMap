@@ -1,5 +1,5 @@
 {
-  "totalRuns": 252,
+  "totalRuns": 253,
   "repoFeatures": {
     "getagentbox": [
       "Added interactive chat demo with multiple scenarios (memory, search, reminder, image)",
@@ -25,7 +25,8 @@
       "Added interactive chat playground with pattern-matched responses and typing indicators",
       "Added live agent activity feed with simulated real-time actions. 20 activity types, Fisher-Yates shuffle, IntersectionObserver visibility, slide-in/out animations, live counters, pulse indicator, light/dark mode, reduced motion support, ARIA log region. 30 Jest tests. (2026-03-04)",
       "Interactive Prompt Gallery",
-      "Expanded Comparison Table -- replaced 3-column/8-feature table with 5-competitor/16-feature dynamic table (ChatGPT, Google Assistant, Alexa, Siri). Responsive scroll, hover highlights, light/dark theme. Commit b24f320 (2026-03-05)"
+      "Expanded Comparison Table -- replaced 3-column/8-feature table with 5-competitor/16-feature dynamic table (ChatGPT, Google Assistant, Alexa, Siri). Responsive scroll, hover highlights, light/dark theme. Commit b24f320 (2026-03-05)",
+      "Interactive Onboarding Wizard -- floating 3-step guided setup: role selection (dev/student/pro/casual), goal picker (role-specific, pick 2), personalized recommendation with tailored features, pro tips, plan suggestion, and Telegram CTA. localStorage persistence, dark mode, mobile responsive, keyboard accessible, reduced motion. Commit 79a2eb9 (2026-03-05)"
     ],
     "agentlens": [
       "Added CLI entry point with rich terminal dashboard for trace inspection",
@@ -118,7 +119,8 @@
       "Added generator functions with yield keyword, GeneratorValue runtime, collect/is_generator builtins, for/in integration, 25 tests (2026-03-04)",
       "Performance Profiler -- sauravprof.py CLI tool (397 lines). Instruments interpreter via monkey-patching + dispatch table patching. Per-function timing (total/self/min/max/avg), call graph, shadow call stack, text report with time distribution + hot spots, JSON output, smart recommendations (memoization candidates, variance, recursion). 46 tests (510 lines). All 1644 tests pass. (2026-03-04)",
       "Code Formatter (sauravfmt) -- sauravfmt.py CLI tool (445 lines). Normalises indentation (tabs/spaces, configurable width), operator spacing (binary vs unary heuristic), trailing whitespace, blank line runs, comment alignment. Modes: dry-run diff, --write, --check (CI). Recursive directory support. 72 tests. (2026-03-04)",
-      "Documentation Generator (sauravdoc) -- sauravdoc.py CLI tool. Parses .srv files, extracts functions/enums/variables/imports/sections with comments, generates Markdown/HTML/JSON docs. Directory mode with index, TOC, stats, source inclusion, private filtering. 64 tests (2026-03-05)"
+      "Documentation Generator (sauravdoc) -- sauravdoc.py CLI tool. Parses .srv files, extracts functions/enums/variables/imports/sections with comments, generates Markdown/HTML/JSON docs. Directory mode with index, TOC, stats, source inclusion, private filtering. 64 tests (2026-03-05)",
+      "Code Complexity Analyzer (sauravcomplex.py) -- cyclomatic/cognitive complexity, Halstead metrics, maintainability index, risk flagging, recommendations, file comparison, directory analysis, JSON/text output. 107 tests (2026-03-05)"
     ],
     "agenticchat": [
       "Added Markdown rendering support for AI responses with syntax-highlighted code blocks and copy button",
@@ -434,8 +436,8 @@
       "PeerBenchmarkService"
     ]
   },
-  "lastRepo": "gif-captcha",
-  "lastFeature": "Trust Score Engine",
+  "lastRepo": "sauravcode",
+  "lastFeature": "Code Complexity Analyzer",
   "lastRun": "2026-03-05",
   "features": {
     "GraphVisual": [
