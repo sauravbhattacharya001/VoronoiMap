@@ -1,3 +1,33 @@
+## Gardener Run 813-814 -- 2026-03-05 5:40 PM PST
+
+### Gardener #813 -- sauravcode
+- **Task:** add_tests
+- Added 55 edge case tests for control flow, error handling, and types
+- Covers: break/continue, for-each, try/catch, operator errors, scope, lists, maps, strings, booleans, arithmetic
+- Commit 7b9b6e3
+
+### Gardener #814 -- gif-captcha
+- **Task:** refactor
+- Extracted compliance scoring into 3 reusable helpers: _countSeverities, _computeAllCategoryScores, _weightedAverage
+- Replaced 40 lines of nested for-loops with clean functions (75 ins, 40 del)
+- All 1248 tests pass (2 pre-existing failures: describe not imported in compliance/metrics-aggregator tests)
+- Commit a3a9f4d
+
+## Gardener Run 813-814 -- 2026-03-05 5:00 PM PST
+
+### Task 1: fix_issue — agentlens
+- **Issue:** #35 — BudgetTracker session_index collision when multiple budgets share a session_id
+- **Fix:** Changed `_session_index` from `dict[str, str]` to `dict[str, list[str]]` to support multiple budgets per session
+- Added `all_reports_for_session()` method, fixed `remove_budget()` to not orphan sibling budgets
+- 6 regression tests added, all 62 tests pass
+- **PR:** [#37](https://github.com/sauravbhattacharya001/agentlens/pull/37)
+
+### Task 2: bug_fix — WinSentinel
+- **Bug:** `ExtractDirectory` in `ThreatCorrelator` truncated paths at `.` characters (was in `IndexOfAny` delimiters)
+- Broke DLL sideloading correlation for users with dotted usernames (e.g. `john.doe`)
+- Removed `.` from delimiter set, added regression test, all 16 correlator tests pass
+- **PR:** [#37](https://github.com/sauravbhattacharya001/WinSentinel/pull/37)
+
 ## Builder Run 251 -- 2026-03-05 5:05 PM PST
 
 ### Builder #251 -- WinSentinel
@@ -7297,6 +7327,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

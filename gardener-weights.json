@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-03-06T00:00:00.000Z",
-  "totalRuns": 812,
+  "totalRuns": 814,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 22,
@@ -10,8 +10,8 @@
     },
     "bug_fix": {
       "weight": 22,
-      "runs": 74,
-      "successes": 75
+      "runs": 75,
+      "successes": 76
     },
     "security_fix": {
       "weight": 22,
@@ -29,15 +29,15 @@
     },
     "refactor": {
       "weight": 22,
-      "runs": 44,
-      "successes": 47,
+      "runs": 45,
+      "successes": 48,
       "description": "Architecture/code refactor",
       "attempts": 2
     },
     "add_tests": {
       "weight": 22,
-      "runs": 56,
-      "successes": 56,
+      "runs": 57,
+      "successes": 57,
       "description": "Add meaningful tests",
       "attempts": 2
     },
@@ -72,8 +72,8 @@
     },
     "fix_issue": {
       "weight": 22,
-      "runs": 118,
-      "successes": 117,
+      "runs": 119,
+      "successes": 118,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 811-812. Vidly: opened PR #43 fixing missing percentage coupon validation (could create >100% discount coupons). sauravcode: opened PR #31 adding 22 tests for process_escapes() which had zero coverage.",
-  "lastRepo": "sauravcode",
+  "notes": "Run 813-814. agentlens: PR #37 fixing BudgetTracker session_index collision (issue #35) \u2014 changed _session_index to support multiple budgets per session. WinSentinel: PR #37 fixing ExtractDirectory truncating paths at '.' characters, breaking DLL sideloading correlation for dotted usernames.",
+  "lastRepo": "WinSentinel",
   "lastRun": "2026-03-05",
-  "runCount": 48,
+  "runCount": 50,
   "lastWeightAdjustment": 770,
   "adjustmentHistory": [
     {
@@ -704,7 +704,7 @@
     }
   ],
   "lastTasks": [
-    "bug_fix",
-    "add_tests"
+    "fix_issue",
+    "bug_fix"
   ]
 }
