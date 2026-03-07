@@ -403,14 +403,13 @@ def _generate_svg(result, bounds, width=800, height=600, animate=False,
         SVG markup.
     """
     x_min, x_max, y_min, y_max = bounds
-    bw = x_max - x_min
-    bh = y_max - y_min
 
-    def tx(x):
-        return (x - x_min) / bw * width
-
-    def ty(y):
-        return height - (y - y_min) / bh * height
+    from vormap_geometry import SVGCoordinateTransform
+    ct = SVGCoordinateTransform(
+        (x_min, x_max), (y_min, y_max), width, height,
+        margin=0, mode="stretch")
+    tx = ct.tx
+    ty = ct.ty
 
     schemes = {
         "pastel": ["#FFB3BA", "#FFDFBA", "#FFFFBA", "#BAFFC9", "#BAE1FF",

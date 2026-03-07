@@ -627,25 +627,10 @@ def export_cluster_svg(result, regions, data, output_path, *,
         output_path, allow_absolute=True)
 
     # Compute coordinate transform (data space → SVG space)
-    all_xs = [s[0] for s in data]
-    all_ys = [s[1] for s in data]
-    min_x, max_x = min(all_xs), max(all_xs)
-    min_y, max_y = min(all_ys), max(all_ys)
-    data_w = max_x - min_x or 1.0
-    data_h = max_y - min_y or 1.0
-    margin = 40
-    draw_w = width - 2 * margin
-    draw_h = height - 2 * margin
-    scale_x = draw_w / data_w
-    scale_y = draw_h / data_h
-    scale = min(scale_x, scale_y)
-
-    def tx(x):
-        return margin + (x - min_x) * scale
-
-    def ty(y):
-        # Flip Y axis (SVG Y increases downward)
-        return margin + (max_y - y) * scale
+    from vormap_geometry import SVGCoordinateTransform
+    ct = SVGCoordinateTransform.from_points(data, width, height, margin=40)
+    tx = ct.tx
+    ty = ct.ty
 
     # Build seed -> cluster_id lookup from result.labels
     label_lookup = {}
@@ -728,7 +713,7 @@ def export_cluster_svg(result, regions, data, output_path, *,
 
     # Legend
     legend_y = height - 20
-    legend_x = margin
+    legend_x = 40
     for cid in range(result.num_clusters):
         color = _cluster_color(cid, result.num_clusters)
         ET.SubElement(svg, "rect", {

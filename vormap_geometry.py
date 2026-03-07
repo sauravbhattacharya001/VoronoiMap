@@ -256,3 +256,134 @@ def normal_cdf(x):
     pdf = math.exp(-0.5 * x * x) / math.sqrt(2.0 * math.pi)
     poly = t * (b1 + t * (b2 + t * (b3 + t * (b4 + t * b5))))
     return 1.0 - pdf * poly
+
+
+# ── SVG coordinate transform ────────────────────────────────────────
+
+
+class SVGCoordinateTransform:
+    """Map data-space coordinates to SVG pixel-space.
+
+    Provides ``tx(x)`` and ``ty(y)`` methods that 14+ VoronoiMap modules
+    previously defined as inline closures.  Centralising the transform
+    eliminates ~28 duplicated closure definitions and keeps scaling
+    behaviour consistent.
+
+    Supports two scaling modes:
+
+    * **uniform** (default): aspect-preserving with centring, matching
+      the ``_CoordinateTransform`` class in ``vormap_viz``.
+    * **stretch**: independent x/y scaling to fill the canvas, matching
+      the inline pattern used in ``vormap_edge``, ``vormap_outlier``, etc.
+
+    Parameters
+    ----------
+    x_bounds : tuple[float, float]
+        (min_x, max_x) of the data.
+    y_bounds : tuple[float, float]
+        (min_y, max_y) of the data.
+    width : int or float
+        SVG canvas width in pixels.
+    height : int or float
+        SVG canvas height in pixels.
+    margin : int or float
+        Pixel margin around the drawable area (default 40).
+    mode : str
+        ``"uniform"`` for aspect-preserving or ``"stretch"`` for
+        independent x/y scaling.
+    pad_fraction : float
+        Fraction of data range to add as padding before computing the
+        transform (default 0).  Applied equally on all sides.  Useful
+        for the stretch pattern where modules typically pad by 5%.
+    """
+
+    __slots__ = ("_min_x", "_max_y", "_scale", "_scale_x", "_scale_y",
+                 "_offset_x", "_offset_y", "_mode", "_width", "_height",
+                 "_margin")
+
+    def __init__(self, x_bounds, y_bounds, width, height, *,
+                 margin=40, mode="uniform", pad_fraction=0.0):
+        min_x, max_x = x_bounds
+        min_y, max_y = y_bounds
+
+        # Apply optional padding
+        if pad_fraction > 0:
+            pad_x = (max_x - min_x) * pad_fraction
+            pad_y = (max_y - min_y) * pad_fraction
+            if pad_x == 0:
+                pad_x = 10.0
+            if pad_y == 0:
+                pad_y = 10.0
+            min_x -= pad_x
+            max_x += pad_x
+            min_y -= pad_y
+            max_y += pad_y
+
+        range_x = max(max_x - min_x, 1e-6)
+        range_y = max(max_y - min_y, 1e-6)
+
+        self._min_x = min_x
+        self._max_y = max_y
+        self._width = width
+        self._height = height
+        self._margin = margin
+        self._mode = mode
+
+        draw_w = width - 2 * margin
+        draw_h = height - 2 * margin
+
+        if mode == "stretch":
+            self._scale_x = draw_w / range_x if draw_w > 0 else 1.0
+            self._scale_y = draw_h / range_y if draw_h > 0 else 1.0
+            self._offset_x = margin
+            self._offset_y = margin
+            self._scale = min(self._scale_x, self._scale_y)
+        else:
+            scale = min(draw_w / range_x, draw_h / range_y)
+            self._scale = scale
+            self._scale_x = scale
+            self._scale_y = scale
+            self._offset_x = margin + (draw_w - range_x * scale) / 2
+            self._offset_y = margin + (draw_h - range_y * scale) / 2
+
+    def tx(self, x):
+        """Transform a data-space X to pixel-space X."""
+        if self._mode == "stretch":
+            return self._offset_x + (x - self._min_x) * self._scale_x
+        return self._offset_x + (x - self._min_x) * self._scale
+
+    def ty(self, y):
+        """Transform a data-space Y to pixel-space Y (Y-flipped for SVG)."""
+        if self._mode == "stretch":
+            return self._offset_y + (self._max_y - y) * self._scale_y
+        return self._offset_y + (self._max_y - y) * self._scale
+
+    @classmethod
+    def from_points(cls, points, width, height, **kwargs):
+        """Convenience constructor from a list of (x, y) points.
+
+        Parameters
+        ----------
+        points : list[tuple[float, float]]
+            Seed points or any coordinate data.
+        width, height : int or float
+            SVG canvas dimensions.
+        **kwargs
+            Forwarded to ``__init__`` (margin, mode, pad_fraction).
+        """
+        if not points:
+            raise ValueError("Cannot create transform from empty point list")
+        xs = [p[0] for p in points]
+        ys = [p[1] for p in points]
+        return cls((min(xs), max(xs)), (min(ys), max(ys)),
+                   width, height, **kwargs)
+
+    @property
+    def scale(self):
+        """Uniform scale factor (aspect-preserving modes).
+
+        For ``stretch`` mode, returns ``min(scale_x, scale_y)`` which can
+        be used as a reasonable approximation for radii and other isotropic
+        quantities.
+        """
+        return self._scale

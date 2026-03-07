@@ -244,11 +244,11 @@ class VoronoiReport:
             f'border-radius:8px;">'
         ]
 
-        def tx(x):
-            return (x - w) / bw * width
-
-        def ty(y):
-            return height - (y - s) / bh * height
+        from vormap_geometry import SVGCoordinateTransform
+        ct = SVGCoordinateTransform(
+            (w, e), (s, n), width, height, margin=0, mode="stretch")
+        tx = ct.tx
+        ty = ct.ty
 
         for i, region in enumerate(self.regions):
             if len(region) < 3:

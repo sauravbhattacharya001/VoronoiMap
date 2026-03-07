@@ -347,19 +347,13 @@ def export_outlier_svg(result, regions, data, path, width=800, height=600):
 
     min_x, max_x = min(all_x), max(all_x)
     min_y, max_y = min(all_y), max(all_y)
-    pad = max((max_x - min_x), (max_y - min_y)) * 0.05
-    min_x -= pad
-    max_x += pad
-    min_y -= pad
-    max_y += pad
-    range_x = max_x - min_x or 1
-    range_y = max_y - min_y or 1
 
-    def tx(x):
-        return (x - min_x) / range_x * width
-
-    def ty(y):
-        return height - (y - min_y) / range_y * height
+    from vormap_geometry import SVGCoordinateTransform
+    ct = SVGCoordinateTransform(
+        (min_x, max_x), (min_y, max_y), width, height,
+        margin=0, mode="stretch", pad_fraction=0.05)
+    tx = ct.tx
+    ty = ct.ty
 
     # Outlier seed set for fast lookup
     outlier_seeds = set()

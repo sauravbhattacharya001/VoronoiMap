@@ -712,24 +712,11 @@ def export_svg(analysis: HullAnalysis,
     if not points:
         return
 
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
-    min_x, max_x = min(xs), max(xs)
-    min_y, max_y = min(ys), max(ys)
-
-    data_w = max_x - min_x or 1.0
-    data_h = max_y - min_y or 1.0
-
-    draw_w = width - 2 * margin
-    draw_h = height - 2 * margin
-    scale = min(draw_w / data_w, draw_h / data_h)
-
-    def tx(x):
-        return margin + (x - min_x) * scale
-
-    def ty(y):
-        # Flip Y axis (SVG y grows down)
-        return height - margin - (y - min_y) * scale
+    from vormap_geometry import SVGCoordinateTransform
+    ct = SVGCoordinateTransform.from_points(points, width, height, margin=margin)
+    tx = ct.tx
+    ty = ct.ty
+    scale = ct.scale
 
     from xml.etree.ElementTree import Element, SubElement, tostring
 
