@@ -1261,6 +1261,275 @@ def get_sum(FILENAME, N1, _depth=0):
     return result, est_max_e, est_avg_e
 
 
+# ── Extracted command handlers ─────────────────────────────────────
+# Each handler encapsulates one logical CLI command that was previously
+# inlined in main().  This reduces main() by ~300 lines and makes each
+# command independently testable.
+
+
+def _cmd_generate(args):
+    """Handle --generate: create synthetic point patterns."""
+    import vormap_generate
+
+    gen_bounds = tuple(args.bounds) if args.bounds else (0, 1000, 0, 2000)
+
+    gen_kwargs = {}
+    if args.generate in ('clustered', 'mixed'):
+        gen_kwargs['parents'] = args.generate_parents
+        gen_kwargs['radius'] = args.generate_radius
+    if args.generate == 'regular':
+        gen_kwargs['jitter'] = args.generate_jitter
+    if args.generate == 'inhibitory':
+        gen_kwargs['min_dist'] = args.generate_min_dist
+    if args.generate == 'gradient':
+        gen_kwargs['direction'] = args.generate_direction
+    if args.generate == 'mixed':
+        gen_kwargs['cluster_fraction'] = args.generate_cluster_fraction
+
+    points = vormap_generate.generate_pattern(
+        args.generate, n=args.generate_n, bounds=gen_bounds,
+        seed=args.generate_seed, **gen_kwargs)
+
+    if args.generate_stats:
+        summary = vormap_generate.pattern_summary(points, args.generate)
+        print('Pattern: %s' % summary['pattern'])
+        print('Points:  %d' % summary['count'])
+        if summary.get('centroid'):
+            print('Centroid: (%.2f, %.2f)' % summary['centroid'])
+        if summary.get('spread'):
+            print('Spread:  %.2f x %.2f' % summary['spread'])
+        if summary.get('nni') is not None:
+            nni = summary['nni']
+            label = ('clustered' if nni < 0.8
+                     else 'regular' if nni > 1.2
+                     else 'random')
+            print('NNI:     %.4f (%s)' % (nni, label))
+        print()
+
+    if args.generate_output:
+        ext = args.generate_output.rsplit('.', 1)[-1].lower()
+        if ext == 'csv':
+            vormap_generate.export_csv(points, args.generate_output,
+                                       allow_absolute=True)
+        elif ext == 'json':
+            vormap_generate.export_json(points, args.generate_output,
+                                        allow_absolute=True)
+        else:
+            vormap_generate.export_txt(points, args.generate_output,
+                                       allow_absolute=True)
+        print('Generated %d %s points -> %s'
+              % (len(points), args.generate, args.generate_output))
+    else:
+        for x, y in points:
+            print('%.6f %.6f' % (x, y))
+
+
+def _cmd_stats(args, regions, data):
+    """Handle --stats / --stats-csv / --stats-json."""
+    import vormap_viz
+
+    region_stats = vormap_viz.compute_region_stats(regions, data)
+
+    if args.stats:
+        print()
+        print(vormap_viz.format_stats_table(region_stats))
+
+    if args.stats_csv:
+        vormap_viz.export_stats_csv(region_stats, args.stats_csv)
+        print('Statistics CSV saved to %s' % args.stats_csv)
+
+    if args.stats_json:
+        vormap_viz.export_stats_json(region_stats, args.stats_json)
+        print('Statistics JSON saved to %s' % args.stats_json)
+
+
+def _cmd_cluster(args, regions, data):
+    """Handle --cluster / --cluster-svg / --cluster-json."""
+    import vormap_cluster
+    import vormap_viz
+
+    region_stats = vormap_viz.compute_region_stats(regions, data)
+
+    # Parse value range if given
+    value_range = None
+    if args.cluster_range:
+        parts = args.cluster_range.split(",")
+        if len(parts) == 2:
+            value_range = (float(parts[0]), float(parts[1]))
+
+    cluster_result = vormap_cluster.cluster_regions(
+        region_stats, regions, data,
+        method=args.cluster_method,
+        metric=args.cluster_metric,
+        value_range=value_range,
+        min_neighbors=args.cluster_min_neighbors,
+        num_clusters=args.cluster_count,
+    )
+    print('Clustering: %d clusters (%s, %s)'
+          % (cluster_result.num_clusters, args.cluster_method,
+             args.cluster_metric))
+    if cluster_result.num_noise > 0:
+        print('  Noise cells: %d' % cluster_result.num_noise)
+
+    if args.cluster:
+        print()
+        print(vormap_cluster.format_cluster_table(cluster_result))
+
+    if args.cluster_json:
+        vormap_cluster.export_cluster_json(
+            cluster_result, args.cluster_json)
+        print('Cluster JSON saved to %s' % args.cluster_json)
+
+    if args.cluster_svg:
+        vormap_cluster.export_cluster_svg(
+            cluster_result, regions, data, args.cluster_svg,
+            width=args.svg_width, height=args.svg_height,
+            show_labels=args.cluster_labels,
+            title='Spatial Clusters (%s, %s) — %s (%d points)'
+                  % (args.cluster_method, args.cluster_metric,
+                     args.datafile, len(data)),
+        )
+        print('Cluster SVG saved to %s' % args.cluster_svg)
+
+
+def _cmd_edge_network(args, regions, data):
+    """Handle --edge-network / --edge-csv / --edge-json / --edge-svg."""
+    import vormap_edge
+
+    network = vormap_edge.extract_edge_network(regions)
+    stats = vormap_edge.compute_edge_stats(network)
+    print('Edge network: %d vertices, %d edges (%.0f total length)'
+          % (stats['num_vertices'], stats['num_edges'],
+             stats['total_length']))
+
+    if args.edge_network:
+        print()
+        print(vormap_edge.format_edge_stats(stats))
+
+    if args.edge_csv:
+        vormap_edge.export_edge_csv(network, args.edge_csv)
+        print('Edge CSV saved to %s' % args.edge_csv)
+
+    if args.edge_json:
+        vormap_edge.export_edge_json(network, args.edge_json)
+        print('Edge JSON saved to %s' % args.edge_json)
+
+    if args.edge_svg:
+        vormap_edge.export_edge_svg(
+            network,
+            args.edge_svg,
+            width=args.svg_width,
+            height=args.svg_height,
+            title='Edge Network — %s (%d vertices, %d edges)'
+                  % (args.datafile, stats['num_vertices'],
+                     stats['num_edges']),
+        )
+        print('Edge network SVG saved to %s' % args.edge_svg)
+
+
+def _cmd_kde(args, data):
+    """Handle --kde-svg / --kde-csv / --kde-hotspots."""
+    import vormap_kde
+
+    points = [(p[0], p[1]) for p in data]
+    grid = vormap_kde.kde_grid(
+        points,
+        nx=args.kde_nx,
+        ny=args.kde_ny,
+        bandwidth=args.kde_bandwidth,
+        bandwidth_method=args.kde_bandwidth_method,
+    )
+
+    summary = vormap_kde.kde_summary(grid)
+    print('KDE: bandwidth=%.4f  density_range=[%.2e, %.2e]  mass=%.4f'
+          % (summary['bandwidth'], summary['density_min'],
+             summary['density_max'], summary['total_mass']))
+
+    if args.kde_svg:
+        vormap_kde.export_kde_svg(
+            grid,
+            args.kde_svg,
+            width=args.svg_width,
+            height=args.svg_height,
+            ramp=args.kde_ramp,
+            show_hotspots=args.kde_show_hotspots,
+            title='KDE Density — %s (%d points, h=%.2f)'
+                  % (args.datafile, len(points), grid.bandwidth),
+        )
+        print('KDE SVG saved to %s' % args.kde_svg)
+
+    if args.kde_csv:
+        vormap_kde.export_kde_csv(grid, args.kde_csv)
+        print('KDE CSV saved to %s' % args.kde_csv)
+
+    if args.kde_hotspots:
+        hotspots = vormap_kde.find_hotspots(grid)
+        vormap_kde.export_hotspots_json(hotspots, args.kde_hotspots, grid)
+        print('Found %d hotspots, saved to %s'
+              % (len(hotspots), args.kde_hotspots))
+
+
+def _cmd_autocorr(args, regions, data):
+    """Handle --autocorr / --autocorr-json / --lisa-svg."""
+    import vormap_autocorr
+    import vormap_viz
+
+    region_stats = vormap_viz.compute_region_stats(regions, data)
+    ac_values = vormap_autocorr._extract_metric_values(
+        region_stats, args.autocorr_metric)
+
+    global_result = vormap_autocorr.global_morans_i(
+        ac_values, regions, data, metric=args.autocorr_metric)
+
+    if args.autocorr:
+        print()
+        print(vormap_autocorr.format_global_report(global_result))
+
+    lisa_result = None
+    if args.autocorr_json or args.lisa_svg:
+        lisa_result = vormap_autocorr.local_morans_i(
+            ac_values, regions, data,
+            metric=args.autocorr_metric,
+            permutations=args.lisa_permutations,
+            significance=args.lisa_significance,
+        )
+        print()
+        print(vormap_autocorr.format_lisa_summary(lisa_result))
+
+    if args.autocorr_json:
+        vormap_autocorr.export_autocorr_json(
+            global_result, lisa_result, args.autocorr_json)
+        print('Autocorrelation JSON saved to %s' % args.autocorr_json)
+
+    if args.lisa_svg:
+        vormap_autocorr.export_lisa_svg(
+            lisa_result, regions, data, args.lisa_svg,
+            width=args.svg_width, height=args.svg_height,
+            title="LISA Cluster Map (%s) — %s (%d points)"
+                  % (args.autocorr_metric, args.datafile, len(data)),
+        )
+        print('LISA SVG saved to %s' % args.lisa_svg)
+
+
+def _cmd_hull(args, data):
+    """Handle --hull / --hull-json / --hull-svg."""
+    import vormap_hull
+
+    pts = [(d["x"], d["y"]) for d in data]
+    analysis = vormap_hull.hull_analysis(pts)
+
+    if args.hull:
+        print(vormap_hull.format_report(analysis))
+
+    if args.hull_json:
+        vormap_hull.export_json(analysis, args.hull_json)
+        print('Hull JSON saved to %s' % args.hull_json)
+
+    if args.hull_svg:
+        vormap_hull.export_svg(analysis, pts, args.hull_svg)
+        print('Hull SVG saved to %s' % args.hull_svg)
+
+
 def main():
     """CLI entry point for VoronoiMap estimation."""
     import argparse
@@ -1838,59 +2107,7 @@ def main():
 
     # ── Handle --generate before normal flow ─────────────────────────
     if args.generate:
-        import vormap_generate
-
-        gen_bounds = tuple(args.bounds) if args.bounds else (0, 1000, 0, 2000)
-
-        gen_kwargs = {}
-        if args.generate in ('clustered', 'mixed'):
-            gen_kwargs['parents'] = args.generate_parents
-            gen_kwargs['radius'] = args.generate_radius
-        if args.generate == 'regular':
-            gen_kwargs['jitter'] = args.generate_jitter
-        if args.generate == 'inhibitory':
-            gen_kwargs['min_dist'] = args.generate_min_dist
-        if args.generate == 'gradient':
-            gen_kwargs['direction'] = args.generate_direction
-        if args.generate == 'mixed':
-            gen_kwargs['cluster_fraction'] = args.generate_cluster_fraction
-
-        points = vormap_generate.generate_pattern(
-            args.generate, n=args.generate_n, bounds=gen_bounds,
-            seed=args.generate_seed, **gen_kwargs)
-
-        if args.generate_stats:
-            summary = vormap_generate.pattern_summary(points, args.generate)
-            print('Pattern: %s' % summary['pattern'])
-            print('Points:  %d' % summary['count'])
-            if summary.get('centroid'):
-                print('Centroid: (%.2f, %.2f)' % summary['centroid'])
-            if summary.get('spread'):
-                print('Spread:  %.2f x %.2f' % summary['spread'])
-            if summary.get('nni') is not None:
-                nni = summary['nni']
-                label = ('clustered' if nni < 0.8
-                         else 'regular' if nni > 1.2
-                         else 'random')
-                print('NNI:     %.4f (%s)' % (nni, label))
-            print()
-
-        if args.generate_output:
-            ext = args.generate_output.rsplit('.', 1)[-1].lower()
-            if ext == 'csv':
-                vormap_generate.export_csv(points, args.generate_output,
-                                           allow_absolute=True)
-            elif ext == 'json':
-                vormap_generate.export_json(points, args.generate_output,
-                                            allow_absolute=True)
-            else:
-                vormap_generate.export_txt(points, args.generate_output,
-                                           allow_absolute=True)
-            print('Generated %d %s points -> %s'
-                  % (len(points), args.generate, args.generate_output))
-        else:
-            for x, y in points:
-                print('%.6f %.6f' % (x, y))
+        _cmd_generate(args)
         return
 
     # Apply explicit bounds if given (disables auto-detection)
@@ -2011,21 +2228,7 @@ def main():
 
     # Region statistics
     if args.stats or args.stats_csv or args.stats_json:
-        import vormap_viz
-
-        region_stats = vormap_viz.compute_region_stats(regions, data)
-
-        if args.stats:
-            print()
-            print(vormap_viz.format_stats_table(region_stats))
-
-        if args.stats_csv:
-            vormap_viz.export_stats_csv(region_stats, args.stats_csv)
-            print('Statistics CSV saved to %s' % args.stats_csv)
-
-        if args.stats_json:
-            vormap_viz.export_stats_json(region_stats, args.stats_json)
-            print('Statistics JSON saved to %s' % args.stats_json)
+        _cmd_stats(args, regions, data)
 
     # Lloyd relaxation animation
     if args.relax_animate:
@@ -2145,171 +2348,23 @@ def main():
 
     # ── Spatial clustering ──
     if args.cluster or args.cluster_svg or args.cluster_json:
-        import vormap_cluster
-        import vormap_viz
-
-        region_stats = vormap_viz.compute_region_stats(regions, data)
-
-        # Parse value range if given
-        value_range = None
-        if args.cluster_range:
-            parts = args.cluster_range.split(",")
-            if len(parts) == 2:
-                value_range = (float(parts[0]), float(parts[1]))
-
-        cluster_result = vormap_cluster.cluster_regions(
-            region_stats, regions, data,
-            method=args.cluster_method,
-            metric=args.cluster_metric,
-            value_range=value_range,
-            min_neighbors=args.cluster_min_neighbors,
-            num_clusters=args.cluster_count,
-        )
-        print('Clustering: %d clusters (%s, %s)'
-              % (cluster_result.num_clusters, args.cluster_method,
-                 args.cluster_metric))
-        if cluster_result.num_noise > 0:
-            print('  Noise cells: %d' % cluster_result.num_noise)
-
-        if args.cluster:
-            print()
-            print(vormap_cluster.format_cluster_table(cluster_result))
-
-        if args.cluster_json:
-            vormap_cluster.export_cluster_json(
-                cluster_result, args.cluster_json)
-            print('Cluster JSON saved to %s' % args.cluster_json)
-
-        if args.cluster_svg:
-            vormap_cluster.export_cluster_svg(
-                cluster_result, regions, data, args.cluster_svg,
-                width=args.svg_width, height=args.svg_height,
-                show_labels=args.cluster_labels,
-                title='Spatial Clusters (%s, %s) — %s (%d points)'
-                      % (args.cluster_method, args.cluster_metric,
-                         args.datafile, len(data)),
-            )
-            print('Cluster SVG saved to %s' % args.cluster_svg)
+        _cmd_cluster(args, regions, data)
 
     # ── Edge network analysis ──
     if args.edge_network or args.edge_csv or args.edge_json or args.edge_svg:
-        import vormap_edge
-
-        network = vormap_edge.extract_edge_network(regions)
-        stats = vormap_edge.compute_edge_stats(network)
-        print('Edge network: %d vertices, %d edges (%.0f total length)'
-              % (stats['num_vertices'], stats['num_edges'],
-                 stats['total_length']))
-
-        if args.edge_network:
-            print()
-            print(vormap_edge.format_edge_stats(stats))
-
-        if args.edge_csv:
-            vormap_edge.export_edge_csv(network, args.edge_csv)
-            print('Edge CSV saved to %s' % args.edge_csv)
-
-        if args.edge_json:
-            vormap_edge.export_edge_json(network, args.edge_json)
-            print('Edge JSON saved to %s' % args.edge_json)
-
-        if args.edge_svg:
-            vormap_edge.export_edge_svg(
-                network,
-                args.edge_svg,
-                width=args.svg_width,
-                height=args.svg_height,
-                title='Edge Network — %s (%d vertices, %d edges)'
-                      % (args.datafile, stats['num_vertices'],
-                         stats['num_edges']),
-            )
-            print('Edge network SVG saved to %s' % args.edge_svg)
+        _cmd_edge_network(args, regions, data)
 
     # ── Kernel Density Estimation ──
     kde_requested = (args.kde_svg or args.kde_csv or args.kde_hotspots)
     if kde_requested:
-        import vormap_kde
-
-        points = [(p[0], p[1]) for p in data]
-        grid = vormap_kde.kde_grid(
-            points,
-            nx=args.kde_nx,
-            ny=args.kde_ny,
-            bandwidth=args.kde_bandwidth,
-            bandwidth_method=args.kde_bandwidth_method,
-        )
-
-        summary = vormap_kde.kde_summary(grid)
-        print('KDE: bandwidth=%.4f  density_range=[%.2e, %.2e]  mass=%.4f'
-              % (summary['bandwidth'], summary['density_min'],
-                 summary['density_max'], summary['total_mass']))
-
-        if args.kde_svg:
-            vormap_kde.export_kde_svg(
-                grid,
-                args.kde_svg,
-                width=args.svg_width,
-                height=args.svg_height,
-                ramp=args.kde_ramp,
-                show_hotspots=args.kde_show_hotspots,
-                title='KDE Density — %s (%d points, h=%.2f)'
-                      % (args.datafile, len(points), grid.bandwidth),
-            )
-            print('KDE SVG saved to %s' % args.kde_svg)
-
-        if args.kde_csv:
-            vormap_kde.export_kde_csv(grid, args.kde_csv)
-            print('KDE CSV saved to %s' % args.kde_csv)
-
-        if args.kde_hotspots:
-            hotspots = vormap_kde.find_hotspots(grid)
-            vormap_kde.export_hotspots_json(hotspots, args.kde_hotspots, grid)
-            print('Found %d hotspots, saved to %s'
-                  % (len(hotspots), args.kde_hotspots))
+        _cmd_kde(args, data)
 
     # ── Spatial autocorrelation (Moran's I) ──
     autocorr_requested = (
         args.autocorr or args.autocorr_json or args.lisa_svg
     )
     if autocorr_requested:
-        import vormap_autocorr
-        import vormap_viz
-
-        region_stats = vormap_viz.compute_region_stats(regions, data)
-        ac_values = vormap_autocorr._extract_metric_values(
-            region_stats, args.autocorr_metric)
-
-        global_result = vormap_autocorr.global_morans_i(
-            ac_values, regions, data, metric=args.autocorr_metric)
-
-        if args.autocorr:
-            print()
-            print(vormap_autocorr.format_global_report(global_result))
-
-        lisa_result = None
-        if args.autocorr_json or args.lisa_svg:
-            lisa_result = vormap_autocorr.local_morans_i(
-                ac_values, regions, data,
-                metric=args.autocorr_metric,
-                permutations=args.lisa_permutations,
-                significance=args.lisa_significance,
-            )
-            print()
-            print(vormap_autocorr.format_lisa_summary(lisa_result))
-
-        if args.autocorr_json:
-            vormap_autocorr.export_autocorr_json(
-                global_result, lisa_result, args.autocorr_json)
-            print('Autocorrelation JSON saved to %s' % args.autocorr_json)
-
-        if args.lisa_svg:
-            vormap_autocorr.export_lisa_svg(
-                lisa_result, regions, data, args.lisa_svg,
-                width=args.svg_width, height=args.svg_height,
-                title="LISA Cluster Map (%s) — %s (%d points)"
-                      % (args.autocorr_metric, args.datafile, len(data)),
-            )
-            print('LISA SVG saved to %s' % args.lisa_svg)
+        _cmd_autocorr(args, regions, data)
 
     # ── HTML analysis report ─────────────────────────────────────────
     if args.report:
@@ -2331,21 +2386,7 @@ def main():
 
     # ── Convex hull & bounding geometry ──────────────────────────────
     if args.hull or args.hull_json or args.hull_svg:
-        import vormap_hull
-
-        pts = [(d["x"], d["y"]) for d in data]
-        analysis = vormap_hull.hull_analysis(pts)
-
-        if args.hull:
-            print(vormap_hull.format_report(analysis))
-
-        if args.hull_json:
-            vormap_hull.export_json(analysis, args.hull_json)
-            print('Hull JSON saved to %s' % args.hull_json)
-
-        if args.hull_svg:
-            vormap_hull.export_svg(analysis, pts, args.hull_svg)
-            print('Hull SVG saved to %s' % args.hull_svg)
+        _cmd_hull(args, data)
 
 
 if __name__ == '__main__':
