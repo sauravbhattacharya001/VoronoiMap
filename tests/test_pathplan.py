@@ -380,5 +380,104 @@ class TestStdHelper(unittest.TestCase):
         self.assertAlmostEqual(pp._std([2, 4, 4, 4, 5, 5, 7, 9]), 2.0)
 
 
+@unittest.skipUnless(HAS_SCIPY, 'scipy required')
+class TestPathPlannerEdgeCases(unittest.TestCase):
+    """Edge-case and regression tests for the Voronoi path planner."""
+
+    def test_coincident_start_and_goal_returns_found(self):
+        """Start == goal at an arbitrary point should always produce a path."""
+        roadmap = pp.build_roadmap(GRID_DATA)
+        result = pp.find_path(roadmap, (1.5, 1.5), (1.5, 1.5))
+        self.assertTrue(result.found)
+        self.assertEqual(result.waypoints[0], (1.5, 1.5))
+        self.assertEqual(result.waypoints[-1], (1.5, 1.5))
+
+    def test_start_and_goal_outside_bounds(self):
+        """Points far outside the data bounds should still snap to nearest node."""
+        roadmap = pp.build_roadmap(GRID_DATA)
+        result = pp.find_path(roadmap, (-100, -100), (100, 100))
+        self.assertTrue(result.found)
+        self.assertGreater(result.total_distance, 0)
+
+    def test_safest_path_clearance_never_zero_on_valid_graph(self):
+        """On a valid roadmap, safest path clearance should be positive."""
+        roadmap = pp.build_roadmap(GRID_DATA)
+        result = pp.find_path(roadmap, (0.5, 0.5), (2.5, 2.5), mode='safest')
+        self.assertTrue(result.found)
+        self.assertGreater(result.min_clearance, 0)
+
+    def test_all_nodes_have_valid_positions(self):
+        """Every roadmap node should have finite coordinates."""
+        roadmap = pp.build_roadmap(GRID_DATA)
+        for node in roadmap.nodes:
+            self.assertTrue(math.isfinite(node.x))
+            self.assertTrue(math.isfinite(node.y))
+            self.assertTrue(math.isfinite(node.clearance))
+
+    def test_path_waypoints_are_ordered_start_to_goal(self):
+        """First waypoint is start, last is goal, intermediates are roadmap nodes."""
+        roadmap = pp.build_roadmap(GRID_DATA)
+        start, goal = (0.3, 0.3), (2.7, 2.7)
+        result = pp.find_path(roadmap, start, goal)
+        self.assertTrue(result.found)
+        self.assertEqual(result.waypoints[0], start)
+        self.assertEqual(result.waypoints[-1], goal)
+        # Intermediate waypoints should match roadmap node positions
+        for i, ni in enumerate(result.node_indices):
+            node = roadmap.nodes[ni]
+            wp = result.waypoints[i + 1]  # +1 because waypoints[0] = start
+            self.assertAlmostEqual(wp[0], node.x, places=10)
+            self.assertAlmostEqual(wp[1], node.y, places=10)
+
+    def test_reverse_path_has_same_distance(self):
+        """Path A→B and B→A should have the same total distance (undirected graph)."""
+        roadmap = pp.build_roadmap(GRID_DATA)
+        ab = pp.find_path(roadmap, (0.5, 0.5), (2.5, 2.5))
+        ba = pp.find_path(roadmap, (2.5, 2.5), (0.5, 0.5))
+        self.assertTrue(ab.found and ba.found)
+        self.assertAlmostEqual(ab.total_distance, ba.total_distance, places=6)
+
+    def test_csv_export_roundtrips_waypoints(self):
+        """CSV export should contain all waypoints."""
+        roadmap = pp.build_roadmap(GRID_DATA)
+        result = pp.find_path(roadmap, (0.5, 0.5), (2.5, 2.5))
+        csv = pp.export_path_csv(result)
+        lines = csv.strip().split('\n')
+        # Header + one line per waypoint
+        self.assertEqual(len(lines), 1 + len(result.waypoints))
+
+    def test_json_export_stats_consistency(self):
+        """JSON export stats should match compute_path_stats output."""
+        roadmap = pp.build_roadmap(GRID_DATA)
+        result = pp.find_path(roadmap, (0.5, 0.5), (2.5, 2.5))
+        stats = pp.compute_path_stats(result, roadmap)
+        data = pp.export_path_json(result, roadmap, stats)
+        self.assertEqual(data['stats']['found'], True)
+        self.assertAlmostEqual(data['stats']['total_distance'],
+                               stats['total_distance'], places=6)
+
+    def test_large_point_set_performance(self):
+        """100-point random set should produce a valid path without error."""
+        import random
+        random.seed(99)
+        pts = [(random.uniform(0, 100), random.uniform(0, 100))
+               for _ in range(100)]
+        data = _make_data(pts)
+        roadmap = pp.build_roadmap(data)
+        result = pp.find_path(roadmap, (5, 5), (95, 95))
+        self.assertTrue(result.found)
+        self.assertGreater(len(result.waypoints), 2)
+
+    def test_svg_custom_dimensions(self):
+        """SVG export respects custom width/height."""
+        roadmap = pp.build_roadmap(GRID_DATA)
+        result = pp.find_path(roadmap, (0.5, 0.5), (2.5, 2.5))
+        svg = pp.export_path_svg(roadmap, result, width=400, height=300)
+        from xml.etree.ElementTree import fromstring
+        root = fromstring(svg)
+        self.assertEqual(root.get('width'), '400')
+        self.assertEqual(root.get('height'), '300')
+
+
 if __name__ == '__main__':
     unittest.main()
