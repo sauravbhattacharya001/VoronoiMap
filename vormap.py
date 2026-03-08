@@ -864,19 +864,37 @@ def isect_B(alng, alat, dirn):
     yr = dirn * (IND_E - alng) + alat       # right edge (x = IND_E)
     yl = dirn * (IND_W - alng) + alat       # left edge (x = IND_W)
 
-    # Collect points that actually lie on the boundary
-    ret = []
+    # Collect points that actually lie on the boundary, deduplicating
+    # corners where two edges share a vertex (e.g. (IND_W, IND_N) is
+    # on both the top and left edges).  Without dedup, corner-passing
+    # lines produce 6+ values → RuntimeError.  (Fixes #42)
+    candidates = []
     if IND_W <= xt <= IND_E:
-        ret.extend((xt, IND_N))
+        candidates.append((xt, IND_N))
     if IND_W <= xb <= IND_E:
-        ret.extend((xb, IND_S))
+        candidates.append((xb, IND_S))
     if IND_S <= yl <= IND_N:
-        ret.extend((IND_W, yl))
+        candidates.append((IND_W, yl))
     if IND_S <= yr <= IND_N:
-        ret.extend((IND_E, yr))
+        candidates.append((IND_E, yr))
+
+    # Deduplicate: two boundary edges can share a corner point
+    seen = set()
+    ret = []
+    for pt in candidates:
+        # Round to avoid floating-point near-duplicates at corners
+        key = (round(pt[0], 10), round(pt[1], 10))
+        if key not in seen:
+            seen.add(key)
+            ret.extend(pt)
 
     if len(ret) == 4:
         return ret
+
+    # Single intersection (tangent to corner): duplicate it so callers
+    # get the expected 4-element format
+    if len(ret) == 2:
+        return ret + ret
 
     raise RuntimeError(
         "Line from (%s, %s) with slope %s does not intersect search "
