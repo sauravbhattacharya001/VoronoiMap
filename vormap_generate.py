@@ -226,11 +226,6 @@ def generate_gradient(n, direction="horizontal",
     width = e - w
     height = n_bound - s
 
-    # Oversample then thin
-    oversample = int(n * 2.5)
-    candidates = [(rng.uniform(w, e), rng.uniform(s, n_bound))
-                  for _ in range(oversample)]
-
     def intensity(x, y):
         if direction == "horizontal":
             return (x - w) / width
@@ -239,12 +234,20 @@ def generate_gradient(n, direction="horizontal",
         else:  # diagonal
             return ((x - w) / width + (y - s) / height) / 2.0
 
+    # Use an adaptive loop instead of fixed oversampling.
+    # The old approach generated a fixed 2.5×n candidates and thinned,
+    # which could return far fewer than n points because the average
+    # acceptance rate of the linear intensity is only ~0.5 (expected
+    # yield ≈ 1.25n, with high variance for small n or unlucky seeds).
     points = []
-    for x, y in candidates:
+    max_attempts = n * 50
+    attempts = 0
+    while len(points) < n and attempts < max_attempts:
+        x = rng.uniform(w, e)
+        y = rng.uniform(s, n_bound)
         if rng.random() < intensity(x, y):
             points.append((x, y))
-        if len(points) >= n:
-            break
+        attempts += 1
     return points
 
 
