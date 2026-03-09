@@ -105,10 +105,9 @@ def build_delaunay_graph(stats):
     for i, s in enumerate(stats):
         poly = s.get("polygon", [])
         for vx, vy in poly:
+            # Round to tolerance level for consistent vertex matching
             key = (round(vx / tol) * tol, round(vy / tol) * tol)
-            # Use rounded key for tolerance-based matching
-            rkey = (round(vx, 4), round(vy, 4))
-            vertex_map.setdefault(rkey, []).append(i)
+            vertex_map.setdefault(key, []).append(i)
 
     # Count shared vertices per region pair
     pair_counts = {}
