@@ -485,7 +485,7 @@ def _parse_points_json(filepath):
                 # Try common key names
                 lng_val = None
                 lat_val = None
-                for xk in ('x', 'lng', 'lon', 'longitude', 'easting'):
+                for xk in ('x', 'lng', 'lon', 'long', 'longitude', 'easting'):
                     if xk in item:
                         lng_val = float(item[xk])
                         break

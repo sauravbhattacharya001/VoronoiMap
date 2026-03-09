@@ -124,6 +124,17 @@ def test_parse_json_skips_invalid(tmp_path):
     assert len(pts) == 2
 
 
+def test_parse_json_long_lat_keys(tmp_path):
+    """JSON objects with 'long'/'lat' keys should be parsed (consistency with CSV parser)."""
+    f = tmp_path / "data.json"
+    data = [{"long": -122.3, "lat": 47.6}, {"long": -73.9, "lat": 40.7}]
+    f.write_text(json.dumps(data))
+    pts = vormap._parse_points_json(str(f))
+    assert len(pts) == 2
+    assert pts[0] == (-122.3, 47.6)
+    assert pts[1] == (-73.9, 40.7)
+
+
 # ── GeoJSON parsing ──────────────────────────────────────────────────
 
 def test_parse_geojson_feature_collection(tmp_path):
