@@ -370,14 +370,17 @@ class TestPlanPath(unittest.TestCase):
 class TestStdHelper(unittest.TestCase):
 
     def test_empty_list(self):
-        self.assertEqual(pp._std([]), 0.0)
+        from vormap_geometry import std as _std
+        self.assertEqual(_std([]), 0.0)
 
     def test_single_value(self):
-        self.assertEqual(pp._std([5.0]), 0.0)
+        from vormap_geometry import std as _std
+        self.assertEqual(_std([5.0]), 0.0)
 
     def test_known_values(self):
+        from vormap_geometry import std as _std
         # std of [2, 4, 4, 4, 5, 5, 7, 9] = 2.0
-        self.assertAlmostEqual(pp._std([2, 4, 4, 4, 5, 5, 7, 9]), 2.0)
+        self.assertAlmostEqual(_std([2, 4, 4, 4, 5, 5, 7, 9]), 2.0)
 
 
 @unittest.skipUnless(HAS_SCIPY, 'scipy required')

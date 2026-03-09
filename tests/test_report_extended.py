@@ -12,8 +12,15 @@ import pytest
 
 from vormap_report import (
     VoronoiReport, generate_report,
-    _escape_html, _format_number, _polygon_area, _polygon_perimeter,
-    _polygon_centroid, _mean, _std, _median, _color_lerp,
+    _escape_html, _format_number, _color_lerp,
+)
+from vormap_geometry import (
+    polygon_area as _polygon_area,
+    polygon_perimeter as _polygon_perimeter,
+    polygon_centroid as _polygon_centroid,
+    mean as _mean,
+    std as _std,
+    median as _median,
 )
 
 

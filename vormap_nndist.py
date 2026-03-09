@@ -45,7 +45,7 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
 from vormap import validate_output_path
-from vormap_geometry import mean as _mean, std as _std, percentile as _percentile_sorted, normal_cdf as _normal_cdf
+from vormap_geometry import mean as _mean, median as _median, std as _std, percentile as _percentile_sorted, normal_cdf as _normal_cdf
 
 try:
     from scipy.spatial import cKDTree as _KDTree
@@ -70,16 +70,6 @@ def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
     """Euclidean distance between two 2D points."""
     return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
-
-def _median(values: list) -> float:
-    """Median of a list of numbers."""
-    if not values:
-        return 0.0
-    s = sorted(values)
-    n = len(s)
-    if n % 2 == 1:
-        return s[n // 2]
-    return (s[n // 2 - 1] + s[n // 2]) / 2.0
 
 
 def _polygon_area_shoelace(vertices: List[Tuple[float, float]]) -> float:

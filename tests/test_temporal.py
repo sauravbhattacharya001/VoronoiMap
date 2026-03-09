@@ -14,12 +14,12 @@ from vormap_temporal import (
     TransitionStats,
     _euclidean,
     _match_seeds,
-    _polygon_area,
     _get_cell_areas,
     export_csv,
     export_json,
     temporal_analysis,
 )
+from vormap_geometry import polygon_area as _polygon_area
 from vormap_viz import compute_regions
 
 

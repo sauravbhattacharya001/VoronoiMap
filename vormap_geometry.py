@@ -206,6 +206,44 @@ def std(values, population=True, mean_val=None):
     return math.sqrt(sum((v - m) ** 2 for v in values) / denom)
 
 
+def median(values):
+    """Median of a list of numbers.
+
+    Parameters
+    ----------
+    values : list[float]
+
+    Returns
+    -------
+    float
+        Median value, or 0.0 for empty input.
+    """
+    if not values:
+        return 0.0
+    s = sorted(values)
+    n = len(s)
+    if n % 2 == 1:
+        return s[n // 2]
+    return (s[n // 2 - 1] + s[n // 2]) / 2.0
+
+
+def cross_product_2d(o, a, b):
+    """2D cross product of vectors OA and OB.
+
+    Positive result means counter-clockwise turn from OA to OB.
+
+    Parameters
+    ----------
+    o, a, b : tuple[float, float]
+        Three 2D points.
+
+    Returns
+    -------
+    float
+    """
+    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+
 def percentile(sorted_vals, p):
     """Compute the *p*-th percentile (0–100) via linear interpolation.
 
