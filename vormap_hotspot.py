@@ -231,6 +231,11 @@ def _gi_star(values, weights, i):
 def _classify_spot(z, p, confidence):
     """Classify a region based on z-score and p-value.
 
+    Only thresholds at or below the requested ``confidence`` level are
+    considered.  For example, with ``confidence=0.05`` only the 99% and
+    95% tiers can fire; the 90% tier (p ≤ 0.10) is skipped because it
+    exceeds the user's significance cutoff.
+
     Returns one of: 'hotspot_99', 'hotspot_95', 'hotspot_90',
     'coldspot_99', 'coldspot_95', 'coldspot_90', 'not_significant'.
     """
@@ -240,6 +245,8 @@ def _classify_spot(z, p, confidence):
         (0.10, "90"),
     ]
     for p_thresh, label in thresholds:
+        if p_thresh > confidence:
+            continue  # skip tiers less strict than the requested confidence
         if p <= p_thresh:
             if z > 0:
                 return f"hotspot_{label}"
