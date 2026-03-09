@@ -22,9 +22,12 @@ import os
 import datetime
 
 from vormap_geometry import (
+    mean as _mean,
+    median as _median,
     polygon_area,
     polygon_centroid,
     polygon_perimeter,
+    std as _std,
 )
 
 
@@ -47,29 +50,6 @@ def _format_number(value, decimals=2):
         return f"{value:.{decimals}f}"
     return str(value)
 
-
-
-def _mean(values):
-    if not values:
-        return 0.0
-    return sum(values) / len(values)
-
-
-def _std(values):
-    if len(values) < 2:
-        return 0.0
-    m = _mean(values)
-    return math.sqrt(sum((v - m) ** 2 for v in values) / len(values))
-
-
-def _median(values):
-    s = sorted(values)
-    n = len(s)
-    if n == 0:
-        return 0.0
-    if n % 2 == 1:
-        return s[n // 2]
-    return (s[n // 2 - 1] + s[n // 2]) / 2.0
 
 
 def _color_lerp(t, ramp="viridis"):

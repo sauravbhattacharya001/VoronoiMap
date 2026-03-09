@@ -47,6 +47,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 import vormap
+from vormap_geometry import std as _geometry_std
 
 # scipy is optional — used for Voronoi computation
 try:
@@ -445,20 +446,11 @@ def compute_path_stats(path_result, roadmap):
         'max_clearance': max(clearances) if clearances else 0,
         'avg_clearance': (sum(clearances) / len(clearances)
                           if clearances else 0),
-        'clearance_std': _std(clearances),
+        'clearance_std': _geometry_std(clearances),
         'segment_lengths': segments,
         'start': path_result.start,
         'goal': path_result.goal,
     }
-
-
-def _std(values):
-    """Standard deviation (population)."""
-    if len(values) < 2:
-        return 0.0
-    mean = sum(values) / len(values)
-    var = sum((v - mean) ** 2 for v in values) / len(values)
-    return math.sqrt(var)
 
 
 # ── Export Functions ─────────────────────────────────────────────

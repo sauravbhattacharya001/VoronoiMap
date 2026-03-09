@@ -46,6 +46,7 @@ from typing import List, Optional, Tuple
 
 from vormap import validate_output_path
 from vormap_geometry import (
+    cross_product_2d as _cross,
     polygon_area,
     polygon_centroid,
     polygon_perimeter,
@@ -57,12 +58,6 @@ from vormap_geometry import (
 
 def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
     return edge_length(a, b)
-
-
-def _cross(o: Tuple[float, float], a: Tuple[float, float],
-           b: Tuple[float, float]) -> float:
-    """Cross product of vectors OA and OB (positive = counter-clockwise)."""
-    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
 
 
 # ── Convex Hull (Andrew's monotone chain) ───────────────────────────

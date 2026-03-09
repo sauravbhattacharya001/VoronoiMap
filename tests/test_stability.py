@@ -11,13 +11,13 @@ from vormap_stability import (
     CellStability,
     StabilityResult,
     _perturb_points,
-    _polygon_area,
     _stability_color,
     export_csv,
     export_json,
     export_svg,
     stability_analysis,
 )
+from vormap_geometry import polygon_area as _polygon_area
 from vormap_viz import compute_regions
 
 

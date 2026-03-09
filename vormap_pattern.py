@@ -37,7 +37,7 @@ import math
 from collections import namedtuple
 
 from vormap import eudist_pts
-from vormap_geometry import normal_cdf as _normal_cdf
+from vormap_geometry import cross_product_2d as _cross, normal_cdf as _normal_cdf
 
 
 # -- Result types ----------------------------------------------------
@@ -192,11 +192,6 @@ def _convex_hull_area(points):
         area += hull[i][0] * hull[j][1]
         area -= hull[j][0] * hull[i][1]
     return abs(area) / 2.0
-
-
-def _cross(o, a, b):
-    """2D cross product of vectors OA and OB."""
-    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
 
 
 # -- Core analyses ---------------------------------------------------
