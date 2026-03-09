@@ -122,7 +122,9 @@ def _snap_to(pt, points, tol=1e-6):
         if d < best_d:
             best_d = d
             best = p
-    return tuple(best) if best_d < tol * tol or best is not None else None
+    if best is None:
+        return None
+    return tuple(best) if best_d <= tol * tol else None
 
 
 def _build_adjacency_brute(points, regions):
