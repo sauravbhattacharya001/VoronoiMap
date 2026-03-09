@@ -310,8 +310,9 @@ def _betweenness_centrality(adjacency, n):
             if w != s:
                 cb[w] += delta[w]
 
-    # Normalize
-    norm = (n - 1) * (n - 2) if n > 2 else 1
+    # Normalize for undirected graph: each shortest path is counted from
+    # both endpoints, so divide by 2 compared to the directed formula.
+    norm = (n - 1) * (n - 2) / 2 if n > 2 else 1
     if norm > 0:
         for i in cb:
             cb[i] /= norm
