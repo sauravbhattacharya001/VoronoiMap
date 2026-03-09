@@ -148,6 +148,67 @@ def scott_bandwidth(points: list[tuple[float, float]]) -> float:
     return max(h, 1e-6)
 
 
+# -- Spatial binning for grid KDE acceleration --------------------------
+
+class _SpatialBins:
+    """Partition points into a regular grid of bins for fast neighbour lookup.
+
+    When computing KDE over a grid, each query point only needs points
+    within ``cutoff`` distance.  Instead of iterating all *n* source
+    points per query (O(nx * ny * n)), we iterate only the bins that
+    overlap the cutoff circle – giving O(nx * ny * k) where k << n
+    for datasets much larger than the bandwidth.
+
+    The bin cell size equals the cutoff radius so each query needs at
+    most a 3×3 neighbourhood of bins.
+    """
+
+    __slots__ = ("_bins", "_bx", "_by", "_ox", "_oy", "_cell")
+
+    def __init__(
+        self,
+        points: list[tuple[float, float]],
+        cutoff: float,
+        x_min: float, y_min: float,
+        x_max: float, y_max: float,
+    ) -> None:
+        cell = max(cutoff, 1e-9)
+        self._cell = cell
+        self._ox = x_min
+        self._oy = y_min
+        self._bx = max(1, int(math.ceil((x_max - x_min) / cell)))
+        self._by = max(1, int(math.ceil((y_max - y_min) / cell)))
+
+        bins: dict[int, list[tuple[float, float]]] = {}
+        for px, py in points:
+            bx = min(int((px - x_min) / cell), self._bx - 1)
+            by = min(int((py - y_min) / cell), self._by - 1)
+            key = by * self._bx + bx
+            if key in bins:
+                bins[key].append((px, py))
+            else:
+                bins[key] = [(px, py)]
+        self._bins = bins
+
+    def neighbours(self, qx: float, qy: float) -> list[tuple[float, float]]:
+        """Return all points in the 3×3 bin neighbourhood of (qx, qy)."""
+        bx = min(int((qx - self._ox) / self._cell), self._bx - 1)
+        by = min(int((qy - self._oy) / self._cell), self._by - 1)
+        out: list[tuple[float, float]] = []
+        for dy in (-1, 0, 1):
+            ry = by + dy
+            if ry < 0 or ry >= self._by:
+                continue
+            for dx in (-1, 0, 1):
+                rx = bx + dx
+                if rx < 0 or rx >= self._bx:
+                    continue
+                key = ry * self._bx + rx
+                if key in self._bins:
+                    out.extend(self._bins[key])
+        return out
+
+
 # -- Core KDE computation ----------------------------------------------
 
 def gaussian_kernel(dist_sq: float, h_sq: float) -> float:
@@ -234,12 +295,35 @@ def kde_grid(
     d_min = float("inf")
     d_max = 0.0
 
+    # Build spatial index for O(1)-neighbourhood point lookup.
+    # The cutoff radius is 4*bandwidth (matching kde_at_point).
+    cutoff = 4.0 * h
+    n = len(points)
+    h_sq = h * h
+    cutoff_sq = cutoff * cutoff
+
+    # For small point sets (< 64), spatial binning overhead isn't worth it.
+    use_bins = n >= 64
+    if use_bins:
+        bins = _SpatialBins(points, cutoff, x_min, y_min, x_max, y_max)
+
+    inv_n = 1.0 / n
+    coeff = 1.0 / (2.0 * math.pi * h_sq)
+
     for row in range(ny):
         y = y_min + row * (y_max - y_min) / (ny - 1)
         row_vals = []
         for col in range(nx):
             x = x_min + col * (x_max - x_min) / (nx - 1)
-            d = kde_at_point(x, y, points, h)
+            total = 0.0
+            src = bins.neighbours(x, y) if use_bins else points
+            for px, py in src:
+                dx = x - px
+                dy = y - py
+                d_sq = dx * dx + dy * dy
+                if d_sq <= cutoff_sq:
+                    total += math.exp(-0.5 * d_sq / h_sq)
+            d = total * coeff * inv_n
             row_vals.append(d)
             if d < d_min:
                 d_min = d
