@@ -41,6 +41,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import vormap
+from vormap_geometry import polygon_area, edge_length
 from vormap_viz import compute_regions, compute_region_stats
 
 
@@ -225,20 +226,7 @@ class TemporalResult:
 
 def _euclidean(a, b):
     """Euclidean distance between two 2D points."""
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
-
-
-def _polygon_area(vertices):
-    """Shoelace formula for polygon area (unsigned)."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
+    return edge_length(a, b)
 
 
 def _match_seeds(seeds_a, seeds_b, radius):
@@ -295,7 +283,7 @@ def _get_cell_areas(points):
     regions = compute_regions(points)
     areas = {}
     for seed, vertices in regions.items():
-        areas[seed] = _polygon_area(vertices)
+        areas[seed] = polygon_area(vertices)
     return areas
 
 
