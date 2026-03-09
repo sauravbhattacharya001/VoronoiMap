@@ -53,7 +53,11 @@ def _centroids_from_stats(stats):
     """Extract (x, y) centroids from region stats."""
     centroids = []
     for s in stats:
-        cx, cy = s.get("centroid", (0, 0))
+        if "centroid" in s:
+            cx, cy = s["centroid"]
+        else:
+            cx = s.get("centroid_x", 0)
+            cy = s.get("centroid_y", 0)
         centroids.append((cx, cy))
     return centroids
 
@@ -127,7 +131,11 @@ def build_delaunay_graph(stats):
 
     nodes = []
     for i, s in enumerate(stats):
-        cx, cy = s.get("centroid", (0, 0))
+        if "centroid" in s:
+            cx, cy = s["centroid"]
+        else:
+            cx = s.get("centroid_x", 0)
+            cy = s.get("centroid_y", 0)
         area = s.get("area", 0)
         nodes.append({"index": i, "centroid": (cx, cy), "area": area})
 
