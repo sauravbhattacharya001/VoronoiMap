@@ -5,27 +5,45 @@
 ## Table of Contents
 
 - [Core (`vormap`)](#vormap)
+- [Access (`vormap_access`)](#vormap_access)
 - [Autocorr (`vormap_autocorr`)](#vormap-autocorr)
 - [Clip (`vormap_clip`)](#vormap-clip)
 - [Cluster (`vormap_cluster`)](#vormap-cluster)
 - [Color (`vormap_color`)](#vormap-color)
 - [Compare (`vormap_compare`)](#vormap-compare)
+- [Coverage (`vormap_coverage`)](#vormap_coverage)
 - [Edge (`vormap_edge`)](#vormap-edge)
+- [Generate (`vormap_generate`)](#vormap_generate)
+- [GeoJSON (`vormap_geojson`)](#vormap_geojson)
 - [Geometry (`vormap_geometry`)](#vormap-geometry)
 - [Graph (`vormap_graph`)](#vormap-graph)
 - [Heatmap (`vormap_heatmap`)](#vormap-heatmap)
+- [Hotspot (`vormap_hotspot`)](#vormap_hotspot)
 - [Hull (`vormap_hull`)](#vormap-hull)
 - [Interp (`vormap_interp`)](#vormap-interp)
 - [Kde (`vormap_kde`)](#vormap-kde)
 - [Kml (`vormap_kml`)](#vormap-kml)
+- [Landscape (`vormap_landscape`)](#vormap_landscape)
+- [Merge (`vormap_merge`)](#vormap_merge)
+- [Mosaic (`vormap_mosaic`)](#vormap_mosaic)
+- [Network (`vormap_network`)](#vormap_network)
 - [Nndist (`vormap_nndist`)](#vormap-nndist)
 - [Outlier (`vormap_outlier`)](#vormap-outlier)
+- [Pathplan (`vormap_pathplan`)](#vormap_pathplan)
 - [Pattern (`vormap_pattern`)](#vormap-pattern)
 - [Power (`vormap_power`)](#vormap-power)
 - [Query (`vormap_query`)](#vormap-query)
+- [Regularity (`vormap_regularity`)](#vormap_regularity)
+- [Relax (`vormap_relax`)](#vormap_relax)
+- [Report (`vormap_report`)](#vormap_report)
+- [Sample (`vormap_sample`)](#vormap_sample)
 - [Seeds (`vormap_seeds`)](#vormap-seeds)
 - [Stability (`vormap_stability`)](#vormap-stability)
+- [Temporal (`vormap_temporal`)](#vormap_temporal)
 - [Territory (`vormap_territory`)](#vormap-territory)
+- [Transect (`vormap_transect`)](#vormap_transect)
+- [Trend (`vormap_trend`)](#vormap_trend)
+- [Variogram (`vormap_variogram`)](#vormap_variogram)
 - [Viz (`vormap_viz`)](#vormap-viz)
 
 ---
@@ -651,3 +669,284 @@ def lloyd_relaxation(data, iterations=10, *, bounds=None, callback=None)
 def generate_relaxed_diagram( datafile, output_path="voronoi_relaxed.svg", iterations=10, **kwargs, )
 def export_relaxation_html( data, iterations=10, output_path="relaxation.html", *, width=960, height=700, color_scheme=DEFAULT_COLOR_SCHEME, title=None, bounds=None, )
 ```
+
+---
+
+## vormap_access
+
+> Spatial Accessibility Analyzer for Voronoi diagrams.
+
+| Function | Description |
+|----------|-------------|
+| `proximity_scores` | Compute proximity-based accessibility scores. |
+| `gravity_scores` | Compute gravity-model accessibility scores. |
+| `two_step_fca` | Two-Step Floating Catchment Area method (Luo & Wang 2003). |
+| `enhanced_two_step_fca` | Enhanced Two-Step Floating Catchment Area (Luo & Qi 2009). |
+| `access_inequality` | Compute access inequality metrics from a list of scores. |
+| `accessibility_report` | Run a full accessibility analysis and produce a report. |
+| `export_json` | Export accessibility report to JSON. |
+| `export_csv` | Export accessibility scores to CSV. |
+| `main` | CLI entry point for spatial accessibility analysis. |
+
+---
+
+## vormap_coverage
+
+> Coverage Analyzer — service area coverage, gaps, and optimal site placement.
+
+| Function | Description |
+|----------|-------------|
+| `coverage_analysis` | Analyze service-area coverage for a set of sites. |
+| `suggest_site` | Return the optimal next-site suggestion. |
+| `export_json` | Export CoverageResult to a JSON file. |
+| `export_csv` | Export per-site coverage stats to CSV. |
+| `export_heatmap_svg` | Export a coverage depth heatmap as SVG. |
+| `render` | Render a human-readable text report. |
+| `main` | CLI entry point. |
+
+---
+
+## vormap_generate
+
+> Synthetic point pattern generator for VoronoiMap.
+
+| Function | Description |
+|----------|-------------|
+| `generate_poisson` | Complete Spatial Randomness (homogeneous Poisson process). |
+| `generate_clustered` | Thomas (Poisson cluster) process. |
+| `generate_regular` | Jittered regular grid. |
+| `generate_inhibitory` | Simple Sequential Inhibition (hard-core) process. |
+| `generate_gradient` | Inhomogeneous Poisson process with a linear density gradient. |
+| `generate_mixed` | Mixed pattern: clusters + uniform background noise. |
+| `generate_pattern` | Generate a point pattern by name. |
+| `list_patterns` | Return available pattern names. |
+| `export_txt` | Write points to a space-separated text file (vormap native format). |
+| `export_csv` | Write points to CSV with x,y headers. |
+| `export_json` | Write points as a JSON array of [x, y] pairs. |
+| `pattern_summary` | Compute summary statistics for a generated pattern. |
+| `main` | CLI entry point. |
+
+---
+
+## vormap_geojson
+
+> GeoJSON export — generates RFC 7946 GeoJSON files.
+
+| Function | Description |
+|----------|-------------|
+| `export_geojson` | Export Voronoi regions as a GeoJSON FeatureCollection. |
+| `generate_geojson` | Load data, compute regions, and export GeoJSON in one call. |
+| `main` | CLI entry point for GeoJSON export. |
+
+---
+
+## vormap_hotspot
+
+> Spatial hotspot detection using Getis-Ord Gi* statistic.
+
+| Function | Description |
+|----------|-------------|
+| `build_queen_weights` | Build queen contiguity weight matrix. |
+| `build_distance_weights` | Build distance-band weight matrix. |
+| `build_knn_weights` | Build k-nearest-neighbor weight matrix. |
+| `detect_hotspots` | Detect spatial hotspots and coldspots using Getis-Ord Gi*. |
+| `export_hotspot_svg` | Export hotspot map as SVG. |
+| `export_hotspot_json` | Export hotspot results as JSON. |
+| `export_hotspot_csv` | Export hotspot results as CSV. |
+
+---
+
+## vormap_landscape
+
+> Landscape Ecology Metrics for Voronoi Diagrams.
+
+| Function | Description |
+|----------|-------------|
+| `compute_patch_metrics` | Compute metrics for each patch. |
+| `compute_class_metrics` | Compute class-level metrics. |
+| `compute_landscape_metrics` | Compute landscape-level aggregate metrics. |
+| `analyze_landscape` | Run full landscape ecology analysis. |
+| `format_landscape_report` | Format analysis as human-readable text report. |
+| `export_landscape_json` | Export analysis to JSON file. |
+| `export_landscape_csv` | Export patch-level metrics to CSV file. |
+
+---
+
+## vormap_merge
+
+> Region Merger — merge adjacent Voronoi regions by attribute similarity.
+
+| Function | Description |
+|----------|-------------|
+| `merge_regions` | Merge adjacent Voronoi regions based on attribute similarity. |
+| `merge_summary` | Return a formatted text summary of merged zones. |
+| `export_merge_svg` | Export a colour-coded SVG of merged zones. |
+| `export_merge_json` | Export merge result as JSON. |
+| `export_merge_csv` | Export seed-to-zone mapping as CSV. |
+
+---
+
+## vormap_mosaic
+
+> Voronoi mosaic image filter — stained-glass and pixel-art effects.
+
+| Function | Description |
+|----------|-------------|
+| `create_mosaic` | Full pipeline: generate seeds, assign pixels, colour, render. |
+| `generate_seeds` | Generate seed points for the mosaic. |
+| `assign_pixels` | Assign each pixel to its nearest seed index. |
+| `compute_region_colors` | Compute the fill colour for each region. |
+| `render` | Render the mosaic image. |
+| `save_png` | Save the mosaic as a PNG file. |
+| `main` | CLI entry point. |
+
+---
+
+## vormap_network
+
+> Spatial network analysis via Delaunay triangulation.
+
+| Function | Description |
+|----------|-------------|
+| `build_delaunay_graph` | Build the Delaunay adjacency graph from Voronoi region stats. |
+| `compute_mst` | Compute the Minimum Spanning Tree using Kruskal's algorithm. |
+| `network_stats` | Compute comprehensive network statistics. |
+| `export_network_svg` | Export the spatial network as an SVG visualization. |
+| `export_network_json` | Export network analysis results as JSON. |
+| `export_network_csv` | Export per-node network metrics as CSV. |
+
+---
+
+## vormap_pathplan
+
+> Voronoi-based path planner for obstacle-aware navigation.
+
+| Function | Description |
+|----------|-------------|
+| `build_roadmap` | Build a navigation roadmap from Voronoi edges of obstacle points. |
+| `find_path` | Find a path from start to goal through the Voronoi roadmap. |
+| `compute_path_stats` | Compute detailed statistics about a path. |
+| `export_path_json` | Export path and roadmap data to JSON. |
+| `export_path_csv` | Export waypoints to CSV. |
+| `export_path_svg` | Generate an SVG visualisation of the path through obstacles. |
+| `format_path_report` | Generate a human-readable text report of the path. |
+| `plan_path` | One-call convenience function for the full path planning pipeline. |
+| `main` | CLI entry point. |
+
+---
+
+## vormap_regularity
+
+> Voronoi entropy and regularity analysis.
+
+| Function | Description |
+|----------|-------------|
+| `polygon_distribution` | Compute polygon type distribution from side counts. |
+| `voronoi_entropy` | Shannon entropy of side-count distribution (bits). |
+| `lewis_law_fit` | Fit Lewis's law: mean_area(n) = slope * n + offset. |
+| `aboav_weaire_fit` | Fit the Aboav-Weaire law from adjacency data. |
+| `regularity_analysis` | Run full Voronoi regularity and entropy analysis. |
+| `export_regularity_json` | Write regularity analysis to JSON file. |
+| `format_report` | Format a human-readable regularity report. |
+
+---
+
+## vormap_relax
+
+> Lloyd's Relaxation — Centroidal Voronoi Tessellation.
+
+| Function | Description |
+|----------|-------------|
+| `lloyd_relaxation` | Apply Lloyd's relaxation to a set of 2D points. |
+| `uniformity_score` | Measure spatial uniformity of a point set (0 = clustered, 1 = uniform). |
+| `main` | CLI entry point for Lloyd's relaxation. |
+
+---
+
+## vormap_report
+
+> Generate a self-contained HTML analysis report for a Voronoi diagram.
+
+| Function | Description |
+|----------|-------------|
+| `generate_report` | Convenience function to generate a report in one call. |
+| `generate` | Generate the HTML report and write to output_path. |
+
+---
+
+## vormap_sample
+
+> Voronoi-based spatial sampling for survey and study design.
+
+| Function | Description |
+|----------|-------------|
+| `stratified_random` | Generate stratified random samples within Voronoi regions. |
+| `systematic_grid` | Generate systematic grid samples within each Voronoi region. |
+| `centroid_based` | Sample at region centroids with optional random jitter. |
+| `boundary_focused` | Generate samples near region boundaries for transition studies. |
+| `density_weighted` | Allocate samples proportional to a density or importance field. |
+| `adaptive` | Adaptive sampling: more samples in heterogeneous regions. |
+| `export_sample_plan` | Export a sample plan to CSV or GeoJSON for field use. |
+| `coverage_analysis` | Analyze spatial coverage of a sample plan. |
+
+---
+
+## vormap_temporal
+
+> Voronoi Temporal Dynamics — track how diagrams evolve over time.
+
+| Function | Description |
+|----------|-------------|
+| `temporal_analysis` | Analyse how a Voronoi diagram evolves across time snapshots. |
+| `export_json` | Export temporal analysis to JSON. |
+| `export_csv` | Export temporal events to CSV. |
+| `main` | CLI entry point for temporal Voronoi analysis. |
+
+---
+
+## vormap_transect
+
+> Transect Profiler — cross-section analysis along a line through Voronoi diagrams.
+
+| Function | Description |
+|----------|-------------|
+| `create_transect` | Create a transect from coordinate pairs or tuples. |
+| `analyse_transect` | Analyse a transect across a Voronoi diagram. |
+| `export_transect_svg` | Export a transect profile as an SVG cross-section diagram. |
+| `export_transect_json` | Export transect analysis to JSON. |
+| `export_transect_csv` | Export transect crossings to CSV. |
+
+---
+
+## vormap_trend
+
+> Trend Surface Analysis for Voronoi diagrams.
+
+| Function | Description |
+|----------|-------------|
+| `fit_trend_surface` | Fit a polynomial trend surface to region attributes. |
+| `compare_trends` | Compare trend surfaces across polynomial orders. |
+| `predict_at` | Predict the trend value at an arbitrary (x, y) location. |
+| `predict_grid` | Generate a grid of predicted trend values. |
+| `export_trend_svg` | Export trend surface or residuals as SVG. |
+| `export_trend_csv` | Export trend analysis results to CSV. |
+| `export_trend_json` | Export trend analysis results to JSON. |
+
+---
+
+## vormap_variogram
+
+> Variogram analysis for Voronoi-based spatial data.
+
+| Function | Description |
+|----------|-------------|
+| `evaluate_model` | Evaluate a fitted variogram model at distance h. |
+| `experimental_variogram` | Compute an experimental (empirical) variogram. |
+| `fit_variogram` | Fit a theoretical variogram model to experimental data. |
+| `auto_fit` | Try all model types and return the best fit (lowest RMSE). |
+| `variogram_surface` | Compute directional variograms to detect anisotropy. |
+| `variogram_cloud` | Compute the variogram cloud (all pairwise semivariances). |
+| `export_variogram_svg` | Export an SVG plot of the experimental variogram with optional model curve. |
+| `export_variogram_csv` | Export variogram data as CSV. |
+| `export_variogram_json` | Export variogram data as JSON. |
+| `variogram_summary` | Generate a human-readable variogram summary. |
