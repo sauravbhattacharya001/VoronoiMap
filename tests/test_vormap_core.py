@@ -174,13 +174,39 @@ class TestIsectB:
             result = vormap.isect_B(500, 500, slope)
             assert len(result) == 4, f"Slope {slope} produced {len(result)} values"
 
-    def test_corner_hitting_slope_raises(self):
-        """Slope 1.0 from center of square bounds hits corners, producing
-        >2 boundary intersections, which raises RuntimeError."""
+    def test_corner_hitting_slope_returns_valid(self):
+        """Slope 1.0 from center of square bounds hits corners.
+
+        After the corner-dedup fix (#42), isect_B correctly returns the
+        two distinct corner points instead of raising RuntimeError.
+        """
         vormap.set_bounds(0, 100, 0, 100)
-        # This is a known edge case — the line goes through two corners
-        with pytest.raises(RuntimeError, match="does not intersect"):
-            vormap.isect_B(50, 50, 1.0)
+        result = vormap.isect_B(50, 50, 1.0)
+        assert len(result) == 4, f"Expected 4 values, got {len(result)}"
+        # Line y = x through (50,50) hits corners (0,0) and (100,100)
+        pts = [(result[0], result[1]), (result[2], result[3])]
+        corners = {(0.0, 0), (100.0, 100)}
+        assert set(pts) == corners, f"Expected corners {corners}, got {pts}"
+
+    def test_negative_slope_through_corners(self):
+        """Slope -1.0 from center hits anti-diagonal corners."""
+        vormap.set_bounds(0, 100, 0, 100)
+        result = vormap.isect_B(50, 50, -1.0)
+        assert len(result) == 4
+        pts = {(result[0], result[1]), (result[2], result[3])}
+        # Line y = -x + 100 through (50,50) hits (0,100) and (100,0)
+        assert pts == {(0.0, 100), (100.0, 0)}
+
+    def test_corner_slope_non_square_bounds(self):
+        """Corner-hitting slope on rectangular (non-square) bounds."""
+        # set_bounds(south, north, west, east) → y ∈ [0,100], x ∈ [0,200]
+        vormap.set_bounds(0, 100, 0, 200)
+        # slope = 100/200 = 0.5 from center (100,50) hits (0,0) and (200,100)
+        result = vormap.isect_B(100, 50, 0.5)
+        assert len(result) == 4
+        pts = {(round(result[0], 8), result[1]),
+               (round(result[2], 8), result[3])}
+        assert pts == {(0.0, 0), (200.0, 100)}
 
 
 # ── find_CXY / find_BXY (boundary endpoint selection) ───────────────
@@ -257,7 +283,7 @@ class TestBinSearch:
     def test_already_converged(self):
         """When endpoints are already within BIN_PREC, the loop body
         never runs, so xm/ym stay at -1 and RuntimeError is raised.
-        This is expected behavior — bin_search needs actual search distance."""
+        This is expected behavior - bin_search needs actual search distance."""
         data = [(0, 0), (10, 10)]
         eps = vormap.BIN_PREC / 10
         with pytest.raises(RuntimeError, match="Binary search failed"):
@@ -266,7 +292,7 @@ class TestBinSearch:
     def test_short_distance_search(self):
         """bin_search with a small but > BIN_PREC gap should converge."""
         data = [(0, 0), (10, 0)]
-        # Search between (4, 0) and (6, 0) — boundary is at x=5
+        # Search between (4, 0) and (6, 0) - boundary is at x=5
         x, y = vormap.bin_search(data, 4.0, 0, 6.0, 0, 0, 0)
         # The result depends on the NN comparison logic; just verify
         # it returns valid coordinates
