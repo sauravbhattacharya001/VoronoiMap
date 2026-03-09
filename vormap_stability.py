@@ -35,6 +35,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import vormap
+from vormap_geometry import polygon_area
 from vormap_viz import compute_regions, compute_region_stats
 
 
@@ -197,25 +198,12 @@ def _match_seeds(
             p_seed = perturbed_data[i]
             if p_seed in perturbed_lookup:
                 verts = perturbed_lookup[p_seed]
-                area = _polygon_area(verts)
+                area = polygon_area(verts)
                 matched[orig_seed] = {
                     "area": area,
                     "vertex_count": len(verts),
                 }
     return matched
-
-
-def _polygon_area(vertices: Sequence[Tuple[float, float]]) -> float:
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
 
 
 def stability_analysis(

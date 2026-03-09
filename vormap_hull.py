@@ -45,70 +45,24 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
 from vormap import validate_output_path
+from vormap_geometry import (
+    polygon_area,
+    polygon_centroid,
+    polygon_perimeter,
+    edge_length,
+)
 
 
 # ── Helpers ─────────────────────────────────────────────────────────
 
 def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+    return edge_length(a, b)
 
 
 def _cross(o: Tuple[float, float], a: Tuple[float, float],
            b: Tuple[float, float]) -> float:
     """Cross product of vectors OA and OB (positive = counter-clockwise)."""
     return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
-
-
-def _polygon_area(vertices: List[Tuple[float, float]]) -> float:
-    """Shoelace formula for polygon area (unsigned)."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
-
-
-def _polygon_perimeter(vertices: List[Tuple[float, float]]) -> float:
-    n = len(vertices)
-    if n < 2:
-        return 0.0
-    total = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        total += _dist(vertices[i], vertices[j])
-    return total
-
-
-def _polygon_centroid(vertices: List[Tuple[float, float]]
-                      ) -> Tuple[float, float]:
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n <= 2:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    cx = cy = 0.0
-    a = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = (vertices[i][0] * vertices[j][1]
-                 - vertices[j][0] * vertices[i][1])
-        a += cross
-        cx += (vertices[i][0] + vertices[j][0]) * cross
-        cy += (vertices[i][1] + vertices[j][1]) * cross
-    a /= 2.0
-    if abs(a) < 1e-12:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    cx /= (6.0 * a)
-    cy /= (6.0 * a)
-    return (cx, cy)
 
 
 # ── Convex Hull (Andrew's monotone chain) ───────────────────────────
@@ -227,9 +181,9 @@ def convex_hull(points: List[Tuple[float, float]]) -> ConvexHullResult:
             hull_ratio=2 / n if n > 0 else 1.0,
         )
 
-    area = _polygon_area(hull)
-    perimeter = _polygon_perimeter(hull)
-    centroid = _polygon_centroid(hull)
+    area = polygon_area(hull)
+    perimeter = polygon_perimeter(hull)
+    centroid = polygon_centroid(hull)
 
     compactness = 0.0
     if perimeter > 0:

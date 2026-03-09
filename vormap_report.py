@@ -21,6 +21,12 @@ import math
 import os
 import datetime
 
+from vormap_geometry import (
+    polygon_area,
+    polygon_centroid,
+    polygon_perimeter,
+)
+
 
 def _escape_html(text):
     """Escape HTML special characters."""
@@ -41,54 +47,6 @@ def _format_number(value, decimals=2):
         return f"{value:.{decimals}f}"
     return str(value)
 
-
-def _polygon_area(vertices):
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
-
-
-def _polygon_perimeter(vertices):
-    """Compute polygon perimeter."""
-    n = len(vertices)
-    if n < 2:
-        return 0.0
-    perimeter = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        dx = vertices[j][0] - vertices[i][0]
-        dy = vertices[j][1] - vertices[i][1]
-        perimeter += math.sqrt(dx * dx + dy * dy)
-    return perimeter
-
-
-def _polygon_centroid(vertices):
-    """Compute polygon centroid."""
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n == 1:
-        return vertices[0]
-    cx, cy, a_sum = 0.0, 0.0, 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = vertices[i][0] * vertices[j][1] - vertices[j][0] * vertices[i][1]
-        cx += (vertices[i][0] + vertices[j][0]) * cross
-        cy += (vertices[i][1] + vertices[j][1]) * cross
-        a_sum += cross
-    if abs(a_sum) < 1e-12:
-        xs = sum(v[0] for v in vertices) / n
-        ys = sum(v[1] for v in vertices) / n
-        return (xs, ys)
-    a_sum *= 3.0
-    return (cx / a_sum, cy / a_sum)
 
 
 def _mean(values):
@@ -171,9 +129,9 @@ class VoronoiReport:
             return self._stats
         stats = []
         for i, region in enumerate(self.regions):
-            area = _polygon_area(region)
-            perim = _polygon_perimeter(region)
-            cx, cy = _polygon_centroid(region)
+            area = polygon_area(region)
+            perim = polygon_perimeter(region)
+            cx, cy = polygon_centroid(region)
             nverts = len(region)
             compactness = (
                 (4 * math.pi * area / (perim * perim)) if perim > 0 else 0.0
