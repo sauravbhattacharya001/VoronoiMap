@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "voronoimap"
-version = "1.0.0"
+version = "1.1.0"
 description = "Estimate aggregate statistics of unknown point sets using Voronoi partitioning and nearest-neighbor oracles"
 readme = "README.md"
 license = {text = "MIT"}
@@ -61,10 +61,55 @@ Issues = "https://github.com/sauravbhattacharya001/VoronoiMap/issues"
 Documentation = "https://sauravbhattacharya001.github.io/VoronoiMap/"
 
 [tool.setuptools]
-py-modules = ["vormap", "vormap_viz"]
+py-modules = [
+    "vormap",
+    "vormap_access",
+    "vormap_autocorr",
+    "vormap_clip",
+    "vormap_cluster",
+    "vormap_color",
+    "vormap_compare",
+    "vormap_coverage",
+    "vormap_edge",
+    "vormap_generate",
+    "vormap_geojson",
+    "vormap_geometry",
+    "vormap_graph",
+    "vormap_heatmap",
+    "vormap_hotspot",
+    "vormap_hull",
+    "vormap_interp",
+    "vormap_kde",
+    "vormap_kml",
+    "vormap_landscape",
+    "vormap_mapalgebra",
+    "vormap_merge",
+    "vormap_mosaic",
+    "vormap_network",
+    "vormap_nndist",
+    "vormap_outlier",
+    "vormap_pathplan",
+    "vormap_pattern",
+    "vormap_pipeline",
+    "vormap_power",
+    "vormap_query",
+    "vormap_regularity",
+    "vormap_relax",
+    "vormap_report",
+    "vormap_sample",
+    "vormap_seeds",
+    "vormap_stability",
+    "vormap_temporal",
+    "vormap_territory",
+    "vormap_transect",
+    "vormap_trend",
+    "vormap_variogram",
+    "vormap_viz",
+    "vormap_watershed",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.coverage.run]
-source = ["vormap"]
+source = ["vormap", "vormap_access", "vormap_autocorr", "vormap_clip", "vormap_cluster", "vormap_color", "vormap_compare", "vormap_coverage", "vormap_edge", "vormap_generate", "vormap_geojson", "vormap_geometry", "vormap_graph", "vormap_heatmap", "vormap_hotspot", "vormap_hull", "vormap_interp", "vormap_kde", "vormap_kml", "vormap_landscape", "vormap_mapalgebra", "vormap_merge", "vormap_mosaic", "vormap_network", "vormap_nndist", "vormap_outlier", "vormap_pathplan", "vormap_pattern", "vormap_pipeline", "vormap_power", "vormap_query", "vormap_regularity", "vormap_relax", "vormap_report", "vormap_sample", "vormap_seeds", "vormap_stability", "vormap_temporal", "vormap_territory", "vormap_transect", "vormap_trend", "vormap_variogram", "vormap_viz", "vormap_watershed"]
