@@ -653,7 +653,7 @@ def export_network_json(graph, nstats, output_path, *, mst=None):
             ],
         }
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
 
@@ -685,5 +685,5 @@ def export_network_csv(graph, nstats, output_path):
         bet = bc.get(idx, 0)
         lines.append(f"{idx},{cx:.4f},{cy:.4f},{area:.4f},{deg},{bet:.6f}")
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")

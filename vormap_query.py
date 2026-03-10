@@ -356,7 +356,7 @@ def export_query_json(results: Sequence[QueryResult], path: str) -> None:
     data = [asdict(r) for r in results]
     from vormap import validate_output_path
     path = validate_output_path(path, allow_absolute=True)
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
 
@@ -418,7 +418,7 @@ def export_query_svg(seeds: Sequence[Point],
     lines.append('</svg>')
     from vormap import validate_output_path
     path = validate_output_path(path, allow_absolute=True)
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding="utf-8") as f:
         f.write('\n'.join(lines))
 
 

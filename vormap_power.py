@@ -735,7 +735,7 @@ def export_power_json(result, path=None):
     if path:
         from vormap import validate_output_path
         path = validate_output_path(path, allow_absolute=True)
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding="utf-8") as f:
             f.write(text)
     return text
 
@@ -832,7 +832,7 @@ def export_power_svg(result, path=None, width=800, height=600,
     if path:
         from vormap import validate_output_path
         path = validate_output_path(path, allow_absolute=True)
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding="utf-8") as f:
             f.write(svg)
     return svg
 

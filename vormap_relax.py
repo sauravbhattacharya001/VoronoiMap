@@ -647,7 +647,7 @@ def main():
     # Write outputs
     if args.output:
         safe_out = vormap.validate_output_path(args.output, allow_absolute=True)
-        with open(safe_out, "w") as f:
+        with open(safe_out, "w", encoding="utf-8") as f:
             for x, y in result["points"]:
                 f.write(f"{x:.6f} {y:.6f}\n")
         if not args.quiet:
@@ -667,7 +667,7 @@ def main():
             },
             "bounds": list(bounds),
         }
-        with open(safe_json, "w") as f:
+        with open(safe_json, "w", encoding="utf-8") as f:
             json.dump(out, f, indent=2)
         if not args.quiet:
             print(f"Full result written to {args.json}")
@@ -679,7 +679,7 @@ def main():
             width=args.svg_width, height=args.svg_height,
             animate=args.animate, color_scheme=args.color_scheme,
         )
-        with open(safe_svg, "w") as f:
+        with open(safe_svg, "w", encoding="utf-8") as f:
             f.write(svg)
         if not args.quiet:
             print(f"SVG visualization written to {args.svg}")

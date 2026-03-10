@@ -605,7 +605,7 @@ def export_kde_csv(grid: KDEGrid, output_path: str) -> str:
     """Export KDE grid as CSV with columns: x, y, density."""
     output_path = vormap.validate_output_path(output_path)
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write("x,y,density\n")
         for row in range(grid.ny):
             for col in range(grid.nx):
@@ -650,7 +650,7 @@ def export_hotspots_json(
             "points_used": grid.points_used,
         }
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
     return output_path

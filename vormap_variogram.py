@@ -746,7 +746,7 @@ def export_variogram_csv(
     if model:
         headers.append("model_value")
 
-    with open(output_path, "w", newline="") as f:
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(headers)
         for b in ev.bins:
@@ -810,7 +810,7 @@ def export_variogram_json(
             "r_squared": model.r_squared,
         }
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     return output_path
 

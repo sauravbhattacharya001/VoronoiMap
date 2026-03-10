@@ -200,6 +200,115 @@ def extract_neighborhood_graph(regions, data=None, *, tol=0.5):
 
 # ── Graph statistics ─────────────────────────────────────────────────
 
+def _compute_degree_stats(adjacency):
+    """Compute degree statistics from adjacency map.
+
+    Returns (degrees_dict, min, max, mean, distribution, isolated, leaves).
+    """
+    degrees = {seed: len(neighbors) for seed, neighbors in adjacency.items()}
+    vals = list(degrees.values())
+    if not vals:
+        return {}, 0, 0, 0.0, {}, 0, 0
+    min_d = min(vals)
+    max_d = max(vals)
+    mean_d = sum(vals) / len(vals)
+    dist = {}
+    for d in vals:
+        dist[d] = dist.get(d, 0) + 1
+    isolated = sum(1 for d in vals if d == 0)
+    leaves = sum(1 for d in vals if d == 1)
+    return degrees, min_d, max_d, mean_d, dict(sorted(dist.items())), isolated, leaves
+
+
+def _compute_clustering(adjacency):
+    """Compute global clustering coefficient (closed/total triplets)."""
+    neighbor_set = {seed: set(neigh) for seed, neigh in adjacency.items()}
+    total_triplets = 0
+    closed_triplets = 0
+    for seed, neighbors in adjacency.items():
+        k = len(neighbors)
+        if k < 2:
+            continue
+        total_triplets += k * (k - 1) // 2
+        for i in range(len(neighbors)):
+            for j in range(i + 1, len(neighbors)):
+                if neighbors[j] in neighbor_set[neighbors[i]]:
+                    closed_triplets += 1
+    return closed_triplets / total_triplets if total_triplets > 0 else 0.0
+
+
+def _find_components(adjacency):
+    """Count connected components via BFS.
+
+    Returns (num_components, is_connected).
+    """
+    visited = set()
+    components = 0
+    for start in adjacency:
+        if start in visited:
+            continue
+        components += 1
+        queue = deque([start])
+        visited.add(start)
+        while queue:
+            node = queue.popleft()
+            for neigh in adjacency[node]:
+                if neigh not in visited:
+                    visited.add(neigh)
+                    queue.append(neigh)
+    return components, components == 1
+
+
+def _compute_diameter_and_paths(adjacency, seeds_list, n):
+    """Compute diameter and sampled average path length via BFS.
+
+    Returns (diameter, avg_path_length).  Only computed for connected
+    graphs with n > 1; returns (None, None) otherwise.
+    """
+    import random as _rand
+
+    def _bfs_farthest(start):
+        dist = {start: 0}
+        queue = deque([start])
+        farthest = start
+        max_d = 0
+        while queue:
+            node = queue.popleft()
+            for neigh in adjacency[node]:
+                if neigh not in dist:
+                    dist[neigh] = dist[node] + 1
+                    queue.append(neigh)
+                    if dist[neigh] > max_d:
+                        max_d = dist[neigh]
+                        farthest = neigh
+        return farthest, max_d
+
+    # Double-BFS approximation for diameter
+    u = seeds_list[0]
+    v, _ = _bfs_farthest(u)
+    _, diameter = _bfs_farthest(v)
+
+    # Sampled average path length (up to 50 random sources)
+    sample_k = min(50, n)
+    sources = _rand.sample(seeds_list, sample_k) if n > sample_k else seeds_list
+    total_dist = 0
+    pair_count = 0
+    for start in sources:
+        dist = {start: 0}
+        queue = deque([start])
+        while queue:
+            node = queue.popleft()
+            for neigh in adjacency[node]:
+                if neigh not in dist:
+                    dist[neigh] = dist[node] + 1
+                    queue.append(neigh)
+                    total_dist += dist[neigh]
+                    pair_count += 1
+    avg_path = round(total_dist / pair_count, 4) if pair_count > 0 else 0.0
+
+    return diameter, avg_path
+
+
 def compute_graph_stats(graph):
     """Compute statistics for the neighbourhood graph.
 
@@ -247,107 +356,19 @@ def compute_graph_stats(graph):
             "isolated_nodes": 0, "leaf_nodes": 0,
         }
 
-    # Degree stats
-    degrees = {seed: len(neighbors) for seed, neighbors in adjacency.items()}
-    degree_values = list(degrees.values())
-    min_deg = min(degree_values)
-    max_deg = max(degree_values)
-    mean_deg = sum(degree_values) / n
-
-    degree_dist = {}
-    for d in degree_values:
-        degree_dist[d] = degree_dist.get(d, 0) + 1
-
-    isolated = sum(1 for d in degree_values if d == 0)
-    leaves = sum(1 for d in degree_values if d == 1)
-
-    # Density
+    _, min_deg, max_deg, mean_deg, degree_dist, isolated, leaves = (
+        _compute_degree_stats(adjacency)
+    )
     density = (2.0 * m) / (n * (n - 1)) if n > 1 else 0.0
+    clustering = _compute_clustering(adjacency)
+    components, is_connected = _find_components(adjacency)
 
-    # Clustering coefficient (global)
-    neighbor_set = {seed: set(neigh) for seed, neigh in adjacency.items()}
-    total_triplets = 0
-    closed_triplets = 0
-    for seed, neighbors in adjacency.items():
-        k = len(neighbors)
-        if k < 2:
-            continue
-        total_triplets += k * (k - 1) // 2
-        for i in range(len(neighbors)):
-            for j in range(i + 1, len(neighbors)):
-                if neighbors[j] in neighbor_set[neighbors[i]]:
-                    closed_triplets += 1
-    clustering = closed_triplets / total_triplets if total_triplets > 0 else 0.0
-
-    # Connected components (BFS)
-    visited = set()
-    components = 0
-    seeds_list = list(adjacency.keys())
-
-    for start in seeds_list:
-        if start in visited:
-            continue
-        components += 1
-        queue = deque([start])
-        visited.add(start)
-        while queue:
-            node = queue.popleft()
-            for neigh in adjacency[node]:
-                if neigh not in visited:
-                    visited.add(neigh)
-                    queue.append(neigh)
-
-    is_connected = components == 1
-
-    # Diameter and avg path length (BFS from each node, only if connected)
     diameter = None
     avg_path_length = None
-
     if is_connected and n > 1:
-        # Double-BFS approximation for diameter: O(V+E) instead of O(V*(V+E))
-        # Exact for trees, tight approximation for sparse planar graphs like
-        # Voronoi duals.
-        def _bfs_farthest(start):
-            """BFS from start; return (farthest_node, max_distance, dist_map)."""
-            dist = {start: 0}
-            queue = deque([start])
-            farthest = start
-            max_d = 0
-            while queue:
-                node = queue.popleft()
-                for neigh in adjacency[node]:
-                    if neigh not in dist:
-                        dist[neigh] = dist[node] + 1
-                        queue.append(neigh)
-                        if dist[neigh] > max_d:
-                            max_d = dist[neigh]
-                            farthest = neigh
-            return farthest, max_d, dist
-
-        u = seeds_list[0]
-        v, _, _ = _bfs_farthest(u)
-        _, diam, _ = _bfs_farthest(v)
-        diameter = diam
-
-        # Sampled average path length: pick up to 50 random sources for a
-        # statistically sound O(K*(V+E)) estimate instead of O(V*(V+E)).
-        import random as _rand
-        sample_k = min(50, n)
-        sample_sources = _rand.sample(seeds_list, sample_k) if n > sample_k else seeds_list
-        total_dist = 0
-        pair_count = 0
-        for start in sample_sources:
-            dist = {start: 0}
-            queue = deque([start])
-            while queue:
-                node = queue.popleft()
-                for neigh in adjacency[node]:
-                    if neigh not in dist:
-                        dist[neigh] = dist[node] + 1
-                        queue.append(neigh)
-                        total_dist += dist[neigh]
-                        pair_count += 1
-        avg_path_length = round(total_dist / pair_count, 4) if pair_count > 0 else 0.0
+        diameter, avg_path_length = _compute_diameter_and_paths(
+            adjacency, list(adjacency.keys()), n
+        )
 
     return {
         "num_nodes": n,
@@ -356,7 +377,7 @@ def compute_graph_stats(graph):
         "min_degree": min_deg,
         "max_degree": max_deg,
         "mean_degree": round(mean_deg, 4),
-        "degree_distribution": dict(sorted(degree_dist.items())),
+        "degree_distribution": degree_dist,
         "clustering_coefficient": round(clustering, 4),
         "connected_components": components,
         "is_connected": is_connected,
@@ -365,7 +386,6 @@ def compute_graph_stats(graph):
         "isolated_nodes": isolated,
         "leaf_nodes": leaves,
     }
-
 
 # ── Export functions ─────────────────────────────────────────────────
 

@@ -332,7 +332,7 @@ def export_clip_json(result: ClipResult, output_path: str) -> None:
     data["boundary"] = [list(v) for v in result.boundary]
     from vormap import validate_output_path
     output_path = validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
 
@@ -394,7 +394,7 @@ def export_clip_svg(result: ClipResult, output_path: str, *,
 
     from vormap import validate_output_path
     output_path = validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding="utf-8") as f:
         f.write('\n'.join(lines))
 
 

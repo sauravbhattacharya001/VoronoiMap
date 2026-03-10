@@ -786,7 +786,7 @@ def export_svg(analysis: HullAnalysis,
         lx += len(label) * 7 + 30
 
     raw = tostring(svg, encoding='unicode')
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding="utf-8") as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         f.write(raw)
 
@@ -796,5 +796,5 @@ def export_svg(analysis: HullAnalysis,
 def export_json(analysis: HullAnalysis, output_path: str) -> None:
     """Export hull analysis results as JSON."""
     output_path = validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding="utf-8") as f:
         json.dump(analysis.to_dict(), f, indent=2)

@@ -569,7 +569,7 @@ def export_cluster_json(result, output_path):
         "clusters": result.clusters,
         "labels": result.labels,
     }
-    with open(safe_path, "w") as f:
+    with open(safe_path, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
 
 
@@ -856,7 +856,7 @@ def generate_clusters(datafile, output_path=None, *,
                                % (datafile, method, metric))
         else:
             # Text table to file
-            with open(output_path, "w") as f:
+            with open(output_path, "w", encoding="utf-8") as f:
                 f.write(format_cluster_table(result))
     else:
         if fmt == "json":

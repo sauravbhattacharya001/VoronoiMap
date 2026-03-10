@@ -805,14 +805,14 @@ def export_json(report: AccessReport, filepath: str) -> None:
         "underserved_count": len(report.underserved),
         "hotspot_count": len(report.hotspots),
     }
-    with open(safe_path, "w") as f:
+    with open(safe_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
 
 def export_csv(report: AccessReport, filepath: str) -> None:
     """Export accessibility scores to CSV."""
     safe_path = vormap.validate_output_path(filepath, allow_absolute=True)
-    with open(safe_path, "w", newline="") as f:
+    with open(safe_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["x", "y", "score", "rank", "level",
                          "nearest_supply_dist", "reachable_supply_count"])
@@ -831,7 +831,7 @@ def _load_supply_csv(filepath: str) -> List[SupplyPoint]:
     """Load supply points from CSV (x,y,capacity or x,y)."""
     safe = vormap.validate_input_path(filepath, allow_absolute=True)
     points = []
-    with open(safe, "r") as f:
+    with open(safe, "r", encoding="utf-8") as f:
         reader = csv.reader(f)
         header = next(reader, None)
         for row in reader:

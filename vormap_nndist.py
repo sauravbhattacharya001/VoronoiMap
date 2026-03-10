@@ -738,7 +738,7 @@ def export_nn_csv(summary: DistanceSummary, path: str) -> str:
             lines.append(
                 f"{entry['x']},{entry['y']},{di + 1},{dist:.6f},{nbr}"
             )
-    with open(abs_path, "w", newline="") as f:
+    with open(abs_path, "w", newline="", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
     return abs_path
 
@@ -763,6 +763,6 @@ def export_nn_json(result: object, path: str) -> str:
     path = validate_output_path(path, allow_absolute=True)
     abs_path = os.path.abspath(path)
     os.makedirs(os.path.dirname(abs_path) or ".", exist_ok=True)
-    with open(abs_path, "w") as f:
+    with open(abs_path, "w", encoding="utf-8") as f:
         json.dump(result.to_dict(), f, indent=2)
     return abs_path
