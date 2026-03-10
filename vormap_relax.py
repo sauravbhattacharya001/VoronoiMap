@@ -84,7 +84,7 @@ def _polygon_centroid(vertices):
     return (float(cx), float(cy))
 
 
-def _clip_infinite_region(vor, region_idx, bounds):
+def _clip_infinite_region(vor, region_idx, bounds, point_idx=None):
     """Clip a Voronoi region to a bounding box.
 
     For regions with vertices at infinity (index -1), projects the
@@ -99,6 +99,9 @@ def _clip_infinite_region(vor, region_idx, bounds):
         Index into ``vor.regions``.
     bounds : tuple
         (x_min, x_max, y_min, y_max).
+    point_idx : int or None
+        Index of the point this region belongs to (avoids O(n) lookup
+        when the caller already knows it).
 
     Returns
     -------
@@ -118,20 +121,18 @@ def _clip_infinite_region(vor, region_idx, bounds):
         return clipped if len(clipped) >= 3 else None
 
     # Region has infinite edges — we need to handle them
-    # Find the point this region belongs to
-    point_idx = None
-    for i, r in enumerate(vor.point_region):
-        if r == region_idx:
-            point_idx = i
-            break
+    # Resolve point index (use caller-provided value to skip O(n) scan)
     if point_idx is None:
-        return None
+        for i, r in enumerate(vor.point_region):
+            if r == region_idx:
+                point_idx = i
+                break
+        if point_idx is None:
+            return None
 
-    # Collect finite vertices and project infinite ridges
-    finite_verts = []
-    for v_idx in region:
-        if v_idx >= 0:
-            finite_verts.append(vor.vertices[v_idx])
+    # Collect finite vertices (vectorized index selection)
+    finite_indices = [v for v in region if v >= 0]
+    finite_verts = list(vor.vertices[finite_indices]) if finite_indices else []
 
     # Find ridges that belong to this point and have -1 vertex
     center = vor.points.mean(axis=0)
@@ -186,6 +187,9 @@ def _clip_polygon_to_box(vertices, bounds):
     vertices : ndarray, shape (n, 2)
     bounds : tuple
         (x_min, x_max, y_min, y_max).
+    point_idx : int or None
+        Index of the point this region belongs to (avoids O(n) lookup
+        when the caller already knows it).
 
     Returns
     -------
@@ -303,7 +307,7 @@ def lloyd_relaxation(points, iterations=20, bounds=None, tolerance=0.1,
 
         for i in range(len(pts)):
             region_idx = vor.point_region[i]
-            clipped = _clip_infinite_region(vor, region_idx, bounds)
+            clipped = _clip_infinite_region(vor, region_idx, bounds, point_idx=i)
             if clipped is not None and len(clipped) >= 3:
                 cx, cy = _polygon_centroid(clipped)
                 # Clamp to bounds
@@ -437,7 +441,7 @@ def _generate_svg(result, bounds, width=800, height=600, animate=False,
     # Draw cells
     for i in range(len(final_pts)):
         region_idx = vor.point_region[i]
-        clipped = _clip_infinite_region(vor, region_idx, bounds)
+        clipped = _clip_infinite_region(vor, region_idx, bounds, point_idx=i)
         if clipped is not None and len(clipped) >= 3:
             poly_str = " ".join(f"{tx(v[0]):.1f},{ty(v[1]):.1f}" for v in clipped)
             fill = colors[i % len(colors)]
