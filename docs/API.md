@@ -950,3 +950,269 @@ def export_relaxation_html( data, iterations=10, output_path="relaxation.html", 
 | `export_variogram_csv` | Export variogram data as CSV. |
 | `export_variogram_json` | Export variogram data as JSON. |
 | `variogram_summary` | Generate a human-readable variogram summary. |
+
+## vormap_animate
+
+Voronoi Animation -- animated HTML visualization of diagram evolution.
+
+### Classes
+
+**`AnimationConfig`** — Configuration for Voronoi animation rendering.
+
+### Functions
+
+#### `animate(snapshots, output_path, config=None)`
+
+Generate an animated HTML visualization of Voronoi diagram evolution.
+
+#### `animate_from_files(file_paths, output_path, config=None)`
+
+Load snapshots from text files and generate animation.
+
+#### `main(argv=None)`
+
+CLI entry point.
+
+
+## vormap_mapalgebra
+
+Voronoi Map Algebra — spatial operations on cell attribute layers.
+
+### Classes
+
+**`CellLayer`** — A spatial attribute layer over Voronoi cells.
+- `from_dict()` — Create a layer from a value dictionary and adjacency graph.
+- `from_json()` — Load a layer from a JSON file.
+- `valid_cells()` — Return sorted list of cells with valid values.
+- `valid_neighbours()` — Return neighbours of *cell* that have valid values.
+- `copy()` — Deep copy with optional new name.
+- `to_dict()` — Serialise to a JSON-safe dictionary.
+- `to_json()` — Write layer to a JSON file.
+- `stats()` — Basic descriptive statistics of valid values.
+
+**`ZonalResult`** — Statistics for one zone.
+- `to_dict()`
+
+### Functions
+
+#### `local_add(a: CellLayer, b: CellLayer) -> CellLayer`
+
+Add two layers: result[i] = a[i] + b[i].
+
+#### `local_subtract(a: CellLayer, b: CellLayer) -> CellLayer`
+
+Subtract: result[i] = a[i] - b[i].
+
+#### `local_multiply(a: CellLayer, b: CellLayer) -> CellLayer`
+
+Multiply: result[i] = a[i] * b[i].
+
+#### `local_divide(a: CellLayer, b: CellLayer) -> CellLayer`
+
+Divide: result[i] = a[i] / b[i].  Returns nodata for division by zero.
+
+#### `local_max(a: CellLayer, b: CellLayer) -> CellLayer`
+
+Cell-wise maximum of two layers.
+
+#### `local_min(a: CellLayer, b: CellLayer) -> CellLayer`
+
+Cell-wise minimum of two layers.
+
+#### `local_scale(layer: CellLayer, factor: float) -> CellLayer`
+
+Multiply every valid cell value by a scalar.
+
+#### `local_offset(layer: CellLayer, offset: float) -> CellLayer`
+
+Add a scalar to every valid cell value.
+
+#### `local_abs(layer: CellLayer) -> CellLayer`
+
+Absolute value of each cell.
+
+#### `local_power(layer: CellLayer, exponent: float) -> CellLayer`
+
+Raise each cell value to the given power.
+
+#### `local_log(layer: CellLayer) -> CellLayer`
+
+Natural log of each cell value.  Non-positive values → nodata.
+
+#### `local_normalise(layer: CellLayer) -> CellLayer`
+
+Min-max normalise to [0, 1].
+
+#### `local_standardise(layer: CellLayer) -> CellLayer`
+
+Z-score standardise (mean=0, std=1).
+
+#### `local_threshold(layer: CellLayer, threshold: float, above: float = 1.0, below: float = 0.0) -> CellLayer`
+
+Binary threshold: above → *above*, else → *below*.
+
+#### `local_clamp(layer: CellLayer, lo: float, hi: float) -> CellLayer`
+
+Clamp values to [lo, hi].
+
+#### `local_reclassify(layer: CellLayer, breaks: List[float], labels: Optional[List[float]] = None) -> CellLayer`
+
+Reclassify continuous values into discrete classes.
+
+#### `local_apply(layer: CellLayer, fn: Callable[[float], float], name: str = 'custom') -> CellLayer`
+
+Apply an arbitrary function to each valid cell value.
+
+#### `focal_mean(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Neighbourhood mean (spatial smoothing).
+
+#### `focal_median(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Neighbourhood median (edge-preserving smooth).
+
+#### `focal_max(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Neighbourhood maximum.
+
+#### `focal_min(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Neighbourhood minimum.
+
+#### `focal_range(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Neighbourhood range (max - min).
+
+#### `focal_std(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Neighbourhood standard deviation.
+
+#### `focal_sum(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Neighbourhood sum.
+
+#### `focal_count(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Count of valid neighbours (+ self if include_self).
+
+#### `focal_majority(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Most common value in neighbourhood (for categorical data).
+
+#### `focal_diversity(layer: CellLayer, include_self: bool = True) -> CellLayer`
+
+Count of unique values in neighbourhood (richness).
+
+#### `focal_slope(layer: CellLayer) -> CellLayer`
+
+Maximum absolute gradient to any neighbour.
+
+#### `zonal_stats(layer: CellLayer, zones: Dict[int, Any]) -> Dict[Any, ZonalResult]`
+
+Compute per-zone aggregate statistics.
+
+#### `zonal_apply(layer: CellLayer, zones: Dict[int, Any], stat: str = 'mean') -> CellLayer`
+
+Replace each cell's value with its zone's aggregate statistic.
+
+#### `weighted_overlay(layers: List[CellLayer], weights: List[float], name: str = 'weighted_overlay') -> CellLayer`
+
+Weighted overlay combination of multiple layers.
+
+#### `layer_stack(layers: List[CellLayer]) -> Dict[int, List[float]]`
+
+Stack multiple layers into per-cell value vectors.
+
+#### `export_algebra_json(layer: CellLayer, path: str) -> None`
+
+Export a layer to JSON.
+
+#### `export_algebra_csv(layer: CellLayer, path: str) -> None`
+
+Export layer values to CSV.
+
+#### `export_zonal_csv(results: Dict[Any, ZonalResult], path: str) -> None`
+
+Export zonal statistics to CSV.
+
+#### `format_algebra_report(layer: CellLayer, detail: bool = False) -> str`
+
+Human-readable text report of a layer.
+
+#### `main(argv: Optional[List[str]] = None) -> None`
+
+CLI entry point for map algebra operations.
+
+
+## vormap_pipeline
+
+Batch Analysis Pipeline — chain multiple VoronoiMap tools together.
+
+### Classes
+
+**`StepResult`** — Result of a single pipeline step.
+- `to_dict()`
+
+**`PipelineResult`** — Result of a complete pipeline run.
+- `success()`
+- `to_dict()`
+- `summary_text()` — Human-readable pipeline summary.
+
+**`ValidationIssue`** — A problem found during pipeline validation.
+- `to_dict()`
+
+**`Pipeline`** — Configurable multi-step analysis pipeline.
+- `from_file()` — Load pipeline from a JSON file.
+- `from_json()` — Load pipeline from a JSON string.
+- `validate()` — Validate the pipeline configuration.
+- `run()` — Execute the pipeline.
+- `results()` — Access step results by output_key.
+
+### Functions
+
+#### `validate_pipeline(config: Dict[str, Any]) -> List[ValidationIssue]`
+
+Validate a pipeline configuration.
+
+#### `main(argv: Optional[List[str]] = None) -> int`
+
+CLI entry point.
+
+
+## vormap_watershed
+
+Voronoi Watershed & Flow Analysis (vormap_watershed).
+
+### Classes
+
+**`FlowCell`** — Flow properties for a single Voronoi cell.
+
+**`Basin`** — A drainage basin (watershed).
+
+**`FlowPath`** — A traced flow path from a source cell to a sink.
+
+**`WatershedResult`** — Complete watershed analysis result.
+- `summary()` — Human-readable summary.
+
+### Functions
+
+#### `watershed_analysis(stats: list, attribute: str = 'area', trace_paths: bool = True, max_path_traces: int = 50) -> WatershedResult`
+
+Run watershed analysis on Voronoi region stats.
+
+#### `export_watershed_svg(result: WatershedResult, regions: list, data: dict, path: str, show_flow: bool = True, show_ridges: bool = True, width: int = 800, height: int = 600) -> str`
+
+Export watershed analysis as SVG.
+
+#### `export_watershed_json(result: WatershedResult, path: str) -> str`
+
+Export watershed analysis as JSON.
+
+#### `export_watershed_csv(result: WatershedResult, path: str) -> str`
+
+Export per-cell watershed data as CSV.
+
+#### `main(argv: list = None)`
+
+Command-line interface.
+

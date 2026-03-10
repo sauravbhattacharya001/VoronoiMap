@@ -197,7 +197,7 @@ def compute_edge_stats(network):
     lengths = [e["length"] for e in edges]
     lengths_sorted = sorted(lengths)
     total = sum(lengths)
-    mean = total / n_edges
+    mean = total / n_edges if n_edges > 0 else 0.0
     median_idx = n_edges // 2
     median = (lengths_sorted[median_idx] if n_edges % 2 == 1
               else (lengths_sorted[median_idx - 1] + lengths_sorted[median_idx]) / 2)
@@ -224,7 +224,7 @@ def compute_edge_stats(network):
     entropy = 0.0
     for count in angle_bins:
         if count > 0:
-            p = count / n_edges
+            p = count / n_edges if n_edges > 0 else 0.0
             entropy -= p * math.log2(p)
 
     return {
@@ -432,8 +432,8 @@ def export_edge_svg(
     y_min -= pad_y
     y_max += pad_y
 
-    data_w = x_max - x_min
-    data_h = y_max - y_min
+    data_w = x_max - x_min or 1.0
+    data_h = y_max - y_min or 1.0
 
     def tx(x):
         return (x - x_min) / data_w * width

@@ -550,8 +550,8 @@ def export_path_svg(roadmap, path_result, data=None, *,
     south -= dy
     north += dy
 
-    range_x = east - west
-    range_y = north - south
+    range_x = east - west or 1.0
+    range_y = north - south or 1.0
 
     def tx(x):
         return (x - west) / range_x * width
