@@ -421,7 +421,7 @@ def density_contours(grid: KDEGrid, levels: int = 5) -> list[DensityContour]:
     if levels < 1:
         raise ValueError("levels must be at least 1")
 
-    d_range = grid.density_max - grid.density_min
+    d_range = grid.density_max - grid.density_min or 1.0
     if d_range <= 0:
         return []
 
