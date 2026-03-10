@@ -325,7 +325,7 @@ def export_surface_csv(grid_result, output_path):
     grid = grid_result['grid']
     xs, ys = grid_result['xs'], grid_result['ys']
     output_path = validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, 'w', newline='') as f:
+    with open(output_path, 'w', newline='', encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(['y\\x'] + [f'{x:.4f}' for x in xs])
         for j, row in enumerate(grid):
@@ -335,7 +335,7 @@ def export_surface_csv(grid_result, output_path):
 def run_interp_cli(args, data):
     """Execute interpolation commands from CLI args."""
     interp_path = validate_input_path(args.interp_values, allow_absolute=True)
-    with open(interp_path, 'r') as f:
+    with open(interp_path, 'r', encoding="utf-8") as f:
         raw = [line.strip() for line in f if line.strip()]
     values = [float(v) for v in raw]
     if len(values) != len(data):

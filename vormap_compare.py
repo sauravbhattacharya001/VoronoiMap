@@ -625,5 +625,5 @@ def export_comparison_json(result, output_path):
     import json
 
     output_path = validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(result.to_dict(), f, indent=2)

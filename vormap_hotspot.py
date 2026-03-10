@@ -625,7 +625,7 @@ def export_hotspot_json(result, output_path):
     str
         The output path.
     """
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(result.to_dict(), f, indent=2)
     return output_path
 
@@ -651,7 +651,7 @@ def export_hotspot_csv(result, output_path):
         "region_index", "seed_x", "seed_y", "value",
         "z_score", "p_value", "classification", "neighbors",
     ]
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(",".join(headers) + "\n")
         for r in result.all_regions:
             row = [str(r[h]) for h in headers]

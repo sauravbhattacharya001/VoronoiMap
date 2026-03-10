@@ -297,7 +297,7 @@ class Pipeline:
     @classmethod
     def from_file(cls, path: str) -> "Pipeline":
         """Load pipeline from a JSON file."""
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             config = json.load(f)
         return cls(config)
 

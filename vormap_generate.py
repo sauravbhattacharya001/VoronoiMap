@@ -353,7 +353,7 @@ def export_txt(points, filepath, allow_absolute=False):
     """
     resolved = vormap.validate_output_path(filepath,
                                            allow_absolute=allow_absolute)
-    with open(resolved, "w") as f:
+    with open(resolved, "w", encoding="utf-8") as f:
         for x, y in points:
             f.write("%.6f %.6f\n" % (x, y))
 
@@ -362,7 +362,7 @@ def export_csv(points, filepath, allow_absolute=False):
     """Write points to CSV with x,y headers."""
     resolved = vormap.validate_output_path(filepath,
                                            allow_absolute=allow_absolute)
-    with open(resolved, "w") as f:
+    with open(resolved, "w", encoding="utf-8") as f:
         f.write("x,y\n")
         for x, y in points:
             f.write("%.6f,%.6f\n" % (x, y))
@@ -373,7 +373,7 @@ def export_json(points, filepath, allow_absolute=False):
     resolved = vormap.validate_output_path(filepath,
                                            allow_absolute=allow_absolute)
     data = [[round(x, 6), round(y, 6)] for x, y in points]
-    with open(resolved, "w") as f:
+    with open(resolved, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
 

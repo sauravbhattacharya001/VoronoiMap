@@ -563,7 +563,7 @@ def export_autocorr_json(
         }
 
     validated = vormap.validate_output_path(path, allow_absolute=True)
-    with open(validated, "w") as f:
+    with open(validated, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2)
 
 

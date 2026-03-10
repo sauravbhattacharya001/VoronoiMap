@@ -157,7 +157,7 @@ class CellLayer:
 
     def to_json(self, path: str, indent: int = 2) -> None:
         """Write layer to a JSON file."""
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=indent)
 
     def stats(self) -> Dict[str, float]:
@@ -695,7 +695,7 @@ def export_algebra_json(layer: CellLayer, path: str) -> None:
 
 def export_algebra_csv(layer: CellLayer, path: str) -> None:
     """Export layer values to CSV."""
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("cell,value\n")
         for cell in sorted(layer.values):
             f.write(f"{cell},{layer.values[cell]}\n")
@@ -703,7 +703,7 @@ def export_algebra_csv(layer: CellLayer, path: str) -> None:
 
 def export_zonal_csv(results: Dict[Any, ZonalResult], path: str) -> None:
     """Export zonal statistics to CSV."""
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("zone_id,count,sum,mean,min,max,std,range,dominant\n")
         for zone_id in sorted(results, key=str):
             r = results[zone_id]

@@ -670,7 +670,7 @@ def export_watershed_json(result: WatershedResult, path: str) -> str:
             for fp in result.flow_paths
         ],
     }
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(doc, f, indent=2)
     return path
 
@@ -681,7 +681,7 @@ def export_watershed_json(result: WatershedResult, path: str) -> str:
 def export_watershed_csv(result: WatershedResult, path: str) -> str:
     """Export per-cell watershed data as CSV."""
     validate_output_path(path, allow_absolute=True)
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
             "cell_index", "centroid_x", "centroid_y", "elevation",

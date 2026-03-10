@@ -333,7 +333,7 @@ def export_edge_csv(network, output_path, *, include_stats=True):
         lines.append("# dead_ends,%d" % stats["num_dead_ends"])
 
     output_path = vormap.validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
 
@@ -369,7 +369,7 @@ def export_edge_json(network, output_path):
     }
 
     output_path = vormap.validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2)
 
 

@@ -578,7 +578,7 @@ def export_trend_csv(result, path):
         Output CSV path.
     """
     validate_output_path(path)
-    with open(path, "w", newline="") as f:
+    with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["x", "y", "observed", "predicted", "residual"])
         for i in range(result.n_points):
@@ -602,5 +602,5 @@ def export_trend_json(result, path):
         Output JSON path.
     """
     validate_output_path(path)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(result.to_dict(), f, indent=2)

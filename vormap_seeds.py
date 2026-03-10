@@ -423,7 +423,7 @@ def save_seeds(points, filename, header=True):
 
     from vormap import validate_output_path
     filename = validate_output_path(filename, allow_absolute=True)
-    with open(filename, 'w') as f:
+    with open(filename, 'w', encoding="utf-8") as f:
         if header:
             f.write(f"{len(points)}\n")
         for x, y in points:
@@ -454,7 +454,7 @@ def load_seeds(filename):
     resolved = validate_input_path(filename, allow_absolute=True)
 
     points = []
-    with open(resolved, 'r') as f:
+    with open(resolved, 'r', encoding="utf-8") as f:
         for line in f:
             parts = line.strip().split()
             if len(parts) == 2:

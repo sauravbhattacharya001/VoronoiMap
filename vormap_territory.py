@@ -514,7 +514,7 @@ def export_territory_json(
         export["shared_borders"].append(entry)
 
     output_path = vormap.validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(export, f, indent=indent)
 
 
@@ -560,5 +560,5 @@ def export_territory_csv(
         )
 
     output_path = vormap.validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
