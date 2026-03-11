@@ -783,18 +783,21 @@ def plan_path(data, start, goal, *, mode='shortest',
         print(format_path_report(path_result, roadmap, stats))
 
     if svg_path:
+        svg_path = vormap.validate_output_path(svg_path, allow_absolute=True)
         svg_content = export_path_svg(roadmap, path_result, data)
         with open(svg_path, 'w', encoding='utf-8') as f:
             f.write(svg_content)
         print(f'\n  SVG written to {svg_path}')
 
     if json_path:
+        json_path = vormap.validate_output_path(json_path, allow_absolute=True)
         json_data = export_path_json(path_result, roadmap, stats)
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(json_data, f, indent=2)
         print(f'  JSON written to {json_path}')
 
     if csv_path:
+        csv_path = vormap.validate_output_path(csv_path, allow_absolute=True)
         csv_content = export_path_csv(path_result)
         with open(csv_path, 'w', encoding='utf-8') as f:
             f.write(csv_content)
