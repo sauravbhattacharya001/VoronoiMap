@@ -16,11 +16,15 @@ ci/cd:
           - '.github/workflows/**'
           - '.github/dependabot.yml'
           - '.github/labeler.yml'
+          - '.github/copilot-setup-steps.yml'
+          - 'Dockerfile'
+          - '.dockerignore'
 
 testing:
   - changed-files:
       - any-glob-to-any-file:
           - 'tests/**'
+          - 'test_*.py'
           - '.coveragerc'
 
 dependencies:
@@ -29,16 +33,55 @@ dependencies:
           - 'requirements.txt'
           - 'pyproject.toml'
           - 'MANIFEST.in'
-          - 'Dockerfile'
-          - '.dockerignore'
 
+# Core Voronoi engine — changes here have broad impact
 bug:
   - changed-files:
       - any-glob-to-any-file:
           - 'vormap.py'
+          - 'vormap_generate.py'
+          - 'vormap_seeds.py'
+          - 'vormap_merge.py'
+          - 'vormap_clip.py'
+          - 'vormap_query.py'
+          - 'vormap_relax.py'
 
+# Feature additions and extensions
 enhancement:
   - changed-files:
       - any-glob-to-any-file:
-          - 'vormap.py'
-          - 'vormap_viz.py'
+          - 'vormap_*.py'
+
+# Visualization and rendering modules
+refactor:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'vormap_pipeline.py'
+          - 'vormap_report.py'
+
+# Performance-sensitive modules (spatial computation, simulation, interpolation)
+performance:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'vormap_hotspot.py'
+          - 'vormap_kde.py'
+          - 'vormap_interp.py'
+          - 'vormap_montecarlo.py'
+          - 'vormap_diffusion.py'
+          - 'vormap_cluster.py'
+          - 'vormap_autocorr.py'
+          - 'vormap_nndist.py'
+          - 'vormap_pathplan.py'
+          - 'vormap_coverage.py'
+          - 'vormap_landscape.py'
+          - 'vormap_power.py'
+          - 'vormap_variogram.py'
+
+# Security-relevant modules (file I/O, export, external data)
+security:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'vormap_geojson.py'
+          - 'vormap_kml.py'
+          - 'vormap_report.py'
+          - 'vormap_pipeline.py'
