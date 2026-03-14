@@ -633,9 +633,14 @@ def weighted_overlay(
         raise ValueError(f"Need {len(layers)} weights, got {len(weights)}")
     if not layers:
         raise ValueError("Need at least one layer")
+    if any(w < 0 for w in weights):
+        raise ValueError(
+            "Negative weights are not supported in weighted overlay. "
+            "All weights must be >= 0 (use local_subtract for inverse criteria)."
+        )
 
-    # Normalise weights
-    total_w = sum(abs(w) for w in weights)
+    # Normalise weights to sum to 1
+    total_w = sum(weights)
     if total_w == 0:
         raise ValueError("Weights cannot all be zero")
     norm_weights = [w / total_w for w in weights]
