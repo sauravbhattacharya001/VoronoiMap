@@ -56,7 +56,7 @@ class TestBandwidth:
         many = [(rng.uniform(0, 100), rng.uniform(0, 100)) for _ in range(200)]
         h_few = vormap_kde.silverman_bandwidth(few)
         h_many = vormap_kde.silverman_bandwidth(many)
-        # Silverman: h ~ n^(-1/5), so more points → smaller bandwidth
+        # Silverman 2D: h ~ n^(-1/6), so more points → smaller bandwidth
         assert h_many < h_few
 
 

@@ -105,7 +105,7 @@ class DensityContour:
 def silverman_bandwidth(points: list[tuple[float, float]]) -> float:
     """Silverman's rule-of-thumb bandwidth for 2D Gaussian KDE.
 
-    h = (4 / (3n))^(1/5) * mean_std
+    h = n^(-1/(d+4)) * mean_std, where d=2 gives n^(-1/6).
     """
     n = len(points)
     if n < 2:
@@ -121,7 +121,7 @@ def silverman_bandwidth(points: list[tuple[float, float]]) -> float:
 
     sx, sy = _std(xs), _std(ys)
     mean_std = (sx + sy) / 2.0
-    h = ((4.0 / (3.0 * n)) ** 0.2) * mean_std
+    h = (n ** (-1.0 / 6.0)) * mean_std
     return max(h, 1e-6)
 
 
