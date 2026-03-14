@@ -48,6 +48,111 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Lloyd Relaxation** — Iterative centroid smoothing for uniform tessellations with animated HTML visualization
 - **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
+
+## Module Catalog (52 Modules)
+
+VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is every module organized by category:
+
+### Core
+
+| Module | Description |
+|--------|-------------|
+| `vormap` | Core algorithm: EstimateSUM, Voronoi construction, boundary detection, KDTree acceleration |
+| `vormap_viz` | SVG + interactive HTML visualization with color schemes and dark/light themes |
+| `vormap_geometry` | Computational geometry primitives: area, centroid, perimeter, intersection, clipping |
+| `vormap_seeds` | Seed point generators: grid, hexagonal, random, Poisson disk, clustered |
+| `vormap_generate` | Synthetic point pattern generator: 6 patterns, NNI stats, CLI |
+| `vormap_pipeline` | Pipeline runner: chain multiple analysis steps into automated workflows |
+
+### Visualization & Export
+
+| Module | Description |
+|--------|-------------|
+| `vormap_heatmap` | Density heatmap: color cells by density, area, compactness with 3 color ramps |
+| `vormap_color` | Map coloring: four-color theorem for conflict-free cell coloring |
+| `vormap_animate` | Animated HTML visualization of diagram evolution over time |
+| `vormap_mosaic` | Image mosaic filter: stained-glass and pixel-art effects |
+| `vormap_report` | Self-contained HTML analysis report with stats, histograms, region table |
+| `vormap_geojson` | GeoJSON export (RFC 7946) for GIS tools (QGIS, Mapbox, Leaflet, ArcGIS) |
+| `vormap_kml` | KML export for Google Earth visualization |
+
+### Spatial Statistics
+
+| Module | Description |
+|--------|-------------|
+| `vormap_autocorr` | Spatial autocorrelation: Moran's I, Geary's C, local indicators (LISA) |
+| `vormap_hotspot` | Hotspot detection: Getis-Ord Gi* statistic, significance testing |
+| `vormap_pattern` | Point pattern analysis: Clark-Evans NNI, Ripley's K/L, quadrat analysis |
+| `vormap_nndist` | Nearest-neighbor distance analysis: distribution, expected vs observed |
+| `vormap_outlier` | Spatial outlier detection: z-score and IQR methods on cell metrics |
+| `vormap_trend` | Trend surface analysis: 1st/2nd/3rd order polynomial OLS fitting |
+| `vormap_variogram` | Semivariogram analysis: empirical variogram, model fitting, kriging support |
+| `vormap_kde` | Kernel density estimation: Gaussian KDE with Silverman/Scott bandwidth |
+| `vormap_regularity` | Voronoi entropy, Lewis's law, Aboav-Weaire law, regularity index |
+| `vormap_montecarlo` | Monte Carlo spatial simulation: CSR testing, confidence envelopes |
+
+### Graph & Network
+
+| Module | Description |
+|--------|-------------|
+| `vormap_graph` | Neighbourhood graph: adjacency extraction, 14 structural metrics |
+| `vormap_network` | Delaunay network: MST, betweenness centrality, components, efficiency |
+| `vormap_edge` | Edge analysis: boundary lengths, shared edges, edge density |
+
+### Shape & Geometry
+
+| Module | Description |
+|--------|-------------|
+| `vormap_shape` | Cell shape analysis: IPQ compactness, elongation, rectangularity, orientation |
+| `vormap_hull` | Convex hull and bounding geometry: area ratios, convexity metrics |
+| `vormap_clip` | Region clipping: clip Voronoi cells to arbitrary polygon boundaries |
+| `vormap_power` | Weighted (power) Voronoi diagrams: site weights affect cell sizes |
+| `vormap_relax` | Lloyd's relaxation: iterative centroid smoothing for uniform tessellations |
+| `vormap_stability` | Stability analysis: sensitivity to point perturbation |
+
+### Spatial Operations
+
+| Module | Description |
+|--------|-------------|
+| `vormap_interp` | Spatial interpolation: natural neighbor weights for smooth surfaces |
+| `vormap_mapalgebra` | Map algebra: spatial operations (add/multiply/reclassify) on cell layers |
+| `vormap_merge` | Region merger: merge adjacent cells by attribute similarity |
+| `vormap_contour` | Contour extraction: isolines, IDW interpolation, 4 colormaps |
+| `vormap_query` | Spatial queries: KD-tree nearest-neighbor, k-nearest, radius, point location |
+| `vormap_sample` | Spatial sampling: stratified, systematic, centroid, boundary, density-weighted |
+| `vormap_transect` | Transect profiler: cross-section analysis along lines through the diagram |
+| `vormap_compare` | Diagram comparison: seed displacement, area change, topology difference |
+
+### Clustering & Classification
+
+| Module | Description |
+|--------|-------------|
+| `vormap_cluster` | Spatial clustering: threshold, DBSCAN, agglomerative methods |
+| `vormap_classify` | Data classification: equal interval, quantile, natural breaks (Jenks), std dev |
+
+### Simulation & Modeling
+
+| Module | Description |
+|--------|-------------|
+| `vormap_diffusion` | Spatial diffusion: heat equation, SIR epidemic, threshold cascade |
+| `vormap_automata` | Cellular automata: Game of Life, majority, forest fire, epidemic on irregular grids |
+| `vormap_gravity` | Gravity models: classic, Huff, Hansen, doubly-constrained spatial interaction |
+| `vormap_watershed` | Watershed & flow: flow direction, accumulation, basin delineation |
+
+### Planning & Territory
+
+| Module | Description |
+|--------|-------------|
+| `vormap_territory` | Territorial analysis: dominance, border pressure, balance metrics |
+| `vormap_landscape` | Landscape ecology: FRAGSTATS-style patch/class/landscape metrics |
+| `vormap_access` | Spatial accessibility: travel time, service area coverage |
+| `vormap_coverage` | Coverage analysis: service gaps, overlap, optimal site placement |
+| `vormap_siting` | Facility siting: gap filling, demand-weighted, max-min distance placement |
+| `vormap_pathplan` | Path planning: obstacle-aware navigation using Voronoi edge roadmaps |
+| `vormap_fractal` | Fractal dimension analysis of boundary complexity |
+| `vormap_temporal` | Temporal dynamics: track diagram evolution over time series |
+
+
 ## 🔧 Installation
 
 ### From PyPI (Recommended)
@@ -410,26 +515,29 @@ vormap_viz.generate_graph("datauni5.txt", "graph.json", fmt="json")
 | `MAX_RETRIES` | 50 | Max retry attempts for estimation |
 | `BIN_SEARCH_MAX_ITER` | 100 | Binary search iteration limit |
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 VoronoiMap/
 ├── vormap.py                    # Core algorithm implementation
 ├── vormap_viz.py                # SVG + interactive HTML visualization
+├── vormap_*.py (50 modules)     # Spatial analysis toolkit (see catalog above)
+├── test_*.py (14 test files)    # Unit & integration tests
 ├── requirements.txt             # Optional dependencies
-├── .coveragerc                  # Coverage configuration
+├── pyproject.toml               # Package configuration
+├── Dockerfile                   # Container build
 ├── LICENSE                      # MIT License
-├── data/                        # Point data files (not tracked)
+├── data/                        # Point data files
 ├── docs/
-│   └── index.html               # Interactive demo page (GitHub Pages)
-├── tests/
-│   ├── test_vormap.py           # Unit & security tests
-│   └── test_vormap_viz.py       # Visualization tests (SVG + HTML)
+│   └── index.html               # Interactive demo (GitHub Pages)
 └── .github/
     ├── copilot-instructions.md  # Copilot agent context
     ├── copilot-setup-steps.yml  # Copilot agent setup
+    ├── dependabot.yml           # Dependency updates
     └── workflows/
         ├── ci.yml               # CI: lint + test + coverage
+        ├── codeql.yml           # Security analysis
+        ├── docker.yml           # Docker build & push
         └── pages.yml            # GitHub Pages deployment
 ```
 
