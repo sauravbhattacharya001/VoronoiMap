@@ -135,10 +135,16 @@ def _shape_index(area: float, perimeter: float) -> float:
 
 
 def _fractal_dimension(area: float, perimeter: float) -> float:
-    """Patch fractal dimension (perimeter-area relationship)."""
+    """Patch fractal dimension using FRAGSTATS formula.
+
+    FRAC = 2 * ln(0.25 * P) / ln(A)
+
+    The 0.25 normalization ensures a square patch yields FRAC = 1.0.
+    Reference: McGarigal et al. 2012, FRAGSTATS v4.
+    """
     if area <= 0 or perimeter <= 0:
         return 0.0
-    ln_p = math.log(perimeter)
+    ln_p = math.log(0.25 * perimeter)
     ln_a = math.log(area)
     if ln_a == 0:
         return 0.0

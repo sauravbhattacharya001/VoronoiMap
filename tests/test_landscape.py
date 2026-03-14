@@ -424,6 +424,14 @@ class TestHelpers:
     def test_fractal_dim_zero_area(self):
         assert vormap_landscape._fractal_dimension(0, 100) == 0.0
 
+    def test_fractal_dim_square_patch(self):
+        """A perfect square (area=100, perimeter=40) should give FRAC=1.0."""
+        import math
+        result = vormap_landscape._fractal_dimension(100, 40)
+        expected = 2 * math.log(0.25 * 40) / math.log(100)  # 1.0
+        assert abs(result - expected) < 1e-10
+        assert abs(result - 1.0) < 1e-10
+
     def test_core_area_zero_depth(self):
         area = 10000
         perim = 400
