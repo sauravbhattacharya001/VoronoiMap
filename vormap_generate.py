@@ -158,6 +158,11 @@ def generate_inhibitory(n, min_dist=None, bounds=(0, 1000, 0, 2000),
     of an existing point.  Stops after *n* points or when placement fails
     repeatedly.
 
+    Uses a grid-based spatial index for O(1) expected-time proximity
+    checks instead of the previous O(k) brute-force scan (where k is
+    the number of placed points). For large n this reduces overall
+    complexity from O(n²) to O(n).
+
     Parameters
     ----------
     n : int
@@ -181,19 +186,36 @@ def generate_inhibitory(n, min_dist=None, bounds=(0, 1000, 0, 2000),
         # pack circles: area / n ≈ π r²  → r ≈ sqrt(area / (π n)) * 0.7
         min_dist = math.sqrt(width * height / (math.pi * max(n, 1))) * 0.7
 
+    min_dist_sq = min_dist ** 2
+
+    # Grid-based spatial index: cell size = min_dist so we only need to
+    # check the 3×3 neighborhood of cells around a candidate point.
+    cell_size = max(min_dist, 1e-12)
+    grid = {}  # (col, row) -> list of (x, y)
+
+    def _grid_cell(x, y):
+        return (int((x - w) / cell_size), int((y - s) / cell_size))
+
+    def _too_close(px, py):
+        gc, gr = _grid_cell(px, py)
+        for dc in range(-1, 2):
+            for dr in range(-1, 2):
+                cell = (gc + dc, gr + dr)
+                for qx, qy in grid.get(cell, ()):
+                    if (px - qx) ** 2 + (py - qy) ** 2 < min_dist_sq:
+                        return True
+        return False
+
     points = []
     max_attempts = n * 100
     attempts = 0
     while len(points) < n and attempts < max_attempts:
         px = rng.uniform(w, e)
         py = rng.uniform(s, n_bound)
-        too_close = False
-        for qx, qy in points:
-            if (px - qx) ** 2 + (py - qy) ** 2 < min_dist ** 2:
-                too_close = True
-                break
-        if not too_close:
+        if not _too_close(px, py):
             points.append((px, py))
+            cell = _grid_cell(px, py)
+            grid.setdefault(cell, []).append((px, py))
         attempts += 1
     return points
 
