@@ -138,7 +138,7 @@ def _fractal_dimension(area: float, perimeter: float) -> float:
     """Patch fractal dimension (perimeter-area relationship)."""
     if area <= 0 or perimeter <= 0:
         return 0.0
-    ln_p = math.log(perimeter)
+    ln_p = math.log(0.25 * perimeter)  # FRAGSTATS perimeter normalization
     ln_a = math.log(area)
     if ln_a == 0:
         return 0.0
