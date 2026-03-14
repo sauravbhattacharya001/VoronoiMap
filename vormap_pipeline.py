@@ -46,6 +46,7 @@ CLI::
 from __future__ import annotations
 
 import argparse
+import html as _html
 import json
 import math
 import os
@@ -599,7 +600,13 @@ class Pipeline:
         return json_str
 
     def _generate_html_report(self) -> str:
-        """Generate a self-contained HTML report of pipeline results."""
+        """Generate a self-contained HTML report of pipeline results.
+
+        All dynamic values are HTML-escaped to prevent XSS when report
+        content is derived from untrusted input (e.g. user-supplied
+        pipeline names, step types, or error messages).
+        """
+        _esc = _html.escape
         rows = ""
         for sr in self._step_results:
             color = {"ok": "#2ecc71", "error": "#e74c3c",
@@ -608,17 +615,19 @@ class Pipeline:
                 sr.status, "?")
             rows += (f"<tr>"
                      f"<td>{sr.step_index}</td>"
-                     f"<td>{sr.step_type}</td>"
-                     f"<td style='color:{color}'>{icon} {sr.status}</td>"
+                     f"<td>{_esc(sr.step_type)}</td>"
+                     f"<td style='color:{color}'>{icon} {_esc(sr.status)}</td>"
                      f"<td>{sr.duration_ms:.0f}ms</td>"
-                     f"<td>{sr.output_key or '—'}</td>"
-                     f"<td>{sr.message[:80]}</td>"
+                     f"<td>{_esc(sr.output_key or '—')}</td>"
+                     f"<td>{_esc(sr.message[:80])}</td>"
                      f"</tr>\n")
 
+        safe_name = _esc(self.name)
+        safe_data = _esc(self.data_file)
         return f"""<!DOCTYPE html>
 <html>
 <head>
-<title>{self.name} — Pipeline Report</title>
+<title>{safe_name} — Pipeline Report</title>
 <style>
 body {{ font-family: -apple-system, sans-serif; max-width: 900px;
        margin: 2rem auto; padding: 0 1rem; background: #fafafa; }}
@@ -632,8 +641,8 @@ tr:hover {{ background: #ecf0f1; }}
 </style>
 </head>
 <body>
-<h1>📊 {self.name}</h1>
-<p class="meta">Data: {self.data_file} | Steps: {len(self.steps)}</p>
+<h1>📊 {safe_name}</h1>
+<p class="meta">Data: {safe_data} | Steps: {len(self.steps)}</p>
 <table>
 <tr><th>#</th><th>Type</th><th>Status</th><th>Duration</th>
 <th>Output Key</th><th>Message</th></tr>
