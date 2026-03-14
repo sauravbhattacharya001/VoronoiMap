@@ -454,28 +454,71 @@ class MonteCarloTest:
                 for _ in range(n)]
 
     def _compute_nni(self, points):
-        """Compute Clark-Evans Nearest-Neighbor Index."""
+        """Compute Clark-Evans Nearest-Neighbor Index.
+
+        Uses a grid-based spatial index for O(n) expected time instead
+        of the naive O(n^2) all-pairs approach.  The study area is
+        partitioned into square grid cells whose side length is chosen
+        so that the expected nearest-neighbor distance falls within one
+        cell, making only the 9 surrounding cells (3x3 neighbourhood)
+        necessary for the search.
+        """
         n = len(points)
         if n < 2:
             return 1.0
-
-        total_nn = 0.0
-        for i in range(n):
-            min_d = float("inf")
-            for j in range(n):
-                if i == j:
-                    continue
-                d = math.hypot(points[i][0] - points[j][0],
-                               points[i][1] - points[j][1])
-                if d < min_d:
-                    min_d = d
-            total_nn += min_d
-        obs_mean = total_nn / n
 
         s, north, w, e = self.bounds
         area = (north - s) * (e - w)
         density = n / area if area > 0 else 0
         expected = 0.5 / math.sqrt(density) if density > 0 else 0
+
+        # Grid cell size — use 2x expected NN distance to guarantee
+        # that the true nearest neighbour is in an adjacent cell.
+        cell_size = max(expected * 2.0, 1e-9)
+        inv_cell = 1.0 / cell_size
+
+        # Build spatial grid — dict of (col, row) -> list of point indices
+        grid = {}
+        for idx in range(n):
+            cx = int((points[idx][0] - w) * inv_cell)
+            cy = int((points[idx][1] - s) * inv_cell)
+            key = (cx, cy)
+            if key in grid:
+                grid[key].append(idx)
+            else:
+                grid[key] = [idx]
+
+        total_nn = 0.0
+        for i in range(n):
+            px, py = points[i]
+            cx = int((px - w) * inv_cell)
+            cy = int((py - s) * inv_cell)
+            min_d = float("inf")
+            # Search 3x3 neighbourhood of grid cells
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    bucket = grid.get((cx + dx, cy + dy))
+                    if bucket is None:
+                        continue
+                    for j in bucket:
+                        if j == i:
+                            continue
+                        d = math.hypot(px - points[j][0],
+                                       py - points[j][1])
+                        if d < min_d:
+                            min_d = d
+            # Fallback: if no neighbor found in 3x3 (extremely sparse
+            # or degenerate), widen search
+            if min_d == float("inf"):
+                for j in range(n):
+                    if j == i:
+                        continue
+                    d = math.hypot(px - points[j][0],
+                                   py - points[j][1])
+                    if d < min_d:
+                        min_d = d
+            total_nn += min_d
+        obs_mean = total_nn / n
 
         return obs_mean / expected if expected > 0 else 1.0
 
