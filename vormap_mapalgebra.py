@@ -272,10 +272,23 @@ def local_abs(layer: CellLayer) -> CellLayer:
 
 
 def local_power(layer: CellLayer, exponent: float) -> CellLayer:
-    """Raise each cell value to the given power."""
+    """Raise each cell value to the given power.
+
+    Negative base values with fractional exponents would produce complex
+    numbers, so those cells are set to nodata instead (consistent with
+    how ``local_log`` handles non-positive values).
+    """
+    nodata = layer.nodata if layer.nodata is not None else float("nan")
     result = layer.copy(name=f"{layer.name}^{exponent}")
+    is_integer_exp = float(exponent) == int(exponent)
     for cell in result.valid_cells():
-        result.values[cell] = result.values[cell] ** exponent
+        v = result.values[cell]
+        if v < 0 and not is_integer_exp:
+            result.values[cell] = nodata
+        elif v == 0 and exponent < 0:
+            result.values[cell] = nodata
+        else:
+            result.values[cell] = v ** exponent
     return result
 
 
