@@ -148,31 +148,33 @@ class PipelineResult:
 
     def summary_text(self) -> str:
         """Human-readable pipeline summary."""
+        W = 53  # inner width between ║ chars
         lines = []
-        lines.append("╔══════════════════════════════════════════════════════╗")
-        lines.append("║            Pipeline Execution Summary               ║")
-        lines.append("╠══════════════════════════════════════════════════════╣")
-        lines.append(f"║  Name:      {self.name[:41]:<41}║")
-        lines.append(f"║  Data:      {self.data_file[:41]:<41}║")
-        lines.append(f"║  Steps:     {self.total_steps} total, "
-                     f"{self.completed} ok, {self.skipped} skipped, "
-                     f"{self.failed} failed")
-        lines.append(f"║  Duration:  {self.total_duration_ms:.0f}ms"
-                     f"{'':<41}║")
-        lines.append(f"║  Status:    {'✓ SUCCESS' if self.success else '✗ FAILED'}"
-                     f"{'':<37}║")
-        lines.append("╠══════════════════════════════════════════════════════╣")
+        lines.append("╔" + "═" * W + "╗")
+        lines.append("║" + "Pipeline Execution Summary".center(W) + "║")
+        lines.append("╠" + "═" * W + "╣")
+        lines.append(f"║  {'Name:':<10} {self.name[:W-13]:<{W-13}}║")
+        lines.append(f"║  {'Data:':<10} {self.data_file[:W-13]:<{W-13}}║")
+        steps_info = (f"{self.total_steps} total, {self.completed} ok, "
+                      f"{self.skipped} skipped, {self.failed} failed")
+        lines.append(f"║  {'Steps:':<10} {steps_info:<{W-13}}║")
+        dur_info = f"{self.total_duration_ms:.0f}ms"
+        lines.append(f"║  {'Duration:':<10} {dur_info:<{W-13}}║")
+        status_info = '✓ SUCCESS' if self.success else '✗ FAILED'
+        lines.append(f"║  {'Status:':<10} {status_info:<{W-13}}║")
+        lines.append("╠" + "═" * W + "╣")
 
         for sr in self.steps:
             icon = {"ok": "✓", "skipped": "⊘", "error": "✗"}.get(sr.status, "?")
-            line = f"║  {icon} [{sr.step_index}] {sr.step_type:<16} {sr.duration_ms:>7.0f}ms"
+            detail = f"  {icon} [{sr.step_index}] {sr.step_type:<16} {sr.duration_ms:>7.0f}ms"
             if sr.output_key:
-                line += f"  → {sr.output_key}"
-            lines.append(line)
+                detail += f"  → {sr.output_key}"
+            lines.append(f"║{detail:<{W}}║")
             if sr.status == "error":
-                lines.append(f"║      Error: {sr.message[:42]}")
+                err_detail = f"      Error: {sr.message[:W-13]}"
+                lines.append(f"║{err_detail:<{W}}║")
 
-        lines.append("╚══════════════════════════════════════════════════════╝")
+        lines.append("╚" + "═" * W + "╝")
         return "\n".join(lines)
 
 
