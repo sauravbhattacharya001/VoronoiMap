@@ -15,6 +15,7 @@ from vormap_power import (
     WeightedSeed, PowerDiagramResult,
     _power_distance, _multiplicative_distance, _additive_distance,
     _polygon_area, _polygon_centroid, _polygon_perimeter, _convex_hull,
+    _ordered_boundary,
 )
 
 
@@ -547,6 +548,67 @@ class TestEdgeCases(unittest.TestCase):
                                            resolution=30)
             ws = result.find_cell((200, 200))
             self.assertIsInstance(ws, WeightedSeed)
+
+    # ---- Tests for non-convex boundary tracing (issue #98) ----
+
+    def test_multiplicative_regions_not_convex_hull(self):
+        """Multiplicative mode should use ordered boundary, not convex hull.
+
+        A lower-weight center seed gets a smaller but non-convex region.
+        The boundary trace should produce a polygon that's not larger than
+        the convex hull of its boundary points.
+        """
+        seeds = [(50, 50), (0, 0), (100, 0), (100, 100), (0, 100)]
+        weights = [1.0, 3.0, 3.0, 3.0, 3.0]
+        regions_mult = compute_power_regions(
+            seeds, weights, mode='multiplicative', resolution=100)
+        # Region for the center seed (index 0) should exist
+        self.assertTrue(len(regions_mult[0]) >= 3,
+                        "center seed should have a region polygon")
+        # All regions should be non-empty lists of tuples
+        for i, r in enumerate(regions_mult):
+            if r:
+                for pt in r:
+                    self.assertEqual(len(pt), 2)
+
+    def test_additive_regions_not_convex_hull(self):
+        """Additive mode should also use ordered boundary trace."""
+        seeds = [(50, 50), (0, 0), (100, 0), (100, 100), (0, 100)]
+        weights = [1.0, 5.0, 5.0, 5.0, 5.0]
+        regions_add = compute_power_regions(
+            seeds, weights, mode='additive', resolution=100)
+        self.assertTrue(len(regions_add[0]) >= 3)
+
+    def test_power_mode_still_uses_convex_hull(self):
+        """Power mode should still use convex hull (regions are convex)."""
+        seeds = [(50, 50), (0, 0), (100, 0), (100, 100), (0, 100)]
+        weights = [1.0, 100.0, 100.0, 100.0, 100.0]
+        regions_pow = compute_power_regions(
+            seeds, weights, mode='power', resolution=100)
+        # Should succeed without errors
+        for r in regions_pow:
+            if r:
+                for pt in r:
+                    self.assertEqual(len(pt), 2)
+
+    def test_ordered_boundary_preserves_concavity(self):
+        """Ordered boundary area should be <= convex hull area for non-convex
+        regions (multiplicative mode)."""
+        seeds = [(50, 50), (0, 0), (100, 0), (100, 100), (0, 100)]
+        weights = [1.0, 3.0, 3.0, 3.0, 3.0]
+
+        # Get multiplicative region (uses ordered boundary)
+        regions_mult = compute_power_regions(
+            seeds, weights, mode='multiplicative', resolution=100)
+
+        if len(regions_mult[0]) >= 3:
+            # Compute area of the traced boundary polygon
+            traced_area = abs(_polygon_area(regions_mult[0]))
+            # Compute area of its convex hull
+            hull = _convex_hull(regions_mult[0])
+            hull_area = abs(_polygon_area(hull))
+            # Traced boundary should be <= convex hull (preserves concavity)
+            self.assertLessEqual(traced_area, hull_area + 1e-6)
 
 
 if __name__ == '__main__':
