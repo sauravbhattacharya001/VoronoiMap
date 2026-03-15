@@ -181,19 +181,39 @@ def generate_inhibitory(n, min_dist=None, bounds=(0, 1000, 0, 2000),
         # pack circles: area / n ≈ π r²  → r ≈ sqrt(area / (π n)) * 0.7
         min_dist = math.sqrt(width * height / (math.pi * max(n, 1))) * 0.7
 
+    # Use a grid-based spatial hash for O(1) expected proximity checks
+    # instead of brute-force O(n) scan per candidate.  The grid cell size
+    # equals min_dist so only the 3×3 neighborhood needs checking.
+    cell_size = min_dist
+    grid = {}  # (col, row) -> list of (x, y)
+
+    def _grid_key(x, y):
+        return (int((x - w) / cell_size), int((y - s) / cell_size))
+
+    def _is_too_close(px, py):
+        gc, gr = _grid_key(px, py)
+        min_dist_sq = min_dist ** 2
+        for dc in range(-1, 2):
+            for dr in range(-1, 2):
+                cell = grid.get((gc + dc, gr + dr))
+                if cell:
+                    for qx, qy in cell:
+                        if (px - qx) ** 2 + (py - qy) ** 2 < min_dist_sq:
+                            return True
+        return False
+
     points = []
     max_attempts = n * 100
     attempts = 0
     while len(points) < n and attempts < max_attempts:
         px = rng.uniform(w, e)
         py = rng.uniform(s, n_bound)
-        too_close = False
-        for qx, qy in points:
-            if (px - qx) ** 2 + (py - qy) ** 2 < min_dist ** 2:
-                too_close = True
-                break
-        if not too_close:
+        if not _is_too_close(px, py):
             points.append((px, py))
+            key = _grid_key(px, py)
+            if key not in grid:
+                grid[key] = []
+            grid[key].append((px, py))
         attempts += 1
     return points
 
