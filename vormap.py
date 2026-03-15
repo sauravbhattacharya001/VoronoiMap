@@ -144,7 +144,11 @@ def compute_bounds(points, padding=0.1):
 
     Returns (south, north, west, east) with *padding* fraction added
     on each side so Voronoi cells near the boundary are not clipped.
+
+    Raises ValueError if *points* is empty.
     """
+    if not points:
+        raise ValueError("Cannot compute bounds from an empty point list.")
     lngs, lats = zip(*points)
     w, e = min(lngs), max(lngs)
     s, n = min(lats), max(lats)
