@@ -379,9 +379,22 @@ def compute_power_regions(seeds, weights, mode='power', bounds=None,
             regions.append([])
             continue
 
-        # Convex hull (Graham scan)
-        hull = _convex_hull(pts)
-        regions.append(hull)
+        if mode == 'power':
+            # Power diagram cells are always convex — convex hull is exact.
+            hull = _convex_hull(pts)
+            regions.append(hull)
+        else:
+            # Multiplicative and additive modes can produce non-convex
+            # regions (Apollonius circles).  Trace the ordered boundary
+            # from the grid using a contour-following walk so concavities
+            # are preserved.
+            boundary = _trace_boundary(grid, k, resolution,
+                                       x_min, y_min, dx, dy)
+            if boundary:
+                regions.append(boundary)
+            else:
+                # Fallback: order boundary pixels by angle from centroid
+                regions.append(_angular_order(pts))
 
     return regions
 
@@ -408,6 +421,122 @@ def _convex_hull(points):
         upper.append(p)
 
     return lower[:-1] + upper[:-1]
+
+
+def _trace_boundary(grid, region_id, resolution, x_min, y_min, dx, dy):
+    """Trace the ordered boundary of a region using Moore neighborhood tracing.
+
+    This preserves concavities that a convex hull would fill in, which is
+    critical for multiplicative/additive Voronoi modes whose regions can
+    be non-convex (bounded by circular Apollonius arcs).
+
+    Parameters
+    ----------
+    grid : list[list[int]]
+        Grid assignment (grid[iy][ix] = seed index).
+    region_id : int
+        Which region to trace.
+    resolution : int
+        Grid dimension.
+    x_min, y_min, dx, dy : float
+        Grid-to-world coordinate mapping.
+
+    Returns
+    -------
+    list[tuple[float, float]] or None
+        Ordered polygon vertices, or None if tracing fails.
+    """
+    # Find start cell: topmost (min iy), then leftmost (min ix)
+    start = None
+    for iy in range(resolution):
+        for ix in range(resolution):
+            if grid[iy][ix] == region_id:
+                # Check if it's a boundary cell
+                if _is_boundary_cell(grid, ix, iy, region_id, resolution):
+                    start = (ix, iy)
+                    break
+        if start is not None:
+            break
+
+    if start is None:
+        return None
+
+    # Moore neighborhood: 8 directions clockwise from west
+    #   5 6 7
+    #   4 . 0
+    #   3 2 1
+    DIRS = [(1, 0), (1, 1), (0, 1), (-1, 1),
+            (-1, 0), (-1, -1), (0, -1), (1, -1)]
+
+    boundary = [start]
+    current = start
+    # Enter from the west (direction 4 in our table), so start scanning
+    # from direction 5 (= (entry + 1) % 8 where entry came from dir 0's
+    # opposite = 4, so scan_start = 5).
+    scan_start = 5
+    max_steps = resolution * resolution  # safety limit
+
+    for _ in range(max_steps):
+        found = False
+        for i in range(8):
+            d = (scan_start + i) % 8
+            nx = current[0] + DIRS[d][0]
+            ny = current[1] + DIRS[d][1]
+            if (0 <= nx < resolution and 0 <= ny < resolution and
+                    grid[ny][nx] == region_id and
+                    _is_boundary_cell(grid, nx, ny, region_id, resolution)):
+                nxt = (nx, ny)
+                if nxt == start and len(boundary) > 2:
+                    # Completed the loop
+                    return _grid_to_world(boundary, x_min, y_min, dx, dy)
+                if nxt not in (boundary[-1],):
+                    boundary.append(nxt)
+                current = nxt
+                # Next scan starts from (opposite of d) + 1
+                scan_start = (d + 5) % 8
+                found = True
+                break
+        if not found:
+            break
+
+    # Didn't close the loop cleanly — return what we have if substantial
+    if len(boundary) >= 3:
+        return _grid_to_world(boundary, x_min, y_min, dx, dy)
+    return None
+
+
+def _is_boundary_cell(grid, ix, iy, region_id, resolution):
+    """Check if a cell is on the boundary of its region."""
+    for diy in (-1, 0, 1):
+        for dix in (-1, 0, 1):
+            if diy == 0 and dix == 0:
+                continue
+            ny, nx = iy + diy, ix + dix
+            if (ny < 0 or ny >= resolution or
+                    nx < 0 or nx >= resolution or
+                    grid[ny][nx] != region_id):
+                return True
+    return False
+
+
+def _grid_to_world(cells, x_min, y_min, dx, dy):
+    """Convert grid cell coordinates to world coordinates."""
+    return [(x_min + (ix + 0.5) * dx, y_min + (iy + 0.5) * dy)
+            for ix, iy in cells]
+
+
+def _angular_order(pts):
+    """Order boundary points by angle from their centroid.
+
+    Fallback for when Moore tracing doesn't close cleanly.
+    Produces a star-shaped polygon that preserves concavities better
+    than a convex hull (though not perfectly for highly non-star-shaped
+    regions).
+    """
+    import math
+    cx = sum(p[0] for p in pts) / len(pts)
+    cy = sum(p[1] for p in pts) / len(pts)
+    return sorted(pts, key=lambda p: math.atan2(p[1] - cy, p[0] - cx))
 
 
 # ---------------------------------------------------------------------------
