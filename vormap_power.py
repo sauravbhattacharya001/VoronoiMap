@@ -379,9 +379,15 @@ def compute_power_regions(seeds, weights, mode='power', bounds=None,
             regions.append([])
             continue
 
-        # Convex hull (Graham scan)
-        hull = _convex_hull(pts)
-        regions.append(hull)
+        if mode == 'power':
+            # Power diagram cells are always convex — hull is exact.
+            hull = _convex_hull(pts)
+            regions.append(hull)
+        else:
+            # Multiplicative/additive modes produce non-convex regions
+            # (Apollonius circles). Use ordered boundary trace instead.
+            boundary = _ordered_boundary(pts)
+            regions.append(boundary)
 
     return regions
 
@@ -408,6 +414,58 @@ def _convex_hull(points):
         upper.append(p)
 
     return lower[:-1] + upper[:-1]
+
+
+def _ordered_boundary(points):
+    """Order boundary points into a polygon by angular sweep from centroid.
+
+    Unlike convex hull, this preserves concavities — critical for
+    multiplicative and additive weighted Voronoi regions where cells
+    can be crescent-shaped (bounded by Apollonius circles).
+
+    The approach:
+    1. Compute centroid of all boundary points.
+    2. Sort points by angle from centroid.
+    3. If multiple points share similar angles, keep only the outermost
+       to avoid self-intersections in thin regions.
+
+    This works well for grid-sampled boundaries because the boundary
+    pixels form a connected ring around the region.
+    """
+    import math
+
+    if len(points) <= 2:
+        return list(points)
+
+    # Centroid
+    cx = sum(p[0] for p in points) / len(points)
+    cy = sum(p[1] for p in points) / len(points)
+
+    # Sort by angle from centroid
+    def angle_key(p):
+        return math.atan2(p[1] - cy, p[0] - cx)
+
+    sorted_pts = sorted(set(points), key=angle_key)
+
+    # Deduplicate near-coincident angles (keep outermost point)
+    # This prevents self-intersections in thin crescent regions
+    if len(sorted_pts) > 4:
+        eps = 2 * math.pi / (4 * len(sorted_pts))  # angular tolerance
+        deduped = [sorted_pts[0]]
+        for i in range(1, len(sorted_pts)):
+            a_prev = angle_key(deduped[-1])
+            a_curr = angle_key(sorted_pts[i])
+            if abs(a_curr - a_prev) < eps:
+                # Keep whichever is farther from centroid
+                d_prev = (deduped[-1][0] - cx)**2 + (deduped[-1][1] - cy)**2
+                d_curr = (sorted_pts[i][0] - cx)**2 + (sorted_pts[i][1] - cy)**2
+                if d_curr > d_prev:
+                    deduped[-1] = sorted_pts[i]
+            else:
+                deduped.append(sorted_pts[i])
+        return deduped
+
+    return sorted_pts
 
 
 # ---------------------------------------------------------------------------
