@@ -1,21 +1,73 @@
 {
-  "runNumber": 338,
-  "lastFeature": "Interactive configuration wizard (config.html)",
-  "lastRepo": "gif-captcha",
-  "lastRunTimestamp": "2026-03-14T22:50:00-07:00",
+  "runNumber": 365,
+  "lastFeature": "Interactive Command Reference — searchable command cheat sheet with 15 commands, 6 categories, copy-to-clipboard, 16 tests",
+  "lastRepo": "getagentbox",
+  "lastRunTimestamp": "2026-03-15T15:15:00.000Z",
   "repoFeatures": {
     "sauravcode": [
       "sauravapi — serve .srv functions as REST API endpoints",
-      "sauravtest — test runner for .srv programs (discover, run, setup/teardown, JSON export)"
+      "sauravtest — test runner for .srv programs (discover, run, setup/teardown, JSON export)",
+      "sauravmetrics — code complexity analyzer (cyclomatic complexity, maintainability index, LOC, nesting depth, JSON/CSV export, 22 tests)",
+      "sauravdbg — interactive step-through debugger (step/next/continue, breakpoints with conditions, var inspection, call stack, watchlist, source view, restart). 33 tests."
     ],
     "GraphVisual": [
-      "JSON graph exporter (D3.js/vis.js/Cytoscape.js compatible)"
+      "JSON graph exporter (D3.js/vis.js/Cytoscape.js compatible)",
+      "NetworkReportGenerator — self-contained HTML network analysis report with SVG charts, health score, degree/edge-type/top-nodes visualizations, 12 tests",
+      "Interactive Graph Explorer — load JSON, force-directed layout, ego network highlighting, shortest path, search, community detection, PNG export"
     ],
     "VoronoiMap": [
-      "vormap_benchmark — performance benchmarking module (NN, area, EstimateSUM, scaling analysis)"
+      "vormap_benchmark — performance benchmarking module (NN, area, EstimateSUM, scaling analysis)",
+      "LOO cross-validation for interpolation methods (compare nearest/IDW/natural, error metrics, SVG chart, CSV export)"
     ],
     "gif-captcha": [
-      "Interactive configuration wizard (config.html) — step-by-step setup, code generation, score dashboard"
+      "Interactive configuration wizard (config.html) — step-by-step setup, code generation, score dashboard",
+      "CaptchaAnomalyDetector — statistical anomaly detection (z-score, IQR, bursts, geo shift, changepoints, EMA)"
+    ],
+    "agentlens": [
+      "CLI tool (agentlens command) — 10 subcommands: sessions, session, costs, events, export, analytics, health, compare, alerts, status",
+      "Session Guardrails — constraint validation (token budgets, duration, tool allow/blocklists, model restrictions, error thresholds, custom predicates, suite reports, 39 tests)"
+    ],
+    "BioBots": [
+      "Data Integrity Auditor (integrity.html) — 18 validation rules, summary dashboard, rule chart, filterable findings, CSV export",
+      "Interactive Bioink Compatibility Matrix — heatmap, dimension breakdown, rankings, add custom bioinks, recommendations",
+      "Print Recipe Builder — target-based parameter optimization with 5 presets, composite scoring, recipe cards, distributions, 33 tests"
+    ],
+    "Vidly": [
+      "Global Search bar — navbar search + SearchController querying movies, customers, and rentals with unified results view",
+      "Customer Insights dashboard — loyalty score, spending, patterns, genres, timeline, rental history. 16 tests.",
+      "Movie Quiz — interactive trivia with difficulty levels, categories, speed bonus, leaderboard, daily challenge, hints, 12 tests"
+    ],
+    "agenticchat": [
+      "Word Cloud visualization panel — interactive word frequency cloud, role-colored, click-to-search (Ctrl+Shift+W)",
+      "ChatGPT conversation importer — parse mapping tree, extract messages, create sessions. 17 tests.",
+      "Prompt Chain Runner — multi-step prompt chains with variable substitution, 3 presets, import/export, 18 tests"
+    ],
+    "prompt": [
+      "PromptPlayground — interactive HTML playground for testing prompt templates (live preview, dark mode, token stats, copy, library import)",
+      "PromptSchemaGenerator — fluent structured output schema builder (JSON Schema + prompt instructions + example generation, 14 tests)"
+    ],
+    "WinSentinel": [
+      "Attack Path Analyzer — chains findings into multi-step attack paths (6 kill chain stages), exploitability scoring, chokepoint remediation priorities, CLI + 14 tests",
+      "Score Forecast CLI — predict future security scores with trend analysis, confidence intervals, module projections, risk factors, target estimation, 9 tests"
+    ],
+    "FeedReader": [
+      "Text-to-Speech article reader — AVSpeechSynthesizer with play/pause/stop, voice selection, language detection",
+      "ArticleExpiryManager — auto-cleanup for stale articles with configurable policies, dry-run, sweep execution, 16 tests"
+    ],
+    "Ocaml-sample-code": [
+      "Example Explorer (explorer.html) — browsable catalog of all 90 examples with 12 categories, search, sort, difficulty badges, inline code preview"
+    ],
+    "everything": [
+      "Packing List Screen — template-based trip packing UI with category grouping, progress tracking, weight breakdown, readiness checks",
+      "Vehicle Maintenance Tracker — 4-tab screen (Vehicles, Service Log, Alerts, Costs) with add/log/update dialogs, sample data, 12 tests"
+    ],
+    "ai": [
+      "Fleet Snapshot command — kubectl-style worker overview with table/JSON/CSV output, sorting, filtering",
+      "Interactive Simulation Playground — HTML page with parameter sliders, client-side simulation, tree/timeline/depth visualizations, 5 presets, 10 tests"
+    ],
+    "getagentbox": [
+      "Performance Benchmarks (benchmarks.js) — 12 task comparisons across 4 categories with animated bars, filters, summary stats, 14 tests",
+      "Interactive Command Reference — searchable/filterable command cheat sheet with 15 commands, 6 categories, examples, copy-to-clipboard, tips, 16 tests"
     ]
   }
 }

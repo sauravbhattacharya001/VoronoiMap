@@ -1,4 +1,270 @@
+
+## 2026-03-15
+
+### Run #365 — Feature Builder (7:15 AM PST)
+- **Repo:** getagentbox
+- **Feature:** Interactive Command Reference — searchable command cheat sheet
+- **Details:** 15 commands across 6 categories (Memory, Search, Productivity, Media, Settings, Advanced). Each with syntax, description, examples with copy-to-clipboard, and tips. Real-time search, category filters, expand/collapse cards, dark/light theme. 16 tests, all passing.
+- **Commit:** `feat: Interactive Command Reference — searchable command cheat sheet`
+
+### Gardener Run #923 — 7:05 AM
+- **Task 1:** add_tests on **agentlens** — 16 integration tests for `backend/lib/tag-statements.js`: singleton caching, addTag/getTagsForSession, INSERT OR IGNORE dedup, countTags, removeTag, removeAllTags, allTags aggregation, sessionsByTag with LIMIT/OFFSET pagination, sessionsByTagCount, created_at ordering. Uses real in-memory SQLite. → pushed to master
+- **Task 2:** add_tests on **prompt** — 32 extended tests for `PromptSchemaGenerator`: builder validation (null desc, fluent chaining, snapshot isolation), JSON Schema structure (all type mappings, nested required arrays, all-optional), example generation (parsed via JsonDocument for 7 types), prompt instructions formatting, property accessors. → pushed to main
+
+## 2026-03-15
+
+### Gardener Run #921 — 7:00 AM
+- **Task 1:** fix_issue on **Vidly** — Fixed #93: 10 services accepted `IClock` in constructor but never assigned it to `_clock`, causing `NullReferenceException` at runtime. Added `_clock = clock ?? SystemClock.Instance;` to all 10 constructors. Also removed duplicate `_clock` field declaration in `StaffPerformanceService`. → [PR #98](https://github.com/sauravbhattacharya001/Vidly/pull/98)
+- **Task 2:** fix_issue on **WinSentinel** — Fixed #93: Three bugs in `ThreatCorrelator`: (1) duplicate correlations from `CheckDefenderPlusUnsigned` picking different process events, (2) race condition with `TrimWindow()` outside lock, (3) `CheckRapidMultiModule` firing repeatedly instead of only at threshold crossing. → [PR #94](https://github.com/sauravbhattacharya001/WinSentinel/pull/94)
+
+### Gardener Run #920 — 6:40 AM
+- **Task 1:** doc_update on **Vidly** — Created `docs/API.md`: comprehensive route reference for all 26 controllers (~100 routes). Organized by domain: Core, Catalog, Customers, Transactions, Social, Data. Method/route/description tables, error handling, auth notes. → [PR #99](https://github.com/sauravbhattacharya001/Vidly/pull/99) merged
+- **Task 2:** code_cleanup on **WinSentinel** — Extracted `CreateSilentProcessInfo` helper in `AutoRemediator.cs`: consolidated 7 repeated 8-line `ProcessStartInfo` blocks into 2-line calls. 33 lines saved (842→809). 10 tests pass. → pushed to main
+- **Weight adjustment at 920:** Boosted security_fix/refactor/add_tests/code_cleanup to 18.1, reduced open_issue/fix_issue to 15.1, doc_update to 16.1. Next adjustment at 930.
+
+### Builder Run #364 — 7:00 AM
+- **Repo:** sauravcode
+- **Feature:** `sauravdbg` — Interactive step-through debugger for Sauravcode. Commands: step/next/continue, breakpoints with optional conditions (`b 10 if x > 5`), variable inspection (`p`, `vars`), call stack (`stack`), watchlist (`watch`/`unwatch`), source context (`where`, `list`), restart. Subclasses `Interpreter` via `DebugInterpreter`, overrides `interpret()` for breakpoint/stepping hooks. ANSI color output (auto-detected). 33 tests.
+- → [PR #66](https://github.com/sauravbhattacharya001/sauravcode/pull/66) merged
+
+### Feature Builder Run #363 — 6:45 AM
+- **Repo:** WinSentinel
+- **Feature:** Score Forecast CLI — `--forecast` command exposing the existing ScoreForecaster service
+- **Details:** Added `--forecast` with `--forecast-target`, `--forecast-days`, `--forecast-no-modules`, `--forecast-no-risks` flags. Rich console output (trend, confidence, projections with 95% CI, module breakdowns, risk factors) + JSON support. New `ConsoleFormatter.Forecast.cs` partial class.
+- **Tests:** 9 new CLI parser tests (40 total with existing ScoreForecaster tests, all passing)
+- **PR:** #95
+- **Files:** 4 changed (+443 lines)
+
+### Gardener Run #918 — 6:30 AM
+- **Task 1:** fix_issue on **ai** — Issue #60: KillSwitchManager.revive() was resetting sustained breach tracking for ALL agents globally. Made `_first_breach` per-agent (Dict keyed by agent_id), fixed `reset()` and `revive()` to be agent-specific. Also fixed missing RESOURCE_DISK/RESOURCE_NETWORK in proximity scores. → PR #62
+- **Task 2:** fix_issue on **sauravcode** — Issue #62: Top-level function identifiers returned raw string instead of FunctionNode with closure scope. Removed `_call_depth > 0` guard so closure capture works at all scopes. → PR #65
+
+### Builder Run #362 — 6:35 AM
+- **Repo:** GraphVisual
+- **Feature:** Interactive Graph Explorer — load JSON graph files and explore them visually in the browser. Force-directed layout (pure SVG, no D3), zoom/pan, degree-proportional node sizing, edge type coloring with legend, click-to-highlight ego network, node info panel with neighbor navigation, shortest path finder (BFS) with path visualization, fuzzy node search, connected component community detection, adjustable physics controls (force strength, link distance), labels toggle, community coloring toggle, PNG export (2x res), live stats. Zero external dependencies.
+- → [PR #82](https://github.com/sauravbhattacharya001/GraphVisual/pull/82) merged
+
+### Gardener Run #917 — 6:06 AM
+- **Task 1:** doc_update on **GraphVisual** — Created Cookbook page (docs/cookbook.html) with 10 practical recipes: generate synthetic graphs, find influencers (centrality), detect communities (Louvain), shortest paths, export (GraphML/GEXF/DOT/JSON), resilience testing, anomaly detection, graph comparison, PageRank, full analysis pipeline. Difficulty tags, code examples, expected output, tips. Cookbook link added to all 5 doc pages. → [PR #81](https://github.com/sauravbhattacharya001/GraphVisual/pull/81) merged
+- **Task 2:** perf_improvement on **prompt** — Optimized PromptSimilarityAnalyzer: (1) LevenshteinDistance two-row DP (O(m×n)→O(min(m,n)) memory), (2) LCSLength two-row DP, (3) FindDuplicates+SimilarityMatrix pre-normalize all strings once before O(n²) loop. 53 tests pass. → [PR #82](https://github.com/sauravbhattacharya001/prompt/pull/82) merged
+
+### Builder Run #361 — 6:15 AM
+- **Repo:** agentlens
+- **Feature:** Session Guardrails — fluent constraint validation module for agent sessions. Supports token budgets, duration limits, tool allowlists/blocklists, model restrictions, event count limits, error thresholds, and custom predicates. Includes `GuardrailSuite` for running multiple guardrail sets with aggregated text/JSON reporting. 39 tests, all passing.
+- **Commit:** [2e17f3f](https://github.com/sauravbhattacharya001/agentlens/commit/2e17f3f)
+
+### Gardener Run #914 — 6:00 AM
+- **Task 1:** fix_issue on **Vidly** — Fixed #93: 10 services accepted IClock parameter but never assigned it to _clock, causing NullReferenceException. Added `_clock = clock ?? new SystemClock()` to all 10 constructors. → [PR #98](https://github.com/sauravbhattacharya001/Vidly/pull/98)
+- **Task 2:** fix_issue on **WinSentinel** — Fixed #93: ThreatCorrelator race conditions. (1) Moved TrimWindow() inside _correlationLock for atomic trim+snapshot, (2) Fixed duplicate DefenderPlusUnsigned correlations by reusing suspiciousProcessEvent, (3) RapidMultiModule now only fires when newEvent pushes source count over threshold. → [PR #94](https://github.com/sauravbhattacharya001/WinSentinel/pull/94)
+
+### Builder Run #360 — 6:10 AM
+- **Repo:** BioBots
+- **Feature:** Print Recipe Builder — search 10K historical runs to find optimal bioprinting parameters for target outcomes
+- **What:** Target viability/elasticity/layer-height/dead-cell %, 5 presets (High Viability, Fine Resolution, Balanced, Rapid Prototype, High Elasticity), 3 tolerance modes, crosslinking/wellplate filters, composite scoring (viability 40% + elasticity 25% + resolution 20% + dead-cell 15%), recipe card with confidence bars, parameter distributions, top-10 table, JSON/CSV/clipboard export. Core logic in `shared/recipeBuilder.js`.
+- **Tests:** 33 tests (filtering, scoring, recipe computation, histograms, presets, edge cases)
+- → [PR #76](https://github.com/sauravbhattacharya001/BioBots/pull/76) merged
+
+### Builder Run #359 — 5:45 AM
+- **FeedReader**: ArticleExpiryManager — auto-cleanup for stale articles with configurable expiry policies (global/per-feed), age + count limits, bookmark/annotation protection, dry-run preview, sweep execution with audit log, storage estimation. 16 tests. Commit 5fd8c02.
+
+### Gardener Run #914 — 5:50 AM
+- **WinSentinel** (open_issue): Filed [#93](https://github.com/sauravbhattacharya001/WinSentinel/issues/93) — ThreatCorrelator has 3 bugs: CheckDefenderPlusUnsigned can emit duplicate correlations, TrimWindow races with ProcessEvent outside the lock, CheckRapidMultiModule fires for every event once threshold is met.
+- **agenticchat** (bug_fix): MessageScheduler.onSend() never wired up + fallback uses wrong element IDs (#messageInput instead of #chat-input). Scheduled messages silently marked "sent" but never dispatched. → [PR #79](https://github.com/sauravbhattacharya001/agenticchat/pull/79) merged
+
+### Gardener Run #913 — 5:30 AM
+- **Task 1:** fix_issue on **ai** — PR #61: Made KillSwitch breach tracking per-agent. `_first_breach` changed from `Optional[float]` to `Dict[str, float]`, `revive()` now only resets the target agent. Also fixed missing RESOURCE_DISK/RESOURCE_NETWORK in proximity scoring. Closes #60.
+- **Task 2:** fix_issue on **Vidly** — PR #97: Added `_clock = clock ?? new SystemClock()` to 10 service constructors that accepted IClock but never assigned it, causing NullReferenceException. Closes #93.
+
+### Builder Run #358 — 5:45 AM
+- **Repo:** agenticchat
+- **Feature:** Prompt Chain Runner — multi-step prompt workflows with `{{prev}}` and `{{step.N}}` substitution
+- **What:** Create, edit, run sequential prompt chains. 3 built-in presets (REST API Builder, Code Review Pipeline, Data Pipeline). Progress UI with stop button. Run history. Import/export as JSON. `/chains` and `/run-chain` slash commands. Toolbar button.
+- **Tests:** 18 tests (CRUD, persistence, presets, panel UI, toggle, export)
+- → [PR #78](https://github.com/sauravbhattacharya001/agenticchat/pull/78) merged
+
+### Builder Run #357 — 5:15 AM
+- **Repo:** sauravcode
+- **Feature:** `sauravmetrics.py` — code complexity analyzer for .srv files
+- **What:** Analyzes sauravcode files reporting cyclomatic complexity, LOC breakdown, function metrics, nesting depth, maintainability index (A-F grades). Supports JSON/CSV output, sorting, threshold warnings, recursive scanning, per-function detail breakdowns.
+- **Tests:** 22 tests (line classification, function detection, complexity, nesting, maintainability, file discovery)
+- **Commit:** a21d09d
+
+### Gardener Run #912 — 5:25 AM
+- **Ocaml-sample-code** (open_issue): Filed [#51](https://github.com/sauravbhattacharya001/Ocaml-sample-code/issues/51) — raft.ml AppendEntries reverses log entries on multi-entry append + sends wrong entries on replication retry.
+- **prompt** (bug_fix): CachingMiddleware thread-safety — atomic counters via `Interlocked.Increment`, thundering herd prevention via request coalescing. Closes [#80](https://github.com/sauravbhattacharya001/prompt/issues/80). → [PR #81](https://github.com/sauravbhattacharya001/prompt/pull/81)
+
+### Gardener Run #911 — 5:15 AM
+- **VoronoiMap** (add_tests): 36 tests for untested `vormap_crossval` module — CrossValResult, cross_validate, compare_methods, CSV/SVG export. → [PR #105](https://github.com/sauravbhattacharya001/VoronoiMap/pull/105)
+- **GraphVisual** (perf_improvement): Barnes-Hut quadtree for O(V log V) repulsion in force-directed layout (was O(V²)). 15-200x speedup for large graphs. 2 tests. → [PR #80](https://github.com/sauravbhattacharya001/GraphVisual/pull/80)
+
+### Builder Run #356 — 5:05 AM
+- **Vidly**: Movie Quiz — interactive trivia game with leaderboard. 3 difficulty levels, 5 categories, speed bonus, daily challenge, hints, stats. QuizController (6 actions), 4 views, 12 tests. → [PR #96](https://github.com/sauravbhattacharya001/Vidly/pull/96)
+
+### Builder Run #355 — 4:45 AM
+- **Repo:** ai (AI Replication Sandbox)
+- **Feature:** Interactive Simulation Playground (HTML)
+- **Details:** Self-contained HTML page for exploring replication dynamics. Parameter sliders (depth, replicas, strategy, cooldown, probability, seed), client-side JS simulation engine, worker tree visualization, event timeline canvas, depth distribution bars, denial breakdown, 5 presets, dark theme, responsive. 10 tests.
+- **Commit:** `b6f4a92` → `master`
+
+### Builder Run #354 — 4:45 AM
+- **agenticchat**: ChatGPT conversation importer — import `conversations.json` from ChatGPT exports. Parses nested mapping tree, extracts user/assistant messages, creates sessions. UI button + `/import-chatgpt` slash command. 17 tests. → [PR #77](https://github.com/sauravbhattacharya001/agenticchat/pull/77)
+
+### Gardener Run #909 — 4:15 AM
+- **FeedReader** (bug_fix): Fix auto-escalation skipping priority levels — added `lastEscalatedAt` anchor field. 1 test. → [PR #76](https://github.com/sauravbhattacharya001/FeedReader/pull/76)
+
+### Gardener Run #910 — 4:15 AM
+- **sauravcode** (code_cleanup): Fix sauravlint `loop_depth`/`nesting_depth` never decremented + dead code removal. 2 tests (69 total). → [PR #64](https://github.com/sauravbhattacharya001/sauravcode/pull/64)
+
+### Gardener Run #911 — 4:30 AM
+- **All repos complete:** All 16 non-fork repos have all 29 task types done. No tasks remain to execute.
+
+### Gardener Run #909 — 4:15 AM
+- **FeedReader** (bug_fix): Fix auto-escalation skipping priority levels — `autoEscalate()` measured elapsed time from `savedAt` (never changes), so items jumped low→urgent in one cycle. Added `lastEscalatedAt` field as anchor. 1 new test. → [PR #76](https://github.com/sauravbhattacharya001/FeedReader/pull/76)
+
+### Gardener Run #910 — 4:15 AM
+- **sauravcode** (code_cleanup): Fix sauravlint `loop_depth`/`nesting_depth` never decremented — E005 and W008 rules were broken. Removed dead vars (`indent_stack`, `shadow_outer`). Removed undocumented S001 rule from docstring. 2 new tests (69 total). → [PR #64](https://github.com/sauravbhattacharya001/sauravcode/pull/64)
+
+### Builder Run #353 — 4:15 AM
+- **Repo:** prompt
+- **Feature:** PromptSchemaGenerator — fluent structured output schema builder
+- **What:** Added `PromptSchemaGenerator` class with fluent API for defining output schemas (string/int/number/bool/array/object with nesting). Generates JSON Schema (draft 2020-12), natural-language prompt instructions, and example JSON. 14 tests, all passing.
+- **Commit:** `4cb091e` on main
+
+### Gardener Run #455 — 4:00 AM
+- **Tasks:** None — all 29 task types completed on all 16 repos
+- **Status:** Repo gardener has exhausted all task/repo combinations. Consider adding new repos or new task types.
+
+### Builder Run #352 — 3:45 AM
+- **Repo:** gif-captcha
+- **Feature:** CaptchaAnomalyDetector — statistical anomaly detection module
+- **Details:** Z-score & IQR outlier detection, traffic/failure burst detection, geo distribution shift detection, solve rate changepoint detection, EMA trend tracking, 3 sensitivity presets, alert history. 19 tests, all passing.
+- **Commit:** `37d1b1e` → pushed to main
+
+### Gardener Run #455 — 3:34 AM
+- **No work done** — all 16 repos have all 29 task types completed. Garden is fully tended. 🌱
+
+### Builder Run #351 — 3:15 AM
+- **everything**: PR #78 — Vehicle Maintenance Tracker screen with 4-tab UI (Vehicles, Service Log, Alerts, Costs). Add/log/update dialogs, vehicle filter chips, overdue alerts, cost breakdown by category & vehicle. Sample data (2 vehicles, 6 records). 12 unit tests. Wired into home screen nav bar.
+
+### Gardener Run #905-906 — 3:00 AM
+- **FeedReader** (bug_fix): PR #75 — replaced djb2 (UInt64) hash with SHA-256 in `ArticleDeduplicator.stableHash()`. Same collision-prone hash pattern already fixed in `ImageCache.diskPath`. Two different canonical links could silently merge unrelated duplicate groups.
+- **VoronoiMap** (perf_improvement): PR #104 — replaced O(n²·v²) pairwise vertex comparison in `build_queen_weights()` with hash-based vertex→region index. ~3000x speedup for 1000-region diagrams. All 43 tests pass.
+
+### Builder Run #350 — 2:45 AM
+- **Repo:** GraphVisual
+- **Feature:** NetworkReportGenerator — self-contained HTML network analysis report with inline SVG charts (degree histogram, edge type pie, top nodes bar chart), health score, degree frequency table, dark theme, print/responsive CSS, XSS-safe. 12 unit tests.
+- **Commit:** `12abb3d`
+
+### Gardener Run #901-902 — 2:30 AM
+- **Status:** All 16 repos have all 29 task types completed. No tasks remaining.
+- **Action:** None — gardener has fully covered all repos.
+
+### Builder Run #349 — 2:15 AM
+- **Repo:** [ai](https://github.com/sauravbhattacharya001/ai)
+- **Feature:** Fleet Snapshot command (`python -m replication fleet`) — kubectl-style overview of all workers with lineage, resources, status, signature validity. Supports table/JSON/CSV output, sorting, and filtering.
+- **Commit:** `bdd779b`
+
+### Gardener Run #901-902 — 2:00 AM
+- **Status:** All 16 repos have all 29 task types completed. No work to do.
+- **Note:** Gardener has reached full coverage. Consider adding new task types or repos.
+
+### Builder Run #348 — 1:45 AM
+- **Repo:** everything (Flutter productivity app)
+- **Feature:** Packing List Screen — full UI for the existing PackingListService
+  - Create lists from 7 trip templates (beach, business, camping, winter, backpacking, weekend, family)
+  - Category-grouped items with filter chips
+  - Check/uncheck items with swipe-to-delete
+  - Progress bar + readiness check dialog (essential/important/optional breakdown)
+  - Weight breakdown dialog by category
+  - Pack all / unpack all / duplicate / archive actions
+  - Home screen luggage icon integration
+  - 12 unit tests for service functionality
+- **Commit:** c074bbb → pushed to master
+
+### Gardener Run #899-900 — 1:30 AM
+- **All 16 repos fully saturated** — every task type (29/29) already completed on every repo. No work performed. Consider retiring the gardener or adding new task types.
+
+### Builder Run #351 — 3:18 AM
+- **Vidly**: Customer Insights dashboard — personalized analytics page with loyalty score, spending summary, rental patterns (on-time rate, streak, active day), genre breakdown with bars, activity timeline, rental history table. 16 unit tests. → [PR #95](https://github.com/sauravbhattacharya001/Vidly/pull/95)
+
+### Builder Run #349 — 2:18 AM
+- **getagentbox**: Performance Benchmarks section — interactive comparison dashboard with 12 benchmarks across 4 categories (Memory, Integrations, Efficiency, Context). Animated bar charts on scroll, category filters, summary card with advantage %. 14 unit tests pass. → [PR #73](https://github.com/sauravbhattacharya001/getagentbox/pull/73)
+
+### Builder Run #347 — 1:18 AM
+- **Ocaml-sample-code**: Interactive Example Explorer (explorer.html) — browsable catalog of all 90 OCaml examples with 12 category filters, full-text search, sort by name/lines/difficulty, difficulty badges, inline code preview (click to load), doc links, stats bar. Matches existing docs theme. → [PR #48](https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/48)
+
+### Builder Run #346 — 1:15 AM
+- **FeedReader**: Added **Text-to-Speech article reader** — `ArticleTextToSpeech.swift` using iOS AVSpeechSynthesizer. Play/pause/stop via speaker button in article navbar, adjustable rate/pitch/volume, auto language detection, voice selection, word-level progress tracking, audio session management. Integrated into StoryViewController with state-aware icon updates and toast notifications. → [commit 4335e2e](https://github.com/sauravbhattacharya001/FeedReader/commit/4335e2e)
+
+### Gardener Run #907-908 — 3:05 AM
+- **#907 — code_cleanup on Ocaml-sample-code**: Added 6 missing `.ml` files to Makefile (cellular_automata, kd_tree, memoize, signal_processing, spreadsheet, tensor). Added `alcotest` to CI and copilot-setup-steps for kd_tree/tensor. → [PR #50](https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/50)
+- **#908 — doc_update on Vidly**: Created comprehensive testing guide (`docs/TESTING.md`, 271 lines) documenting 3,254 tests across 78 files — conventions, categories, CI integration, how-to-write guides. Fixed stale counts (33→53 services, 10→24 controllers). → [PR #94](https://github.com/sauravbhattacharya001/Vidly/pull/94)
+
+### Gardener Run #903-904 — 2:35 AM
+- **#903 — doc_update on Ocaml-sample-code**: Added 3 documentation pages for undocumented modules: `autodiff.html` (forward+reverse mode AD), `rope.html` (rope data structure), `sat-solver.html` (DPLL SAT solver). Nav links added to index. → [PR #49](https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/49)
+- **#904 — open_issue on ai**: Filed safety-critical bug — `KillSwitchManager.revive()` resets sustained breach tracking for ALL agents, not just the revived one. Also identified secondary DRY violation in evaluate() scoring key_map. → [Issue #60](https://github.com/sauravbhattacharya001/ai/issues/60)
+
+### Gardener Run #901-902 — 2:05 AM
+- **#901 — bug_fix on everything**: Fixed milestone progress desync in `GoalTrackerService` — completing all milestones → uncompleting one kept progress at 100% instead of recalculating. Also fixed `removeMilestone` not updating progress/completion. +3 tests. → [PR #77](https://github.com/sauravbhattacharya001/everything/pull/77)
+- **#902 — refactor on BioBots**: Extracted `_extractRecordParams()` and `_pearsonCorrelation()` from `viability.js` — eliminated 36 lines of duplication between `batchAnalyze()` and `calibrate()`. 71 tests pass. → [PR #75](https://github.com/sauravbhattacharya001/BioBots/pull/75)
+
+### Gardener Run #899-900 — 1:35 AM
+- **#899 — fix_issue on VoronoiMap**: Fixed #98 — `compute_power_regions()` was using convex hull for all modes, but multiplicative/additive modes produce non-convex (Apollonius circle) regions. Added `_ordered_boundary()` that sorts by angle from centroid, preserving concavities. Power mode still uses convex hull (correct). +4 tests, 2364 total pass. → [PR #103](https://github.com/sauravbhattacharya001/VoronoiMap/pull/103)
+- **#900 — perf_improvement on FeedReader**: `ArticleReadLaterReminder` had 17 O(n) linear scans (`firstIndex(where:)` by id/link). Added `idToIndex` and `linkToIndex` dictionaries for O(1) lookups. Rebuilt on load, updated on mutations. → [PR #74](https://github.com/sauravbhattacharya001/FeedReader/pull/74)
+- Weights self-adjusted at run 900.
+
+### Gardener Run #897-898 — 1:05 AM
+- **#897 — security_fix on ai**: Replaced hardcoded default watermark secret (`"default-watermark-secret"`) in `WatermarkConfig` with per-instance CSPRNG key via `secrets.token_hex(32)`. Added `UserWarning` for production use. Also replaced `hashlib.md5` with `hashlib.sha256` in `game_theory.py`. 128 tests pass. → [PR #59](https://github.com/sauravbhattacharya001/ai/pull/59)
+- **#898 — open_issue on Vidly**: Filed [#93](https://github.com/sauravbhattacharya001/Vidly/issues/93) — 10 services accept `IClock` in constructor but never assign it to `_clock`, causing `NullReferenceException` at runtime. Affects gift cards, loyalty points, ratings, reviews, scheduling, and more.
+- Recommendation: Add new repos or new task types to continue gardening.
+
+### Builder Run #345 — 12:48 AM
+- **WinSentinel**: Attack Path Analyzer — chains audit findings into multi-step attack paths following MITRE ATT&CK kill chain (Initial Access → Exfiltration). Exploitability scoring, chokepoint remediation priorities (fix what breaks the most paths). CLI: `winsentinel --attack-paths`. 14 unit tests. → [PR #92](https://github.com/sauravbhattacharya001/WinSentinel/pull/92)
+
+### Builder Run #344 — 12:30 AM
+- **BioBots**: Interactive Bioink Compatibility Matrix UI (compatibility.html) — heatmap showing all pairwise compatibility scores, click-for-detail with 6-dimension breakdown (rheology, crosslinking, thermal, pH, interface, degradation), best/worst pair rankings, actionable recommendations, add-custom-bioink form. 6 built-in bioinks. Dark theme. → [PR #74](https://github.com/sauravbhattacharya001/BioBots/pull/74)
+
+### Builder Run #343 — 12:15 AM
+- **agenticchat**: Added Word Cloud visualization panel — interactive word frequency cloud from conversation messages, sized by frequency, colored by role (blue=user, green=AI), click-to-search. Toolbar button ☁️ + keyboard shortcut Ctrl+Shift+W. Stop-word filtering, code/URL exclusion. → [commit](https://github.com/sauravbhattacharya001/agenticchat/commit/8ac9ea5)
+
+### Gardener Run #895-896 — 12:05 AM
+- **Vidly** (doc_update): Added comprehensive data models reference (docs/MODELS.md). Documents all 41 model files organized by business domain — core entities with property tables, enums, rentals lifecycle, customer management, pricing, inventory, analytics, social features, staff ops, gamification, and entity-relationship diagram. Added Further Reading links to ARCHITECTURE.md. → [PR #92](https://github.com/sauravbhattacharya001/Vidly/pull/92)
+- **prompt** (open_issue): Filed [#80](https://github.com/sauravbhattacharya001/prompt/issues/80) — CachingMiddleware thread-safety: non-atomic HitCount/MissCount/EvictionCount increments (need Interlocked.Increment) + thundering herd on cache miss (need request coalescing). Same pattern in PromptCache.cs and PromptAnalytics.cs.
+
 ## 2026-03-14
+
+### Builder Run #342 — 11:55 PM
+- **VoronoiMap**: LOO cross-validation for interpolation methods — new `vormap_crossval.py` module. Evaluates nearest/IDW/natural neighbor accuracy by withholding each point, computing MAE/RMSE/R²/MaxError. `compare_methods()` ranks by RMSE. CSV and SVG bar chart export. Full CLI integration (`--crossval`, `--crossval-csv`, `--crossval-svg`). → [PR #102](https://github.com/sauravbhattacharya001/VoronoiMap/pull/102)
+
+### Builder Run #341 — 11:50 PM
+- **Vidly**: Global Search bar — added navbar search input + `SearchController` that queries movies, customers, and rentals simultaneously. Unified results view with color-coded panels, star ratings, genre labels, rental status badges, overdue highlighting. Navigate to `/Search?q=term` or use the navbar. → [commit b89c31e](https://github.com/sauravbhattacharya001/Vidly/commit/b89c31e)
+
+### Gardener Run 893-894 — 11:35 PM
+- **VoronoiMap** (perf_improvement): KDTree-accelerated nearest/IDW interpolation in `vormap_interp.py`. Pre-builds cKDTree once, shares across grid queries. Nearest: O(n*nx*ny) → O(nx*ny*log(n)). IDW: k=16 nearest neighbors instead of all points. Brute-force fallback preserved. → [PR #101](https://github.com/sauravbhattacharya001/VoronoiMap/pull/101)
+- **agenticchat** (add_tests): 20 tests for InputHistory module — push/dedup, ArrowUp/Down navigation, draft save/restore, cursor gating, MAX_ENTRIES cap, localStorage persistence, defensive copy. All pass. → [PR #76](https://github.com/sauravbhattacharya001/agenticchat/pull/76)
+- **Time:** 11:30 PM PST
+- **Result:** All 16 repos have all 29 task types completed. Nothing to do. Gardener may need new repos or new task types to continue being productive.
+
+### Builder Run 340 — BioBots: Data Integrity Auditor
+- **Repo:** BioBots
+- **Feature:** Data Integrity Auditor (docs/integrity.html) — validates bioprint records against 18 rules (completeness, range, consistency, uniqueness). Summary dashboard with data health %, severity breakdown, rule distribution chart, filterable/searchable findings table, CSV export.
+- **PR:** #73 merged.
+
+### Builder Run 339 — 11:15 PM
+- **agentlens**: Added CLI tool (`agentlens` command) with 10 subcommands for querying the backend from the terminal — sessions, session, costs, events, export, analytics, health, compare, alerts, status. Registered as `console_scripts` entry point. 8 tests, all passing. [Commit b177387](https://github.com/sauravbhattacharya001/agentlens/commit/b177387)
+
+### Gardener Run 891-892 — 11:05 PM
+- **Ocaml-sample-code** (open_issue): Filed [#47](https://github.com/sauravbhattacharya001/Ocaml-sample-code/issues/47) — `graph_db.ml` `compare_values` crashes on VBool, VNull, VList, or mixed-type comparisons (non-exhaustive pattern match, only 5/36 type combos handled).
+- **sauravbhattacharya001** (code_cleanup): Removed private zalenix-memory from README project table. Updated stale OCaml module counts (45/80+/84+ → 110+, actual: 114). Fixed AI Safety module count (34→39). → [PR #33](https://github.com/sauravbhattacharya001/sauravbhattacharya001/pull/33)
+- Weight adjustment at run 892: dampened overused tasks (-1), boosted underused setup tasks (+2).
+
+### Gardener Run 889-890 — 11:00 PM
+- **VoronoiMap** (fix_issue #98): Replaced convex hull with Moore neighborhood boundary tracing for multiplicative/additive Voronoi modes. These modes produce non-convex regions bounded by Apollonius circles, which the convex hull incorrectly filled in. All 87 tests pass. → [PR #100](https://github.com/sauravbhattacharya001/VoronoiMap/pull/100)
+- **WinSentinel** (bug_fix): Fixed false-positive Critical "coordinated attack" correlations in `ThreatCorrelator.CheckRapidMultiModule`. The rule would fire even when the triggering event was Info/Low severity, as long as the sliding window had 3+ medium+ sources. Added severity gate on the incoming event. → [PR #91](https://github.com/sauravbhattacharya001/WinSentinel/pull/91)
+
+### Daily Memory Backup — 11:00 PM
+- Committed and pushed workspace to backup repo (5 files changed, including new `memory/2026-03-14.md`)
+- Also cleaned up `.gitignore` to exclude embedded git repos (`build-ws-*`, `temp-*`, `ws-build`, `everything`)
 
 ### Builder Run 339 — gif-captcha: Configuration Wizard
 - **Repo:** gif-captcha
@@ -8298,6 +8564,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 
