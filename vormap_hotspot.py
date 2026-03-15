@@ -80,6 +80,11 @@ def build_queen_weights(regions, stats):
 
     Two regions are neighbors if they share at least one vertex.
 
+    Uses a spatial index (vertex → set of region indices) to find
+    neighbors in O(n·v) time instead of the previous O(n²·v²) pairwise
+    vertex comparison, where n is the number of regions and v is the
+    average vertex count per region.
+
     Parameters
     ----------
     regions : dict
@@ -104,12 +109,26 @@ def build_queen_weights(regions, stats):
                 break
         seed_verts.append(regions[key] if key is not None else [])
 
-    weights = {i: set() for i in range(n)}
+    # Build vertex → region index using rounded coordinates as keys.
+    # Rounding to 6 decimal places handles floating-point noise while
+    # preserving distinctness for any realistic coordinate range.
+    vertex_to_regions: dict[tuple, set] = {}
     for i in range(n):
-        for j in range(i + 1, n):
-            if _shared_edge_or_vertex(seed_verts[i], seed_verts[j]):
-                weights[i].add(j)
-                weights[j].add(i)
+        for v in seed_verts[i]:
+            key = (round(v[0], 6), round(v[1], 6))
+            if key not in vertex_to_regions:
+                vertex_to_regions[key] = set()
+            vertex_to_regions[key].add(i)
+
+    # Regions sharing a vertex key are neighbors (queen contiguity).
+    weights = {i: set() for i in range(n)}
+    for region_set in vertex_to_regions.values():
+        if len(region_set) < 2:
+            continue
+        for i in region_set:
+            for j in region_set:
+                if i != j:
+                    weights[i].add(j)
     return weights
 
 
