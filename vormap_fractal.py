@@ -51,12 +51,9 @@ CLI::
     voronoimap datauni5.txt 5 --fractal-json fractal.json
 """
 
-from __future__ import annotations
 
 import json
 import math
-import sys
-from typing import Any
 
 
 # ── Box-Counting Dimension ───────────────────────────────────

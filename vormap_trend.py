@@ -46,13 +46,12 @@ CLI::
     voronoimap datauni5.txt 5 --trend-json trend.json
 """
 
-from __future__ import annotations
 
 import csv
 import json
 import math
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from vormap import validate_output_path
 from vormap_geometry import (

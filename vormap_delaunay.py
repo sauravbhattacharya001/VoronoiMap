@@ -48,13 +48,11 @@ All functions are pure and depend only on the Python standard library
 (plus ``math``).  No scipy/numpy required.
 """
 
-from __future__ import annotations
 
 import json
 import math
 import os
 import statistics
-from typing import Any
 
 __all__ = [
     "delaunay_triangulate",

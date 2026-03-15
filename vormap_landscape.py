@@ -35,12 +35,11 @@ Example::
     export_landscape_json(analysis, "landscape.json")
 """
 
-from __future__ import annotations
 
 import json
 import math
 import os
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import vormap
 import vormap_viz

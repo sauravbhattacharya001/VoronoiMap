@@ -52,19 +52,16 @@ CLI::
     python vormap_diffusion.py data/points.txt --model heat --svg diffusion.svg
 """
 
-from __future__ import annotations
 
 import argparse
 import csv
 import json
-import math
 import random as _random
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import vormap
-from vormap_geometry import polygon_area
 
 
 # ── Result containers ───────────────────────────────────────────────

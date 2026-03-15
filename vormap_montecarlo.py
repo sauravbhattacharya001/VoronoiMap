@@ -27,7 +27,6 @@ CLI::
     python vormap_montecarlo.py datauni5.txt --sims 999 --svg envelope.svg
 """
 
-from __future__ import annotations
 
 import argparse
 import json
@@ -36,7 +35,7 @@ import os
 import random
 import sys
 from collections import namedtuple
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Optional, Tuple
 
 import vormap
 from vormap_geometry import (

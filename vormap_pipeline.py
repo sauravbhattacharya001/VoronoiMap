@@ -43,16 +43,13 @@ CLI::
     python vormap_pipeline.py --example > pipeline.json
 """
 
-from __future__ import annotations
 
 import argparse
 import html as _html
 import json
-import math
 import os
 import sys
 import time
-from collections import OrderedDict
 from dataclasses import dataclass, field, asdict
 from typing import Any, Dict, List, Optional, Sequence
 

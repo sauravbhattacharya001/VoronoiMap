@@ -35,12 +35,11 @@ CLI::
     voronoimap datauni5.txt 5 --regularity-json regularity.json
 """
 
-from __future__ import annotations
 
 import json
 import math
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 
 # ── Result containers ───────────────────────────────────────────────

@@ -53,7 +53,6 @@ CLI::
     python vormap_automata.py datauni5.txt --rule epidemic --steps 80 --infection 0.3
 """
 
-from __future__ import annotations
 
 import argparse
 import json
@@ -63,7 +62,7 @@ import statistics
 import xml.etree.ElementTree as ET
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import vormap
 

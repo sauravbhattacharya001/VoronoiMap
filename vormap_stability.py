@@ -25,14 +25,13 @@ Usage::
     python vormap_stability.py data/points.txt --noise 5.0 --svg stability.svg
 """
 
-from __future__ import annotations
 
 import json
 import math
 import random
 import sys
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import vormap
 from vormap_geometry import polygon_area

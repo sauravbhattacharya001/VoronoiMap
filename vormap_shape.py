@@ -47,13 +47,11 @@ Usage (CLI)::
     python vormap_shape.py sites.txt --csv shapes.csv
 """
 
-from __future__ import annotations
 
 import csv
 import json
 import math
 import os
-import sys
 from typing import Any, Dict, List, Optional, Tuple
 
 import vormap

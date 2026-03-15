@@ -44,15 +44,13 @@ Usage (CLI)::
     python vormap_mapalgebra.py zonal-stats data.json --zones zones.json
 """
 
-from __future__ import annotations
 
 import argparse
 import json
 import math
-import sys
 from collections import Counter
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional
 
 
 # ── Cell Layer ───────────────────────────────────────────────────────

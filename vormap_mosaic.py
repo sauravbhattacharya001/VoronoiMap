@@ -21,14 +21,12 @@ CLI usage
 
 """
 
-from __future__ import annotations
 
 import argparse
 import math
 import os
 import random
 import struct
-import sys
 import zlib
 from collections import defaultdict
 from typing import List, Tuple, Optional, Dict

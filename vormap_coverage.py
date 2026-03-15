@@ -42,7 +42,6 @@ CLI::
     python vormap_coverage.py data/datauni5.txt --radius 150 --heatmap coverage.svg
 """
 
-from __future__ import annotations
 
 import json
 import math
@@ -724,7 +723,6 @@ def render(result):
 def main():
     """CLI entry point."""
     import argparse
-    import sys
 
     parser = argparse.ArgumentParser(
         description="Coverage Analyzer — service area coverage analysis",
