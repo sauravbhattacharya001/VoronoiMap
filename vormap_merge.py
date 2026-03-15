@@ -31,13 +31,12 @@ Example::
     export_merge_svg(result, "merged.svg", width=600, height=600)
 """
 
-from __future__ import annotations
 
 import csv
 import json
 import math
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from vormap import validate_output_path
 

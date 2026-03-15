@@ -32,17 +32,15 @@ CLI supports 2+ snapshot files.  Each file uses the standard vormap
 point format (one ``x y`` pair per line).
 """
 
-from __future__ import annotations
 
 import json
-import math
 import sys
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import List, Optional, Tuple
 
 import vormap
 from vormap_geometry import polygon_area, edge_length
-from vormap_viz import compute_regions, compute_region_stats
+from vormap_viz import compute_regions
 
 
 # -- Data classes -----------------------------------------------------

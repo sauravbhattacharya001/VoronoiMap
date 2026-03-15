@@ -52,7 +52,6 @@ import random
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
-from vormap_geometry import polygon_area, polygon_centroid
 
 
 # ── Data classes ─────────────────────────────────────────────────────

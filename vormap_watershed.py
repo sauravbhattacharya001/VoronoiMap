@@ -44,13 +44,11 @@ CLI::
 
 """
 
-from __future__ import annotations
 
 import argparse
 import csv
 import json
 import math
-import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Set, Tuple
@@ -58,7 +56,7 @@ from typing import Dict, List, Optional, Set, Tuple
 from vormap import validate_output_path
 
 try:
-    from vormap_geometry import polygon_centroid, polygon_area, edge_length
+    from vormap_geometry import polygon_centroid, polygon_area
 except ImportError:  # pragma: no cover
     pass
 

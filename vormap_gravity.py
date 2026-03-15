@@ -56,16 +56,14 @@ CLI::
 
 """
 
-from __future__ import annotations
 
 import argparse
 import csv
 import json
 import math
 import random
-import sys
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 

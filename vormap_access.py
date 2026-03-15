@@ -55,16 +55,14 @@ CLI::
     python vormap_access.py demand.txt supply.csv --report --json access.json
 """
 
-from __future__ import annotations
 
 import argparse
 import csv
 import json
 import math
 import os
-import sys
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import vormap
 

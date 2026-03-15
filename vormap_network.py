@@ -44,7 +44,7 @@ import xml.etree.ElementTree as ET
 from collections import deque
 from dataclasses import dataclass, field
 
-from vormap_geometry import polygon_centroid, polygon_area, edge_length
+from vormap_geometry import edge_length
 
 
 # ── Graph construction ──────────────────────────────────────────────

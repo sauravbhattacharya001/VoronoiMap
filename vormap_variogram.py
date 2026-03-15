@@ -54,12 +54,11 @@ Usage::
     export_variogram_svg(ev, model, "variogram.svg")
 """
 
-from __future__ import annotations
 
 import csv
 import json
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 
