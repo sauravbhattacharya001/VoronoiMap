@@ -49,13 +49,37 @@ try:
 except ImportError:
     _HAS_SCIPY = False
 
+try:
+    from scipy.spatial import cKDTree as _KDTree
+    _HAS_KDTREE = True
+except ImportError:
+    _HAS_KDTREE = False
 
-def nearest_interp(points, values, query):
-    """Return the value of the nearest seed point."""
+
+def nearest_interp(points, values, query, _tree=None):
+    """Return the value of the nearest seed point.
+
+    Parameters
+    ----------
+    _tree : scipy.spatial.cKDTree, optional
+        Pre-built KDTree for batch queries (used by grid_interpolate).
+        When provided, skips tree construction for O(log n) lookup.
+    """
     if len(points) != len(values):
         raise ValueError("points and values must have the same length")
     if not points:
         raise ValueError("points must not be empty")
+
+    # Fast path: use KDTree for O(log n) lookup
+    if _tree is not None:
+        _, idx = _tree.query(query)
+        return values[idx]
+    if _HAS_KDTREE and len(points) > 32:
+        tree = _KDTree(points)
+        _, idx = tree.query(query)
+        return values[idx]
+
+    # Brute-force fallback: O(n)
     best_d = float('inf')
     best_v = values[0]
     qx, qy = query
@@ -67,12 +91,49 @@ def nearest_interp(points, values, query):
     return best_v
 
 
-def idw_interp(points, values, query, power=2.0, epsilon=1e-12):
-    """Inverse distance weighted interpolation."""
+def idw_interp(points, values, query, power=2.0, epsilon=1e-12,
+               _tree=None, _k=None):
+    """Inverse distance weighted interpolation.
+
+    Parameters
+    ----------
+    _tree : scipy.spatial.cKDTree, optional
+        Pre-built KDTree for batch queries (used by grid_interpolate).
+    _k : int, optional
+        Number of nearest neighbors to use.  When *_tree* is provided
+        and *_k* is set, only the k closest points contribute to the
+        weighted average.  This reduces per-query cost from O(n) to
+        O(k) (after the O(log n) tree lookup) and avoids accumulating
+        negligible weights from distant points.  Defaults to
+        ``min(len(points), 16)`` when a tree is available.
+    """
     if len(points) != len(values):
         raise ValueError("points and values must have the same length")
     if not points:
         raise ValueError("points must not be empty")
+
+    # Fast path: KDTree-accelerated k-nearest IDW
+    if _tree is not None:
+        k = _k if _k is not None else min(len(points), 16)
+        dists, idxs = _tree.query(query, k=k)
+        # scalar when k=1
+        if k == 1:
+            return values[int(idxs)]
+        weights = []
+        for d, i in zip(dists, idxs):
+            if d < epsilon:
+                return values[int(i)]
+            weights.append((1.0 / d ** power, values[int(i)]))
+        w_sum = sum(w for w, _ in weights)
+        return sum(w * v / w_sum for w, v in weights)
+
+    if _HAS_KDTREE and len(points) > 32:
+        tree = _KDTree(points)
+        k = min(len(points), 16)
+        return idw_interp(points, values, query, power=power,
+                          epsilon=epsilon, _tree=tree, _k=k)
+
+    # Brute-force fallback: O(n)
     qx, qy = query
     weights = []
     for (px, py), v in zip(points, values):
@@ -227,6 +288,17 @@ def grid_interpolate(points, values, nx=50, ny=50, bounds=None,
         areas_orig = _voronoi_cell_areas(pts_array)
         interp_fn = lambda q: _natural_neighbor_interp_precomputed(
             pts_array, areas_orig, values, q)
+    elif _HAS_KDTREE and method in ('nearest', 'idw'):
+        # Build KDTree once, share across all nx*ny grid queries.
+        # Reduces nearest from O(n*nx*ny) to O(nx*ny*log(n)),
+        # and IDW from O(n*nx*ny) to O(nx*ny*(log(n)+k)).
+        tree = _KDTree(points)
+        if method == 'nearest':
+            interp_fn = lambda q: nearest_interp(points, values, q,
+                                                 _tree=tree)
+        else:
+            interp_fn = lambda q: idw_interp(points, values, q,
+                                             power=power, _tree=tree)
     else:
         interp_fn = {
             'natural': lambda q: natural_neighbor_interp(points, values, q),
