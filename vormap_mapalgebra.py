@@ -166,7 +166,7 @@ class CellLayer:
         n = len(vals)
         s = sum(vals)
         mean = s / n
-        std = math.sqrt(sum((v - mean) ** 2 for v in vals) / n) if n > 1 else 0.0
+        std = _std(vals)
         return {
             "count": n,
             "min": min(vals),
@@ -189,6 +189,15 @@ class CellLayer:
 # Binary ops align two layers on matching cell indices.
 
 
+def _std(vals: List[float]) -> float:
+    """Population standard deviation of *vals* (0.0 if fewer than 2)."""
+    n = len(vals)
+    if n < 2:
+        return 0.0
+    mean = sum(vals) / n
+    return math.sqrt(sum((v - mean) ** 2 for v in vals) / n)
+
+
 def _binary_op(
     a: CellLayer, b: CellLayer, op: Callable[[float, float], float], name: str
 ) -> CellLayer:
@@ -206,6 +215,16 @@ def _binary_op(
         else:
             result[cell] = op(va, vb)
     return CellLayer(values=result, adjacency=a.adjacency, name=name, nodata=a.nodata)
+
+
+def _unary_op(
+    layer: CellLayer, fn: Callable[[float], float], name: str
+) -> CellLayer:
+    """Apply a unary function to each valid cell, returning a new layer."""
+    result = layer.copy(name=name)
+    for cell in result.valid_cells():
+        result.values[cell] = fn(result.values[cell])
+    return result
 
 
 def local_add(a: CellLayer, b: CellLayer) -> CellLayer:
@@ -247,26 +266,17 @@ def local_min(a: CellLayer, b: CellLayer) -> CellLayer:
 
 def local_scale(layer: CellLayer, factor: float) -> CellLayer:
     """Multiply every valid cell value by a scalar."""
-    result = layer.copy(name=f"{layer.name}*{factor}")
-    for cell in result.valid_cells():
-        result.values[cell] *= factor
-    return result
+    return _unary_op(layer, lambda v: v * factor, f"{layer.name}*{factor}")
 
 
 def local_offset(layer: CellLayer, offset: float) -> CellLayer:
     """Add a scalar to every valid cell value."""
-    result = layer.copy(name=f"{layer.name}+{offset}")
-    for cell in result.valid_cells():
-        result.values[cell] += offset
-    return result
+    return _unary_op(layer, lambda v: v + offset, f"{layer.name}+{offset}")
 
 
 def local_abs(layer: CellLayer) -> CellLayer:
     """Absolute value of each cell."""
-    result = layer.copy(name=f"|{layer.name}|")
-    for cell in result.valid_cells():
-        result.values[cell] = abs(result.values[cell])
-    return result
+    return _unary_op(layer, abs, f"|{layer.name}|")
 
 
 def local_power(layer: CellLayer, exponent: float) -> CellLayer:
@@ -323,7 +333,7 @@ def local_standardise(layer: CellLayer) -> CellLayer:
     if len(vals) < 2:
         return layer.copy(name=f"zscore({layer.name})")
     mean = sum(vals) / len(vals)
-    std = math.sqrt(sum((v - mean) ** 2 for v in vals) / len(vals))
+    std = _std(vals)
     result = layer.copy(name=f"zscore({layer.name})")
     if std == 0:
         for cell in result.valid_cells():
@@ -338,18 +348,16 @@ def local_threshold(
     layer: CellLayer, threshold: float, above: float = 1.0, below: float = 0.0
 ) -> CellLayer:
     """Binary threshold: above → *above*, else → *below*."""
-    result = layer.copy(name=f"threshold({layer.name},{threshold})")
-    for cell in result.valid_cells():
-        result.values[cell] = above if result.values[cell] >= threshold else below
-    return result
+    return _unary_op(
+        layer,
+        lambda v: above if v >= threshold else below,
+        f"threshold({layer.name},{threshold})",
+    )
 
 
 def local_clamp(layer: CellLayer, lo: float, hi: float) -> CellLayer:
     """Clamp values to [lo, hi]."""
-    result = layer.copy(name=f"clamp({layer.name},{lo},{hi})")
-    for cell in result.valid_cells():
-        result.values[cell] = max(lo, min(hi, result.values[cell]))
-    return result
+    return _unary_op(layer, lambda v: max(lo, min(hi, v)), f"clamp({layer.name},{lo},{hi})")
 
 
 def local_reclassify(
@@ -389,10 +397,7 @@ def local_reclassify(
 
 def local_apply(layer: CellLayer, fn: Callable[[float], float], name: str = "custom") -> CellLayer:
     """Apply an arbitrary function to each valid cell value."""
-    result = layer.copy(name=name)
-    for cell in result.valid_cells():
-        result.values[cell] = fn(result.values[cell])
-    return result
+    return _unary_op(layer, fn, name)
 
 
 # ── Focal Operations ─────────────────────────────────────────────────
@@ -453,13 +458,7 @@ def focal_range(layer: CellLayer, include_self: bool = True) -> CellLayer:
 
 def focal_std(layer: CellLayer, include_self: bool = True) -> CellLayer:
     """Neighbourhood standard deviation."""
-    def std_fn(vs: List[float]) -> float:
-        if len(vs) < 2:
-            return 0.0
-        m = sum(vs) / len(vs)
-        return math.sqrt(sum((v - m) ** 2 for v in vs) / len(vs))
-
-    return _focal_op(layer, std_fn, f"focal_std({layer.name})", include_self)
+    return _focal_op(layer, _std, f"focal_std({layer.name})", include_self)
 
 
 def focal_sum(layer: CellLayer, include_self: bool = True) -> CellLayer:
@@ -571,7 +570,7 @@ def zonal_stats(
         n = len(vals)
         s = sum(vals)
         mean = s / n if n else 0.0
-        std = math.sqrt(sum((v - mean) ** 2 for v in vals) / n) if n > 1 else 0.0
+        std = _std(vals)
         counts = Counter(vals)
         dominant = counts.most_common(1)[0][0] if counts else 0.0
         lo = min(vals) if vals else 0.0
