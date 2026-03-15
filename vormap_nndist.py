@@ -140,23 +140,34 @@ def _validate_points(points: list) -> List[Tuple[float, float]]:
 # ── Core: k-Nearest Neighbor Distances ──────────────────────────────
 
 def _knn_brute(points, k):
-    """Brute-force kNN — O(n² log k).  No external dependencies.
+    """Brute-force kNN — O(n² log k) using bounded max-heap.
+
+    Uses a max-heap of size k per point instead of sorting all n-1
+    distances.  This reduces per-point work from O(n log n) to
+    O(n log k), which is significant when k ≪ n.
 
     Returns a list of ``(distances, indices)`` tuples, one per point.
     Each distances/indices pair is sorted by ascending distance.
     """
+    import heapq
+
     n = len(points)
     k_actual = min(k, n - 1)
     result = []
     for i in range(n):
-        pairs = []
+        # Max-heap of size k: store (-dist, j) so largest dist pops first
+        heap = []
         for j in range(n):
             if i == j:
                 continue
-            pairs.append((_euclidean(points[i], points[j]), j))
-        pairs.sort(key=lambda p: p[0])
-        top_k = pairs[:k_actual]
-        result.append(([p[0] for p in top_k], [p[1] for p in top_k]))
+            d = _euclidean(points[i], points[j])
+            if len(heap) < k_actual:
+                heapq.heappush(heap, (-d, j))
+            elif d < -heap[0][0]:
+                heapq.heapreplace(heap, (-d, j))
+        # Extract and sort ascending
+        top_k = sorted((-d, j) for d, j in heap)
+        result.append(([d for d, _ in top_k], [j for _, j in top_k]))
     return result
 
 
