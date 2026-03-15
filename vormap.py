@@ -1841,6 +1841,30 @@ def main():
         help='Color ramp for surface SVG (default: viridis).',
     )
 
+    # ── Cross-validation arguments ──
+    parser.add_argument(
+        '--crossval',
+        action='store_true',
+        help='Run leave-one-out cross-validation for interpolation methods. '
+             'Requires --interp-values.',
+    )
+    parser.add_argument(
+        '--crossval-method',
+        default=None,
+        choices=['nearest', 'idw', 'natural'],
+        help='Evaluate a single method (default: compare all three).',
+    )
+    parser.add_argument(
+        '--crossval-csv',
+        metavar='OUTPUT',
+        help='Export cross-validation results to CSV.',
+    )
+    parser.add_argument(
+        '--crossval-svg',
+        metavar='OUTPUT',
+        help='Export cross-validation comparison bar chart as SVG.',
+    )
+
     # ── Spatial clustering arguments ──
     parser.add_argument(
         '--cluster',
@@ -2161,6 +2185,7 @@ def main():
         args.cluster, args.cluster_svg, args.cluster_json,
         args.autocorr, args.autocorr_json, args.lisa_svg,
         args.report,
+        args.crossval, args.crossval_csv, args.crossval_svg,
     ])
 
     data = None
@@ -2367,6 +2392,13 @@ def main():
     if args.interp_values:
         import vormap_interp
         vormap_interp.run_interp_cli(args, data)
+
+    # ── Cross-validation ──
+    if args.crossval or args.crossval_csv or args.crossval_svg:
+        if not args.interp_values:
+            parser.error('--crossval requires --interp-values')
+        import vormap_crossval
+        vormap_crossval.run_crossval_cli(args, data)
 
     # ── Spatial clustering ──
     if args.cluster or args.cluster_svg or args.cluster_json:
