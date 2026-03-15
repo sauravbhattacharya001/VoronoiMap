@@ -51,7 +51,48 @@ import os
 import sys
 import time
 from dataclasses import dataclass, field, asdict
+from pathlib import PurePosixPath, PureWindowsPath
 from typing import Any, Dict, List, Optional, Sequence
+
+# ── Path safety ─────────────────────────────────────────────────────
+
+
+def _safe_join(base_dir: str, untrusted_name: str) -> str:
+    """Join *base_dir* and *untrusted_name* with path-traversal protection.
+
+    Rejects absolute paths and ``..`` components so that user-supplied
+    filenames in pipeline JSON configs cannot escape *base_dir*.
+
+    Raises ``ValueError`` on attempted traversal.
+    """
+    # Normalise to forward slashes for consistent checking
+    cleaned = untrusted_name.replace("\\", "/")
+
+    # Reject absolute paths (Unix or Windows drive letters)
+    if os.path.isabs(cleaned) or (len(cleaned) >= 2 and cleaned[1] == ":"):
+        raise ValueError(
+            f"Absolute paths are not allowed in pipeline configs: "
+            f"{untrusted_name!r}")
+
+    # Reject any '..' component
+    parts = cleaned.split("/")
+    if ".." in parts:
+        raise ValueError(
+            f"Path traversal ('..') is not allowed in pipeline configs: "
+            f"{untrusted_name!r}")
+
+    result = os.path.join(base_dir, untrusted_name)
+
+    # Belt-and-suspenders: resolved path must still be under base_dir
+    resolved = os.path.realpath(result)
+    base_resolved = os.path.realpath(base_dir)
+    if not resolved.startswith(base_resolved + os.sep) and resolved != base_resolved:
+        raise ValueError(
+            f"Resolved path escapes output directory: "
+            f"{untrusted_name!r}")
+
+    return result
+
 
 # ── Safe imports (graceful fallback when modules missing) ────────────
 
@@ -266,6 +307,15 @@ def validate_pipeline(config: Dict[str, Any]) -> List[ValidationIssue]:
             issues.append(ValidationIssue("warning", i,
                                           f"Step {i} (export) has no 'file' — "
                                           f"results will print to stdout"))
+
+        # Reject path traversal in step file names
+        step_file = step.get("file")
+        if step_file:
+            cleaned = step_file.replace("\\", "/")
+            if os.path.isabs(cleaned) or ".." in cleaned.split("/"):
+                issues.append(ValidationIssue("error", i,
+                                              f"Step {i} 'file' contains "
+                                              f"path traversal: {step_file}"))
 
     return issues
 
@@ -527,7 +577,7 @@ class Pipeline:
             hot_result = vormap_hotspot.detect_hotspots(
                 stats, attribute=step.get("attribute", "area"))
         out = step.get("file", "hotspot.svg")
-        out = os.path.join(self.output_dir, out)
+        out = _safe_join(self.output_dir, out)
         vormap_hotspot.export_hotspot_svg(hot_result, regions, data, out)
         return out
 
@@ -542,7 +592,7 @@ class Pipeline:
                 stats, attribute=step.get("attribute", "area"),
                 order=step.get("order", 2))
         out = step.get("file", "trend.svg")
-        out = os.path.join(self.output_dir, out)
+        out = _safe_join(self.output_dir, out)
         vormap_trend.export_trend_svg(trend_result, regions, data, out)
         return out
 
@@ -555,13 +605,13 @@ class Pipeline:
         if net_result is None:
             net_result = vormap_network.build_network(stats)
         out = step.get("file", "network.svg")
-        out = os.path.join(self.output_dir, out)
+        out = _safe_join(self.output_dir, out)
         vormap_network.export_network_svg(net_result, regions, data, out)
         return out
 
     def _run_report(self, step: Dict[str, Any]) -> str:
         out = step.get("file", "pipeline_report.html")
-        out = os.path.join(self.output_dir, out)
+        out = _safe_join(self.output_dir, out)
         # Collect step summaries for the report
         content = self._generate_html_report()
         with open(out, "w", encoding="utf-8") as f:
@@ -590,7 +640,7 @@ class Pipeline:
 
         json_str = json.dumps(export_data, indent=2, default=str)
         if out:
-            out = os.path.join(self.output_dir, out)
+            out = _safe_join(self.output_dir, out)
             with open(out, "w", encoding="utf-8") as f:
                 f.write(json_str)
             return out
