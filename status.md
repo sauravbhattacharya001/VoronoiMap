@@ -1,5 +1,8 @@
-# Status: Gardener Run #859-860
-## Task 1: fix_issue — sauravcode #33 (pop keyword crash)
-Cloning and investigating...
-## Task 2: fix_issue — agentlens #35 (BudgetTracker collision)
-Pending...
+# Status: Idle
+All runs complete.
+
+**Builder #339 (gif-captcha):**
+- New page: config.html — interactive configuration wizard
+- Step-by-step setup with real-time code generation
+- Security/UX/performance score dashboard
+- PR #60 merged.

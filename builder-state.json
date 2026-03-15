@@ -1,64 +1,21 @@
 {
-  "lastRun": "2026-03-06T14:15:00-08:00",
-  "runsCompleted": 30,
-  "lastRepo": "getagentbox",
-  "lastFeature": "Onboarding Quiz \u2014 interactive plan recommendation quiz with weighted scoring, 5 questions, keyboard nav, ARIA accessibility",
+  "runNumber": 338,
+  "lastFeature": "Interactive configuration wizard (config.html)",
+  "lastRepo": "gif-captcha",
+  "lastRunTimestamp": "2026-03-14T22:50:00-07:00",
   "repoFeatures": {
-    "Ocaml-sample-code": [
-      "Zipper \u2014 functional cursor (list/tree/filesystem)",
-      "QuickCheck - property-based testing framework (generators, shrinking, monadic combinators)"
-    ],
-    "agenticchat": [
-      "CSV export for conversations with timestamps and response times",
-      "Global Session Search \u2014 full-text search across all saved sessions",
-      "Cost Dashboard \u2014 persistent API spend tracker with budget alerts, daily chart, model breakdown"
-    ],
-    "ai": [
-      "Watermark \u2014 agent state provenance fingerprinting (4 strategies)",
-      "Unified CLI entry point (python -m replication) \u2014 36 subcommands under one dispatcher"
-    ],
-    "VoronoiMap": [
-      "Self-contained HTML analysis report with stats, heatmap, histograms, and region table (--report flag)",
-      "Synthetic point pattern generator (vormap_generate) \u2014 6 patterns, CLI, export, NNI stats"
-    ],
     "sauravcode": [
-      "AST visualizer tool (sauravast.py) \u2014 pretty tree, JSON, Graphviz DOT, and statistics modes",
-      "VS Code extension \u2014 TextMate grammar, 25 snippets, language config",
-      "sauravtest \u2014 built-in test runner for .srv files (discovery, colored output, filtering, fail-fast)"
-    ],
-    "BioBots": [
-      "Interactive Cost Estimator \u2014 material, machine, energy, consumable, labor breakdown with donut chart and batch scaling"
+      "sauravapi — serve .srv functions as REST API endpoints",
+      "sauravtest — test runner for .srv programs (discover, run, setup/teardown, JSON export)"
     ],
     "GraphVisual": [
-      "Ego Network search panel \u2014 search by node ID, highlights 1-hop neighborhood, shows degree/type breakdown/neighbor list"
+      "JSON graph exporter (D3.js/vis.js/Cytoscape.js compatible)"
     ],
-    "agentlens": [
-      "Session bookmarks \u2014 star/unstar sessions, filter by bookmarks, bookmark notes, cascade delete",
-      "Agent Baselines \u2014 track and check session performance against rolling averages (regression detection)"
-    ],
-    "everything": [
-      "Achievement System \u2014 40 badges, 12 categories, 5 tiers, level system, progress tracking",
-      "Meditation Tracker \u2014 session logging, mood analysis, streaks, technique insights"
+    "VoronoiMap": [
+      "vormap_benchmark — performance benchmarking module (NN, area, EstimateSUM, scaling analysis)"
     ],
     "gif-captcha": [
-      "Event Emitter \u2014 lightweight pub/sub for CAPTCHA lifecycle hooks (on/once/off/emit/pipe/wildcard)",
-      "i18n/localization module (createI18n) \u2014 12 built-in locales, interpolation, runtime switching"
-    ],
-    "Vidly": [
-      "Parental Controls \u2014 MPAA ratings, content advisories, per-customer profiles, PIN override, family filtering",
-      "Printable rental receipt \u2014 itemized costs, timeline, status badge, print CSS, pseudo-barcode"
-    ],
-    "FeedReader": [
-      "Reading Mood Tracker \u2014 mood logging, feed impact analysis, mood-based suggestions, patterns, export",
-      "Reading Speed Tracker \u2014 personalized WPM, length-adjusted estimates, trend analysis, feed/category breakdowns, population percentile"
-    ],
-    "prompt": [
-      "PromptConditional \u2014 if/else/switch/case conditional logic for prompt templates (7 operators, nesting, validation, 33 tests)",
-      "PromptFallbackChain \u2014 multi-model fallback execution with quality gates, per-tier timeouts, telemetry"
-    ],
-    "getagentbox": [
-      "Interactive Commands Cheat Sheet \u2014 searchable, filterable, copy-to-clipboard command reference",
-      "Onboarding Quiz"
+      "Interactive configuration wizard (config.html) — step-by-step setup, code generation, score dashboard"
     ]
   }
 }
