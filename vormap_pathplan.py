@@ -317,8 +317,14 @@ def _astar_shortest(roadmap, start_idx, goal_idx, goal):
     came_from = {}
     g_score = {start_idx: 0.0}
 
+    closed = set()
+
     while open_set:
         _, _, current = heapq.heappop(open_set)
+
+        if current in closed:
+            continue
+        closed.add(current)
 
         if current == goal_idx:
             return _reconstruct_path(came_from, current)
@@ -351,16 +357,18 @@ def _astar_safest(roadmap, start_idx, goal_idx, goal):
     best_clr = {start_idx: start_clr}
     best_dist = {start_idx: 0.0}
 
+    closed = set()
+
     while open_set:
         neg_clr, dist, _, current = heapq.heappop(open_set)
         current_clr = -neg_clr
 
+        if current in closed:
+            continue
+        closed.add(current)
+
         if current == goal_idx:
             return _reconstruct_path(came_from, current)
-
-        # Skip if we've already found a better path to this node
-        if current_clr < best_clr.get(current, -1):
-            continue
 
         for neighbour, edge in roadmap.adjacency.get(current, []):
             n_node = roadmap.nodes[neighbour]
