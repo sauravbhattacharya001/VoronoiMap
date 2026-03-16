@@ -130,12 +130,12 @@ def _bench_nearest_neighbor(data, bounds, rng, trials):
     return times
 
 
-def _bench_voronoi_area(data, bounds, trials):
+def _bench_voronoi_area(data, bounds, trials, seed=42):
     """Benchmark Voronoi region area computation for random points."""
     vormap.set_bounds(*bounds)
     # Pick random data points to compute area for (up to trials count)
     indices = list(range(len(data)))
-    rng = random.Random(42)
+    rng = random.Random(seed)
     rng.shuffle(indices)
     pick = indices[:min(trials, len(data))]
     times = []
@@ -249,7 +249,7 @@ def run_benchmark(sizes=None, trials=3, seed=42, verbose=False,
 
         # 3. Voronoi area (per-region)
         area_trials = min(trials, size)
-        at = _bench_voronoi_area(data, bounds, area_trials)
+        at = _bench_voronoi_area(data, bounds, area_trials, seed=seed + size)
         timings.append(OperationTiming("voronoi_area", size, at))
 
         # 4. EstimateSUM (expensive — optional)
