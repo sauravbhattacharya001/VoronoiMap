@@ -2169,6 +2169,30 @@ def main():
              'coefficient name (default: residuals).',
     )
 
+    # ── Spatial center analysis ─────────────────────────────────────
+    parser.add_argument(
+        '--centers',
+        action='store_true',
+        help='Print spatial center analysis (mean/median/weighted '
+             'center, standard distance, deviational ellipse).',
+    )
+    parser.add_argument(
+        '--centers-json',
+        metavar='OUTPUT',
+        help='Export center analysis as JSON.',
+    )
+    parser.add_argument(
+        '--centers-csv',
+        metavar='OUTPUT',
+        help='Export center analysis as CSV.',
+    )
+    parser.add_argument(
+        '--centers-svg',
+        metavar='OUTPUT',
+        help='Export center analysis visualization as SVG '
+             '(centers, standard distance circle, deviational ellipse).',
+    )
+
     # ── HTML analysis report ────────────────────────────────────────
     parser.add_argument(
         '--report',
@@ -2554,6 +2578,29 @@ def main():
             allow_absolute=True,
         )
         print('HTML report saved to %s' % args.report)
+
+    # ── Spatial center analysis ────────────────────────────────────
+    centers_requested = (
+        args.centers or args.centers_json or args.centers_csv
+        or args.centers_svg
+    )
+    if centers_requested:
+        import vormap_centroid
+        pts = [(d["x"], d["y"]) for d in data]
+        cr = vormap_centroid.analyze_centers(
+            pts, bounds=(IND_S, IND_N, IND_W, IND_E),
+        )
+        if args.centers:
+            print(cr.summary())
+        if args.centers_json:
+            cr.to_json(args.centers_json)
+            print('Centers JSON saved to %s' % args.centers_json)
+        if args.centers_csv:
+            cr.to_csv(args.centers_csv)
+            print('Centers CSV saved to %s' % args.centers_csv)
+        if args.centers_svg:
+            cr.to_svg(args.centers_svg)
+            print('Centers SVG saved to %s' % args.centers_svg)
 
     # ── Convex hull & bounding geometry ──────────────────────────────
     if args.hull or args.hull_json or args.hull_svg:
