@@ -1,5 +1,209 @@
+## 2026-03-15
+
+### Run 404 — Builder (10:54 PM PST)
+- **Repo:** prompt (.NET Prompt Management Library)
+- **Feature:** PromptUsageReport — comprehensive usage reporting with time-bucketed breakdowns (hourly/daily/weekly/monthly), per-model cost estimation, trend detection (usage/latency/errors/tokens), latency percentiles, text/HTML/JSON export, 28 tests
+- **Commit:** ca59386
+
+### Run 403 — Builder (10:49 PM PST)
+- **Repo:** ai (AI Replication Sandbox)
+- **Feature:** Safety Policy Linter — static analysis for policy definitions
+- **Details:** Catches invalid metrics (with typo suggestions), contradictions, threshold range issues, coverage gaps, redundancies, severity mismatches, and best-practice suggestions. CLI: `python -m replication lint`. 32 tests, all passing.
+- **Files:** `src/replication/policy_linter.py`, `__tests__/test_policy_linter.py`, updated `__main__.py`
+
+### Run 938-939 — Gardener (10:35 PM PST)
+
+**Task 1: Vidly — bug_fix**
+- Fixed ~150 of ~302 build errors preventing CI from passing
+- Constructor syntax errors in NotificationService.cs and RentalSurveyService.cs (stray `)`)
+- Duplicate `_clock` field in RentalInsuranceService.cs
+- Ambiguous `SpendingSummary` reference in CustomerInsightsController.cs
+- Renamed duplicate `LeaderboardEntry` class in LoyaltyPointsService.cs
+- Removed duplicate test method in AchievementServiceTests.cs
+- Added missing `GetByCustomer(int)` to 12 test stubs implementing IRentalRepository
+- **PR:** https://github.com/sauravbhattacharya001/Vidly/pull/105
+
+**Task 2: FeedReader — bug_fix**
+- Fixed race condition in `ImageCache.loadImage()` — concurrent requests for the same URL triggered duplicate disk reads and network fetches
+- Added request coalescing: multiple callers for the same URL share a single fetch, all receive the result via pending-completions map
+- `prefetch()` already had deduplication; `loadImage()` did not
+- **PR:** https://github.com/sauravbhattacharya001/FeedReader/pull/83
+
+### Run 402 — Builder (10:22 PM PST)
+- **Repo:** agenticchat
+- **Feature:** Typing Speed Monitor — live WPM indicator next to char count with sparkline dashboard
+- **Details:** Rolling 3-second keystroke window, color-coded speed tiers (blue/green/orange), 4-stat dashboard with canvas sparkline, localStorage persistence, Ctrl+Shift+T shortcut, 16 tests
+- **Commit:** `ce8d0b9`
+
+### Run 401 — Builder (10:15 PM PST)
+- **Repo:** Vidly
+- **Feature:** Rental Calendar — visual monthly calendar view with color-coded rental events
+- **Files:** RentalCalendarService.cs, CalendarController.cs, Views/Calendar/Index.cshtml, Views/Calendar/Upcoming.cshtml, 20 tests
+- **Details:** Monthly grid with checkouts (blue), due dates (yellow), returns (green), overdue (red). Customer filter dropdown, prev/next month navigation, summary stats panel, upcoming due dates table with urgency highlighting.
+- **Commit:** b595be1
+
+### Run 936-937 (10:05 PM PST)
+
+**Task 1: ai — bug_fix**
+- Fixed `_build_demo_fleet()` in `fleet.py` — was creating anonymous objects via `type("RegistryEntry", ...)()` instead of using the real `RegistryEntry` dataclass from `controller.py`
+- This breaks `isinstance` checks, `dataclass` introspection, and any `RegistryEntry`-specific methods
+- PR: https://github.com/sauravbhattacharya001/ai/pull/67
+
+**Task 2: FeedReader — bug_fix**
+- Fixed duplicate network requests in `ImageCache` — `loadImage()` didn't participate in `inflightURLs` tracking that `prefetch()` used
+- Multiple concurrent `loadImage()` calls or `loadImage()` + `prefetch()` for the same URL would each start separate downloads
+- Added completion handler coalescing via `pendingCompletions` dictionary and shared `completeInflight()` helper
+- PR: https://github.com/sauravbhattacharya001/FeedReader/pull/82
+
+### Run 934-935 (10:00 PM PST)
+
+**Task 1: Vidly — bug_fix**
+- Fixed `RentalReturnService.ProcessReturn` combining damage charges into `rental.LateFee`
+- Added `DamageCharge` property to `Rental` model, stored separately from `LateFee`
+- Updated `TotalCost` to include both fields
+- PR: https://github.com/sauravbhattacharya001/Vidly/pull/104
+
+**Task 2: getagentbox — open_issue**
+- Filed issue to refactor 9,752-line `app.js` monolith into separate module files
+- Issue: https://github.com/sauravbhattacharya001/getagentbox/issues/76
+
+### Run 400 (9:52 PM PST) — Feature Builder
+- **Repo:** ai
+- **Feature:** Risk Heatmap — interactive likelihood × impact grid visualization (`src/replication/risk_heatmap.py`)
+- 5×5 heatmap with color-coded cells, 24 risk templates across 8 categories
+- Category filters, click-to-inspect, distribution chart, top-5 table, JSON import/export
+- CLI: `python -m replication risk-heatmap`
+- 15 tests, all passing
+- **Commit:** 0d378c9
+
+### Run 399 (9:47 PM PST) — Feature Builder
+- **Repo:** Ocaml-sample-code
+- **Feature:** Spaced Repetition Flashcards (`docs/flashcards.html`)
+  - 80 flashcards across 10 categories (Basics, Pattern Matching, Types, Modules, Higher-Order, Data Structures, Functional Patterns, Concurrency, Algorithms, Parsing)
+  - SM-2 spaced repetition algorithm with adaptive interval scheduling
+  - Deck management, progress heatmap, day streak tracking
+  - Keyboard shortcuts, browse/search, localStorage persistence
+
+### Run 935 (9:35 PM PST) — Repo Gardener
+- **Repo 1:** WinSentinel — `bug_fix`
+  - Fixed false-positive Critical alert flood in ThreatCorrelator's DefenderPlusUnsigned rule
+  - Any ProcessMonitor event (even Low/Info) triggered Critical correlation if window already had a suspicious process + Defender-disabled event
+  - Fix: only emit correlation when newEvent itself is Medium+ severity
+  - Commit: `b03be53` → pushed to main
+- **Repo 2:** gif-captcha — `security_fix`
+  - Hardened captcha-incident-manager against prototype pollution (CWE-1321): replaced 4 plain `{}` with `Object.create(null)`
+  - Added key validation in `importJSON()` to reject `__proto__`/`constructor`/`prototype` from untrusted JSON
+  - Added CSV formula injection protection (CWE-1236) in `exportCSV()` via `_csvSafe()` helper
+  - Commit: `5868d60` → pushed to main
+
+### Run 398 (9:19 PM PST) — Feature Builder
+- **Repo:** sauravcode
+- **Feature:** sauravscaffold — project scaffolding & template generator
+- **Details:** 6 built-in templates (basic/cli/lib/web/game/data), variable substitution, saurav.pkg.json manifest generation, duplicate prevention, custom output dirs
+- **Tests:** 125 passed
+- **Commit:** `bac9cb8`
+
+### Run 397 (9:13 PM PST) — Feature Builder
+- **everything** — Movie & TV Watchlist: 4-tab screen (Browse/Add/Watching/Stats) with search, filters (status/genre/type/platform), 7 sort modes, 5 media types, 19 genres, episode progress tracking, 0-10 rating, favorites, random pick, detail bottom sheet, command palette integration, 6 sample items, 18 tests. 1700 lines added.
+
+### Run 932-933 (9:05 PM PST)
+- **prompt** — fix_issue: Fixed StackOverflowException in `AddToHistory` (recursive self-call instead of `_history.Add()`). Added `ExecuteAsync` method with `Task.Delay` for async support. Closes #86.
+- **BioBots** — bug_fix: Fixed CSV formula injection bypass in `passage.js` `escapeCSVField`. The `isFinite()` check allowed numeric-looking text (e.g. phone numbers like `+1234567890`) to bypass the single-quote prefix defense. Fixed the passage module while preserving the export module's number-aware behavior.
+
+### Run 932 — No tasks available (9:00 PM PST)
+- All 16 repos have all 29 task types completed. Garden is fully maintained. 🌿
+
+### Run 396 — getagentbox feature (8:47 PM PST)
+- **Repo:** sauravbhattacharya001/getagentbox
+- **Feature:** Workflow Builder — visual multi-step automation composer. 8 action types (Trigger, Search, Summarize, Remind, Analyze, Compose, Condition, Save), 4 preset templates, drag-and-drop reorder, config panel, export as commands or JSON, import JSON. 32 tests.
+- **Commit:** `2c5cea4`
+
+### Run 395 — FeedReader feature (8:43 PM PST)
+- **Repo:** sauravbhattacharya001/FeedReader
+- **Feature:** Article Archive Exporter — export articles as self-contained HTML files with 4 themes (light/dark/sepia/newspaper), batch export with TOC, save/list/delete, print styles, HTML escaping. 28 tests.
+
+### Run 933 — ai security_fix (8:35 PM PST)
+- **Repo:** sauravbhattacharya001/ai
+- **Task:** Fixed XSS vulnerability in HTMLReporter — json.dumps() output was embedded directly in `<script>` tags without escaping `</script>` or `<!--` sequences. Added `_json_for_html()` helper that escapes `<`/`>` as Unicode escapes. Updated all 16 call sites. All 57 reporter tests pass.
+- **Commit:** 7266326
+
+### Run 932 — Vidly bug_fix (8:35 PM PST)
+- **Repo:** sauravbhattacharya001/Vidly
+- **Task:** Fixed data integrity bug in GetCustomerReturnProfile — was using name-based Search() which does substring matching, causing cross-customer data leakage (e.g., "John" matching "Johnny"). Added GetByCustomer(int customerId) to IRentalRepository for exact ID-based filtering. Updated RentalReturnService to use it.
+- **Commit:** 2e955b0
+
+### Run 931 — GraphVisual add_tests (8:30 PM PST)
+- **Repo:** sauravbhattacharya001/GraphVisual
+- **Task:** Added 20 unit tests for DotExporter covering null graph rejection, directed/undirected output, name sanitization, edge type coloring, legend toggling, file export, DOT injection prevention via quote escaping, and edge cases (empty graph, single vertex)
+- **Commit:** 9df3903
+
+### Run 930 — FeedReader security_fix (8:30 PM PST)
+- **Repo:** sauravbhattacharya001/FeedReader
+- **Task:** Fixed SSRF vulnerability in RSSParser.parseFeed — was only checking HTTP(S) scheme but not validating against private/reserved IP ranges. Now delegates to URLValidator.validateFeedURL for full SSRF protection (loopback, link-local, cloud metadata, private IPs)
+- **Commit:** c9d7088
+
+### Run 394 — agentlens feature (8:19 PM PST)
+- **Repo:** sauravbhattacharya001/agentlens
+- **Feature:** Token Usage Heatmap — calendar-style visualization with HeatmapBuilder (hour/day/week granularity, 5 metrics, GitHub-style HTML heatmap, model bar chart, cost estimation, JSON export, 28 tests)
+- **Files:** `sdk/agentlens/heatmap.py`, `sdk/tests/test_heatmap.py`, `sdk/agentlens/__init__.py`
+- **Result:** ✅ 28/28 tests passed, pushed to master
+
+### Run 929 — BioBots bug_fix (8:05 PM PST)
+- **Repo:** sauravbhattacharya001/BioBots
+- **Task:** bug_fix — CSV formula injection defense for phone-like values
+- **PR:** https://github.com/sauravbhattacharya001/BioBots/pull/79
+- **Details:** `escapeCSVField` in passage.js skipped the formula-injection prefix for values like `+1234567890` (parsed as finite numbers). Tightened the numeric exception to require a decimal point, fixing the failing `passage-csv-security` test (13/13 pass).
+
+### Run 928 — Vidly bug_fix (8:05 PM PST)
+- **Repo:** sauravbhattacharya001/Vidly
+- **Task:** bug_fix — duplicate `_clock` field in RentalInsuranceService
+- **PR:** https://github.com/sauravbhattacharya001/Vidly/pull/103
+- **Details:** `RentalInsuranceService.cs` had a duplicate `_clock` field declaration and duplicate constructor assignment, causing CS0102 compile error. Removed duplicates.
+
+### Run 392 — VoronoiMap: Spatial Smoothing (7:45 PM PST)
+- **Feature:** Spatial smoothing module (`vormap_smooth.py`) — smooth noisy attribute values across Voronoi cell neighbourhoods
+- **Highlights:** 4 methods (mean, median, Gaussian kernel, IDW), configurable iterations/alpha/sigma/power, include_self toggle, CSV/JSON/SVG heatmap export, CLI, convergence tracking, 26 tests
+- **Commit:** `34c4b1b`
+
+### Run 391 — gif-captcha: Bypass Resistance Tester (7:36 PM PST)
+- **Feature:** Bypass Resistance Tester (`resistance.html`) — interactive tool simulating 6 bot attack strategies (OCR frame extraction, ML model attacks, timing side-channels, brute force/replay, human CAPTCHA farms, API exploits) against configurable CAPTCHA setups
+- **Highlights:** 4 presets (Minimal→Fortress), 8 config parameters, visual score ring with A-F grading, per-attack resistance bars, actionable recommendations, JSON/CSV/clipboard export
+- **Tests:** 36 passing (scoring logic, grading, presets, weighted averages, HTML structure)
+- **Commit:** `8961da5` on `main`
+
+### Run 928 — No Work (7:35 PM PST)
+- **Result:** All 16 repos have all 29 task types completed. Nothing to do. The repo gardener has fully tended every garden. 🌿
+
+### Run 927 — WinSentinel (7:30 PM PST)
+- **Task:** security_fix
+- **Details:** Hardened `InputSanitizer.ValidateFilePath()` against NT object manager paths (`\??\`, `\Device\`, `\DosDevices\`), forward-slash UNC variants (`//?/`, `//./`), and symlink/junction resolution bypass. Added tests.
+- **PR:** https://github.com/sauravbhattacharya001/WinSentinel/pull/97
+
+### Run 926 — prompt (7:30 PM PST)
+- **Task:** fix_issue (#86)
+- **Details:** Fixed stack overflow in `PromptRetryPolicy.AddToHistory()` — was recursively calling itself instead of `_history.Add(result)`. Added `ExecuteAsync()` method using `Task.Delay` instead of `Thread.Sleep`.
+- **PR:** https://github.com/sauravbhattacharya001/prompt/pull/new/fix/retry-policy-stack-overflow
+
+### Run 390 — prompt (7:15 PM PST)
+- **Feature:** PromptMatrix — combinatorial template variable tester
+- **Details:** Cartesian product expansion of {{variable}} placeholders, filter predicates, Where/GroupBy result slicing, JSON round-trip serialization, CSV export, QuickExpand convenience method, token stats
+- **Tests:** 26 passing
+- **Commit:** d33042b
+
 
 ## 2026-03-15
+
+### Run 391 — agenticchat (merge_dependabot) ✅
+- **Merged:** Dependabot PR #81 — Jest 30.2.0→30.3.0, jest-environment-jsdom 30.2.0→30.3.0 (minor patch, dev deps)
+
+### Run 392 — ai (bug_fix) ✅
+- **Fixed:** ThreatCorrelator `_apply_rule` computed `time_span` from severity-sorted order (`matched[-1].timestamp - matched[0].timestamp`) instead of actual min/max timestamps. PR #41 merged.
+
+### Run 389 — ai (Safety Radar Chart) ✅
+- **Feature:** Safety Radar Chart — interactive radar/spider chart visualization of scorecard dimensions
+- **What it does:** Generates self-contained HTML radar chart showing safety scores across 8 dimensions. Supports multi-dataset overlay (compare up to 5 configs), toggleable legend, hover tooltips, score detail table with letter grades, PNG download, JSON import. CLI: `python -m replication radar`
+- **Files:** `src/replication/radar.py`, `tests/test_radar.py` (14 tests)
+- **Time:** ~15 min
 
 ### Run #365 — Feature Builder (7:15 AM PST)
 - **Repo:** getagentbox
@@ -8564,6 +8768,7 @@ All sub-agent and cron job runs logged here. Most recent first.
 ### Gardener Run #486
 - **Task 1:** perf_improvement on Vidly � (1) `ReviewService.GetSummary()`: 8+ LINQ passes ? single foreach with inline accumulators (star sum, star distribution array, HashSets for distinct movies/customers, inline max-tracking for most-reviewed). (2) `ReviewService.Enrich()`: N+1 per-review `GetById` calls ? deduplicated lookups via HashSet of unique IDs, reducing from O(2R) to O(C+M). (3) `CustomerActivityService.BuildSummary()`: eliminated 2 extra `Min()`/`Max()` passes by tracking first/last rental dates inline. 619/634 tests (15 pre-existing). Commit `d5e5372`.
 - **Task 2:** perf_improvement on FeedReader � (1) `ReadingStatsManager.computeStats()`: 5 passes (3 `filter()` + 2 loops) ? single loop computing today/week/month counts, hourly distribution, and feed breakdown simultaneously. (2) `ReadingHistoryManager.historySummary()`: 4 passes (2 loops + 2 `reduce` properties) ? single loop with local accumulators. (3) `ReadingHistoryManager.recordVisit()`: O(n) `rebuildIndex()` ? O(index) incremental update of shifted entries only, with guard for index==0 empty-range crash. Commit `dd96b1e`.
+
 
 
 

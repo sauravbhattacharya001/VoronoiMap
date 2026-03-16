@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-03-15T15:00:00.000Z",
-  "totalRuns": 923,
+  "lastUpdated": "2026-03-16T05:48:30.692Z",
+  "totalRuns": 939,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -10,13 +10,13 @@
     },
     "bug_fix": {
       "weight": 17.1,
-      "runs": 84,
-      "successes": 85
+      "runs": 93,
+      "successes": 94
     },
     "security_fix": {
       "weight": 18.1,
-      "runs": 70,
-      "successes": 70,
+      "runs": 72,
+      "successes": 72,
       "description": "Fix security vulnerability",
       "totalDone": 1
     },
@@ -36,8 +36,8 @@
     },
     "add_tests": {
       "weight": 18.1,
-      "runs": 63,
-      "successes": 63,
+      "runs": 64,
+      "successes": 64,
       "description": "Add meaningful tests",
       "attempts": 2
     },
@@ -64,22 +64,22 @@
     },
     "open_issue": {
       "weight": 15.1,
-      "runs": 93,
-      "successes": 96,
+      "runs": 94,
+      "successes": 97,
       "description": "Open a thoughtful issue",
       "totalDone": 1,
       "attempts": 3
     },
     "fix_issue": {
       "weight": 15.1,
-      "runs": 137,
-      "successes": 137,
+      "runs": 139,
+      "successes": 139,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
       "weight": 25,
-      "runs": 22,
-      "successes": 19,
+      "runs": 23,
+      "successes": 20,
       "description": "Review and merge open Dependabot PRs"
     },
     "add_ci_cd": {
@@ -685,10 +685,10 @@
       "docs_site"
     ]
   },
-  "notes": "Run 921-922: Vidly fix_issue #93 (IClock null assignment in 10 services, PR #98), WinSentinel fix_issue #93 (ThreatCorrelator race conditions, PR #94).",
-  "lastRepo": "WinSentinel",
+  "notes": "Run 938: Vidly bug_fix (fix ~150 build errors: constructor syntax, duplicate fields, missing interface methods, ambiguous types, PR #105). Run 939: FeedReader bug_fix (coalesce concurrent loadImage requests to avoid duplicate fetches, PR #83).",
+  "lastRepo": "FeedReader",
   "lastRun": "2026-03-15",
-  "runCount": 64,
+  "runCount": 72,
   "lastWeightAdjustment": 920,
   "adjustmentHistory": [
     {
@@ -712,13 +712,13 @@
     }
   ],
   "lastTasks": [
-    "add_tests",
-    "add_tests"
+    "bug_fix",
+    "bug_fix"
   ],
   "lastAdjusted": 910,
   "lastRepos": [
-    "agentlens",
-    "prompt"
+    "Vidly",
+    "FeedReader"
   ],
-  "lastRunTimestamp": "2026-03-15T15:00:00.000Z"
+  "lastRunTimestamp": "2026-03-16T05:48:30.692Z"
 }

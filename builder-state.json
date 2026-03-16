@@ -1,73 +1,105 @@
 {
-  "runNumber": 365,
-  "lastFeature": "Interactive Command Reference — searchable command cheat sheet with 15 commands, 6 categories, copy-to-clipboard, 16 tests",
-  "lastRepo": "getagentbox",
-  "lastRunTimestamp": "2026-03-15T15:15:00.000Z",
+  "runNumber": 404,
+  "lastFeature": "PromptUsageReport — comprehensive usage reporting with time-bucketed breakdowns, model cost analysis, trend detection, text/HTML/JSON export, 28 tests",
+  "lastRepo": "prompt",
+  "lastRunTimestamp": "2026-03-16T06:54:00.000Z",
   "repoFeatures": {
     "sauravcode": [
       "sauravapi — serve .srv functions as REST API endpoints",
       "sauravtest — test runner for .srv programs (discover, run, setup/teardown, JSON export)",
       "sauravmetrics — code complexity analyzer (cyclomatic complexity, maintainability index, LOC, nesting depth, JSON/CSV export, 22 tests)",
-      "sauravdbg — interactive step-through debugger (step/next/continue, breakpoints with conditions, var inspection, call stack, watchlist, source view, restart). 33 tests."
+      "sauravdbg — interactive step-through debugger (step/next/continue, breakpoints with conditions, var inspection, call stack, watchlist, source view, restart). 33 tests.",
+      "sauravscaffold — project scaffolding with 6 templates (basic/cli/lib/web/game/data), variable substitution, manifest generation, 125 tests"
     ],
     "GraphVisual": [
       "JSON graph exporter (D3.js/vis.js/Cytoscape.js compatible)",
       "NetworkReportGenerator — self-contained HTML network analysis report with SVG charts, health score, degree/edge-type/top-nodes visualizations, 12 tests",
-      "Interactive Graph Explorer — load JSON, force-directed layout, ego network highlighting, shortest path, search, community detection, PNG export"
+      "Interactive Graph Explorer — load JSON, force-directed layout, ego network highlighting, shortest path, search, community detection, PNG export",
+      "Interactive Graph Diff Visualizer — compare two JSON graphs visually with color-coded nodes/edges, merged + side-by-side views, Jaccard metrics, degree changes, drag, tooltips, PNG export"
     ],
     "VoronoiMap": [
       "vormap_benchmark — performance benchmarking module (NN, area, EstimateSUM, scaling analysis)",
-      "LOO cross-validation for interpolation methods (compare nearest/IDW/natural, error metrics, SVG chart, CSV export)"
+      "LOO cross-validation for interpolation methods (compare nearest/IDW/natural, error metrics, SVG chart, CSV export)",
+      "Zonal Statistics module — per-zone aggregates (count/sum/mean/median/std/min/max/range/variance), multi-band, CSV/JSON/SVG export, CLI, 22 tests",
+      "Spatial Smoothing — 4 methods (mean/median/gaussian/IDW), iterative smoothing with alpha blending, CSV/JSON/SVG export, 26 tests"
     ],
     "gif-captcha": [
       "Interactive configuration wizard (config.html) — step-by-step setup, code generation, score dashboard",
-      "CaptchaAnomalyDetector — statistical anomaly detection (z-score, IQR, bursts, geo shift, changepoints, EMA)"
+      "CaptchaAnomalyDetector — statistical anomaly detection (z-score, IQR, bursts, geo shift, changepoints, EMA)",
+      "Challenge Designer — interactive CAPTCHA challenge builder with question templates, difficulty tuning, preview, JSON export/import, 28 tests",
+      "Bypass Resistance Tester — simulate 6 attack vectors with config presets, scorecard, recommendations, JSON/CSV export, 36 tests"
     ],
     "agentlens": [
       "CLI tool (agentlens command) — 10 subcommands: sessions, session, costs, events, export, analytics, health, compare, alerts, status",
-      "Session Guardrails — constraint validation (token budgets, duration, tool allow/blocklists, model restrictions, error thresholds, custom predicates, suite reports, 39 tests)"
+      "Session Guardrails — constraint validation (token budgets, duration, tool allow/blocklists, model restrictions, error thresholds, custom predicates, suite reports, 39 tests)",
+      "Trace Waterfall Viewer — interactive gantt-style event visualization (minimap, filters, zoom, detail panel, SVG export, 18 tests)",
+      "Token Usage Heatmap — calendar-style HTML visualization (hour/day/week, 5 metrics, cost estimation, model bars, JSON export, 28 tests)"
     ],
     "BioBots": [
       "Data Integrity Auditor (integrity.html) — 18 validation rules, summary dashboard, rule chart, filterable findings, CSV export",
       "Interactive Bioink Compatibility Matrix — heatmap, dimension breakdown, rankings, add custom bioinks, recommendations",
-      "Print Recipe Builder — target-based parameter optimization with 5 presets, composite scoring, recipe cards, distributions, 33 tests"
+      "Print Recipe Builder — target-based parameter optimization with 5 presets, composite scoring, recipe cards, distributions, 33 tests",
+      "Print Timeline Simulator — animated layer-by-layer visualization with 6 tissue presets, canvas build plate, real-time metrics, timeline chart, event log, playback controls",
+      "Bioprint Troubleshooter — interactive decision-tree diagnostic wizard, 6 categories (Extrusion, Viability, Structure, Resolution, Crosslinking, Hardware), 37 solutions with severity/diagnosis/fixes, copy report, session history"
     ],
     "Vidly": [
       "Global Search bar — navbar search + SearchController querying movies, customers, and rentals with unified results view",
       "Customer Insights dashboard — loyalty score, spending, patterns, genres, timeline, rental history. 16 tests.",
-      "Movie Quiz — interactive trivia with difficulty levels, categories, speed bonus, leaderboard, daily challenge, hints, 12 tests"
+      "Movie Quiz — interactive trivia with difficulty levels, categories, speed bonus, leaderboard, daily challenge, hints, 12 tests",
+      "Reviews views — Index (summary stats, top-rated, search/filter, review form) + Movie (rating distribution bars, per-movie reviews), interactive star rating widget, navbar link",
+      "Rental Calendar — visual monthly calendar with color-coded events (checkouts, due dates, returns, overdue), customer filter, navigation, upcoming due dates view, 20 tests"
     ],
     "agenticchat": [
       "Word Cloud visualization panel — interactive word frequency cloud, role-colored, click-to-search (Ctrl+Shift+W)",
       "ChatGPT conversation importer — parse mapping tree, extract messages, create sessions. 17 tests.",
-      "Prompt Chain Runner — multi-step prompt chains with variable substitution, 3 presets, import/export, 18 tests"
+      "Prompt Chain Runner — multi-step prompt chains with variable substitution, 3 presets, import/export, 18 tests",
+      "Typing Speed Monitor — live WPM indicator with sparkline dashboard (Ctrl+Shift+T), 16 tests",
+      "Conversation Health Check — 8-dimension diagnostic (prompt clarity, balance, context window, repetition, code ratio, question density, persona, length), visual score ring, /health command, Ctrl+Shift+H"
     ],
     "prompt": [
       "PromptPlayground — interactive HTML playground for testing prompt templates (live preview, dark mode, token stats, copy, library import)",
-      "PromptSchemaGenerator — fluent structured output schema builder (JSON Schema + prompt instructions + example generation, 14 tests)"
+      "PromptSchemaGenerator — fluent structured output schema builder (JSON Schema + prompt instructions + example generation, 14 tests)",
+      "PromptPerformanceProfiler — execution profiling with percentiles, comparison, reports, 18 tests",
+      "PromptMatrix — combinatorial template variable tester with cartesian product expansion, filtering, Where/GroupBy, JSON/CSV export, QuickExpand, 26 tests",
+      "PromptUsageReport — comprehensive usage reporting with time-bucketed breakdowns, model cost analysis, trend detection, text/HTML/JSON export, 28 tests"
     ],
     "WinSentinel": [
       "Attack Path Analyzer — chains findings into multi-step attack paths (6 kill chain stages), exploitability scoring, chokepoint remediation priorities, CLI + 14 tests",
-      "Score Forecast CLI — predict future security scores with trend analysis, confidence intervals, module projections, risk factors, target estimation, 9 tests"
+      "Score Forecast CLI — predict future security scores with trend analysis, confidence intervals, module projections, risk factors, target estimation, 9 tests",
+      "Finding Search CLI — keyword search across audit findings with relevance scoring, severity/module filters, match highlighting, JSON output, 15 tests",
+      "Executive Summary — one-page security briefing (score/grade, module health, top risks, strengths, action items, trend), text/HTML/JSON output, 22 tests"
     ],
     "FeedReader": [
       "Text-to-Speech article reader — AVSpeechSynthesizer with play/pause/stop, voice selection, language detection",
-      "ArticleExpiryManager — auto-cleanup for stale articles with configurable policies, dry-run, sweep execution, 16 tests"
+      "ArticleExpiryManager — auto-cleanup for stale articles with configurable policies, dry-run, sweep execution, 16 tests",
+      "ReadingBingoCard — gamified 5x5 bingo cards with 12 challenge types, difficulty scaling, line detection, blackout tracking, 22 tests",
+      "Article Archive Exporter — self-contained HTML export with 4 themes, batch export, TOC, save/list/delete, 28 tests"
     ],
     "Ocaml-sample-code": [
-      "Example Explorer (explorer.html) — browsable catalog of all 90 examples with 12 categories, search, sort, difficulty badges, inline code preview"
+      "Example Explorer (explorer.html) — browsable catalog of all 90 examples with 12 categories, search, sort, difficulty badges, inline code preview",
+      "Interactive Concept Map — force-directed graph showing example relationships via shared concepts, category filters, 4 learning paths, click-to-inspect, 14 tests",
+      "OCaml Cheat Sheet — 65+ searchable snippets across 12 categories (Basics, Functions, Pattern Matching, Data Types, Lists, Arrays, Control Flow, Modules, Higher-Order, I/O, Hashtbl/Map, Idioms), copy-to-clipboard, syntax highlighting",
+      "Spaced Repetition Flashcards — 80 cards across 10 categories, SM-2 algorithm, deck management, progress heatmap, streak tracking"
     ],
     "everything": [
       "Packing List Screen — template-based trip packing UI with category grouping, progress tracking, weight breakdown, readiness checks",
-      "Vehicle Maintenance Tracker — 4-tab screen (Vehicles, Service Log, Alerts, Costs) with add/log/update dialogs, sample data, 12 tests"
+      "Vehicle Maintenance Tracker — 4-tab screen (Vehicles, Service Log, Alerts, Costs) with add/log/update dialogs, sample data, 12 tests",
+      "Recipe Book Screen — browse/search/rate recipes, weekly meal planner, auto shopping list, stats dashboard, 6 sample recipes",
+      "Movie & TV Watchlist — 4-tab screen with browse/add/watching/stats, 5 statuses, 19 genres, episode progress, ratings, 18 tests"
     ],
     "ai": [
       "Fleet Snapshot command — kubectl-style worker overview with table/JSON/CSV output, sorting, filtering",
-      "Interactive Simulation Playground — HTML page with parameter sliders, client-side simulation, tree/timeline/depth visualizations, 5 presets, 10 tests"
+      "Interactive Simulation Playground — HTML page with parameter sliders, client-side simulation, tree/timeline/depth visualizations, 5 presets, 10 tests",
+      "Incident Response Playbook Generator — structured IR playbooks for 8 threat categories (text/JSON/HTML output), 19 tests",
+      "Safety Radar Chart — interactive radar/spider chart for scorecard dimensions, multi-dataset overlay, toggleable legend, hover tooltips, PNG export, JSON import, CLI integration, 14 tests",
+      "Risk Heatmap — interactive 5×5 likelihood × impact grid with 24 risk templates, 8 categories, filters, click-to-inspect, JSON export, 15 tests",
+      "Safety Policy Linter — static analysis for policy definitions (contradictions, coverage gaps, threshold validation, redundancy detection), 32 tests"
     ],
     "getagentbox": [
       "Performance Benchmarks (benchmarks.js) — 12 task comparisons across 4 categories with animated bars, filters, summary stats, 14 tests",
-      "Interactive Command Reference — searchable/filterable command cheat sheet with 15 commands, 6 categories, examples, copy-to-clipboard, tips, 16 tests"
+      "Interactive Command Reference — searchable/filterable command cheat sheet with 15 commands, 6 categories, examples, copy-to-clipboard, tips, 16 tests",
+      "Interactive Migration Guide — LangChain/AutoGPT/CrewAI/Custom concept mapping, code comparison, migration checklists with effort estimation",
+      "Workflow Builder — visual multi-step automation composer with 8 action types, 4 presets, drag-and-drop, JSON import/export, 32 tests"
     ]
   }
 }
