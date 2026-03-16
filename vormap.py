@@ -2061,6 +2061,52 @@ def main():
              'diameter line, centroid).',
     )
 
+    # ── Spatial regression ──────────────────────────────────────────
+    parser.add_argument(
+        '--regress',
+        metavar='FORMULA',
+        help='Fit OLS spatial regression. Formula: y~x1+x2 '
+             '(e.g. area~compactness+vertex_count).',
+    )
+    parser.add_argument(
+        '--regress-gwr',
+        metavar='FORMULA',
+        help='Fit Geographically Weighted Regression. Same formula syntax.',
+    )
+    parser.add_argument(
+        '--bandwidth',
+        type=float,
+        default=None,
+        help='GWR bandwidth (distance). Auto-computed if omitted.',
+    )
+    parser.add_argument(
+        '--kernel',
+        choices=['gaussian', 'bisquare'],
+        default='gaussian',
+        help='GWR kernel function (default: gaussian).',
+    )
+    parser.add_argument(
+        '--regress-svg',
+        metavar='OUTPUT',
+        help='Export regression residual map as SVG.',
+    )
+    parser.add_argument(
+        '--regress-json',
+        metavar='OUTPUT',
+        help='Export regression results as JSON.',
+    )
+    parser.add_argument(
+        '--regress-csv',
+        metavar='OUTPUT',
+        help='Export per-observation regression data as CSV.',
+    )
+    parser.add_argument(
+        '--regress-show',
+        default='residuals',
+        help='SVG display: residuals, fitted, cooks_d, local_r2, or a '
+             'coefficient name (default: residuals).',
+    )
+
     # ── HTML analysis report ────────────────────────────────────────
     parser.add_argument(
         '--report',
@@ -2419,6 +2465,15 @@ def main():
     )
     if autocorr_requested:
         _cmd_autocorr(args, regions, data)
+
+    # ── Spatial regression ────────────────────────────────────────────
+    regress_requested = (
+        args.regress or args.regress_gwr or args.regress_svg
+        or args.regress_json or args.regress_csv
+    )
+    if regress_requested:
+        import vormap_regress
+        vormap_regress.run_regress_cli(args, regions, data)
 
     # ── HTML analysis report ─────────────────────────────────────────
     if args.report:
