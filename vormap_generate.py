@@ -188,9 +188,11 @@ def generate_inhibitory(n, min_dist=None, bounds=(0, 1000, 0, 2000),
     grid = {}  # (col, row) -> list of (x, y)
 
     def _grid_key(x, y):
+        """Map a point to its spatial hash grid cell index."""
         return (int((x - w) / cell_size), int((y - s) / cell_size))
 
     def _is_too_close(px, py):
+        """Check if a point is within *min_dist* of any existing point in the grid."""
         gc, gr = _grid_key(px, py)
         min_dist_sq = min_dist ** 2
         for dc in range(-1, 2):
@@ -247,6 +249,11 @@ def generate_gradient(n, direction="horizontal",
     height = n_bound - s
 
     def intensity(x, y):
+        """Compute the gradient intensity at a point for density-biased sampling.
+
+        Returns a value in [0, 1] where higher values increase the
+        probability of accepting a candidate point.
+        """
         if direction == "horizontal":
             return (x - w) / width
         elif direction == "vertical":
@@ -450,6 +457,7 @@ def pattern_summary(points, pattern_name="unknown"):
 
 
 def _build_parser():
+    """Build the argparse parser for the vormap_generate CLI."""
     parser = argparse.ArgumentParser(
         prog="vormap_generate",
         description="Generate synthetic point patterns for VoronoiMap.",

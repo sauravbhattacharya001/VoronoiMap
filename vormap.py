@@ -240,6 +240,13 @@ def validate_grid_size(nx: int, ny: int, *, caller: str = ""):
 
 
 class Oracle:
+    """Counter for tracking the number of geometric oracle calls.
+
+    Used to measure computational cost of spatial operations.
+    The class-level ``calls`` attribute is incremented each time a
+    distance or nearest-neighbor query is performed, enabling
+    algorithm efficiency analysis.
+    """
     __slots__ = ()
     calls = 0
 
@@ -706,10 +713,41 @@ def get_NN(data, lng, lat):
 
 
 def mid_point(x1, y1, x2, y2):
+    """Return the midpoint of two 2D points, rounded to 2 decimal places.
+
+    Parameters
+    ----------
+    x1, y1 : float
+        Coordinates of the first point.
+    x2, y2 : float
+        Coordinates of the second point.
+
+    Returns
+    -------
+    tuple[float, float]
+        The (x, y) midpoint.
+    """
     return round(((float)(x1 + x2) / 2), 2), round(((float)(y1 + y2) / 2), 2)
 
 
 def perp_dir(x1, y1, x2, y2):
+    """Compute the slope of the perpendicular bisector of a line segment.
+
+    Returns the negative reciprocal of the segment's slope. If the
+    segment is horizontal (``y1 == y2``), returns ``math.inf``.
+
+    Parameters
+    ----------
+    x1, y1 : float
+        Coordinates of the first endpoint.
+    x2, y2 : float
+        Coordinates of the second endpoint.
+
+    Returns
+    -------
+    float
+        Slope of the perpendicular direction, rounded to 2 decimal places.
+    """
     if (y2 != y1):
         return round(((float)(x2 - x1) / (y1 - y2)), 2)
     return math.inf
@@ -760,6 +798,30 @@ def _slopes_equal(m1, m2, rtol=1e-6):
 
 
 def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
+    """Find a new Voronoi edge direction by iterative angular refinement.
+
+    Starting from the slope between points ``(alng, alat)`` and
+    ``(dlng, dlat)``, rotates the search angle in progressively smaller
+    increments to locate the Voronoi edge direction emanating from
+    ``(aplng, aplat)``.  Uses binary search and collinearity checks
+    to converge on the correct slope.
+
+    Parameters
+    ----------
+    data : list
+        Point dataset for nearest-neighbor lookups.
+    aplng, aplat : float
+        Anchor point (Voronoi vertex) coordinates.
+    alng, alat : float
+        Starting direction reference point.
+    dlng, dlat : float
+        Second direction reference point.
+
+    Returns
+    -------
+    float
+        Slope of the new Voronoi edge direction (``math.inf`` if vertical).
+    """
     if (alng == dlng):
         m1 = math.inf
     else:
