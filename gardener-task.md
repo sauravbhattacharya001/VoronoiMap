@@ -8,17 +8,15 @@ Read C:\Users\onlin\.openclaw\workspace\gardener-weights.json at the start of ea
 
 **Each run, do 2 tasks:**
 1. Pick a random repo from https://github.com/sauravbhattacharya001 (skip forks and zalenix-memory). Use `gh repo list sauravbhattacharya001 --json name,primaryLanguage,isFork --limit 50` to get the list.
-2. For each task, select a task TYPE using weighted random selection from the weights file. Higher weight = higher chance. But SKIP task types already completed on the chosen repo (check repoState).
+2. For each task, select a task TYPE using weighted random selection from the weights file. Higher weight = higher chance. **ALL task types are repeatable** — never skip a task type because it was "already done" on a repo. There is always more to improve.
 3. Execute the task with senior-engineer quality. No trivial/cosmetic changes.
 4. After each task, update gardener-weights.json:
    - Increment `runs` for that task type
    - Increment `successes` if the task was meaningful and completed well
-   - Update `repoState` with what was done on that repo (e.g., `"agenticchat": ["add_ci_cd", "security_fix", "deploy_pages"]`)
+   - Do NOT track repoState — all tasks are always eligible on all repos
    - **SELF-ADJUST WEIGHTS:** Every 10 total runs, review the data:
      - Increase weight (+2) for task types with >80% success rate
      - Decrease weight (-2, min 1) for task types with <40% success rate or that keep getting skipped
-     - Decrease weight (-3, min 1) for task types where all repos already have it done
-     - Increase weight (+3) for task types no repo has done yet (fresh opportunities)
 
 ## TASK TYPE REFERENCE
 
