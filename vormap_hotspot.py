@@ -196,9 +196,10 @@ def build_distance_weights(stats, threshold=None):
 def build_knn_weights(stats, k=4):
     """Build k-nearest-neighbor weight matrix.
 
-    Uses a bounded max-heap per point to find the k closest neighbors
-    in O(n² log k) without sorting all n distances per point (was
-    O(n² log n) with full sort).
+    Pre-computes the upper-triangle distance matrix in a single O(n²)
+    pass, then selects k nearest neighbors per point using a bounded
+    max-heap (O(n² log k) total, down from O(n² · distance-call)
+    overhead of recomputing distances per point).
 
     Parameters
     ----------
@@ -216,6 +217,15 @@ def build_knn_weights(stats, k=4):
     n = len(centroids)
     k = min(k, n - 1)
 
+    # Pre-compute upper-triangle distance matrix once — O(n²) distance
+    # calls instead of O(n²) per point.
+    pair_dists = {}
+    for i in range(n):
+        xi, yi = centroids[i]
+        for j in range(i + 1, n):
+            xj, yj = centroids[j]
+            pair_dists[(i, j)] = math.sqrt((xi - xj) ** 2 + (yi - yj) ** 2)
+
     weights = {i: set() for i in range(n)}
     for i in range(n):
         # Max-heap of size k: store (-dist, j) so largest dist is popped first
@@ -223,7 +233,8 @@ def build_knn_weights(stats, k=4):
         for j in range(n):
             if i == j:
                 continue
-            d = _distance(centroids[i], centroids[j])
+            key = (min(i, j), max(i, j))
+            d = pair_dists[key]
             if len(heap) < k:
                 heapq.heappush(heap, (-d, j))
             elif d < -heap[0][0]:
