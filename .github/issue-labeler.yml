@@ -1,0 +1,25 @@
+# Issue labeler configuration — matches issue title and body text
+# Used by github/issue-labeler action
+
+bug:
+  - '(crash|exception|error|traceback|broken|fail|segfault|corrupt|regression|wrong result)'
+performance:
+  - '(slow|performance|speed|latency|memory|OOM|out of memory|optimization|bottleneck|profil)'
+enhancement:
+  - '(feature|request|enhancement|add support|new option|proposal|suggest|would be nice|idea)'
+documentation:
+  - '(doc|documentation|readme|typo|example|tutorial|clarif|explain|usage)'
+security:
+  - '(security|vulnerability|CVE|injection|XSS|SSRF|path traversal|unsafe|sanitiz)'
+testing:
+  - '(test|coverage|assertion|fixture|mock|pytest|unittest|flaky)'
+ci/cd:
+  - '(CI|workflow|action|build failure|pipeline|deploy|release|docker)'
+dependencies:
+  - '(dependency|dependabot|upgrade|update|version|incompatib|import error|ModuleNotFoundError)'
+question:
+  - '(question|how to|how do|help|confused|unclear|what does|is it possible)'
+visualization:
+  - '(plot|render|display|color|animate|heatmap|contour|viz|visual|draw|map output)'
+spatial:
+  - '(voronoi|delaunay|polygon|geometry|coordinate|CRS|projection|GeoJSON|KML|shapefile|spatial)'
