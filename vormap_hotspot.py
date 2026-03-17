@@ -81,6 +81,9 @@ def build_queen_weights(regions, stats):
 
     Two regions are neighbors if they share at least one vertex.
 
+    Uses a spatial vertex hash for O(n·V) average-case performance
+    instead of the naive O(n²·V²) pairwise vertex comparison.
+
     Parameters
     ----------
     regions : dict
@@ -95,20 +98,43 @@ def build_queen_weights(regions, stats):
     """
     n = len(stats)
     seeds = [(s["seed_x"], s["seed_y"]) for s in stats]
-    # Map seeds to their vertex lists
+
+    # Build a lookup dict for region keys to avoid O(n) linear scan per seed.
+    # Keys are rounded to tolerance for consistent matching.
+    _TOL = 1e-9
+    region_lookup = {}
+    for k in regions:
+        rk = (round(k[0] / _TOL) * _TOL, round(k[1] / _TOL) * _TOL)
+        region_lookup[rk] = k
+
     seed_verts = []
     for s in seeds:
-        key = None
-        for k in regions:
-            if abs(k[0] - s[0]) < 1e-9 and abs(k[1] - s[1]) < 1e-9:
-                key = k
-                break
+        rk = (round(s[0] / _TOL) * _TOL, round(s[1] / _TOL) * _TOL)
+        key = region_lookup.get(rk)
         seed_verts.append(regions[key] if key is not None else [])
 
+    # Use a spatial hash on vertices to find adjacency in O(n·V) average case.
+    # Two regions sharing at least one vertex (within tolerance) are neighbors.
+    # We discretize vertex coordinates into grid buckets; vertices that round
+    # to the same bucket belong to the same spatial location.
+    _GRID_TOL = 1e-6  # coarser bucket for vertex grouping
+    vertex_map = {}  # rounded (x, y) -> set of region indices
+    for i, verts in enumerate(seed_verts):
+        for vx, vy in verts:
+            key = (round(vx / _GRID_TOL), round(vy / _GRID_TOL))
+            if key not in vertex_map:
+                vertex_map[key] = set()
+            vertex_map[key].add(i)
+
     weights = {i: set() for i in range(n)}
-    for i in range(n):
-        for j in range(i + 1, n):
-            if _shared_edge_or_vertex(seed_verts[i], seed_verts[j]):
+    for region_indices in vertex_map.values():
+        if len(region_indices) < 2:
+            continue
+        # All regions sharing this vertex are neighbors
+        idx_list = list(region_indices)
+        for a in range(len(idx_list)):
+            for b in range(a + 1, len(idx_list)):
+                i, j = idx_list[a], idx_list[b]
                 weights[i].add(j)
                 weights[j].add(i)
     return weights
