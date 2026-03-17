@@ -1682,6 +1682,29 @@ def main():
              'file path (e.g. diagram.html).',
     )
     parser.add_argument(
+        '--ascii',
+        action='store_true',
+        help='Render Voronoi diagram in the terminal using Unicode '
+             'characters and ANSI colors. No file output needed.',
+    )
+    parser.add_argument(
+        '--ascii-width',
+        type=int,
+        default=80,
+        help='Terminal canvas width in columns (default: 80).',
+    )
+    parser.add_argument(
+        '--ascii-height',
+        type=int,
+        default=24,
+        help='Terminal canvas height in rows (default: 24).',
+    )
+    parser.add_argument(
+        '--ascii-mono',
+        action='store_true',
+        help='Use monochrome box-drawing instead of ANSI colors.',
+    )
+    parser.add_argument(
         '--geojson',
         metavar='OUTPUT',
         help='Export Voronoi regions as GeoJSON for use in GIS tools '
@@ -2357,6 +2380,7 @@ def main():
         args.autocorr, args.autocorr_json, args.lisa_svg,
         args.report,
         args.crossval, args.crossval_csv, args.crossval_svg,
+        args.ascii,
     ])
 
     data = None
@@ -2401,6 +2425,16 @@ def main():
                   % (args.datafile, len(data)),
         )
         print('SVG saved to %s' % args.visualize)
+
+    # ASCII terminal visualization
+    if args.ascii:
+        import vormap_ascii
+        vormap_ascii.render(
+            regions, data,
+            width=args.ascii_width,
+            height=args.ascii_height,
+            mono=args.ascii_mono,
+        )
 
     # Interactive HTML visualization
     if args.interactive:
