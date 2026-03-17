@@ -2193,6 +2193,45 @@ def main():
              '(centers, standard distance circle, deviational ellipse).',
     )
 
+    # ── Buffer zone analysis ───────────────────────────────────────
+    parser.add_argument(
+        '--buffers',
+        metavar='RADIUS',
+        type=float,
+        default=None,
+        help='Run buffer zone analysis with the given radius. '
+             'Prints overlap, containment, and coverage statistics.',
+    )
+    parser.add_argument(
+        '--buffers-json',
+        metavar='OUTPUT',
+        help='Export buffer zone analysis as JSON.',
+    )
+    parser.add_argument(
+        '--buffers-csv',
+        metavar='OUTPUT',
+        help='Export buffer zone analysis as CSV.',
+    )
+    parser.add_argument(
+        '--buffers-svg',
+        metavar='OUTPUT',
+        help='Export buffer zone analysis visualization as SVG.',
+    )
+    parser.add_argument(
+        '--buffer-radius',
+        metavar='RADIUS',
+        type=float,
+        default=50.0,
+        help='Buffer radius for --buffers-json/csv/svg (default: 50).',
+    )
+    parser.add_argument(
+        '--buffer-rings',
+        metavar='RADII',
+        default=None,
+        help='Comma-separated radii for multi-ring buffer analysis '
+             '(e.g. 25,50,100).',
+    )
+
     # ── HTML analysis report ────────────────────────────────────────
     parser.add_argument(
         '--report',
@@ -2605,6 +2644,31 @@ def main():
     # ── Convex hull & bounding geometry ──────────────────────────────
     if args.hull or args.hull_json or args.hull_svg:
         _cmd_hull(args, data)
+
+    # ── Buffer zone analysis ──────────────────────────────────────
+    buf_radius = args.buffers if args.buffers else args.buffer_radius
+    buffers_requested = (
+        args.buffers is not None or args.buffers_json
+        or args.buffers_csv or args.buffers_svg
+    )
+    if buffers_requested:
+        import vormap_buffer
+        pts = [(d["x"], d["y"]) for d in data]
+        radii = None
+        if args.buffer_rings:
+            radii = [float(r.strip()) for r in args.buffer_rings.split(",")]
+        br = vormap_buffer.analyze_buffers(pts, radius=buf_radius, radii=radii)
+        if args.buffers is not None:
+            vormap_buffer.print_buffer_report(br)
+        if args.buffers_json:
+            br.to_json(args.buffers_json)
+            print('Buffer analysis JSON saved to %s' % args.buffers_json)
+        if args.buffers_csv:
+            br.to_csv(args.buffers_csv)
+            print('Buffer analysis CSV saved to %s' % args.buffers_csv)
+        if args.buffers_svg:
+            br.to_svg(args.buffers_svg)
+            print('Buffer analysis SVG saved to %s' % args.buffers_svg)
 
 
 if __name__ == '__main__':
