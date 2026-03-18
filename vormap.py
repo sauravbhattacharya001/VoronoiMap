@@ -4,6 +4,11 @@ import math
 import os
 import warnings
 
+# ── Resource limits to prevent denial-of-service via crafted input ───
+# These can be overridden by callers before loading data.
+MAX_INPUT_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+MAX_POINT_COUNT = 10_000_000  # 10 million points
+
 try:
     import numpy as np
     from scipy.spatial import KDTree
@@ -358,6 +363,16 @@ _kdtree_cache = _KDTreeCacheView()
 _kdtree_by_id = _KDTreeByIdView()
 
 
+def _check_point_limit(points, filename="<unknown>"):
+    """Raise if point list exceeds MAX_POINT_COUNT (resource exhaustion guard)."""
+    if len(points) > MAX_POINT_COUNT:
+        raise ValueError(
+            "File '%s' contains %d points, exceeding the %d limit. "
+            "Increase vormap.MAX_POINT_COUNT to override."
+            % (filename, len(points), MAX_POINT_COUNT)
+        )
+
+
 def _detect_format(filepath):
     """Detect file format from extension and content sniffing.
 
@@ -599,6 +614,16 @@ def load_data(filename, auto_bounds=True):
     # Validate path stays inside data/ directory
     resolved = validate_input_path(clean_name, base_dir="data")
 
+    # Guard against oversized files that could exhaust memory (DoS)
+    file_size = os.path.getsize(resolved)
+    if file_size > MAX_INPUT_FILE_SIZE:
+        raise ValueError(
+            "Input file '%s' is %.1f MB, exceeding the %d MB limit. "
+            "Increase vormap.MAX_INPUT_FILE_SIZE to override."
+            % (filename, file_size / (1024 * 1024),
+               MAX_INPUT_FILE_SIZE // (1024 * 1024))
+        )
+
     # Auto-detect format and parse
     fmt = _detect_format(resolved)
     if fmt == 'csv':
@@ -612,6 +637,8 @@ def load_data(filename, auto_bounds=True):
 
     if not points:
         raise ValueError("No valid points found in '%s'" % filename)
+
+    _check_point_limit(points, filename)
 
     # Warn if any points fall outside the current search bounds
     out_of_bounds = [
