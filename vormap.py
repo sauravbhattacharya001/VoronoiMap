@@ -1236,12 +1236,21 @@ def find_a1(data, alng, alat, dlng, dlat, dirn):
 def polygon_area(alng, alat):
     """Calculate polygon area using the Shoelace formula.
 
-    Uses a single zip-based loop to avoid per-iteration index arithmetic,
-    and an ``abs()`` instead of a conditional multiply for the sign flip.
+    When numpy is available, uses vectorized cross-products for O(n)
+    performance with low constant factor.  Falls back to a scalar loop
+    otherwise.
     """
     n = len(alat)
     if n < 2:
         return 0.0
+
+    if _HAS_SCIPY:
+        # numpy is guaranteed available when scipy is
+        x = np.asarray(alng)
+        y = np.asarray(alat)
+        area = np.abs(np.dot(x, np.roll(y, -1)) - np.dot(y, np.roll(x, -1))) * 0.5
+        return round(float(area), 2)
+
     area = alat[-1] * alng[0] - alat[0] * alng[-1]  # closing edge
     for i in range(n - 1):
         area += alat[i] * alng[i + 1] - alat[i + 1] * alng[i]
