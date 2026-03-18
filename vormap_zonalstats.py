@@ -80,22 +80,34 @@ def _point_in_polygon(px, py, vertices):
 def _assign_observations(regions, observations):
     """Assign each observation to the Voronoi zone containing it.
 
-    Uses nearest-seed fallback when the point doesn't fall inside any
-    polygon (can happen with boundary clipping).
+    By definition, a point belongs to the Voronoi region whose seed is
+    nearest.  The previous implementation tested every observation against
+    every polygon via ray-casting — O(n_obs × n_seeds × avg_vertices),
+    which is extremely slow for large datasets.
+
+    This version uses nearest-seed assignment directly:
+    - With scipy: builds a KDTree for O(n_obs × log n_seeds) total.
+    - Without scipy: brute-force nearest-seed in O(n_obs × n_seeds),
+      still much faster than point-in-polygon since it avoids the
+      per-vertex inner loop.
     """
     zone_values = {seed: [] for seed in regions}
     seeds = list(regions.keys())
 
-    for ox, oy, val in observations:
-        assigned = False
-        for seed in seeds:
-            verts = regions[seed]
-            if _point_in_polygon(ox, oy, verts):
-                zone_values[seed].append(val)
-                assigned = True
-                break
-        if not assigned:
-            # Fallback: nearest seed
+    if not seeds or not observations:
+        return zone_values
+
+    try:
+        from scipy.spatial import KDTree as _KDTree
+        seed_array = [(s[0], s[1]) for s in seeds]
+        tree = _KDTree(seed_array)
+        for ox, oy, val in observations:
+            _, idx = tree.query([ox, oy])
+            zone_values[seeds[idx]].append(val)
+    except ImportError:
+        # Brute-force nearest seed — still O(n_obs × n_seeds) but avoids
+        # the expensive per-vertex ray-casting inner loop.
+        for ox, oy, val in observations:
             best_seed = min(seeds, key=lambda s: (s[0] - ox) ** 2 + (s[1] - oy) ** 2)
             zone_values[best_seed].append(val)
 
