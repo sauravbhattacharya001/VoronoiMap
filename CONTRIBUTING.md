@@ -83,6 +83,28 @@ python -m pytest tests/test_vormap_core.py::TestIsect::test_crossing_segments -v
 
 **All tests must pass before submitting a PR.** The CI pipeline runs tests on Python 3.9, 3.11, and 3.12.
 
+## Linting & Static Analysis
+
+VoronoiMap uses [Ruff](https://docs.astral.sh/ruff/) for linting and import sorting. The configuration lives in `pyproject.toml`.
+
+```bash
+# Install ruff (one-time)
+pip install ruff
+
+# Check for lint errors
+ruff check .
+
+# Auto-fix what's safe to fix
+ruff check --fix .
+
+# Check import sorting
+ruff check --select I .
+```
+
+Ruff enforces pycodestyle, pyflakes, bugbear, security (bandit), and import ordering rules. The CI pipeline will check linting on PRs.
+
+**Tip:** Most editors support Ruff as a language server — enable it for real-time feedback as you code.
+
 ## Code Style
 
 ### General Guidelines
@@ -251,6 +273,41 @@ VoronoiMap estimates Voronoi region counts using random point sampling:
 - Global bounds (`IND_S/N/W/E`) are set by `load_data()` with auto-detection
 - `bin_search` always terminates (iteration limit + convergence check)
 - Path traversal protection prevents reading outside `data/`
+
+## Troubleshooting
+
+### Common Issues
+
+**`ModuleNotFoundError: No module named 'scipy'`**
+SciPy is optional. The core algorithm works without it (using brute-force NN), but tests exercise both paths. Install with `pip install -e ".[dev]"`.
+
+**Tests fail with `IND_S`/`IND_N` assertion errors**
+Global bounds are set by `load_data()` and persist across tests. If a test modifies them without restoring, subsequent tests break. Always save and restore globals in your test teardown:
+```python
+def setup_method(self):
+    import vormap as vm
+    self._saved = (vm.IND_S, vm.IND_N, vm.IND_W, vm.IND_E)
+
+def teardown_method(self):
+    import vormap as vm
+    vm.IND_S, vm.IND_N, vm.IND_W, vm.IND_E = self._saved
+```
+
+**`PermissionError` when loading data files**
+Path traversal protection blocks paths containing `..` or absolute paths. Data files must live inside `data/` relative to the working directory.
+
+**Visualization tests produce different output on different platforms**
+Floating-point formatting varies across OS/Python versions. Use `pytest.approx()` for numerical comparisons in viz tests, not string matching on SVG output.
+
+**Docker build fails with GCC errors**
+Some optional C extensions require GCC. On macOS use `xcode-select --install`, on Ubuntu use `apt install build-essential`.
+
+### Debugging Tips
+
+- Run a single test with `-s` to see print output: `pytest tests/test_vormap.py -v -s -k "test_name"`
+- Use `--tb=long` for full tracebacks: `pytest tests/ --tb=long`
+- Set `PYTHONDONTWRITEBYTECODE=1` to avoid stale `.pyc` files during development
+- The `_data_cache` dict can cause test pollution — clear it with `vormap._data_cache.clear()` in test setup
 
 ## License
 
