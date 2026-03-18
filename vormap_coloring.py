@@ -44,6 +44,7 @@ CLI::
 """
 
 import argparse
+import html as _html_mod
 import json
 import math
 import os
@@ -514,7 +515,7 @@ draw();
 </script>
 </body>
 </html>""" % {
-        "title": title,
+        "title": _html_mod.escape(title),
         "num_cells": len(cells_json),
         "num_colors": num_colors,
         "cells_json": json.dumps(cells_json),
