@@ -438,7 +438,7 @@ def _parse_points_csv(filepath):
 
     points = []
     with open(filepath, 'r', newline='') as f:
-        # Sniff the dialect
+        # Sniff the dialect from a sample
         sample = f.read(4096)
         f.seek(0)
 
@@ -448,13 +448,15 @@ def _parse_points_csv(filepath):
             dialect = 'excel'
 
         reader = csv.reader(f, dialect)
-        rows = list(reader)
 
-    if not rows:
-        return points
+        # Read first row to detect headers
+        try:
+            first_row = next(reader)
+        except StopIteration:
+            return points
 
     # Check if first row is a header
-    header = [h.strip().lower() for h in rows[0]]
+    header = [h.strip().lower() for h in first_row]
     x_col, y_col = None, None
 
     for xname, yname in HEADER_PAIRS:
@@ -463,30 +465,42 @@ def _parse_points_csv(filepath):
             y_col = header.index(yname)
             break
 
-    if x_col is not None:
-        data_rows = rows[1:]
-    else:
-        # Try first row as data — use first two columns
-        # Check if first row is numeric
+    # Re-open to stream rows without holding all in memory
+    with open(filepath, 'r', newline='') as f:
         try:
-            float(rows[0][0])
-            float(rows[0][1])
-            data_rows = rows  # no header
-        except (ValueError, IndexError):
-            data_rows = rows[1:]  # skip non-numeric header
-        x_col, y_col = 0, 1
+            dialect2 = csv.Sniffer().sniff(f.read(4096))
+        except csv.Error:
+            dialect2 = 'excel'
+        f.seek(0)
+        reader = csv.reader(f, dialect2)
 
-    for row in data_rows:
-        if len(row) <= max(x_col, y_col):
-            continue
-        try:
-            lng_val = float(row[x_col].strip())
-            lat_val = float(row[y_col].strip())
-        except (ValueError, OverflowError):
-            continue
-        if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
-            continue
-        points.append((lng_val, lat_val))
+        if x_col is not None:
+            next(reader)  # skip header row
+        else:
+            # Check if first row is numeric data
+            try:
+                float(first_row[0])
+                float(first_row[1])
+                # First row is data — don't skip it
+                x_col, y_col = 0, 1
+            except (ValueError, IndexError):
+                next(reader)  # skip non-numeric header
+                x_col, y_col = 0, 1
+
+        if x_col is None:
+            x_col, y_col = 0, 1
+
+        for row in reader:
+            if len(row) <= max(x_col, y_col):
+                continue
+            try:
+                lng_val = float(row[x_col].strip())
+                lat_val = float(row[y_col].strip())
+            except (ValueError, OverflowError):
+                continue
+            if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
+                continue
+            points.append((lng_val, lat_val))
 
     return points
 
@@ -1324,12 +1338,23 @@ def get_sum(FILENAME, N1, _depth=0):
         sum_estimates = 0.0
         valid_count = 0
 
+        # Cache find_area results keyed by data point — random samples
+        # often map to the same nearest neighbor, and find_area is the
+        # most expensive call (traces the full Voronoi region boundary).
+        # This avoids redundant O(k) boundary traces for duplicate hits.
+        _area_cache = {}
+
         for i in range(N1):
             plng = random.uniform(IND_W, IND_E)
             plat = random.uniform(IND_S, IND_N)
             dlng, dlat = get_NN(data, plng, plat)
 
-            area, v_edges = find_area(data, dlng, dlat)
+            cache_key = (dlng, dlat)
+            if cache_key in _area_cache:
+                area, v_edges = _area_cache[cache_key]
+            else:
+                area, v_edges = find_area(data, dlng, dlat)
+                _area_cache[cache_key] = (area, v_edges)
 
             if area > 0:
                 sum_estimates += total_area / area
