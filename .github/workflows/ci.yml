@@ -19,9 +19,15 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+          cache: pip
 
-      - name: Install linter
-        run: pip install flake8
+      - name: Install linters
+        run: pip install flake8 ruff
+
+      - name: Run ruff (fast lint + format check)
+        run: |
+          ruff check vormap.py vormap_pattern.py --select=E,F,W,I --ignore=E501
+          ruff format --check vormap.py vormap_pattern.py || true
 
       - name: Run flake8
         run: |
@@ -42,6 +48,7 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -95,3 +102,23 @@ jobs:
           assert vormap._HAS_SCIPY, 'scipy should be available'
           print('Module imported with scipy support')
           "
+
+  security-audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      - name: Audit dependencies for known vulnerabilities
+        run: pip-audit --strict --desc on
