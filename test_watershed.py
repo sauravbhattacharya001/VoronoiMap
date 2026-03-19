@@ -398,5 +398,93 @@ class TestMultipleBasins(unittest.TestCase):
         self.assertEqual(len(basin_ids), 2)
 
 
+class TestExportSVG(unittest.TestCase):
+    """Tests for export_watershed_svg."""
+
+    def _simple_result(self):
+        polys = [
+            [(0, 0), (50, 0), (50, 50), (0, 50)],
+            [(50, 0), (100, 0), (100, 50), (50, 50)],
+        ]
+        stats = _make_stats(polys)
+        data = {"bounds": (0, 100, 0, 50)}
+        return watershed_analysis(stats), stats, data
+
+    def test_svg_is_valid_xml(self):
+        from vormap_watershed import export_watershed_svg
+        result, stats, data = self._simple_result()
+        path = "test_ws_output.svg"
+        try:
+            export_watershed_svg(result, stats, data, path)
+            with open(path) as f:
+                content = f.read()
+            self.assertIn("<svg", content)
+            self.assertIn("</svg>", content)
+        finally:
+            if os.path.exists(path):
+                os.unlink(path)
+
+    def test_svg_contains_basins(self):
+        from vormap_watershed import export_watershed_svg
+        result, stats, data = self._simple_result()
+        path = "test_ws_polygons.svg"
+        try:
+            export_watershed_svg(result, stats, data, path)
+            with open(path) as f:
+                content = f.read()
+            self.assertIn("<polygon", content)
+        finally:
+            if os.path.exists(path):
+                os.unlink(path)
+
+    def test_svg_returns_path(self):
+        from vormap_watershed import export_watershed_svg
+        result, stats, data = self._simple_result()
+        path = "test_ws_retval.svg"
+        try:
+            out = export_watershed_svg(result, stats, data, path)
+            self.assertEqual(out, path)
+        finally:
+            if os.path.exists(path):
+                os.unlink(path)
+
+
+class TestGetElevation(unittest.TestCase):
+    """Tests for _get_elevation helper."""
+
+    def test_default_uses_area(self):
+        from vormap_watershed import _get_elevation
+        stat = {"polygon": [(0,0),(10,0),(10,10),(0,10)]}
+        # area of 10x10 square = 100
+        self.assertAlmostEqual(_get_elevation(stat, "area"), 100.0)
+
+    def test_missing_attribute_falls_back_to_area(self):
+        from vormap_watershed import _get_elevation
+        stat = {"area": 10.0, "polygon": [(0,0),(1,0),(1,1),(0,1)]}
+        # Non-existent attribute should fall back
+        elev = _get_elevation(stat, "nonexistent")
+        self.assertIsInstance(elev, float)
+
+    def test_custom_attribute(self):
+        from vormap_watershed import _get_elevation
+        stat = {"area": 10.0, "density": 99.5, "polygon": [(0,0),(1,0),(1,1),(0,1)]}
+        self.assertAlmostEqual(_get_elevation(stat, "density"), 99.5)
+
+
+class TestCLI(unittest.TestCase):
+    """Tests for the main() CLI entry point."""
+
+    def test_help_flag(self):
+        from vormap_watershed import main
+        with self.assertRaises(SystemExit) as ctx:
+            main(["--help"])
+        self.assertEqual(ctx.exception.code, 0)
+
+    def test_missing_data_file(self):
+        from vormap_watershed import main
+        with self.assertRaises((FileNotFoundError, SystemExit)):
+            main(["nonexistent_ws_test_12345.json"])
+
+
 if __name__ == "__main__":
     unittest.main()
