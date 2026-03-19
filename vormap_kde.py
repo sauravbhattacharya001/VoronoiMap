@@ -310,11 +310,14 @@ def kde_grid(
     inv_n = 1.0 / n
     coeff = 1.0 / (2.0 * math.pi * h_sq)
 
+    # Pre-compute x-coordinates to avoid repeated division in the inner loop.
+    x_coords = [x_min + col * (x_max - x_min) / (nx - 1) for col in range(nx)]
+
     for row in range(ny):
         y = y_min + row * (y_max - y_min) / (ny - 1)
         row_vals = []
         for col in range(nx):
-            x = x_min + col * (x_max - x_min) / (nx - 1)
+            x = x_coords[col]
             total = 0.0
             src = bins.neighbours(x, y) if use_bins else points
             for px, py in src:
@@ -417,7 +420,12 @@ def find_hotspots(
 # -- Density contours ---------------------------------------------------
 
 def density_contours(grid: KDEGrid, levels: int = 5) -> list[DensityContour]:
-    """Extract iso-density contour levels from the KDE grid."""
+    """Extract iso-density contour levels from the KDE grid.
+
+    Uses a single pass over the grid to classify each cell into all
+    applicable contour levels, replacing the previous O(levels × nx × ny)
+    approach with O(nx × ny + levels).
+    """
     if levels < 1:
         raise ValueError("levels must be at least 1")
 
@@ -426,18 +434,37 @@ def density_contours(grid: KDEGrid, levels: int = 5) -> list[DensityContour]:
         return []
 
     total_cells = grid.nx * grid.ny
+
+    # Pre-compute level thresholds.
+    level_vals = [
+        grid.density_min + d_range * i / levels
+        for i in range(1, levels + 1)
+    ]
+
+    # Single pass: for each cell, determine the highest level it meets
+    # and add it to that level and all lower levels.  We accumulate cell
+    # lists per level, then build contours.
+    level_cells: list[list[tuple[int, int]]] = [[] for _ in range(levels)]
+
+    for r in range(grid.ny):
+        row = grid.values[r]
+        for c in range(grid.nx):
+            val = row[c]
+            # level_vals is ascending; the cell meets level li if
+            # val >= level_vals[li].  Once val < a threshold, it
+            # won't meet any higher threshold either.
+            for li in range(levels - 1, -1, -1):
+                if val >= level_vals[li]:
+                    # Cell meets this level and all levels below it.
+                    for lj in range(li + 1):
+                        level_cells[lj].append((r, c))
+                    break
+
     contours = []
-
-    for i in range(1, levels + 1):
-        level_val = grid.density_min + d_range * i / levels
-        cells = []
-        for r in range(grid.ny):
-            for c in range(grid.nx):
-                if grid.values[r][c] >= level_val:
-                    cells.append((r, c))
-
+    for li in range(levels):
+        cells = level_cells[li]
         contours.append(DensityContour(
-            level=level_val, cells=cells,
+            level=level_vals[li], cells=cells,
             area_fraction=len(cells) / total_cells if total_cells > 0 else 0.0,
         ))
 
