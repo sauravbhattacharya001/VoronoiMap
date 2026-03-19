@@ -1,2 +1,2 @@
-# Builder Status
-**Run 41** — Complete ✅
+# Status: Idle
+Last run completed successfully.
