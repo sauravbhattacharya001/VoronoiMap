@@ -34,6 +34,12 @@ import sys
 
 import vormap
 
+try:
+    import scipy  # noqa: F401
+    _HAS_SCIPY = True
+except ImportError:
+    _HAS_SCIPY = False
+
 
 # ── Generators ───────────────────────────────────────────────────────
 
@@ -426,15 +432,56 @@ def pattern_summary(points, pattern_name="unknown"):
     # Nearest-neighbor index (Clark-Evans R)
     n = len(points)
     if n > 1:
-        nn_dists = []
-        for i, (px, py) in enumerate(points):
-            min_d = float("inf")
-            for j, (qx, qy) in enumerate(points):
-                if i != j:
-                    d = math.sqrt((px - qx) ** 2 + (py - qy) ** 2)
-                    if d < min_d:
-                        min_d = d
-            nn_dists.append(min_d)
+        if _HAS_SCIPY:
+            # O(n log n) using scipy KDTree
+            from scipy.spatial import cKDTree
+            tree = cKDTree(points)
+            dists, _ = tree.query(points, k=2)  # k=2: self + nearest
+            nn_dists = dists[:, 1].tolist()
+        else:
+            # Fallback: grid-accelerated nearest-neighbor search.
+            # Partition points into cells of adaptive size to achieve
+            # ~O(n) expected time instead of brute-force O(n²).
+            _xs = [p[0] for p in points]
+            _ys = [p[1] for p in points]
+            _grid_size = max(1, int(math.sqrt(n)))
+            _x_min, _x_max = min(_xs), max(_xs)
+            _y_min, _y_max = min(_ys), max(_ys)
+            _cell_w = (_x_max - _x_min) / _grid_size if _x_max > _x_min else 1.0
+            _cell_h = (_y_max - _y_min) / _grid_size if _y_max > _y_min else 1.0
+
+            _grid = {}
+            for idx, (px, py) in enumerate(points):
+                ci = min(int((px - _x_min) / _cell_w), _grid_size - 1)
+                cj = min(int((py - _y_min) / _cell_h), _grid_size - 1)
+                _grid.setdefault((ci, cj), []).append(idx)
+
+            nn_dists = []
+            for i, (px, py) in enumerate(points):
+                ci = min(int((px - _x_min) / _cell_w), _grid_size - 1)
+                cj = min(int((py - _y_min) / _cell_h), _grid_size - 1)
+                min_d = float("inf")
+                # Search expanding rings of neighboring cells
+                for ring in range(max(_grid_size, _grid_size) + 1):
+                    if ring > 1 and min_d < (ring - 1) * min(_cell_w, _cell_h):
+                        break  # Can't find closer point in further cells
+                    for di in range(-ring, ring + 1):
+                        for dj in range(-ring, ring + 1):
+                            if max(abs(di), abs(dj)) != ring and ring > 0:
+                                continue  # Only check the new ring
+                            cell = _grid.get((ci + di, cj + dj))
+                            if cell:
+                                for j in cell:
+                                    if j != i:
+                                        d = math.sqrt((px - points[j][0]) ** 2 + (py - points[j][1]) ** 2)
+                                        if d < min_d:
+                                            min_d = d
+                    if min_d < float("inf") and ring >= 1:
+                        # Check if we can prune: nearest found is closer
+                        # than any point in further rings
+                        if min_d <= ring * min(_cell_w, _cell_h):
+                            break
+                nn_dists.append(min_d)
         mean_nn = sum(nn_dists) / n
         area = spread_x * spread_y if spread_x * spread_y > 0 else 1.0
         expected_nn = 0.5 * math.sqrt(area / n)
