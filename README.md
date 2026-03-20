@@ -8,6 +8,7 @@
     <a href="https://pepy.tech/project/voronoimap"><img src="https://img.shields.io/pepy/dt/voronoimap?color=blue&logo=pypi&logoColor=white" alt="PyPI Downloads"></a>
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/ci.yml"><img src="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/docker.yml"><img src="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/docker.yml/badge.svg" alt="Docker"></a>
+    <a href="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/codeql.yml"><img src="https://github.com/sauravbhattacharya001/VoronoiMap/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
     <a href="https://codecov.io/gh/sauravbhattacharya001/VoronoiMap"><img src="https://codecov.io/gh/sauravbhattacharya001/VoronoiMap/graph/badge.svg" alt="codecov"></a>
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/releases/latest"><img src="https://img.shields.io/github/v/release/sauravbhattacharya001/VoronoiMap?logo=github&color=green" alt="GitHub Release"></a>
     <a href="LICENSE"><img src="https://img.shields.io/github/license/sauravbhattacharya001/VoronoiMap?color=blue" alt="License"></a>
@@ -16,6 +17,9 @@
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/pkgs/container/voronoimap"><img src="https://img.shields.io/badge/ghcr.io-container-blue?logo=docker&logoColor=white" alt="GHCR"></a>
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/stargazers"><img src="https://img.shields.io/github/stars/sauravbhattacharya001/VoronoiMap?style=flat&logo=github" alt="Stars"></a>
     <img src="https://img.shields.io/github/repo-size/sauravbhattacharya001/VoronoiMap" alt="Repo size">
+    <a href="https://github.com/sauravbhattacharya001/VoronoiMap/commits/main"><img src="https://img.shields.io/github/last-commit/sauravbhattacharya001/VoronoiMap" alt="Last commit"></a>
+    <img src="https://img.shields.io/badge/maintained-yes-brightgreen" alt="Maintained">
+    <a href="https://github.com/sauravbhattacharya001/VoronoiMap/network/dependents"><img src="https://img.shields.io/librariesio/dependents/pypi/voronoimap" alt="Dependents"></a>
   </p>
 </p>
 
