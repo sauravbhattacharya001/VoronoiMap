@@ -2367,6 +2367,31 @@ def main():
              'the generated pattern.',
     )
 
+    # ── Circle packing arguments ─────────────────────────────────────
+    parser.add_argument(
+        '--circlepack',
+        metavar='OUTPUT',
+        help='Export a circle packing SVG — largest inscribed circles '
+             'per Voronoi cell with efficiency heatmap.',
+    )
+    parser.add_argument(
+        '--circlepack-html',
+        metavar='OUTPUT',
+        help='Export an interactive HTML circle packing visualization '
+             'with hover tooltips and packing statistics.',
+    )
+    parser.add_argument(
+        '--circlepack-fill',
+        default='heatmap',
+        choices=['heatmap', 'pastel', 'solid'],
+        help='Fill mode for circle packing SVG (default: heatmap).',
+    )
+    parser.add_argument(
+        '--circlepack-stats',
+        action='store_true',
+        help='Print circle packing efficiency statistics to stdout.',
+    )
+
     args = parser.parse_args()
 
     # ── Handle --generate before normal flow ─────────────────────────
@@ -2405,6 +2430,7 @@ def main():
         args.report,
         args.crossval, args.crossval_csv, args.crossval_svg,
         args.ascii,
+        args.circlepack, args.circlepack_html, args.circlepack_stats,
     ])
 
     data = None
@@ -2727,6 +2753,29 @@ def main():
         if args.buffers_svg:
             br.to_svg(args.buffers_svg)
             print('Buffer analysis SVG saved to %s' % args.buffers_svg)
+
+    # ── Circle packing ───────────────────────────────────────────────
+    if args.circlepack or args.circlepack_html or args.circlepack_stats:
+        import vormap_circlepack
+        packing = vormap_circlepack.circle_pack(regions)
+        if args.circlepack_stats or (not args.circlepack and not args.circlepack_html):
+            stats = vormap_circlepack.packing_stats(packing)
+            print('Circle Packing Statistics')
+            print('=' * 35)
+            print('  Cells:            %d' % stats['total_cells'])
+            print('  Mean Efficiency:  %.1f%%' % (stats.get('mean_efficiency', 0) * 100))
+            print('  Min Efficiency:   %.1f%%' % (stats.get('min_efficiency', 0) * 100))
+            print('  Max Efficiency:   %.1f%%' % (stats.get('max_efficiency', 0) * 100))
+            print('  Overall:          %.1f%%' % (stats.get('overall_efficiency', 0) * 100))
+        if args.circlepack:
+            vormap_circlepack.export_svg(
+                packing, regions, data, args.circlepack,
+                fill_mode=args.circlepack_fill,
+            )
+            print('Circle packing SVG saved to %s' % args.circlepack)
+        if args.circlepack_html:
+            vormap_circlepack.export_html(packing, regions, data, args.circlepack_html)
+            print('Circle packing HTML saved to %s' % args.circlepack_html)
 
 
 if __name__ == '__main__':
