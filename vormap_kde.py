@@ -228,6 +228,9 @@ def kde_at_point(
 
     h_sq = bandwidth * bandwidth
     cutoff_sq = (4.0 * bandwidth) ** 2
+    _exp = math.exp
+    neg_half_inv_h_sq = -0.5 / h_sq
+    coeff = 1.0 / (2.0 * math.pi * h_sq)
 
     total = 0.0
     for px, py in points:
@@ -235,9 +238,9 @@ def kde_at_point(
         dy = qy - py
         d_sq = dx * dx + dy * dy
         if d_sq <= cutoff_sq:
-            total += gaussian_kernel(d_sq, h_sq)
+            total += _exp(d_sq * neg_half_inv_h_sq)
 
-    return total / n
+    return total * coeff / n
 
 
 def kde_grid(
@@ -313,25 +316,50 @@ def kde_grid(
     # Pre-compute x-coordinates to avoid repeated division in the inner loop.
     x_coords = [x_min + col * (x_max - x_min) / (nx - 1) for col in range(nx)]
 
+    # Hoist frequently-called functions to local variables — in CPython,
+    # local name lookups (LOAD_FAST) are ~40% faster than attribute
+    # lookups (LOAD_ATTR) and global lookups (LOAD_GLOBAL).  In the
+    # tight nx*ny*k inner loop this is a measurable win.
+    _exp = math.exp
+    _neg_half_inv_h_sq = -0.5 / h_sq
+    _get_neighbours = bins.neighbours if use_bins else None
+    _y_step = (y_max - y_min) / (ny - 1)
+
     for row in range(ny):
-        y = y_min + row * (y_max - y_min) / (ny - 1)
+        y = y_min + row * _y_step
         row_vals = []
-        for col in range(nx):
-            x = x_coords[col]
-            total = 0.0
-            src = bins.neighbours(x, y) if use_bins else points
-            for px, py in src:
-                dx = x - px
-                dy = y - py
-                d_sq = dx * dx + dy * dy
-                if d_sq <= cutoff_sq:
-                    total += math.exp(-0.5 * d_sq / h_sq)
-            d = total * coeff * inv_n
-            row_vals.append(d)
-            if d < d_min:
-                d_min = d
-            if d > d_max:
-                d_max = d
+        if _get_neighbours is not None:
+            for col in range(nx):
+                x = x_coords[col]
+                total = 0.0
+                for px, py in _get_neighbours(x, y):
+                    dx = x - px
+                    dy = y - py
+                    d_sq = dx * dx + dy * dy
+                    if d_sq <= cutoff_sq:
+                        total += _exp(d_sq * _neg_half_inv_h_sq)
+                d = total * coeff * inv_n
+                row_vals.append(d)
+                if d < d_min:
+                    d_min = d
+                if d > d_max:
+                    d_max = d
+        else:
+            for col in range(nx):
+                x = x_coords[col]
+                total = 0.0
+                for px, py in points:
+                    dx = x - px
+                    dy = y - py
+                    d_sq = dx * dx + dy * dy
+                    if d_sq <= cutoff_sq:
+                        total += _exp(d_sq * _neg_half_inv_h_sq)
+                d = total * coeff * inv_n
+                row_vals.append(d)
+                if d < d_min:
+                    d_min = d
+                if d > d_max:
+                    d_max = d
         values.append(row_vals)
 
     return KDEGrid(
