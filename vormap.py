@@ -1316,10 +1316,43 @@ def get_sum(FILENAME, N1, _depth=0):
         # This avoids redundant O(k) boundary traces for duplicate hits.
         _area_cache = {}
 
+        # --- Batch nearest-neighbor lookup when scipy is available ---
+        # Querying the KDTree with all N1 points at once is ~10-50x faster
+        # than N1 individual Python-level calls due to numpy vectorisation
+        # and reduced interpreter overhead.
+        if _HAS_SCIPY:
+            tree = _tree_by_data_id.get(id(data))
+            if tree is None:
+                for entry in _file_cache.values():
+                    if entry['points'] is data:
+                        tree = entry['tree']
+                        break
+            if tree is not None:
+                sample_pts = np.column_stack([
+                    np.random.uniform(IND_W, IND_E, N1),
+                    np.random.uniform(IND_S, IND_N, N1),
+                ])
+                dists, idxs = tree.query(sample_pts, k=2)
+                # Pick the first neighbor with dist > 0 (skip self-matches)
+                nn_coords = []
+                for j in range(N1):
+                    if dists[j, 0] > 0:
+                        nn_coords.append(data[idxs[j, 0]])
+                    else:
+                        nn_coords.append(data[idxs[j, 1]])
+                Oracle.calls += N1
+            else:
+                nn_coords = None  # fall back to per-point loop
+        else:
+            nn_coords = None
+
         for i in range(N1):
-            plng = random.uniform(IND_W, IND_E)
-            plat = random.uniform(IND_S, IND_N)
-            dlng, dlat = get_NN(data, plng, plat)
+            if nn_coords is not None:
+                dlng, dlat = nn_coords[i]
+            else:
+                plng = random.uniform(IND_W, IND_E)
+                plat = random.uniform(IND_S, IND_N)
+                dlng, dlat = get_NN(data, plng, plat)
 
             cache_key = (dlng, dlat)
             if cache_key in _area_cache:
