@@ -934,37 +934,73 @@ def isect_B(alng, alat, dirn):
     yr = dirn * (IND_E - alng) + alat       # right edge (x = IND_E)
     yl = dirn * (IND_W - alng) + alat       # left edge (x = IND_W)
 
-    # Collect points that actually lie on the boundary, deduplicating
-    # corners where two edges share a vertex (e.g. (IND_W, IND_N) is
-    # on both the top and left edges).  Without dedup, corner-passing
-    # lines produce 6+ values → RuntimeError.  (Fixes #42)
-    candidates = []
+    # Collect boundary intersection points.  Most lines hit exactly two
+    # edges (the common case).  We avoid list/set allocation in that path
+    # and only fall back to deduplication when 3+ candidates exist (corner
+    # cases where a line passes through a boundary vertex).
+    n_hits = 0
+    # Pre-declare slots to avoid repeated list appends
+    h0x = h0y = h1x = h1y = h2x = h2y = h3x = h3y = 0.0
     if IND_W <= xt <= IND_E:
-        candidates.append((xt, IND_N))
+        h0x, h0y = xt, IND_N
+        n_hits = 1
     if IND_W <= xb <= IND_E:
-        candidates.append((xb, IND_S))
+        if n_hits == 0:
+            h0x, h0y = xb, IND_S
+        elif n_hits == 1:
+            h1x, h1y = xb, IND_S
+        elif n_hits == 2:
+            h2x, h2y = xb, IND_S
+        else:
+            h3x, h3y = xb, IND_S
+        n_hits += 1
     if IND_S <= yl <= IND_N:
-        candidates.append((IND_W, yl))
+        if n_hits == 0:
+            h0x, h0y = IND_W, yl
+        elif n_hits == 1:
+            h1x, h1y = IND_W, yl
+        elif n_hits == 2:
+            h2x, h2y = IND_W, yl
+        else:
+            h3x, h3y = IND_W, yl
+        n_hits += 1
     if IND_S <= yr <= IND_N:
-        candidates.append((IND_E, yr))
+        if n_hits == 0:
+            h0x, h0y = IND_E, yr
+        elif n_hits == 1:
+            h1x, h1y = IND_E, yr
+        elif n_hits == 2:
+            h2x, h2y = IND_E, yr
+        else:
+            h3x, h3y = IND_E, yr
+        n_hits += 1
 
-    # Deduplicate: two boundary edges can share a corner point
-    seen = set()
-    ret = []
-    for pt in candidates:
-        # Round to avoid floating-point near-duplicates at corners
-        key = (round(pt[0], 10), round(pt[1], 10))
-        if key not in seen:
-            seen.add(key)
-            ret.extend(pt)
+    # Fast path: exactly 2 hits (most common) — no dedup needed
+    if n_hits == 2:
+        return [h0x, h0y, h1x, h1y]
 
-    if len(ret) == 4:
-        return ret
+    # 1 hit: tangent to corner — duplicate
+    if n_hits == 1:
+        return [h0x, h0y, h0x, h0y]
 
-    # Single intersection (tangent to corner): duplicate it so callers
-    # get the expected 4-element format
-    if len(ret) == 2:
-        return ret + ret
+    # 3+ hits: corner-passing line needs deduplication (rare)
+    if n_hits >= 3:
+        candidates = [(h0x, h0y), (h1x, h1y)]
+        if n_hits >= 3:
+            candidates.append((h2x, h2y))
+        if n_hits >= 4:
+            candidates.append((h3x, h3y))
+        seen = set()
+        ret = []
+        for pt in candidates:
+            key = (round(pt[0], 10), round(pt[1], 10))
+            if key not in seen:
+                seen.add(key)
+                ret.extend(pt)
+        if len(ret) == 4:
+            return ret
+        if len(ret) == 2:
+            return ret + ret
 
     raise RuntimeError(
         "Line from (%s, %s) with slope %s does not intersect search "
@@ -1008,6 +1044,7 @@ def eudist_pts(p1, p2):
 
 
 BIN_SEARCH_MAX_ITER = 100  # ~2^100 precision, far beyond float64 range
+_BIN_PREC_SQ = BIN_PREC * BIN_PREC  # Pre-squared for convergence check
 
 
 def bin_search(data, x1, y1, x2, y2, dlng, dlat):
@@ -1032,7 +1069,7 @@ def bin_search(data, x1, y1, x2, y2, dlng, dlat):
     ym = -1
 
     for _ in range(BIN_SEARCH_MAX_ITER):
-        if eudist(x1, y1, x2, y2) <= BIN_PREC:
+        if eudist_sq(x1, y1, x2, y2) <= _BIN_PREC_SQ:
             break
 
         xm = float(x1 + x2) / 2
