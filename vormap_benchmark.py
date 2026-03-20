@@ -26,6 +26,7 @@ import math
 import os
 import random
 import sys
+import tempfile
 import time
 
 import vormap
@@ -225,38 +226,41 @@ def run_benchmark(sizes=None, trials=3, seed=42, verbose=False,
     timings = []
     bounds = (0.0, 1000.0, 0.0, 2000.0)
     rng = random.Random(seed)
-    tmpdir = os.path.dirname(os.path.abspath(__file__))
 
     import platform
     py_version = platform.python_version()
 
     overall_start = time.perf_counter()
 
-    for size in sizes:
-        if verbose:
-            print("Benchmarking %d points..." % size, file=sys.stderr)
+    # Use a secure temporary directory for benchmark data files instead
+    # of writing to the source directory (predictable filenames in shared
+    # locations are a symlink/TOCTOU risk).
+    with tempfile.TemporaryDirectory(prefix="vormap_bench_") as tmpdir:
+        for size in sizes:
+            if verbose:
+                print("Benchmarking %d points..." % size, file=sys.stderr)
 
-        data = _generate_points(size, bounds=bounds, seed=seed + size)
+            data = _generate_points(size, bounds=bounds, seed=seed + size)
 
-        # 1. Bounds detection
-        bt = _bench_bounds_detection(data, trials)
-        timings.append(OperationTiming("compute_bounds", size, bt))
+            # 1. Bounds detection
+            bt = _bench_bounds_detection(data, trials)
+            timings.append(OperationTiming("compute_bounds", size, bt))
 
-        # 2. Nearest-neighbor lookup
-        nn_trials = max(trials, 10)  # NN is fast, use more trials
-        nnt = _bench_nearest_neighbor(data, bounds, rng, nn_trials)
-        timings.append(OperationTiming("nearest_neighbor", size, nnt))
+            # 2. Nearest-neighbor lookup
+            nn_trials = max(trials, 10)  # NN is fast, use more trials
+            nnt = _bench_nearest_neighbor(data, bounds, rng, nn_trials)
+            timings.append(OperationTiming("nearest_neighbor", size, nnt))
 
-        # 3. Voronoi area (per-region)
-        area_trials = min(trials, size)
-        at = _bench_voronoi_area(data, bounds, area_trials)
-        timings.append(OperationTiming("voronoi_area", size, at))
+            # 3. Voronoi area (per-region)
+            area_trials = min(trials, size)
+            at = _bench_voronoi_area(data, bounds, area_trials)
+            timings.append(OperationTiming("voronoi_area", size, at))
 
-        # 4. EstimateSUM (expensive — optional)
-        if not skip_estimate and size <= 500:
-            est_trials = min(trials, 2)
-            et = _bench_estimate_sum(data, bounds, est_trials, tmpdir)
-            timings.append(OperationTiming("estimate_sum", size, et))
+            # 4. EstimateSUM (expensive — optional)
+            if not skip_estimate and size <= 500:
+                est_trials = min(trials, 2)
+                et = _bench_estimate_sum(data, bounds, est_trials, tmpdir)
+                timings.append(OperationTiming("estimate_sum", size, et))
 
     total = time.perf_counter() - overall_start
 
