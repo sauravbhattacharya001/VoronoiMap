@@ -115,6 +115,79 @@ class ConvexHullResult:
         }
 
 
+def _rotating_calipers_diameter(
+    hull: List[Tuple[float, float]],
+) -> Tuple[float, Tuple[Tuple[float, float], Tuple[float, float]]]:
+    """Compute the diameter (farthest pair) of a convex polygon in O(n).
+
+    Uses the rotating calipers technique: two parallel support lines
+    sweep around the polygon, and the farthest pair must be an
+    antipodal pair encountered during the sweep.
+
+    Parameters
+    ----------
+    hull : list of (float, float)
+        Convex hull vertices in CCW order.
+
+    Returns
+    -------
+    (diameter, (point_a, point_b))
+    """
+    n = len(hull)
+    if n <= 1:
+        p = hull[0] if hull else (0.0, 0.0)
+        return (0.0, (p, p))
+    if n == 2:
+        d = _dist(hull[0], hull[1])
+        return (d, (hull[0], hull[1]))
+
+    # Find the vertex farthest from the edge (hull[0], hull[1]) to
+    # initialise the antipodal index.
+    j = 1
+    while True:
+        nj = (j + 1) % n
+        # Cross product of edge (i, i+1) with vector to j+1
+        # determines which side; we advance j while the "next"
+        # vertex is farther from the current edge.
+        cross_val = (
+            (hull[1][0] - hull[0][0]) * (hull[nj][1] - hull[j][1])
+            - (hull[1][1] - hull[0][1]) * (hull[nj][0] - hull[j][0])
+        )
+        if cross_val <= 0:
+            break
+        j = nj
+
+    best_dist = 0.0
+    best_pair = (hull[0], hull[0])
+    q = j  # antipodal vertex
+
+    for i in range(n):
+        ni = (i + 1) % n
+        d = _dist(hull[i], hull[q])
+        if d > best_dist:
+            best_dist = d
+            best_pair = (hull[i], hull[q])
+
+        # Advance q while the next edge rotates past the current edge
+        while True:
+            nq = (q + 1) % n
+            # Compare cross products to decide whether to advance q
+            edge_x = hull[ni][0] - hull[i][0]
+            edge_y = hull[ni][1] - hull[i][1]
+            diag_x = hull[nq][0] - hull[q][0]
+            diag_y = hull[nq][1] - hull[q][1]
+            cross_val = edge_x * diag_y - edge_y * diag_x
+            if cross_val <= 0:
+                break
+            q = nq
+            d = _dist(hull[i], hull[q])
+            if d > best_dist:
+                best_dist = d
+                best_pair = (hull[i], hull[q])
+
+    return (best_dist, best_pair)
+
+
 def convex_hull(points: List[Tuple[float, float]]) -> ConvexHullResult:
     """Compute the convex hull of a 2D point set.
 
@@ -184,17 +257,8 @@ def convex_hull(points: List[Tuple[float, float]]) -> ConvexHullResult:
     if perimeter > 0:
         compactness = 4.0 * math.pi * area / (perimeter ** 2)
 
-    # Diameter: farthest pair (rotating calipers for large hulls,
-    # brute force is fine for typical point sets)
-    diameter = 0.0
-    dp = (hull[0], hull[0])
-    nh = len(hull)
-    for i in range(nh):
-        for j in range(i + 1, nh):
-            d = _dist(hull[i], hull[j])
-            if d > diameter:
-                diameter = d
-                dp = (hull[i], hull[j])
+    # Diameter: farthest pair via rotating calipers — O(n) after hull
+    diameter, dp = _rotating_calipers_diameter(hull)
 
     return ConvexHullResult(
         vertices=hull,
