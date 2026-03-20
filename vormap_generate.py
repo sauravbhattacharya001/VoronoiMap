@@ -426,16 +426,28 @@ def pattern_summary(points, pattern_name="unknown"):
     # Nearest-neighbor index (Clark-Evans R)
     n = len(points)
     if n > 1:
-        nn_dists = []
-        for i, (px, py) in enumerate(points):
-            min_d = float("inf")
-            for j, (qx, qy) in enumerate(points):
-                if i != j:
-                    d = math.sqrt((px - qx) ** 2 + (py - qy) ** 2)
-                    if d < min_d:
-                        min_d = d
-            nn_dists.append(min_d)
-        mean_nn = sum(nn_dists) / n
+        if vormap._HAS_SCIPY:
+            # O(n log n) using KDTree — handles large patterns efficiently
+            import numpy as np
+            from scipy.spatial import KDTree
+            arr = np.array(points)
+            tree = KDTree(arr)
+            # k=2 because the closest neighbour at k=1 is the point itself
+            dists, _ = tree.query(arr, k=2)
+            nn_dists = dists[:, 1]
+            mean_nn = float(np.mean(nn_dists))
+        else:
+            # Fallback O(n²) brute-force when scipy is unavailable
+            nn_dists = []
+            for i, (px, py) in enumerate(points):
+                min_d = float("inf")
+                for j, (qx, qy) in enumerate(points):
+                    if i != j:
+                        d = math.sqrt((px - qx) ** 2 + (py - qy) ** 2)
+                        if d < min_d:
+                            min_d = d
+                nn_dists.append(min_d)
+            mean_nn = sum(nn_dists) / n
         area = spread_x * spread_y if spread_x * spread_y > 0 else 1.0
         expected_nn = 0.5 * math.sqrt(area / n)
         nni = mean_nn / expected_nn if expected_nn > 0 else 0
