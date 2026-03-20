@@ -1638,6 +1638,285 @@ def _cmd_hull(args, data):
         print('Hull SVG saved to %s' % args.hull_svg)
 
 
+def _cmd_visualize(args, regions, data):
+    """Handle --visualize, --ascii, --interactive: render Voronoi diagrams."""
+    if args.visualize:
+        import vormap_viz
+        vormap_viz.export_svg(
+            regions, data, args.visualize,
+            width=args.svg_width, height=args.svg_height,
+            color_scheme=args.color_scheme, show_labels=args.show_labels,
+            title='Voronoi Diagram — %s (%d points)' % (args.datafile, len(data)),
+        )
+        print('SVG saved to %s' % args.visualize)
+
+    if args.ascii:
+        import vormap_ascii
+        vormap_ascii.render(
+            regions, data,
+            width=args.ascii_width, height=args.ascii_height,
+            mono=args.ascii_mono,
+        )
+
+    if args.interactive:
+        import vormap_viz
+        vormap_viz.export_html(
+            regions, data, args.interactive,
+            width=args.svg_width, height=args.svg_height,
+            color_scheme=args.color_scheme,
+            title='Voronoi Diagram — %s (%d points)' % (args.datafile, len(data)),
+        )
+        print('Interactive HTML saved to %s' % args.interactive)
+
+
+def _cmd_export_geo(args, regions, data):
+    """Handle --geojson and --kml exports."""
+    if args.geojson:
+        import vormap_viz
+        vormap_viz.export_geojson(
+            regions, data, args.geojson,
+            include_seeds=not args.no_seeds, crs_name=args.crs,
+        )
+        print('GeoJSON saved to %s' % args.geojson)
+
+    if args.kml:
+        import vormap_kml
+        vormap_kml.export_kml(
+            regions, data, args.kml,
+            include_seeds=not args.no_seeds,
+            color_scheme=args.color_scheme,
+        )
+        print('KML saved to %s' % args.kml)
+
+
+def _cmd_relax_animate(args, data):
+    """Handle --relax-animate: Lloyd relaxation animation."""
+    if not args.relax_animate:
+        return
+    import vormap_viz
+    original_data = load_data(args.datafile)
+    iters = args.relax if args.relax else 10
+    print('Generating relaxation animation (%d iterations)...' % iters)
+    vormap_viz.export_relaxation_html(
+        original_data, iterations=iters,
+        output_path=args.relax_animate,
+        width=args.svg_width, height=args.svg_height,
+        color_scheme=args.color_scheme,
+        title='Lloyd Relaxation — %s (%d points)' % (args.datafile, len(original_data)),
+    )
+    print('Relaxation animation saved to %s' % args.relax_animate)
+
+
+def _cmd_graph(args, regions, data):
+    """Handle --graph, --graph-json, --graph-csv, --graph-svg."""
+    if not (args.graph or args.graph_json or args.graph_csv or args.graph_svg):
+        return
+    import vormap_viz
+    graph = vormap_viz.extract_neighborhood_graph(regions, data)
+    print('Graph: %d nodes, %d edges' % (graph['num_nodes'], graph['num_edges']))
+
+    if args.graph:
+        print()
+        print(vormap_viz.format_graph_stats_table(graph))
+    if args.graph_json:
+        vormap_viz.export_graph_json(graph, args.graph_json)
+        print('Graph JSON saved to %s' % args.graph_json)
+    if args.graph_csv:
+        vormap_viz.export_graph_csv(graph, args.graph_csv)
+        print('Graph CSV saved to %s' % args.graph_csv)
+    if args.graph_svg:
+        vormap_viz.export_graph_svg(
+            regions, data, graph, args.graph_svg,
+            width=args.svg_width, height=args.svg_height,
+            color_scheme=args.color_scheme,
+            show_degree_labels=args.graph_labels,
+            title='Neighbourhood Graph — %s (%d points, %d edges)'
+                  % (args.datafile, len(data), graph['num_edges']),
+        )
+        print('Graph SVG saved to %s' % args.graph_svg)
+
+
+def _cmd_heatmap(args, regions, data):
+    """Handle --heatmap and --heatmap-html."""
+    if not (args.heatmap or args.heatmap_html):
+        return
+    import vormap_heatmap
+    heatmap_title = ('Voronoi Heatmap (%s) — %s (%d points)'
+                     % (args.heatmap_metric, args.datafile, len(data)))
+    if args.heatmap:
+        vormap_heatmap.export_heatmap_svg(
+            regions, data, args.heatmap,
+            width=args.svg_width, height=args.svg_height,
+            color_ramp=args.heatmap_ramp, metric=args.heatmap_metric,
+            show_values=args.heatmap_values, title=heatmap_title,
+        )
+        print('Heatmap SVG saved to %s' % args.heatmap)
+    if args.heatmap_html:
+        vormap_heatmap.export_heatmap_html(
+            regions, data, args.heatmap_html,
+            width=args.svg_width, height=args.svg_height,
+            color_ramp=args.heatmap_ramp, metric=args.heatmap_metric,
+            title=heatmap_title,
+        )
+        print('Interactive heatmap HTML saved to %s' % args.heatmap_html)
+
+
+def _cmd_pattern(args, data):
+    """Handle --pattern and --pattern-json."""
+    if not (args.pattern or args.pattern_json):
+        return
+    import vormap_pattern as vp
+    bounds_tuple = None
+    if args.bounds:
+        s, n, w, e = args.bounds
+        bounds_tuple = (w, e, s, n)
+    summary = vp.analyze_pattern(data, bounds=bounds_tuple)
+    if args.pattern:
+        print(vp.format_pattern_report(summary))
+    if args.pattern_json:
+        import json
+        result = vp.generate_pattern_json(summary)
+        with open(args.pattern_json, 'w') as f:
+            json.dump(result, f, indent=2)
+        print('Pattern analysis JSON saved to %s' % args.pattern_json)
+
+
+def _cmd_query(args, data, regions):
+    """Handle --query and --query-batch."""
+    if not (args.query or args.query_batch):
+        return
+    import vormap_query
+    vormap_query.run_query_cli(args, data, regions)
+
+
+def _cmd_interp(args, data):
+    """Handle --interp-values and related interpolation flags."""
+    if not args.interp_values:
+        return
+    import vormap_interp
+    vormap_interp.run_interp_cli(args, data)
+
+
+def _cmd_crossval(args, data, parser):
+    """Handle --crossval, --crossval-csv, --crossval-svg."""
+    if not (args.crossval or args.crossval_csv or args.crossval_svg):
+        return
+    if not args.interp_values:
+        parser.error('--crossval requires --interp-values')
+    import vormap_crossval
+    vormap_crossval.run_crossval_cli(args, data)
+
+
+def _cmd_regress(args, regions, data):
+    """Handle --regress, --regress-gwr, and related flags."""
+    regress_requested = (
+        args.regress or args.regress_gwr or args.regress_svg
+        or args.regress_json or args.regress_csv
+    )
+    if not regress_requested:
+        return
+    import vormap_regress
+    vormap_regress.run_regress_cli(args, regions, data)
+
+
+def _cmd_report(args, data, regions):
+    """Handle --report: HTML analysis report."""
+    if not args.report:
+        return
+    import vormap_report
+    report_title = (
+        args.report_title
+        or 'Voronoi Analysis Report — %s (%d points)'
+           % (args.datafile, len(data))
+    )
+    vormap_report.generate_report(
+        data, regions,
+        (IND_S, IND_N, IND_W, IND_E),
+        args.report, title=report_title, allow_absolute=True,
+    )
+    print('HTML report saved to %s' % args.report)
+
+
+def _cmd_centers(args, data):
+    """Handle --centers and related flags."""
+    centers_requested = (
+        args.centers or args.centers_json or args.centers_csv
+        or args.centers_svg
+    )
+    if not centers_requested:
+        return
+    import vormap_centroid
+    pts = [(d["x"], d["y"]) for d in data]
+    cr = vormap_centroid.analyze_centers(
+        pts, bounds=(IND_S, IND_N, IND_W, IND_E),
+    )
+    if args.centers:
+        print(cr.summary())
+    if args.centers_json:
+        cr.to_json(args.centers_json)
+        print('Centers JSON saved to %s' % args.centers_json)
+    if args.centers_csv:
+        cr.to_csv(args.centers_csv)
+        print('Centers CSV saved to %s' % args.centers_csv)
+    if args.centers_svg:
+        cr.to_svg(args.centers_svg)
+        print('Centers SVG saved to %s' % args.centers_svg)
+
+
+def _cmd_buffers(args, data):
+    """Handle --buffers and related flags."""
+    buf_radius = args.buffers if args.buffers else args.buffer_radius
+    buffers_requested = (
+        args.buffers is not None or args.buffers_json
+        or args.buffers_csv or args.buffers_svg
+    )
+    if not buffers_requested:
+        return
+    import vormap_buffer
+    pts = [(d["x"], d["y"]) for d in data]
+    radii = None
+    if args.buffer_rings:
+        radii = [float(r.strip()) for r in args.buffer_rings.split(",")]
+    br = vormap_buffer.analyze_buffers(pts, radius=buf_radius, radii=radii)
+    if args.buffers is not None:
+        vormap_buffer.print_buffer_report(br)
+    if args.buffers_json:
+        br.to_json(args.buffers_json)
+        print('Buffer analysis JSON saved to %s' % args.buffers_json)
+    if args.buffers_csv:
+        br.to_csv(args.buffers_csv)
+        print('Buffer analysis CSV saved to %s' % args.buffers_csv)
+    if args.buffers_svg:
+        br.to_svg(args.buffers_svg)
+        print('Buffer analysis SVG saved to %s' % args.buffers_svg)
+
+
+def _cmd_circlepack(args, regions, data):
+    """Handle --circlepack, --circlepack-html, --circlepack-stats."""
+    if not (args.circlepack or args.circlepack_html or args.circlepack_stats):
+        return
+    import vormap_circlepack
+    packing = vormap_circlepack.circle_pack(regions)
+    if args.circlepack_stats or (not args.circlepack and not args.circlepack_html):
+        stats = vormap_circlepack.packing_stats(packing)
+        print('Circle Packing Statistics')
+        print('=' * 35)
+        print('  Cells:            %d' % stats['total_cells'])
+        print('  Mean Efficiency:  %.1f%%' % (stats.get('mean_efficiency', 0) * 100))
+        print('  Min Efficiency:   %.1f%%' % (stats.get('min_efficiency', 0) * 100))
+        print('  Max Efficiency:   %.1f%%' % (stats.get('max_efficiency', 0) * 100))
+        print('  Overall:          %.1f%%' % (stats.get('overall_efficiency', 0) * 100))
+    if args.circlepack:
+        vormap_circlepack.export_svg(
+            packing, regions, data, args.circlepack,
+            fill_mode=args.circlepack_fill,
+        )
+        print('Circle packing SVG saved to %s' % args.circlepack)
+    if args.circlepack_html:
+        vormap_circlepack.export_html(packing, regions, data, args.circlepack_html)
+        print('Circle packing HTML saved to %s' % args.circlepack_html)
+
+
 def main():
     """CLI entry point for VoronoiMap estimation."""
     import argparse
@@ -2459,323 +2738,75 @@ def main():
 
         print('Traced %d of %d regions' % (len(regions), len(data)))
 
-    # SVG visualization
-    if args.visualize:
-        import vormap_viz
+    # Visualization outputs
+    _cmd_visualize(args, regions, data)
 
-        vormap_viz.export_svg(
-            regions,
-            data,
-            args.visualize,
-            width=args.svg_width,
-            height=args.svg_height,
-            color_scheme=args.color_scheme,
-            show_labels=args.show_labels,
-            title='Voronoi Diagram — %s (%d points)'
-                  % (args.datafile, len(data)),
-        )
-        print('SVG saved to %s' % args.visualize)
-
-    # ASCII terminal visualization
-    if args.ascii:
-        import vormap_ascii
-        vormap_ascii.render(
-            regions, data,
-            width=args.ascii_width,
-            height=args.ascii_height,
-            mono=args.ascii_mono,
-        )
-
-    # Interactive HTML visualization
-    if args.interactive:
-        import vormap_viz
-
-        vormap_viz.export_html(
-            regions,
-            data,
-            args.interactive,
-            width=args.svg_width,
-            height=args.svg_height,
-            color_scheme=args.color_scheme,
-            title='Voronoi Diagram — %s (%d points)'
-                  % (args.datafile, len(data)),
-        )
-        print('Interactive HTML saved to %s' % args.interactive)
-
-    # GeoJSON export
-    if args.geojson:
-        import vormap_viz
-
-        vormap_viz.export_geojson(
-            regions,
-            data,
-            args.geojson,
-            include_seeds=not args.no_seeds,
-            crs_name=args.crs,
-        )
-        print('GeoJSON saved to %s' % args.geojson)
-
-    # KML export
-    if args.kml:
-        import vormap_kml
-
-        vormap_kml.export_kml(
-            regions,
-            data,
-            args.kml,
-            include_seeds=not args.no_seeds,
-            color_scheme=args.color_scheme,
-        )
-        print('KML saved to %s' % args.kml)
+    # GeoJSON / KML export
+    _cmd_export_geo(args, regions, data)
 
     # Region statistics
     if args.stats or args.stats_csv or args.stats_json:
         _cmd_stats(args, regions, data)
 
     # Lloyd relaxation animation
-    if args.relax_animate:
-        import vormap_viz
-
-        # Animation always starts from original (unrelaxed) data to
-        # show the full relaxation process.
-        original_data = load_data(args.datafile)
-        iters = args.relax if args.relax else 10
-        print('Generating relaxation animation (%d iterations)...' % iters)
-
-        vormap_viz.export_relaxation_html(
-            original_data,
-            iterations=iters,
-            output_path=args.relax_animate,
-            width=args.svg_width,
-            height=args.svg_height,
-            color_scheme=args.color_scheme,
-            title='Lloyd Relaxation — %s (%d points)'
-                  % (args.datafile, len(original_data)),
-        )
-        print('Relaxation animation saved to %s' % args.relax_animate)
+    _cmd_relax_animate(args, data)
 
     # Neighbourhood graph
-    if args.graph or args.graph_json or args.graph_csv or args.graph_svg:
-        import vormap_viz
+    _cmd_graph(args, regions, data)
 
-        graph = vormap_viz.extract_neighborhood_graph(regions, data)
-        print('Graph: %d nodes, %d edges' % (graph['num_nodes'], graph['num_edges']))
+    # Density heatmap
+    _cmd_heatmap(args, regions, data)
 
-        if args.graph:
-            print()
-            print(vormap_viz.format_graph_stats_table(graph))
+    # Point pattern analysis
+    _cmd_pattern(args, data)
 
-        if args.graph_json:
-            vormap_viz.export_graph_json(graph, args.graph_json)
-            print('Graph JSON saved to %s' % args.graph_json)
+    # Point location & nearest-neighbor query
+    _cmd_query(args, data, regions)
 
-        if args.graph_csv:
-            vormap_viz.export_graph_csv(graph, args.graph_csv)
-            print('Graph CSV saved to %s' % args.graph_csv)
+    # Spatial interpolation
+    _cmd_interp(args, data)
 
-        if args.graph_svg:
-            vormap_viz.export_graph_svg(
-                regions,
-                data,
-                graph,
-                args.graph_svg,
-                width=args.svg_width,
-                height=args.svg_height,
-                color_scheme=args.color_scheme,
-                show_degree_labels=args.graph_labels,
-                title='Neighbourhood Graph — %s (%d points, %d edges)'
-                      % (args.datafile, len(data), graph['num_edges']),
-            )
-            print('Graph SVG saved to %s' % args.graph_svg)
+    # Cross-validation
+    _cmd_crossval(args, data, parser)
 
-    # ── Density heatmap ──
-    if args.heatmap or args.heatmap_html:
-        import vormap_heatmap
-
-        heatmap_title = ('Voronoi Heatmap (%s) — %s (%d points)'
-                         % (args.heatmap_metric, args.datafile, len(data)))
-
-        if args.heatmap:
-            vormap_heatmap.export_heatmap_svg(
-                regions, data, args.heatmap,
-                width=args.svg_width, height=args.svg_height,
-                color_ramp=args.heatmap_ramp,
-                metric=args.heatmap_metric,
-                show_values=args.heatmap_values,
-                title=heatmap_title,
-            )
-            print('Heatmap SVG saved to %s' % args.heatmap)
-
-        if args.heatmap_html:
-            vormap_heatmap.export_heatmap_html(
-                regions, data, args.heatmap_html,
-                width=args.svg_width, height=args.svg_height,
-                color_ramp=args.heatmap_ramp,
-                metric=args.heatmap_metric,
-                title=heatmap_title,
-            )
-            print('Interactive heatmap HTML saved to %s' % args.heatmap_html)
-
-    # ── Point pattern analysis ──
-    if args.pattern or args.pattern_json:
-        import vormap_pattern as vp
-        bounds_tuple = None
-        if args.bounds:
-            s, n, w, e = args.bounds
-            bounds_tuple = (w, e, s, n)
-        else:
-            bounds_tuple = None  # auto-derive from points
-
-        summary = vp.analyze_pattern(data, bounds=bounds_tuple)
-
-        if args.pattern:
-            print(vp.format_pattern_report(summary))
-
-        if args.pattern_json:
-            import json
-            result = vp.generate_pattern_json(summary)
-            with open(args.pattern_json, 'w') as f:
-                json.dump(result, f, indent=2)
-            print('Pattern analysis JSON saved to %s' % args.pattern_json)
-
-    # ── Point location & nearest-neighbor query ──
-    if args.query or args.query_batch:
-        import vormap_query
-        vormap_query.run_query_cli(args, data, regions)
-
-    # ── Spatial interpolation ──
-    if args.interp_values:
-        import vormap_interp
-        vormap_interp.run_interp_cli(args, data)
-
-    # ── Cross-validation ──
-    if args.crossval or args.crossval_csv or args.crossval_svg:
-        if not args.interp_values:
-            parser.error('--crossval requires --interp-values')
-        import vormap_crossval
-        vormap_crossval.run_crossval_cli(args, data)
-
-    # ── Spatial clustering ──
+    # Spatial clustering
     if args.cluster or args.cluster_svg or args.cluster_json:
         _cmd_cluster(args, regions, data)
 
-    # ── Edge network analysis ──
+    # Edge network analysis
     if args.edge_network or args.edge_csv or args.edge_json or args.edge_svg:
         _cmd_edge_network(args, regions, data)
 
-    # ── Kernel Density Estimation ──
+    # Kernel Density Estimation
     kde_requested = (args.kde_svg or args.kde_csv or args.kde_hotspots)
     if kde_requested:
         _cmd_kde(args, data)
 
-    # ── Spatial autocorrelation (Moran's I) ──
+    # Spatial autocorrelation (Moran's I)
     autocorr_requested = (
         args.autocorr or args.autocorr_json or args.lisa_svg
     )
     if autocorr_requested:
         _cmd_autocorr(args, regions, data)
 
-    # ── Spatial regression ────────────────────────────────────────────
-    regress_requested = (
-        args.regress or args.regress_gwr or args.regress_svg
-        or args.regress_json or args.regress_csv
-    )
-    if regress_requested:
-        import vormap_regress
-        vormap_regress.run_regress_cli(args, regions, data)
+    # Spatial regression
+    _cmd_regress(args, regions, data)
 
-    # ── HTML analysis report ─────────────────────────────────────────
-    if args.report:
-        import vormap_report
+    # HTML analysis report
+    _cmd_report(args, data, regions)
 
-        report_title = (
-            args.report_title
-            or 'Voronoi Analysis Report — %s (%d points)'
-               % (args.datafile, len(data))
-        )
-        vormap_report.generate_report(
-            data, regions,
-            (IND_S, IND_N, IND_W, IND_E),
-            args.report,
-            title=report_title,
-            allow_absolute=True,
-        )
-        print('HTML report saved to %s' % args.report)
+    # Spatial center analysis
+    _cmd_centers(args, data)
 
-    # ── Spatial center analysis ────────────────────────────────────
-    centers_requested = (
-        args.centers or args.centers_json or args.centers_csv
-        or args.centers_svg
-    )
-    if centers_requested:
-        import vormap_centroid
-        pts = [(d["x"], d["y"]) for d in data]
-        cr = vormap_centroid.analyze_centers(
-            pts, bounds=(IND_S, IND_N, IND_W, IND_E),
-        )
-        if args.centers:
-            print(cr.summary())
-        if args.centers_json:
-            cr.to_json(args.centers_json)
-            print('Centers JSON saved to %s' % args.centers_json)
-        if args.centers_csv:
-            cr.to_csv(args.centers_csv)
-            print('Centers CSV saved to %s' % args.centers_csv)
-        if args.centers_svg:
-            cr.to_svg(args.centers_svg)
-            print('Centers SVG saved to %s' % args.centers_svg)
-
-    # ── Convex hull & bounding geometry ──────────────────────────────
+    # Convex hull & bounding geometry
     if args.hull or args.hull_json or args.hull_svg:
         _cmd_hull(args, data)
 
-    # ── Buffer zone analysis ──────────────────────────────────────
-    buf_radius = args.buffers if args.buffers else args.buffer_radius
-    buffers_requested = (
-        args.buffers is not None or args.buffers_json
-        or args.buffers_csv or args.buffers_svg
-    )
-    if buffers_requested:
-        import vormap_buffer
-        pts = [(d["x"], d["y"]) for d in data]
-        radii = None
-        if args.buffer_rings:
-            radii = [float(r.strip()) for r in args.buffer_rings.split(",")]
-        br = vormap_buffer.analyze_buffers(pts, radius=buf_radius, radii=radii)
-        if args.buffers is not None:
-            vormap_buffer.print_buffer_report(br)
-        if args.buffers_json:
-            br.to_json(args.buffers_json)
-            print('Buffer analysis JSON saved to %s' % args.buffers_json)
-        if args.buffers_csv:
-            br.to_csv(args.buffers_csv)
-            print('Buffer analysis CSV saved to %s' % args.buffers_csv)
-        if args.buffers_svg:
-            br.to_svg(args.buffers_svg)
-            print('Buffer analysis SVG saved to %s' % args.buffers_svg)
+    # Buffer zone analysis
+    _cmd_buffers(args, data)
 
-    # ── Circle packing ───────────────────────────────────────────────
-    if args.circlepack or args.circlepack_html or args.circlepack_stats:
-        import vormap_circlepack
-        packing = vormap_circlepack.circle_pack(regions)
-        if args.circlepack_stats or (not args.circlepack and not args.circlepack_html):
-            stats = vormap_circlepack.packing_stats(packing)
-            print('Circle Packing Statistics')
-            print('=' * 35)
-            print('  Cells:            %d' % stats['total_cells'])
-            print('  Mean Efficiency:  %.1f%%' % (stats.get('mean_efficiency', 0) * 100))
-            print('  Min Efficiency:   %.1f%%' % (stats.get('min_efficiency', 0) * 100))
-            print('  Max Efficiency:   %.1f%%' % (stats.get('max_efficiency', 0) * 100))
-            print('  Overall:          %.1f%%' % (stats.get('overall_efficiency', 0) * 100))
-        if args.circlepack:
-            vormap_circlepack.export_svg(
-                packing, regions, data, args.circlepack,
-                fill_mode=args.circlepack_fill,
-            )
-            print('Circle packing SVG saved to %s' % args.circlepack)
-        if args.circlepack_html:
-            vormap_circlepack.export_html(packing, regions, data, args.circlepack_html)
-            print('Circle packing HTML saved to %s' % args.circlepack_html)
+    # Circle packing
+    _cmd_circlepack(args, regions, data)
 
 
 if __name__ == '__main__':
