@@ -6,7 +6,6 @@ consumers.
 """
 
 import xml.etree.ElementTree as ET
-from xml.dom import minidom
 
 import vormap
 
@@ -167,17 +166,19 @@ def export_kml(
             )
 
     # Pretty-print and write
-    rough_string = ET.tostring(kml, encoding='unicode')
-    reparsed = minidom.parseString(rough_string)
-    pretty_xml = reparsed.toprettyxml(indent='  ', encoding=None)
-    # Remove extra XML declaration if present
-    lines = pretty_xml.split('\n')
-    if lines and lines[0].startswith('<?xml'):
-        lines[0] = '<?xml version="1.0" encoding="UTF-8"?>'
+    # Use ET.indent (Python 3.9+) instead of minidom.parseString to avoid
+    # XML External Entity (XXE) and billion-laughs vulnerabilities inherent
+    # in minidom's expat-based parser.  ET.indent operates on the existing
+    # ElementTree in-place without re-parsing, which is both safer and faster.
+    ET.indent(kml, space='  ')
 
     output_path = vormap.validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(lines))
+    tree = ET.ElementTree(kml)
+    tree.write(
+        output_path,
+        encoding='unicode',
+        xml_declaration=True,
+    )
 
     return output_path
 
