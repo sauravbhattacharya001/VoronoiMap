@@ -295,11 +295,9 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
 
     n_clusters = len(cluster_members)
 
-    # Build edge set from adjacency (each pair once) and track
-    # per-cluster adjacency for efficient re-heaping after merges.
+    # Build edge set from adjacency (each pair once)
     seen_edges = set()
     edges = []
-    cluster_edges = {}  # cluster_id -> set of (seed_a, seed_b) edges
     for seed in seeds:
         for neighbor in adjacency.get(seed, []):
             nb = tuple(neighbor) if not isinstance(neighbor, tuple) else neighbor
@@ -308,22 +306,23 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
                 seen_edges.add(pair)
                 edges.append(pair)
 
-    # Build initial min-heap of (cost, cluster_a, cluster_b) entries.
-    # Stale entries (where a cluster has been merged away) are lazily
-    # skipped when popped.
     def _merge_cost(c1, c2):
         mean1 = cluster_metric_sum[c1] / cluster_size[c1]
         mean2 = cluster_metric_sum[c2] / cluster_size[c2]
         return abs(mean1 - mean2)
 
+    # Generation counter per cluster — incremented on each merge.
+    # Heap entries store the generation at push time; stale entries
+    # (where generation has changed) are O(1) to detect and skip,
+    # avoiding redundant _merge_cost recomputations.
+    cluster_gen = {cid: 0 for cid in cluster_members}
+
     heap = []
-    # Track which cluster-pair edges exist for re-heaping after merge
     cluster_adj = {}  # cluster_id -> set of adjacent cluster_ids
     for s1, s2 in edges:
         c1 = seed_to_cluster.get(s1)
         c2 = seed_to_cluster.get(s2)
         if c1 is not None and c2 is not None and c1 != c2:
-            pair = (min(c1, c2), max(c1, c2))
             cluster_adj.setdefault(c1, set()).add(c2)
             cluster_adj.setdefault(c2, set()).add(c1)
 
@@ -335,24 +334,19 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
             if pair not in pushed:
                 pushed.add(pair)
                 cost = _merge_cost(c1, c2)
-                heapq.heappush(heap, (cost, pair[0], pair[1]))
+                heapq.heappush(heap, (cost, pair[0], pair[1],
+                                      cluster_gen[pair[0]],
+                                      cluster_gen[pair[1]]))
 
     while n_clusters > num_clusters and heap:
-        cost, c1, c2 = heapq.heappop(heap)
+        cost, c1, c2, gen1, gen2 = heapq.heappop(heap)
 
-        # Skip stale entries — one or both clusters already merged
+        # O(1) staleness check via generation counters
         if c1 not in cluster_members or c2 not in cluster_members:
             continue
-        # Skip if they are actually the same cluster now
         if c1 == c2:
             continue
-        # Re-check cost — it may have changed due to prior merges
-        # affecting metric sums.  Only skip if cost is now higher
-        # and there might be a better option.
-        actual_cost = _merge_cost(c1, c2)
-        if actual_cost > cost + 1e-12:
-            # Re-push with updated cost
-            heapq.heappush(heap, (actual_cost, min(c1, c2), max(c1, c2)))
+        if cluster_gen[c1] != gen1 or cluster_gen[c2] != gen2:
             continue
 
         # Merge c2 into c1 (keep lower id for consistency)
@@ -367,6 +361,9 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
         del cluster_metric_sum[c_remove]
         del cluster_size[c_remove]
         n_clusters -= 1
+
+        # Bump generation for the kept cluster
+        cluster_gen[c_keep] += 1
 
         # Update adjacency: c_keep inherits c_remove's neighbors
         removed_neighbors = cluster_adj.pop(c_remove, set())
@@ -386,7 +383,9 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
             if nb in cluster_members:
                 cost = _merge_cost(c_keep, nb)
                 pair = (min(c_keep, nb), max(c_keep, nb))
-                heapq.heappush(heap, (cost, pair[0], pair[1]))
+                heapq.heappush(heap, (cost, pair[0], pair[1],
+                                      cluster_gen[pair[0]],
+                                      cluster_gen[pair[1]]))
 
     # Renumber clusters 0..n-1
     old_ids = sorted(cluster_members.keys())
