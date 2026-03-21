@@ -30,6 +30,47 @@ import httpx
 DEFAULT_URL = "http://localhost:3000"
 DEFAULT_KEY = "default"
 
+# Characters allowed in session IDs — reject anything that could manipulate URL paths
+_SAFE_ID_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.")
+
+
+def _validate_session_id(session_id: str) -> str:
+    """Validate session_id to prevent URL path injection.
+
+    Only alphanumeric characters, hyphens, underscores, and dots are allowed.
+    Rejects slashes, percent-encoding, and other characters that could
+    manipulate the request URL path or enable SSRF.
+
+    Parameters
+    ----------
+    session_id : str
+        The session ID to validate.
+
+    Returns
+    -------
+    str
+        The validated session ID.
+
+    Raises
+    ------
+    SystemExit
+        If the session ID contains disallowed characters.
+    """
+    if not session_id:
+        print("Error: session_id must not be empty", file=sys.stderr)
+        sys.exit(1)
+    if len(session_id) > 256:
+        print("Error: session_id too long (max 256 chars)", file=sys.stderr)
+        sys.exit(1)
+    bad_chars = set(session_id) - _SAFE_ID_CHARS
+    if bad_chars:
+        print(
+            f"Error: session_id contains disallowed characters: {bad_chars!r}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return session_id
+
 
 def _client() -> tuple[httpx.Client, str]:
     url = os.environ.get("AGENTLENS_URL", DEFAULT_URL).rstrip("/")
@@ -114,11 +155,12 @@ def cmd_sessions(args: argparse.Namespace) -> None:
 
 def cmd_events(args: argparse.Namespace) -> None:
     """List events for a session."""
+    sid = _validate_session_id(args.session_id)
     params: dict[str, Any] = {"limit": args.limit}
     if args.type:
         params["type"] = args.type
 
-    data = _get(f"/sessions/{args.session_id}/events", params)
+    data = _get(f"/sessions/{sid}/events", params)
     events = data if isinstance(data, list) else data.get("events", data.get("data", []))
 
     if not events:
@@ -151,11 +193,12 @@ def cmd_stats(args: argparse.Namespace) -> None:
 
 def cmd_health(args: argparse.Namespace) -> None:
     """Show health score for a session."""
-    data = _get(f"/sessions/{args.session_id}/health")
+    sid = _validate_session_id(args.session_id)
+    data = _get(f"/sessions/{sid}/health")
 
     grade = data.get("grade", data.get("health_grade", "?"))
     score = data.get("score", data.get("health_score", "?"))
-    print(f"Session: {args.session_id}")
+    print(f"Session: {sid}")
     print(f"Grade:   {grade}")
     print(f"Score:   {score}")
 
@@ -189,14 +232,16 @@ def cmd_alerts(args: argparse.Namespace) -> None:
 
 def cmd_explain(args: argparse.Namespace) -> None:
     """Get a human-readable explanation of a session."""
-    data = _get(f"/sessions/{args.session_id}/explain")
+    sid = _validate_session_id(args.session_id)
+    data = _get(f"/sessions/{sid}/explain")
     explanation = data.get("explanation", data.get("summary", json.dumps(data, indent=2)))
     print(explanation)
 
 
 def cmd_export(args: argparse.Namespace) -> None:
     """Export session data as JSON or CSV."""
-    data = _get(f"/sessions/{args.session_id}/events", {"limit": 1000})
+    sid = _validate_session_id(args.session_id)
+    data = _get(f"/sessions/{sid}/events", {"limit": 1000})
     events = data if isinstance(data, list) else data.get("events", data.get("data", []))
 
     if args.format == "csv":
