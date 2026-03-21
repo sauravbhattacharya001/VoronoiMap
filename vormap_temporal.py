@@ -35,8 +35,9 @@ point format (one ``x y`` pair per line).
 
 import json
 import sys
+import warnings
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import vormap
 from vormap_geometry import polygon_area, edge_length
@@ -274,14 +275,32 @@ def _match_seeds(seeds_a, seeds_b, radius):
 def _get_cell_areas(points):
     """Compute Voronoi cell areas for a set of points.
 
-    Returns a dict mapping seed tuple to area.
+    Returns a dict mapping *index* (int) to area, so that duplicate
+    seed coordinates are handled correctly.  When duplicates are
+    detected a warning is emitted.
     """
     if len(points) < 2:
         return {}
+
+    # Warn on duplicate coordinates
+    seen = set()
+    for pt in points:
+        if pt in seen:
+            warnings.warn(
+                f"Duplicate seed coordinate {pt} detected; "
+                "area values for coincident seeds may be unreliable",
+                stacklevel=2,
+            )
+            break
+        seen.add(pt)
+
     regions = compute_regions(points)
-    areas = {}
-    for seed, vertices in regions.items():
-        areas[seed] = polygon_area(vertices)
+    areas: Dict[int, float] = {}
+    for i, seed in enumerate(points):
+        if seed in regions:
+            areas[i] = polygon_area(regions[seed])
+        else:
+            areas[i] = 0.0
     return areas
 
 
@@ -344,7 +363,7 @@ def temporal_analysis(
             initial_seed=seed,
             birth_step=0,
             positions=[seed],
-            areas=[snapshot_areas[0].get(seed, 0.0)],
+            areas=[snapshot_areas[0].get(i, 0.0)],
             lifespan=1,
         )
         trajectories.append(traj)
@@ -370,8 +389,8 @@ def temporal_analysis(
         for idx_a, idx_b in matches.items():
             seed_a = seeds_a[idx_a]
             seed_b = seeds_b[idx_b]
-            area_a = areas_a.get(seed_a, 0.0)
-            area_b = areas_b.get(seed_b, 0.0)
+            area_a = areas_a.get(idx_a, 0.0)
+            area_b = areas_b.get(idx_b, 0.0)
             dist = _euclidean(seed_a, seed_b)
             migration_dists.append(dist)
 
@@ -427,7 +446,7 @@ def temporal_analysis(
         # Process deaths
         for idx_a in deaths_idx:
             seed_a = seeds_a[idx_a]
-            area_a = areas_a.get(seed_a, 0.0)
+            area_a = areas_a.get(idx_a, 0.0)
             step_events.append(CellEvent(
                 time_step=step,
                 event_type="death",
@@ -447,7 +466,7 @@ def temporal_analysis(
         # Process births
         for idx_b in births_idx:
             seed_b = seeds_b[idx_b]
-            area_b = areas_b.get(seed_b, 0.0)
+            area_b = areas_b.get(idx_b, 0.0)
             step_events.append(CellEvent(
                 time_step=step,
                 event_type="birth",

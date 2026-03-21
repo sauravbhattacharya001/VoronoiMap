@@ -123,6 +123,27 @@ class TestGetCellAreas:
         areas = _get_cell_areas([(0, 0)])
         assert areas == {}
 
+    def test_duplicate_coordinates_returns_all_indices(self):
+        """Duplicate seeds should each get their own index entry."""
+        points = [(100.0, 200.0), (100.0, 200.0), (300.0, 400.0)]
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            areas = _get_cell_areas(points)
+            assert len(w) == 1
+            assert "Duplicate seed coordinate" in str(w[0].message)
+        # All three indices must be present
+        assert 0 in areas
+        assert 1 in areas
+        assert 2 in areas
+
+    def test_areas_keyed_by_index(self):
+        """Areas dict should be keyed by integer index, not tuple."""
+        points = [(0.0, 0.0), (100.0, 0.0), (50.0, 100.0)]
+        areas = _get_cell_areas(points)
+        for key in areas:
+            assert isinstance(key, int)
+
 
 # -- Core analysis tests ----------------------------------------------
 
