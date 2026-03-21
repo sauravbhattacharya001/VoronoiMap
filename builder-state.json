@@ -1,8 +1,8 @@
 {
-  "lastRepo": "ai",
-  "lastFeature": "Red Team Planner - structured exercise generator with 5 scenarios, scoring, timeline, HTML/JSON export",
-  "lastRun": "2026-03-19T22:58:00.000-07:00",
-  "runCount": 143,
+  "lastRepo": "agenticchat",
+  "lastFeature": "Message Reader View — full-width overlay for comfortable reading",
+  "lastRun": "2026-03-21T06:58:00.000Z",
+  "runCount": 191,
   "repoFeatures": {
     "sauravcode": [
       "Bitwise operation builtins (bit_and, bit_or, bit_xor, bit_not, bit_lshift, bit_rshift)",
@@ -14,7 +14,8 @@
       "Combinatorics & advanced collection builtins (sort_by, min_by, max_by, partition, rotate, interleave, frequencies, combinations, permutations)",
       "Environment variable & system info builtins (env_get/set/unset/list/has, sys_platform/hostname/cwd/pid/uptime/args/exit)",
       "UUID & random data generation builtins (uuid_v4, random_bytes, random_hex, random_string, random_float)",
-      "ANSI terminal color & styling builtins (color, bg_color, bold, dim, italic, underline, strikethrough, style, rainbow, strip_ansi)"
+      "ANSI terminal color & styling builtins (color, bg_color, bold, dim, italic, underline, strikethrough, style, rainbow, strip_ansi)",
+      "CSV parsing & manipulation builtins (csv_parse, csv_stringify, csv_headers, csv_select, csv_filter, csv_sort, csv_read, csv_write)"
     ],
     "VoronoiMap": [
       "Terminal ASCII/Unicode Voronoi rendering (vormap_ascii module)",
@@ -24,7 +25,9 @@
       "Voronoi Stippling - image-to-dot-art via weighted Lloyd relaxation with SVG/JSON export, animation frames",
       "Voronoi Maze Generator - 3 algorithms (DFS/Kruskal/Prim), BFS solver, SVG/JSON export, CLI",
       "Flow Field Visualiser - 5 vector field types (gradient/curl/random/radial/dipole) with RK2 streamlines, SVG/JSON export",
-      "Hatch Pattern Generator - 6 styles (lines/cross/dots/zigzag/contour/random) with value-driven density, SVG/JSON export"
+      "Hatch Pattern Generator - 6 styles (lines/cross/dots/zigzag/contour/random) with value-driven density, SVG/JSON export",
+      "Circle Packing - largest inscribed circles per cell with efficiency heatmap, SVG/HTML export",
+      "Seamless Tileable Texture Generator - 6 styles, 6 colormaps, toroidal wrapping"
     ],
     "agenticchat": [
       "Per-session notes/memos with inline editing and /note slash command",
@@ -34,7 +37,11 @@
       "Conversation Flashcards - extract Q&A pairs as interactive study cards with flip animation, deck persistence, keyboard navigation",
       "Smart Paste - intelligent paste auto-formatting (JSON, code, CSV, SQL, URLs, stack traces)",
       "Message Context Menu - right-click context menu aggregating per-message actions (copy, bookmark, pin, annotate, react, read aloud, translate, diff, fork, edit, rate)",
-      "Pomodoro Timer - built-in focus timer with work/break cycles, configurable durations, notifications, stats"
+      "Pomodoro Timer - built-in focus timer with work/break cycles, configurable durations, notifications, stats",
+      "Prompt A/B Tester — compare two model responses side-by-side with voting and history",
+      "SmartScroll — floating jump-to-latest button with unread badge and per-session scroll memory",
+      "Text Expander — shorthand triggers that auto-expand inline with custom snippets and management panel",
+      "Message Reader View — full-width overlay for comfortable reading with font controls, copy, Alt+R shortcut"
     ],
     "agentlens": [
       "CLI 'tail' command for live-following session events (like tail -f)",
@@ -43,10 +50,12 @@
       "CLI report command - generate time-range summary reports (day/week/month) with table/JSON/markdown output",
       "CLI flamegraph command - interactive HTML flamegraph generation from session events",
       "CLI dashboard command - self-contained HTML dashboard with Chart.js charts (KPIs, daily sessions/costs, status doughnut, top sessions, session table)",
-      "CLI trace command — terminal waterfall view for session events with type/duration filtering, JSON output",
-      "CLI heatmap command — terminal activity heatmap (day×hour) with 4 metrics, ANSI colors, peak detection",
+      "CLI trace command - terminal waterfall view for session events with type/duration filtering, JSON output",
+      "CLI heatmap command - terminal activity heatmap (day×hour) with 4 metrics, ANSI colors, peak detection",
       "CLI replay command - terminal session playback with live streaming, speed control, type filtering, multiple output formats",
-      "CLI outlier command - IQR-based anomaly detection for sessions by cost, tokens, duration, errors"
+      "CLI outlier command - IQR-based anomaly detection for sessions by cost, tokens, duration, errors",
+      "CLI digest command - periodic summary reports (day/week/month) with KPIs, model breakdown, alerts, recommendations, 4 output formats",
+      "CLI funnel command - workflow funnel analysis with stage drop-off, conversion rates, HTML/JSON/table output"
     ],
     "gif-captcha": [
       "CLI tool (bin/gif-captcha.js) with generate, validate, benchmark, pool, trust, stats, and info commands",
@@ -54,9 +63,12 @@
       "CLI doctor command - system diagnostics with module availability, core validation, perf benchmark, edge cases",
       "Difficulty Curve Planner - interactive page with 8 easing functions, presets, compare mode, export",
       "Fleet Monitor dashboard - real-time multi-site CAPTCHA deployment monitoring with alerts, uptime, sparklines",
-      "Fraud Ring Visualizer — interactive network graph page with force-directed layout, evidence cards, JSON export",
+      "Fraud Ring Visualizer - interactive network graph page with force-directed layout, evidence cards, JSON export",
       "Geo Risk Map - interactive world map with 5 simulation presets, country risk table, real-time stats",
-      "Bot Signature Database - 10 built-in bot patterns with comparison, matching, custom signatures"
+      "Bot Signature Database - 10 built-in bot patterns with comparison, matching, custom signatures",
+      "Rate Limiter Simulator - interactive page with 4 algorithms, traffic patterns, analytics",
+      "Compliance Dashboard - interactive WCAG/GDPR/OWASP/ops audit with presets, gauges, remediation checklist, timeline, export",
+      "CAPTCHA Theme Builder - interactive visual theme designer with 8 presets, live animation, distortion controls, JSON config export"
     ],
     "GraphVisual": [
       "SVG graph exporter with force-directed layout, dark/light themes, edge type coloring, degree-scaled nodes",
@@ -64,19 +76,25 @@
       "ASCII/Unicode graph renderer - spatial layout, adjacency list, degree histogram",
       "Graph Diff HTML Exporter - interactive visual diff of two graph snapshots with D3.js",
       "Graph Coloring Game - interactive puzzle page with 3 difficulties, DSatur scoring, hints, undo, scoreboard",
-      "Graph Layout Comparer — 2x2 HTML export comparing force/circular/grid/radial layouts with synchronized hover",
+      "Graph Layout Comparer - 2x2 HTML export comparing force/circular/grid/radial layouts with synchronized hover",
       "Shortest Path Finder - interactive page with Dijkstra/BFS/Bellman-Ford, canvas graph editor, step-by-step visualization, 5 presets",
-      "Centrality Radar Chart - interactive HTML radar/spider chart for comparing node centrality profiles (up to 8 nodes, ranking table, top-N, search, theme, JSON export)"
+      "Centrality Radar Chart - interactive HTML radar/spider chart for comparing node centrality profiles (up to 8 nodes, ranking table, top-N, search, theme, JSON export)",
+      "Interactive Graph Editor - visual canvas with presets, force layout, import/export (JSON/CSV/DOT/PNG)",
+      "Community Detection Visualizer - 4 algorithms (Louvain, Label Propagation, Girvan-Newman, Spectral Bisection), 6 presets, force layout, JSON/SVG export",
+      "MST Visualizer - interactive minimum spanning tree with Prim's & Kruskal's, step animation, 10 presets, drag nodes, SVG/JSON export"
     ],
     "Vidly": [
       "Rental extension feature - extend active rentals by 1-7 days with 50% daily rate extension fee, one extension per rental",
       "Loyalty Points Dashboard - controller + view model for points balance, rewards, history, leaderboard",
-      "Movie Waitlist System — join queue for rented-out movies with priority levels, position tracking, notify/fulfill/cancel workflow, stats dashboard",
-      "Rental Swap — exchange active rentals for different movies with $1.99 fee, rate upgrade charges, 3/day limit",
-      "Lost & Found Management System — log found items, submit/verify/reject claims, dispose/donate unclaimed items, dashboard stats, search/filter, top locations",
+      "Movie Waitlist System - join queue for rented-out movies with priority levels, position tracking, notify/fulfill/cancel workflow, stats dashboard",
+      "Rental Swap - exchange active rentals for different movies with $1.99 fee, rate upgrade charges, 3/day limit",
+      "Lost & Found Management System - log found items, submit/verify/reject claims, dispose/donate unclaimed items, dashboard stats, search/filter, top locations",
       "Dispute Resolution Controller - submit/escalate/resolve charge disputes with auto-priority, auto-expire, duplicate prevention, dashboard stats, JSON endpoints",
-      "Movie Request Board — customer request submission, voting, trending rankings, genre demand breakdown, staff review/fulfill/decline, stats",
-      "Movie Bingo — interactive 5x5 bingo cards with movie tropes for watch parties (6 themes, click-to-mark, bingo detection)"
+      "Movie Request Board - customer request submission, voting, trending rankings, genre demand breakdown, staff review/fulfill/decline, stats",
+      "Movie Bingo - interactive 5x5 bingo cards with movie tropes for watch parties (6 themes, click-to-mark, bingo detection)",
+      "Screening Room Booking - private room reservations with slot availability, conflict detection, live cost calculator",
+      "Customer Statement Generator - consolidated rental invoices with print view, summary stats, line items",
+      "Rental Budget Tracker — monthly spending limits with genre breakdown, weekly pacing, 6-month history, alerts, smart savings tips"
     ],
     "FeedReader": [
       "Vocabulary Builder - extracts uncommon words from articles with mastery levels, spaced review, filtering, and CSV/JSON export",
@@ -87,7 +105,10 @@
       "Article Mind Map Generator - visual concept mapping with ASCII/Markdown/JSON export, comparison, merge",
       "Reading Pace Predictor - queue completion forecasting with scenarios, backlog trends, bankruptcy warnings, per-item scheduling",
       "Article Link Extractor - extract, categorize, and analyze outbound links with dead link detection, domain frequency, cross-article overlap",
-      "Article Thread Composer - social media thread builder for Twitter/X, Mastodon, Bluesky, LinkedIn"
+      "Article Thread Composer - social media thread builder for Twitter/X, Mastodon, Bluesky, LinkedIn",
+      "Reading Streak Tracker - daily habit tracking with milestones, streak freezes, weekly heatmap, monthly stats, JSON/CSV export",
+      "Article Bias Detector - media bias analysis with 8-dimension scoring, 130+ patterns, severity levels, neutral alternatives",
+      "Article Fact Checker - claim extraction with 7 types, verifiability scoring, hedging detection, credibility analysis, user verdicts, Markdown/JSON export"
     ],
     "BioBots": [
       "Cell Seeding Calculator - scaffold geometry, density conversion, serial dilution, well plate seeding, passage expansion planning",
@@ -98,7 +119,10 @@
       "Lab Inventory Manager - stock tracking, usage logging, low-stock/expiry alerts, consumption forecasting, valuation",
       "Waste Tracker - log/analyze/reduce material waste with type/material breakdown, waste rate ratings, reduction tips, CSV/JSON export",
       "Growth Curve Analyzer - cell proliferation tracking with model fitting",
-      "Print Session Logger - track bioprint jobs with search, analytics, comparison, and CSV export"
+      "Print Session Logger - track bioprint jobs with search, analytics, comparison, and CSV export",
+      "Reagent Dilution Calculator - C1V1 solver, serial dilutions, molarity/mass, buffer prep, percent solutions, working solutions",
+      "Plate Map Generator - well plate layout planning with randomization, edge blanks, 3 templates, ASCII/CSV/JSON export",
+      "Environmental Monitor - incubator/lab condition tracking with 6 profiles, alerts, stability scoring, CSV/JSON export"
     ],
     "prompt": [
       "PromptChainVisualizer - Mermaid, DOT, and ASCII flowcharts from PromptChain",
@@ -109,7 +133,10 @@
       "PromptReadabilityAnalyzer - multi-formula readability scoring (FK, FRE, CLI, ARI) with compare and suggestions",
       "PromptSentimentAnalyzer - tone/sentiment analysis with 7 categories, polarity detection, compare, rewrite",
       "PromptGlossary - domain terminology management and standardization",
-      "PromptRegressionDetector - baseline recording, version comparison, similarity scoring, regression reports"
+      "PromptRegressionDetector - baseline recording, version comparison, similarity scoring, regression reports",
+      "PromptErrorRecovery - LLM failure detection (8 modes) and auto-recovery with configurable strategies",
+      "PromptTagManager - hierarchical tagging system for prompt organization",
+      "PromptAudienceAdapter - adapt prompts for 5 expertise levels (Child/Beginner/Intermediate/Expert/Executive) with 120+ jargon replacements, preambles, format hints, sentence simplification, complexity analysis"
     ],
     "everything": [
       "Bookmark Manager - 4-tab UI with folders, tags, visit tracking & analytics",
@@ -121,7 +148,13 @@
       "Price Tracker - monitor item prices with history, sparkline charts, target alerts, purchase tracking",
       "World Clock - live multi-timezone display with 21 presets, drag reorder, swipe delete, day/night indicators",
       "Tip Calculator - service quality presets, custom %, bill splitting, round-up, copy summary",
-      "Loan Calculator - EMI computation, amortization schedule, extra payment savings analysis"
+      "Loan Calculator - EMI computation, amortization schedule, extra payment savings analysis",
+      "Password Generator - configurable passwords & passphrases with strength meter, entropy calculation, history",
+      "Color Palette Generator - 7 harmony types, hue slider, adjustable count, copy hex/RGB/HSL, save/favorite palettes",
+      "Expense Splitter - create groups, split bills, track balances with greedy debt simplification",
+      "Stopwatch & Lap Timer - live centisecond display, lap/split times, fastest/slowest highlighting, stats bar, clipboard export",
+      "BMI Calculator - visual gauge, metric/imperial toggle, 8 WHO categories, healthy weight range, session history",
+      "Flash Cards - SM-2 spaced repetition with decks, flip-to-reveal study, quality ratings, session stats"
     ],
     "ai": [
       "Safety Trend Tracker - scorecard history, regression detection, sparkline visualization",
@@ -131,8 +164,12 @@
       "Safety Alert Router - rule-based notification routing with rate limiting, severity escalation, quiet hours",
       "Safety Persona Simulator - 6 agent personality archetypes with risk scoring and blending",
       "Tabletop Exercise Generator - structured incident exercises with 6 scenarios, decision points, inject cards, scoring, HTML export",
-      "Safety Warranty — formal safety guarantees with breach detection, conditions, exclusions, remediation plans, HTML/JSON reports",
-      "Red Team Planner - structured exercise generator with 5 scenarios, scoring, timeline, HTML/JSON export"
+      "Safety Warranty - formal safety guarantees with breach detection, conditions, exclusions, remediation plans, HTML/JSON reports",
+      "Red Team Planner - structured exercise generator with 5 scenarios, scoring, timeline, HTML/JSON export",
+      "Threat Hunt Planner - 12 hypothesis-driven missions across 8 categories with IOCs, procedures, MITRE mapping, HTML playbook",
+      "Alert Fatigue Detector - 6 fatigue indicators, composite scoring, recommendations, HTML reports, simulator",
+      "Safety Culture Survey - 43 questions across 6 dimensions, 6 org profiles, maturity scoring, benchmark comparison, HTML radar report",
+      "Access Control Simulator - RBAC/ABAC policy engine with 3 policies, escalation detection, full audit matrix, HTML dashboard"
     ],
     "getagentbox": [
       "Custom 404 page with animated bot theme, chat bubble UI, and particle background",
@@ -142,7 +179,10 @@
       "Team Capacity Planner - interactive usage estimator with team size, message volume, feature multipliers, plan recommendation, cost calculation, utilization bar",
       "FAQ & Help Center - searchable, categorized Q&A page with 6 categories, 30 entries, filtering, search highlighting, vote buttons",
       "Privacy Center - interactive data transparency page with 5 tabs (collection, retention, rights, comparison, FAQ), search, theme toggle",
-      "AI Glossary & Jargon Buster - interactive searchable terminology page with 36 terms, category filters, A-Z nav, difficulty badges"
+      "ROI Calculator - interactive savings estimator with presets, sliders, timeline, export",
+      "AI Glossary & Jargon Buster - interactive searchable terminology page with 36 terms, category filters, A-Z nav, difficulty badges",
+      "Contact & Support page - ticket form with validation/attachments, 6 common solutions, response time badges, community links",
+      "Feature Voting Board — interactive community voting page with upvotes, comments, search, filters, idea submission"
     ],
     "Ocaml-sample-code": [
       "Interactive sorting algorithm visualizer (6 algorithms, adjustable speed/size, comparison/access stats)",
@@ -152,7 +192,11 @@
       "Pattern Matching Playground - sandbox eval engine, step-through trace, 8 examples, 9 challenges, reference tab",
       "Algorithm Complexity Cheat Sheet - interactive HTML page with 90+ entries, Big-O badges, visual bars, search/filter/sort",
       "Module System Explorer - interactive 6-topic tutorial (basics, signatures, abstract types, functors, first-class modules, design patterns) with 5 exercises",
-      "Memory Model Visualizer - interactive page with value representations, sandbox, GC simulator, cheat sheet"
+      "Memory Model Visualizer - interactive page with value representations, sandbox, GC simulator, cheat sheet",
+      "Pipeline Builder - interactive |> operator composer with live evaluation, 50+ functions, 6 presets",
+      "Error Decoder - interactive compiler error explanation page with 20 errors, 6 categories, pattern matching, fix examples",
+      "Operator Precedence Explorer - interactive reference table, expression parenthesizer, and quiz",
+      "Monad Tutorial & Playground - interactive learning page with bind chain visualizer, law verifier, 10 exercises, monad comparison"
     ],
     "WinSentinel": [
       "Score Forecast CLI command (--forecast) with projected scores, module projections, risk factors, target estimation",
@@ -164,7 +208,11 @@
       "Remediation Cost Estimator CLI (--cost) with ROI analysis, sprint planning, category breakdown",
       "Finding Burndown Chart CLI (--burndown) with ASCII chart, velocity stats, projected zero date, severity trends, weekly buckets",
       "CLI --benchmark command - peer group score comparison with percentile rankings, strengths/weaknesses, improvement suggestions",
-      "CLI --compliance command - map findings to CIS/NIST/PCI-DSS/HIPAA frameworks with gap analysis"
+      "CLI --compliance command - map findings to CIS/NIST/PCI-DSS/HIPAA frameworks with gap analysis",
+      "CLI --webhook command - send audit results to Slack/Discord/Teams/generic webhooks with platform-native formatting",
+      "CLI --inventory command - system asset snapshot (apps, services, ports, startup, tasks) with JSON/Markdown export",
+      "CLI --tag command - finding tag management with 10 actions (add/remove/list/search/report/autotag/rename/delete/export/import)",
+      "Config Backup & Restore (--config export/import/inspect) - portable JSON bundle for all WinSentinel configuration"
     ]
   }
 }

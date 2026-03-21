@@ -1,0 +1,60 @@
+# csv_demo.srv - CSV parsing and manipulation builtins demo
+
+# Parse CSV text into structured data
+data = csv_parse "name,age,city\nAlice,30,Seattle\nBob,25,Portland\nCarol,35,Seattle\nDave,28,Portland"
+
+print "=== Parsed CSV Data ==="
+for row in data
+    print row
+
+# Get column headers
+headers = csv_headers (data)
+print ""
+print "=== Headers ==="
+print headers
+
+# Filter rows - find everyone in Seattle
+seattle_folks = csv_filter (data) "city" "Seattle"
+print ""
+print "=== People in Seattle ==="
+for row in seattle_folks
+    print row
+
+# Select specific columns
+names_ages = csv_select (data) ["name", "age"]
+print ""
+print "=== Names and Ages Only ==="
+for row in names_ages
+    print row
+
+# Sort by age ascending
+sorted_asc = csv_sort (data) "age"
+print ""
+print "=== Sorted by Age (ascending) ==="
+for row in sorted_asc
+    print row
+
+# Sort by age descending
+sorted_desc = csv_sort (data) "age" "desc"
+print ""
+print "=== Sorted by Age (descending) ==="
+for row in sorted_desc
+    print row
+
+# Convert back to CSV text
+csv_text = csv_stringify (data)
+print ""
+print "=== Stringified CSV ==="
+print csv_text
+
+# Write and read CSV files
+csv_write "test_output.csv" (data)
+print "=== Wrote test_output.csv ==="
+
+reloaded = csv_read "test_output.csv"
+print "=== Read back from file ==="
+for row in reloaded
+    print row
+
+print ""
+print "CSV builtins working!"
