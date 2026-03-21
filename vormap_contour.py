@@ -167,46 +167,80 @@ def _chain_segments(
     segments: list[tuple[tuple[float, float], tuple[float, float]]],
     tol: float = 1e-6,
 ) -> list[list[tuple[float, float]]]:
-    """Chain disconnected line segments into polylines."""
+    """Chain disconnected line segments into polylines.
+
+    Uses an endpoint hash-map for O(n) average-case chaining instead of
+    the previous O(n²) linear scan per extension step.  Each segment's
+    endpoints are quantized to a grid cell and stored in a dict keyed
+    by (rounded_x, rounded_y).  Lookups and removals are O(1) amortized,
+    making the overall algorithm linear in the number of segments for
+    typical contour data (bounded fan-out per grid cell).
+    """
     if not segments:
         return []
 
-    remaining = list(segments)
+    # Quantize a point to a grid cell for hash-map keying.
+    inv_tol = 1.0 / tol if tol > 0 else 1e6
+
+    def _snap(pt: tuple[float, float]) -> tuple[int, int]:
+        return (round(pt[0] * inv_tol), round(pt[1] * inv_tol))
+
+    # Build adjacency: endpoint_key → list of (segment_index, other_endpoint)
+    # Each segment contributes two entries (one per endpoint).
+    endpoint_map: dict[tuple[int, int], list[tuple[int, int]]] = {}
+    seg_alive = [True] * len(segments)  # track consumed segments
+
+    for idx, (p0, p1) in enumerate(segments):
+        k0 = _snap(p0)
+        k1 = _snap(p1)
+        endpoint_map.setdefault(k0, []).append((idx, 1))  # 1 = other end is p1
+        endpoint_map.setdefault(k1, []).append((idx, 0))  # 0 = other end is p0
+
+    def _pop_neighbor(key: tuple[int, int]) -> tuple[float, float] | None:
+        """Find and consume one live segment sharing this endpoint key.
+
+        Returns the *other* endpoint of the matched segment, or None.
+        """
+        bucket = endpoint_map.get(key)
+        if not bucket:
+            return None
+        while bucket:
+            seg_idx, other_side = bucket.pop()
+            if not seg_alive[seg_idx]:
+                continue
+            seg_alive[seg_idx] = False
+            # Remove the reciprocal entry lazily (dead segments are
+            # skipped when encountered).
+            return segments[seg_idx][other_side]
+        return None
+
     polylines: list[list[tuple[float, float]]] = []
 
-    while remaining:
-        seg = remaining.pop(0)
-        chain = [seg[0], seg[1]]
+    for i, (p0, p1) in enumerate(segments):
+        if not seg_alive[i]:
+            continue
+        seg_alive[i] = False
 
-        changed = True
-        while changed:
-            changed = False
-            for i, s in enumerate(remaining):
-                head = chain[0]
-                tail = chain[-1]
-                if _pt_close(s[1], tail, tol):
-                    chain.append(s[0])
-                    # swap direction and append
-                    chain[-2], chain[-1] = chain[-1], chain[-2]
-                    chain.append(s[1])
-                    remaining.pop(i)
-                    changed = True
-                    break
-                elif _pt_close(s[0], tail, tol):
-                    chain.append(s[1])
-                    remaining.pop(i)
-                    changed = True
-                    break
-                elif _pt_close(s[1], head, tol):
-                    chain.insert(0, s[0])
-                    remaining.pop(i)
-                    changed = True
-                    break
-                elif _pt_close(s[0], head, tol):
-                    chain.insert(0, s[1])
-                    remaining.pop(i)
-                    changed = True
-                    break
+        # Start a new chain with this segment
+        chain = [p0, p1]
+
+        # Extend tail
+        tail_key = _snap(chain[-1])
+        while True:
+            other = _pop_neighbor(tail_key)
+            if other is None:
+                break
+            chain.append(other)
+            tail_key = _snap(other)
+
+        # Extend head
+        head_key = _snap(chain[0])
+        while True:
+            other = _pop_neighbor(head_key)
+            if other is None:
+                break
+            chain.insert(0, other)
+            head_key = _snap(other)
 
         polylines.append(chain)
 
