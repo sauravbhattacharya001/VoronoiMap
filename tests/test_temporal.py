@@ -424,3 +424,28 @@ class TestDataClasses:
         assert r.num_snapshots == 0
         assert r.events == []
         assert r.overall_stability == 0.0
+
+
+class TestDuplicateCoordinates:
+    """Regression tests for issue #119 -- duplicate seed coordinates."""
+
+    def test_get_cell_areas_with_duplicates(self):
+        """_get_cell_areas should return one entry per point index,
+        even when two points share the same coordinates."""
+        points = [(100.0, 100.0), (300.0, 300.0), (100.0, 100.0)]
+        areas = _get_cell_areas(points)
+        # Must have entries for all 3 indices
+        assert 0 in areas
+        assert 1 in areas
+        assert 2 in areas
+        assert len(areas) == 3
+
+    def test_temporal_analysis_duplicate_seeds(self):
+        """temporal_analysis should not crash or lose data when
+        snapshots contain co-located seeds."""
+        snap1 = [(100, 100), (300, 300), (100, 100)]
+        snap2 = [(110, 110), (300, 300), (110, 110)]
+        result = temporal_analysis([snap1, snap2], match_radius=50.0)
+        # Should have events for all 3 cells, no crashes
+        assert result.num_snapshots == 2
+        assert len(result.events) == 3  # one event per cell
