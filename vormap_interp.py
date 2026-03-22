@@ -312,11 +312,10 @@ def grid_interpolate(points, values, nx=50, ny=50, bounds=None,
     # ── Vectorized fast path for IDW/nearest with numpy + KDTree ────
     # Batch-query all grid points at once instead of calling interp_fn
     # in a Python loop.  On a 100x100 grid this is ~20-50x faster.
+    # Reuses the KDTree already built above to avoid O(n log n) duplicate.
     if _HAS_KDTREE and _HAS_SCIPY and method in ('idw', 'nearest'):
         import numpy as np
-        pts_array = np.array(points, dtype=float)
         vals_array = np.array(values, dtype=float)
-        tree = _KDTree(pts_array)
 
         # Build (ny*nx, 2) query matrix
         gx = np.array(x_coords, dtype=float)
