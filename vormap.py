@@ -697,8 +697,11 @@ def get_NN(data, lng, lat):
     minlat = None
 
     for slng, slat in data:
-        dsq = eudist_sq(slng, slat, lng, lat)
-        if (dsq > 0 and dsq <= mindist_sq):
+        # Inlined eudist_sq to avoid function call overhead per data point.
+        _dx = slng - lng
+        _dy = slat - lat
+        dsq = _dx * _dx + _dy * _dy
+        if dsq > 0 and dsq <= mindist_sq:
             mindist_sq = dsq
             minlat = slat
             minlng = slng
@@ -1026,20 +1029,27 @@ def bin_search(data, x1, y1, x2, y2, dlng, dlat):
     xm = -1
     ym = -1
 
+    bin_prec_sq = BIN_PREC * BIN_PREC
+    # Local references avoid global/module-level lookups on every iteration.
+    _get_NN = get_NN
     for _ in range(BIN_SEARCH_MAX_ITER):
-        if eudist(x1, y1, x2, y2) <= BIN_PREC:
+        # Inlined eudist_sq for convergence check — saves a function call
+        # per iteration (~100 iterations × thousands of bin_search calls).
+        _dx = x1 - x2
+        _dy = y1 - y2
+        if _dx * _dx + _dy * _dy <= bin_prec_sq:
             break
 
-        xm = float(x1 + x2) / 2
-        ym = float(y1 + y2) / 2
-        lg, lt = get_NN(data, xm, ym)
-        # Use squared distances for comparison — avoids two sqrt calls
-        # per iteration.  The relative epsilon test is equivalent because
-        # |sqrt(a) - sqrt(b)| / max(sqrt(a), sqrt(b))  ≈
-        # |a - b| / (2 * max(a, b))  for a ≈ b, so we adjust the
-        # tolerance accordingly.
-        d1_sq = eudist_sq(lg, lt, xm, ym)
-        d2_sq = eudist_sq(xm, ym, dlng, dlat)
+        xm = (x1 + x2) * 0.5
+        ym = (y1 + y2) * 0.5
+        lg, lt = _get_NN(data, xm, ym)
+        # Inlined eudist_sq for both distance computations.
+        _dx1 = lg - xm
+        _dy1 = lt - ym
+        d1_sq = _dx1 * _dx1 + _dy1 * _dy1
+        _dx2 = xm - dlng
+        _dy2 = ym - dlat
+        d2_sq = _dx2 * _dx2 + _dy2 * _dy2
         if abs(d1_sq - d2_sq) <= 2e-9 * max(d1_sq, d2_sq, 1e-24):
             x2 = xm
             y2 = ym
