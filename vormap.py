@@ -390,6 +390,9 @@ def _parse_points_csv(filepath):
     Supports common column names: x/y, lng/lat, lon/lat, longitude/latitude,
     easting/northing. Falls back to first two numeric columns if no known
     headers are found.
+
+    Opens the file only once — the dialect is sniffed from a buffered
+    sample and the same file handle is rewound for streaming rows.
     """
     import csv
 
@@ -401,7 +404,7 @@ def _parse_points_csv(filepath):
 
     points = []
     with open(filepath, 'r', newline='') as f:
-        # Sniff the dialect from a sample
+        # Sniff the dialect once from a sample, then rewind
         sample = f.read(4096)
         f.seek(0)
 
@@ -418,43 +421,35 @@ def _parse_points_csv(filepath):
         except StopIteration:
             return points
 
-    # Check if first row is a header
-    header = [h.strip().lower() for h in first_row]
-    x_col, y_col = None, None
+        # Check if first row is a recognised header
+        header = [h.strip().lower() for h in first_row]
+        x_col, y_col = None, None
 
-    for xname, yname in HEADER_PAIRS:
-        if xname in header and yname in header:
-            x_col = header.index(xname)
-            y_col = header.index(yname)
-            break
+        for xname, yname in HEADER_PAIRS:
+            if xname in header and yname in header:
+                x_col = header.index(xname)
+                y_col = header.index(yname)
+                break
 
-    # Re-open to stream rows without holding all in memory
-    with open(filepath, 'r', newline='') as f:
-        try:
-            dialect2 = csv.Sniffer().sniff(f.read(4096))
-        except csv.Error:
-            dialect2 = 'excel'
-        f.seek(0)
-        reader = csv.reader(f, dialect2)
-
-        if x_col is not None:
-            next(reader)  # skip header row
-        else:
-            # Check if first row is numeric data
+        if x_col is None:
+            # Check if first row is numeric data (headerless file)
             try:
                 float(first_row[0])
                 float(first_row[1])
-                # First row is data — don't skip it
+                # First row is data — parse it now, then continue
                 x_col, y_col = 0, 1
+                lng_val = float(first_row[0].strip())
+                lat_val = float(first_row[1].strip())
+                if math.isfinite(lng_val) and math.isfinite(lat_val):
+                    points.append((lng_val, lat_val))
             except (ValueError, IndexError):
-                next(reader)  # skip non-numeric header
+                # Non-numeric, non-recognised header — skip it
                 x_col, y_col = 0, 1
 
-        if x_col is None:
-            x_col, y_col = 0, 1
-
+        # Stream remaining rows from the same file handle & dialect
+        min_cols = max(x_col, y_col) + 1
         for row in reader:
-            if len(row) <= max(x_col, y_col):
+            if len(row) < min_cols:
                 continue
             try:
                 lng_val = float(row[x_col].strip())
