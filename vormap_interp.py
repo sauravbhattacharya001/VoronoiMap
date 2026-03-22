@@ -289,16 +289,20 @@ def grid_interpolate(points, values, nx=50, ny=50, bounds=None,
         interp_fn = lambda q: _natural_neighbor_interp_precomputed(
             pts_array, areas_orig, values, q)
     elif _HAS_KDTREE and method in ('nearest', 'idw'):
-        # Build KDTree once, share across all nx*ny grid queries.
-        # Reduces nearest from O(n*nx*ny) to O(nx*ny*log(n)),
-        # and IDW from O(n*nx*ny) to O(nx*ny*(log(n)+k)).
-        tree = _KDTree(points)
-        if method == 'nearest':
-            interp_fn = lambda q: nearest_interp(points, values, q,
-                                                 _tree=tree)
+        if _HAS_SCIPY:
+            # Vectorized fast path below will handle this case; skip
+            # building a KDTree here to avoid the duplicate O(n log n) cost
+            # (see issue #123).
+            interp_fn = None  # will be unused; vectorized path returns early
         else:
-            interp_fn = lambda q: idw_interp(points, values, q,
-                                             power=power, _tree=tree)
+            # No scipy/numpy — build a single KDTree for the scalar fallback.
+            tree = _KDTree(points)
+            if method == 'nearest':
+                interp_fn = lambda q: nearest_interp(points, values, q,
+                                                     _tree=tree)
+            else:
+                interp_fn = lambda q: idw_interp(points, values, q,
+                                                 power=power, _tree=tree)
     else:
         interp_fn = {
             'natural': lambda q: natural_neighbor_interp(points, values, q),
