@@ -46,6 +46,7 @@ from typing import List, Optional, Tuple
 
 from vormap import validate_output_path
 from vormap_geometry import mean as _mean, median as _median, std as _std, percentile as _percentile_sorted, normal_cdf as _normal_cdf
+from vormap_utils import euclidean_pts as _euclidean
 
 try:
     from scipy.spatial import cKDTree as _KDTree
@@ -64,11 +65,6 @@ except ImportError:
 def _percentile(values: list, p: float) -> float:
     """Percentile (0–100) via linear interpolation.  Accepts unsorted input."""
     return _percentile_sorted(sorted(values), p) if values else 0.0
-
-
-def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    """Euclidean distance between two 2D points."""
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
 

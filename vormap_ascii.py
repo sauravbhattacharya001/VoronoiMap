@@ -22,6 +22,7 @@ Usage (CLI):
 
 import math
 import sys
+from vormap_utils import point_in_polygon as _point_in_polygon
 
 
 # ── ANSI color palettes ──────────────────────────────────────────────
@@ -37,20 +38,6 @@ _REGION_COLORS = [
 
 _SEED_MARKER = '\033[97;1m\u25CF\033[0m'  # bold white circle
 _RESET = '\033[0m'
-
-
-def _point_in_polygon(px, py, polygon):
-    """Ray-casting point-in-polygon test."""
-    n = len(polygon)
-    inside = False
-    j = n - 1
-    for i in range(n):
-        xi, yi = polygon[i]
-        xj, yj = polygon[j]
-        if ((yi > py) != (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi):
-            inside = not inside
-        j = i
-    return inside
 
 
 def render(regions, data, *, width=80, height=24, mono=False,

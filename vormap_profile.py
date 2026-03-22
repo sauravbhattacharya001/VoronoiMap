@@ -26,6 +26,7 @@ import math
 import json
 import os
 import sys
+from vormap_utils import euclidean_pts as _euclidean
 
 try:
     from vormap import load_data
@@ -72,10 +73,6 @@ def _kurtosis(values, mean, sd):
         return 0.0
     m4 = sum(((v - mean) / sd) ** 4 for v in values) / n
     return m4 - 3.0
-
-
-def _euclidean(a, b):
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
 # ---------------------------------------------------------------------------
