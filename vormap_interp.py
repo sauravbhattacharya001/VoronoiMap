@@ -288,10 +288,12 @@ def grid_interpolate(points, values, nx=50, ny=50, bounds=None,
         areas_orig = _voronoi_cell_areas(pts_array)
         interp_fn = lambda q: _natural_neighbor_interp_precomputed(
             pts_array, areas_orig, values, q)
-    elif _HAS_KDTREE and method in ('nearest', 'idw'):
-        # Build KDTree once, share across all nx*ny grid queries.
-        # Reduces nearest from O(n*nx*ny) to O(nx*ny*log(n)),
-        # and IDW from O(n*nx*ny) to O(nx*ny*(log(n)+k)).
+    elif _HAS_KDTREE and _HAS_SCIPY and method in ('nearest', 'idw'):
+        # Vectorized fast path below will handle these; skip building a
+        # throwaway KDTree + interp_fn closure here (fixes issue #123).
+        interp_fn = None  # sentinel — vectorized path runs instead
+    elif method in ('nearest', 'idw') and _HAS_KDTREE:
+        # KDTree available but no scipy/numpy — scalar path with shared tree
         tree = _KDTree(points)
         if method == 'nearest':
             interp_fn = lambda q: nearest_interp(points, values, q,
@@ -306,7 +308,9 @@ def grid_interpolate(points, values, nx=50, ny=50, bounds=None,
             'nearest': lambda q: nearest_interp(points, values, q),
         }.get(method)
 
-    if interp_fn is None:
+    if interp_fn is None and not (
+        _HAS_KDTREE and _HAS_SCIPY and method in ('idw', 'nearest')
+    ):
         raise ValueError("method must be 'natural', 'idw', or 'nearest'")
 
     # ── Vectorized fast path for IDW/nearest with numpy + KDTree ────
