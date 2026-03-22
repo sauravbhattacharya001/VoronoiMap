@@ -58,13 +58,10 @@ from typing import List, Optional, Tuple, Dict, Any
 
 from vormap import validate_output_path
 from vormap_geometry import mean as _mean, median as _median, std as _std
+from vormap_utils import euclidean_pts as _euclidean
 
 
 # ── Helpers ─────────────────────────────────────────────────────────
-
-
-def _euclidean(a, b):
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
 def _nn_distances(points):
