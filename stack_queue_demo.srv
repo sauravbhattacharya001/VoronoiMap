@@ -1,0 +1,82 @@
+# stack_queue_demo.srv - Stack & Queue builtins demo
+
+print "=== Stack (LIFO) ==="
+
+s = stack_create
+print s
+print stack_is_empty s
+
+stack_push (s) 10
+stack_push (s) 20
+stack_push (s) 30
+print "After push 10, 20, 30:"
+print s
+print stack_size s
+print stack_peek s
+
+x = stack_pop s
+print x
+x = stack_pop s
+print x
+print s
+
+s2 = stack_create [1, 2, 3, 4, 5]
+print s2
+print stack_to_list s2
+stack_clear s2
+print s2
+
+print ""
+print "=== Queue (FIFO) ==="
+
+q = queue_create
+print q
+print queue_is_empty q
+
+queue_enqueue (q) "first"
+queue_enqueue (q) "second"
+queue_enqueue (q) "third"
+print "After enqueue:"
+print q
+print queue_size q
+print queue_peek q
+
+x = queue_dequeue q
+print x
+x = queue_dequeue q
+print x
+print q
+
+q2 = queue_create [10, 20, 30, 40]
+print q2
+print queue_to_list q2
+queue_clear q2
+print q2
+
+print ""
+print "=== Reverse String ==="
+word = "sauravcode"
+cs = stack_create
+chars = str_chars word
+for c in chars
+    stack_push (cs) c
+
+rev = ""
+while not stack_is_empty cs
+    ch = stack_pop cs
+    rev = rev + ch
+
+print word
+print rev
+
+print ""
+print "=== Task Queue ==="
+tasks = queue_create ["compile", "test", "lint", "deploy"]
+step = 1
+while not queue_is_empty tasks
+    task = queue_dequeue tasks
+    print step
+    print task
+    step = step + 1
+
+print "Done!"
