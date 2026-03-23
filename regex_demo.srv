@@ -1,0 +1,38 @@
+﻿// regex_demo.srv - Regex builtins demo
+
+// re_test: check if pattern matches
+print("=== re_test ===")
+print(re_test("\\d+", "hello 42 world"))
+print(re_test("^\\d+$", "hello"))
+
+// re_match: match from start of string
+print("=== re_match ===")
+let m2 = re_match("(\\w+)@(\\w+\\.\\w+)", "user@example.com")
+print(m2["matched"])
+print(m2["groups"])
+
+// re_search: find first match anywhere
+print("=== re_search ===")
+let s = re_search("(\\d{3})-(\\d{4})", "Call 555-1234 today")
+print(s["matched"])
+print(s["groups"])
+
+// re_find_all: find all matches
+print("=== re_find_all ===")
+let words = re_find_all("[A-Z][a-z]+", "Hello World Foo Bar")
+print(words)
+
+// re_replace: substitute matches
+print("=== re_replace ===")
+let cleaned = re_replace("\\s+", " ", "too   many    spaces")
+print(cleaned)
+
+// re_split: split by pattern
+print("=== re_split ===")
+let parts = re_split("[,;\\s]+", "one, two; three   four")
+print(parts)
+
+// re_escape: escape special regex chars
+print("=== re_escape ===")
+let safe = re_escape("$10.00")
+print(safe)
