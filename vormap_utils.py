@@ -2,69 +2,17 @@
 
 Centralises commonly duplicated helpers (polygon area, bounding box,
 point validation) so individual modules can import from one place.
+
+``polygon_area`` and ``polygon_centroid`` are canonical in
+:mod:`vormap_geometry`; they are re-exported here for backward
+compatibility so existing ``from vormap_utils import …`` lines
+continue to work.
 """
 
 from typing import List, Tuple
 
-
-def polygon_area(vertices):
-    """Compute polygon area using the shoelace formula (unsigned).
-
-    Parameters
-    ----------
-    vertices : list of (x, y)
-        Polygon vertices in order (clockwise or counter-clockwise).
-        The polygon is implicitly closed.
-
-    Returns
-    -------
-    float
-        Unsigned area of the polygon.
-    """
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
-
-
-def polygon_centroid(vertices):
-    """Centroid of a simple polygon via the shoelace-derived formula.
-
-    Parameters
-    ----------
-    vertices : list of (x, y)
-
-    Returns
-    -------
-    tuple of (float, float)
-    """
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n <= 2:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    area6 = 0.0
-    cx = cy = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = vertices[i][0] * vertices[j][1] - vertices[j][0] * vertices[i][1]
-        area6 += cross
-        cx += (vertices[i][0] + vertices[j][0]) * cross
-        cy += (vertices[i][1] + vertices[j][1]) * cross
-    if abs(area6) < 1e-12:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    cx /= 3.0 * area6
-    cy /= 3.0 * area6
-    return (cx, cy)
+# Re-export from the canonical location to eliminate duplicate code.
+from vormap_geometry import polygon_area, polygon_centroid  # noqa: F401
 
 
 def bounding_box(points):
