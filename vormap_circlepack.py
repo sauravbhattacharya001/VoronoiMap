@@ -44,43 +44,8 @@ except ImportError:
 
 # ── Geometry helpers ─────────────────────────────────────────────────
 
-def _polygon_area(vertices):
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    a = 0.0
-    for i in range(n):
-        x0, y0 = vertices[i]
-        x1, y1 = vertices[(i + 1) % n]
-        a += x0 * y1 - x1 * y0
-    return abs(a) * 0.5
-
-
-def _polygon_centroid(vertices):
-    """Centroid of a simple polygon."""
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n <= 2:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    a6 = 0.0
-    cx = cy = 0.0
-    for i in range(n):
-        x0, y0 = vertices[i]
-        x1, y1 = vertices[(i + 1) % n]
-        cross = x0 * y1 - x1 * y0
-        a6 += cross
-        cx += (x0 + x1) * cross
-        cy += (y0 + y1) * cross
-    if abs(a6) < 1e-12:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    a6 *= 3.0
-    return (cx / a6, cy / a6)
+from vormap_utils import polygon_area as _polygon_area
+from vormap_utils import polygon_centroid as _polygon_centroid
 
 
 def _point_to_segment_dist(px, py, ax, ay, bx, by):

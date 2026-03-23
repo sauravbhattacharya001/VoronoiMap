@@ -67,39 +67,8 @@ class TreemapCell:
 
 # ── Geometry Helpers ──────────────────────────────────────────────────
 
-def _polygon_area(poly):
-    """Shoelace formula for polygon area."""
-    n = len(poly)
-    if n < 3:
-        return 0.0
-    a = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        a += poly[i][0] * poly[j][1]
-        a -= poly[j][0] * poly[i][1]
-    return abs(a) / 2.0
-
-
-def _polygon_centroid(poly):
-    """Centroid of a simple polygon."""
-    n = len(poly)
-    if n == 0:
-        return (0.0, 0.0)
-    if n == 1:
-        return poly[0]
-    cx, cy, a6 = 0.0, 0.0, 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = poly[i][0] * poly[j][1] - poly[j][0] * poly[i][1]
-        cx += (poly[i][0] + poly[j][0]) * cross
-        cy += (poly[i][1] + poly[j][1]) * cross
-        a6 += cross
-    if abs(a6) < 1e-12:
-        xs = [p[0] for p in poly]
-        ys = [p[1] for p in poly]
-        return (sum(xs) / n, sum(ys) / n)
-    a6 *= 3.0
-    return (cx / a6, cy / a6)
+from vormap_utils import polygon_area as _polygon_area
+from vormap_utils import polygon_centroid as _polygon_centroid
 
 
 def _clip_polygon_to_bbox(poly, xmin, ymin, xmax, ymax):

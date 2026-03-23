@@ -90,41 +90,8 @@ PatternSummary = namedtuple("PatternSummary", [
 
 # -- Helper utilities ------------------------------------------------
 
-def _validate_points(points):
-    """Validate and normalize a point list."""
-    if not points or len(points) < 2:
-        raise ValueError("Need at least 2 points for pattern analysis")
-    pts = [(float(x), float(y)) for x, y in points]
-    return pts
-
-
-def _compute_nn_distances(points):
-    """Compute nearest-neighbor distance for each point.
-
-    Uses scipy KDTree when available (O(n log n)), otherwise brute
-    force O(n^2).
-    """
-    n = len(points)
-    try:
-        from scipy.spatial import KDTree
-        tree = KDTree(points)
-        dists, _ = tree.query(points, k=2)  # k=2: self + nearest
-        return [dists[i][1] for i in range(n)]
-    except ImportError:
-        pass
-
-    # Brute force fallback
-    nn_dists = []
-    for i in range(n):
-        min_d = float("inf")
-        for j in range(n):
-            if i == j:
-                continue
-            d = eudist_pts(points[i], points[j])
-            if d < min_d:
-                min_d = d
-        nn_dists.append(min_d)
-    return nn_dists
+from vormap_utils import validate_points as _validate_points
+from vormap_utils import compute_nn_distances as _compute_nn_distances
 
 
 def _compute_bounds(points):

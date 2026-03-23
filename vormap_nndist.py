@@ -72,69 +72,8 @@ def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
 
 
 
-def _polygon_area_shoelace(vertices: List[Tuple[float, float]]) -> float:
-    """Compute polygon area using the shoelace formula (unsigned).
-
-    Parameters
-    ----------
-    vertices : list of (x, y)
-        Polygon vertices in order (clockwise or counter-clockwise).
-        The polygon is implicitly closed.
-
-    Returns
-    -------
-    float
-        Unsigned area of the polygon.
-    """
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
-
-
-def _validate_points(points: list) -> List[Tuple[float, float]]:
-    """Validate and normalize a list of (x, y) points.
-
-    Accepts lists/tuples of two numeric values.  Rejects NaN, Inf,
-    non-numeric, and wrong-length entries.
-
-    Returns
-    -------
-    list of (float, float)
-        Validated point list.
-
-    Raises
-    ------
-    ValueError
-        If any point is invalid or fewer than 2 points remain.
-    """
-    validated = []
-    for i, pt in enumerate(points):
-        if not isinstance(pt, (list, tuple)) or len(pt) != 2:
-            raise ValueError(
-                f"Point at index {i} must be a 2-element sequence, got {type(pt).__name__}"
-            )
-        try:
-            x, y = float(pt[0]), float(pt[1])
-        except (TypeError, ValueError):
-            raise ValueError(
-                f"Point at index {i} has non-numeric coordinates: {pt}"
-            )
-        if math.isnan(x) or math.isnan(y) or math.isinf(x) or math.isinf(y):
-            raise ValueError(
-                f"Point at index {i} has NaN/Inf coordinates: ({x}, {y})"
-            )
-        validated.append((x, y))
-    if len(validated) < 2:
-        raise ValueError(
-            f"At least 2 points required for distance analysis, got {len(validated)}"
-        )
-    return validated
+from vormap_utils import polygon_area as _polygon_area_shoelace
+from vormap_utils import validate_points as _validate_points
 
 
 # ── Core: k-Nearest Neighbor Distances ──────────────────────────────

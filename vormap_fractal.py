@@ -58,11 +58,7 @@ import math
 
 # ── Box-Counting Dimension ───────────────────────────────────
 
-def _bounding_box(points):
-    """Return (x_min, y_min, x_max, y_max) for a list of (x, y) points."""
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
-    return min(xs), min(ys), max(xs), max(ys)
+from vormap_utils import bounding_box as _bounding_box
 
 
 def box_count(points, num_scales=15):
