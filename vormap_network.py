@@ -272,20 +272,35 @@ def _bfs_distances(adjacency, source, n):
     return dist
 
 
-def _betweenness_centrality(adjacency, n):
-    """Brandes' algorithm for betweenness centrality.
+def _betweenness_and_distances(adjacency, n):
+    """Combined Brandes' betweenness centrality + distance metrics.
 
-    Returns dict mapping node index to betweenness score (normalized).
+    Performs a single O(n) BFS from each node to compute betweenness
+    centrality, diameter, average path length, and global efficiency
+    simultaneously — eliminating the redundant second BFS pass that
+    ``_bfs_distances`` would otherwise require for each source.
+
+    Returns
+    -------
+    tuple of (cb, diameter, avg_path_length, global_efficiency)
+        cb : dict — node index to normalized betweenness score
+        diameter : int — longest shortest path in the graph
+        avg_path_length : float — mean shortest path over all reachable pairs
+        global_efficiency : float — Latora & Marchiori global efficiency
     """
-    cb = {i: 0.0 for i in range(n)}
+    cb = [0.0] * n
+    diameter = 0
+    total_dist = 0
+    num_pairs = 0
+    efficiency_sum = 0.0
 
     for s in range(n):
-        # BFS from s
+        # Brandes BFS from s
         stack = []
-        pred = {i: [] for i in range(n)}
-        sigma = {i: 0 for i in range(n)}
+        pred = [[] for _ in range(n)]
+        sigma = [0] * n
         sigma[s] = 1
-        dist = {i: -1 for i in range(n)}
+        dist = [-1] * n
         dist[s] = 0
         queue = deque([s])
 
@@ -300,7 +315,18 @@ def _betweenness_centrality(adjacency, n):
                     sigma[w] += sigma[v]
                     pred[w].append(v)
 
-        delta = {i: 0.0 for i in range(n)}
+        # Accumulate distance metrics (only count j > s to avoid double)
+        for j in range(s + 1, n):
+            d = dist[j]
+            if d > 0:
+                total_dist += d
+                num_pairs += 1
+                if d > diameter:
+                    diameter = d
+                efficiency_sum += 1.0 / d
+
+        # Back-propagation for betweenness
+        delta = [0.0] * n
         while stack:
             w = stack.pop()
             for v in pred[w]:
@@ -309,13 +335,29 @@ def _betweenness_centrality(adjacency, n):
             if w != s:
                 cb[w] += delta[w]
 
-    # Normalize for undirected graph: each shortest path is counted from
-    # both endpoints, so divide by 2 compared to the directed formula.
+    # Normalize betweenness for undirected graph
     norm = (n - 1) * (n - 2) / 2 if n > 2 else 1
+    cb_dict = {}
     if norm > 0:
-        for i in cb:
-            cb[i] /= norm
+        for i in range(n):
+            cb_dict[i] = cb[i] / norm
+    else:
+        for i in range(n):
+            cb_dict[i] = 0.0
 
+    avg_path = total_dist / num_pairs if num_pairs > 0 else 0
+    max_pairs = n * (n - 1) / 2 if n > 1 else 1
+    global_eff = efficiency_sum / max_pairs if max_pairs > 0 else 0
+
+    return cb_dict, diameter, avg_path, global_eff
+
+
+def _betweenness_centrality(adjacency, n):
+    """Brandes' algorithm for betweenness centrality.
+
+    Returns dict mapping node index to betweenness score (normalized).
+    """
+    cb, _, _, _ = _betweenness_and_distances(adjacency, n)
     return cb
 
 
@@ -387,28 +429,9 @@ def network_stats(graph):
     max_edges = n * (n - 1) / 2 if n > 1 else 1
     density = len(edges) / max_edges if max_edges > 0 else 0
 
-    # Diameter and average path length (on largest component)
-    diameter = 0
-    total_dist = 0
-    num_pairs = 0
-    efficiency_sum = 0.0
-
-    for i in range(n):
-        dists = _bfs_distances(adj, i, n)
-        for j in range(i + 1, n):
-            if dists[j] > 0:
-                total_dist += dists[j]
-                num_pairs += 1
-                if dists[j] > diameter:
-                    diameter = dists[j]
-                efficiency_sum += 1.0 / dists[j]
-
-    avg_path = total_dist / num_pairs if num_pairs > 0 else 0
-    max_pairs = n * (n - 1) / 2 if n > 1 else 1
-    global_eff = efficiency_sum / max_pairs if max_pairs > 0 else 0
-
-    # Betweenness centrality
-    bc = _betweenness_centrality(adj, n)
+    # Combined: betweenness centrality + diameter + avg path + efficiency
+    # in a single O(n) BFS per node pass (previously two separate passes)
+    bc, diameter, avg_path, global_eff = _betweenness_and_distances(adj, n)
 
     # Hub nodes (top 10 by betweenness)
     hub_list = sorted(
