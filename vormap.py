@@ -1674,7 +1674,8 @@ def _cmd_hull(args, data):
     """Handle --hull / --hull-json / --hull-svg."""
     import vormap_hull
 
-    pts = [(d["x"], d["y"]) for d in data]
+    # data is a list of (lng, lat) tuples from load_data()
+    pts = list(data)
     analysis = vormap_hull.hull_analysis(pts)
 
     if args.hull:
@@ -1897,7 +1898,8 @@ def _cmd_centers(args, data):
     if not centers_requested:
         return
     import vormap_centroid
-    pts = [(d["x"], d["y"]) for d in data]
+    # data is a list of (lng, lat) tuples from load_data()
+    pts = list(data)
     cr = vormap_centroid.analyze_centers(
         pts, bounds=(IND_S, IND_N, IND_W, IND_E),
     )
@@ -1924,7 +1926,8 @@ def _cmd_buffers(args, data):
     if not buffers_requested:
         return
     import vormap_buffer
-    pts = [(d["x"], d["y"]) for d in data]
+    # data is a list of (lng, lat) tuples from load_data()
+    pts = list(data)
     radii = None
     if args.buffer_rings:
         radii = [float(r.strip()) for r in args.buffer_rings.split(",")]
@@ -2746,6 +2749,7 @@ def main():
     # independently, which (a) wasted work and (b) caused --relax to
     # only apply to --visualize, silently ignoring relaxation for
     # --interactive, --geojson, --stats, and --graph outputs.
+    # Commands that need Voronoi region computation (expensive)
     needs_regions = any([
         args.visualize, args.interactive, args.geojson, args.kml,
         args.stats, args.stats_csv, args.stats_json,
@@ -2763,8 +2767,22 @@ def main():
         args.circlepack, args.circlepack_html, args.circlepack_stats,
     ])
 
+    # Commands that need data loaded but not full region computation
+    needs_data_only = any([
+        args.hull, args.hull_json, args.hull_svg,
+        args.centers, args.centers_json, args.centers_csv, args.centers_svg,
+        args.buffers is not None, args.buffers_json,
+        args.buffers_csv, args.buffers_svg,
+        args.kde_svg, args.kde_csv, args.kde_hotspots,
+        args.pattern, args.pattern_json,
+    ])
+
     data = None
     regions = None
+
+    # Load data for data-only commands even when regions aren't needed
+    if needs_data_only and not needs_regions:
+        data = load_data(args.datafile)
 
     if needs_regions:
         import vormap_viz
