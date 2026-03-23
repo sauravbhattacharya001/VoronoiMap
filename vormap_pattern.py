@@ -92,6 +92,7 @@ PatternSummary = namedtuple("PatternSummary", [
 
 from vormap_utils import validate_points as _validate_points
 from vormap_utils import compute_nn_distances as _compute_nn_distances
+from vormap_utils import polygon_area as _polygon_area
 
 
 def _compute_bounds(points):
@@ -151,14 +152,7 @@ def _convex_hull_area(points):
     if len(hull) < 3:
         return 0.0
 
-    # Shoelace formula
-    area = 0.0
-    n = len(hull)
-    for i in range(n):
-        j = (i + 1) % n
-        area += hull[i][0] * hull[j][1]
-        area -= hull[j][0] * hull[i][1]
-    return abs(area) / 2.0
+    return _polygon_area(hull)
 
 
 # -- Core analyses ---------------------------------------------------

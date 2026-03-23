@@ -42,49 +42,8 @@ except ImportError:
     _HAS_SCIPY = False
 
 import vormap
-
-
-# ── Geometry Helpers ─────────────────────────────────────────────────
-
-def _polygon_area(vertices):
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
-
-
-def _polygon_centroid(vertices):
-    """Compute centroid of a polygon."""
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n < 3:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    area = 0.0
-    cx = 0.0
-    cy = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = vertices[i][0] * vertices[j][1] - vertices[j][0] * vertices[i][1]
-        area += cross
-        cx += (vertices[i][0] + vertices[j][0]) * cross
-        cy += (vertices[i][1] + vertices[j][1]) * cross
-    area /= 2.0
-    if abs(area) < 1e-12:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    cx /= (6.0 * area)
-    cy /= (6.0 * area)
-    return (cx, cy)
+from vormap_utils import polygon_area as _polygon_area
+from vormap_utils import polygon_centroid as _polygon_centroid
 
 
 def _clip_region(vertices, bounds):
