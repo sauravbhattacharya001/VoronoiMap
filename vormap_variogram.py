@@ -61,6 +61,8 @@ import math
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
+from vormap_geometry import edge_length as _dist
+
 
 # ── Data Structures ──────────────────────────────────────────────────
 
@@ -110,10 +112,6 @@ class VariogramSurface:
 
 
 # ── Distance / Angle helpers ─────────────────────────────────────────
-
-
-def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
 def _angle_deg(a: Tuple[float, float], b: Tuple[float, float]) -> float:

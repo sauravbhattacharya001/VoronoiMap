@@ -54,15 +54,12 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Tuple, Dict, Any, Sequence
 
 from vormap import validate_output_path
+from vormap_geometry import edge_length as _dist
 
 
 # ---------------------------------------------------------------------------
 # Geometry helpers
 # ---------------------------------------------------------------------------
-
-def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    """Euclidean distance between two 2-D points."""
-    return math.hypot(a[0] - b[0], a[1] - b[1])
 
 
 def _circle_area(r: float) -> float:

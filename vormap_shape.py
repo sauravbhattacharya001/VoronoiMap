@@ -61,6 +61,7 @@ from vormap_geometry import (
     polygon_area as _polygon_area,
     polygon_perimeter as _polygon_perimeter,
     polygon_centroid as _polygon_centroid,
+    edge_length as _distance,
 )
 
 
@@ -92,10 +93,6 @@ def _classify_shape(ipq: float) -> str:
             return label
     return "highly_elongated"
 
-
-def _distance(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    """Euclidean distance between two points."""
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
 def _min_bounding_rectangle(vertices: List[Tuple[float, float]]) -> Dict[str, float]:

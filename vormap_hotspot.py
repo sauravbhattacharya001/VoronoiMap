@@ -51,7 +51,7 @@ from vormap_geometry import (
     normal_cdf as _normal_cdf,
     polygon_centroid,
     polygon_area,
-    edge_length,
+    edge_length as _distance,
 )
 
 
@@ -60,11 +60,6 @@ from vormap_geometry import (
 def _centroids_from_stats(stats):
     """Extract (x, y) centroids from region stats."""
     return [(s["centroid_x"], s["centroid_y"]) for s in stats]
-
-
-def _distance(a, b):
-    """Euclidean distance between two 2D points."""
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
 def _shared_edge_or_vertex(verts_a, verts_b, tol=1e-9):

@@ -56,7 +56,7 @@ from typing import Dict, List, Optional, Set, Tuple
 from vormap import validate_output_path
 
 try:
-    from vormap_geometry import polygon_centroid, polygon_area
+    from vormap_geometry import polygon_centroid, polygon_area, edge_length as _dist
 except ImportError:  # pragma: no cover
     pass
 
@@ -201,10 +201,6 @@ def _centroid(poly) -> Tuple[float, float]:
         cy = sum(p[1] for p in poly) / len(poly)
         return (cx, cy)
 
-
-def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    """Euclidean distance."""
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
 def _poly_area(poly) -> float:

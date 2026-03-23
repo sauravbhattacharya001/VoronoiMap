@@ -52,6 +52,8 @@ import random
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
+from vormap_geometry import edge_length as _dist
+
 
 
 # ── Data classes ─────────────────────────────────────────────────────
@@ -125,11 +127,6 @@ class SitingResult:
 
 
 # ── Helpers ──────────────────────────────────────────────────────────
-
-
-def _dist(a, b):
-    """Euclidean distance between two points."""
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
 def _bounding_box(points):
