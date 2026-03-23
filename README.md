@@ -49,7 +49,7 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
 
-## Module Catalog (52 Modules)
+## Module Catalog (53 Modules)
 
 VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is every module organized by category:
 
@@ -75,6 +75,7 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_report` | Self-contained HTML analysis report with stats, histograms, region table |
 | `vormap_geojson` | GeoJSON export (RFC 7946) for GIS tools (QGIS, Mapbox, Leaflet, ArcGIS) |
 | `vormap_kml` | KML export for Google Earth visualization |
+| `vormap_gpx` | GPX import/export: load waypoints/tracks/routes, export points for GPS devices |
 
 ### Spatial Statistics
 
