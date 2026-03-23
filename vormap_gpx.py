@@ -37,6 +37,38 @@ import xml.etree.ElementTree as ET
 
 __all__ = ["load_gpx", "export_gpx", "gpx_info"]
 
+
+def _safe_parse_xml(filepath):
+    """Parse an XML file with external entity resolution disabled.
+
+    Mitigates XML External Entity (XXE) injection and billion-laughs
+    denial-of-service attacks when loading untrusted GPX files.
+
+    Parameters
+    ----------
+    filepath : str
+        Path to the XML file.
+
+    Returns
+    -------
+    xml.etree.ElementTree.ElementTree
+
+    Raises
+    ------
+    ET.ParseError
+        If the XML is malformed.
+    ValueError
+        If the XML contains entity declarations.
+    """
+    parser = ET.XMLParser()
+    # Disable external entity loading via the underlying expat parser.
+    if hasattr(parser, '_parser'):  # CPython implementation detail
+        parser._parser.EntityDeclHandler = lambda *_args: (_ for _ in ()).throw(
+            ValueError("XML entity declarations are not allowed in GPX files")
+        )
+        parser._parser.ExternalEntityRefHandler = lambda *_args: 0  # reject
+    return ET.parse(filepath, parser=parser)
+
 # GPX XML namespace
 _GPX_NS = "http://www.topografix.com/GPX/1/1"
 _NS = {"gpx": _GPX_NS}
@@ -133,7 +165,7 @@ def load_gpx(filepath, source="all"):
         raise FileNotFoundError("GPX file not found: %s" % filepath)
 
     try:
-        tree = ET.parse(filepath)
+        tree = _safe_parse_xml(filepath)
     except ET.ParseError as exc:
         raise ValueError("Invalid GPX XML: %s" % exc)
 
@@ -267,7 +299,7 @@ def gpx_info(filepath):
     if not os.path.isfile(filepath):
         raise FileNotFoundError("GPX file not found: %s" % filepath)
 
-    tree = ET.parse(filepath)
+    tree = _safe_parse_xml(filepath)
     root = tree.getroot()
     has_ns = root.tag.startswith("{")
 
