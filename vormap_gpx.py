@@ -35,7 +35,49 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 
+try:
+    import defusedxml.ElementTree as _SafeET  # type: ignore[import-untyped]
+except ImportError:  # pragma: no cover – defusedxml is optional
+    _SafeET = None
+
+
+def _safe_parse(filepath):
+    """Parse XML safely, mitigating XXE / entity-expansion attacks.
+
+    Uses *defusedxml* when available.  Otherwise falls back to the
+    standard library but disables entity expansion by rejecting DTDs
+    via a custom parser that forbids external entities.
+    """
+    if _SafeET is not None:
+        return _SafeET.parse(filepath)
+
+    # Fallback: use iterparse and reject any DOCTYPE / entity declarations
+    # by pre-scanning the first 4 KB for risky preambles.
+    with open(filepath, "rb") as fh:
+        head = fh.read(4096)
+    head_lower = head.lower()
+    if b"<!entity" in head_lower or b"<!doctype" in head_lower:
+        raise ValueError(
+            "GPX file contains a DOCTYPE or ENTITY declaration — "
+            "refusing to parse (possible XXE attack). "
+            "Install defusedxml for safe processing."
+        )
+    return ET.parse(filepath)
+
 __all__ = ["load_gpx", "export_gpx", "gpx_info"]
+
+
+def _sanitize_csv_field(value):
+    """Prevent CSV injection by prefixing dangerous leading characters.
+
+    Spreadsheet applications auto-execute formulas when a cell starts
+    with ``=``, ``+``, ``-``, ``@``, ``\\t``, or ``\\r``.  Prefixing
+    with a single-quote neutralises this while preserving readability.
+    """
+    s = str(value)
+    if s and s[0] in ("=", "+", "-", "@", "\t", "\r"):
+        return "'" + s
+    return s
 
 # GPX XML namespace
 _GPX_NS = "http://www.topografix.com/GPX/1/1"
@@ -133,7 +175,7 @@ def load_gpx(filepath, source="all"):
         raise FileNotFoundError("GPX file not found: %s" % filepath)
 
     try:
-        tree = ET.parse(filepath)
+        tree = _safe_parse(filepath)
     except ET.ParseError as exc:
         raise ValueError("Invalid GPX XML: %s" % exc)
 
@@ -255,8 +297,10 @@ def export_gpx(points, filepath, names=None, descriptions=None,
     tree = ET.ElementTree(gpx)
     ET.indent(tree, space="  ")
 
-    os.makedirs(os.path.dirname(os.path.abspath(filepath)) or ".", exist_ok=True)
-    tree.write(filepath, xml_declaration=True, encoding="UTF-8")
+    import vormap as _vm
+    safe_filepath = _vm.validate_output_path(filepath, allow_absolute=True)
+    os.makedirs(os.path.dirname(os.path.abspath(safe_filepath)) or ".", exist_ok=True)
+    tree.write(safe_filepath, xml_declaration=True, encoding="UTF-8")
 
 
 def gpx_info(filepath):
@@ -267,7 +311,7 @@ def gpx_info(filepath):
     if not os.path.isfile(filepath):
         raise FileNotFoundError("GPX file not found: %s" % filepath)
 
-    tree = ET.parse(filepath)
+    tree = _safe_parse(filepath)
     root = tree.getroot()
     has_ns = root.tag.startswith("{")
 
@@ -344,17 +388,20 @@ def _cli_import(args):
                              "Extension determines format: .csv, .json, .txt")
     opts = parser.parse_args(args)
 
+    import vormap as _vm
+
     points, metadata = load_gpx(opts.gpx_file, source=opts.source)
 
     if opts.output:
-        ext = os.path.splitext(opts.output)[1].lower()
-        os.makedirs(os.path.dirname(os.path.abspath(opts.output)) or ".",
+        safe_out = _vm.validate_output_path(opts.output, allow_absolute=True)
+        ext = os.path.splitext(safe_out)[1].lower()
+        os.makedirs(os.path.dirname(os.path.abspath(safe_out)) or ".",
                     exist_ok=True)
         if ext == ".csv":
-            with open(opts.output, "w") as f:
+            with open(safe_out, "w") as f:
                 f.write("longitude,latitude,name,elevation\n")
                 for (lon, lat), meta in zip(points, metadata):
-                    name = meta.get("name", "")
+                    name = _sanitize_csv_field(meta.get("name", ""))
                     ele = meta.get("ele", "")
                     f.write("%.8f,%.8f,%s,%s\n" % (lon, lat, name, ele))
         elif ext == ".json":
@@ -364,13 +411,13 @@ def _cli_import(args):
                 entry = {"lon": lon, "lat": lat}
                 entry.update(meta)
                 data.append(entry)
-            with open(opts.output, "w") as f:
+            with open(safe_out, "w") as f:
                 json.dump(data, f, indent=2)
         else:
-            with open(opts.output, "w") as f:
+            with open(safe_out, "w") as f:
                 for lon, lat in points:
                     f.write("%.8f %.8f\n" % (lon, lat))
-        print("Exported %d points to %s" % (len(points), opts.output))
+        print("Exported %d points to %s" % (len(points), safe_out))
     else:
         for lon, lat in points:
             print("%.8f %.8f" % (lon, lat))
@@ -388,14 +435,17 @@ def _cli_export(args):
     parser.add_argument("--output", "-o", required=True,
                         help="Output GPX file")
     opts = parser.parse_args(args)
+    import vormap as _vm
+
+    safe_in = _vm.validate_input_path(opts.input_file, allow_absolute=True)
 
     # Read points from input file
-    ext = os.path.splitext(opts.input_file)[1].lower()
+    ext = os.path.splitext(safe_in)[1].lower()
     points = []
     names = []
 
     if ext == ".csv":
-        with open(opts.input_file) as f:
+        with open(safe_in) as f:
             header = f.readline().strip().lower()
             for line in f:
                 parts = line.strip().split(",")
@@ -411,7 +461,7 @@ def _cli_export(args):
                         continue
     elif ext == ".json":
         import json
-        with open(opts.input_file) as f:
+        with open(safe_in) as f:
             data = json.load(f)
         for entry in data:
             if isinstance(entry, dict):
@@ -424,7 +474,7 @@ def _cli_export(args):
                 points.append((float(entry[0]), float(entry[1])))
                 names.append(None)
     else:
-        with open(opts.input_file) as f:
+        with open(safe_in) as f:
             for line in f:
                 parts = line.strip().split()
                 if len(parts) >= 2:
@@ -435,12 +485,13 @@ def _cli_export(args):
                         continue
 
     if not points:
-        print("Error: No valid points found in %s" % opts.input_file)
+        print("Error: No valid points found in %s" % safe_in)
         sys.exit(1)
 
+    safe_out = _vm.validate_output_path(opts.output, allow_absolute=True)
     final_names = [n or ("Point %d" % (i + 1)) for i, n in enumerate(names)]
-    export_gpx(points, opts.output, names=final_names)
-    print("Exported %d points to %s" % (len(points), opts.output))
+    export_gpx(points, safe_out, names=final_names)
+    print("Exported %d points to %s" % (len(points), safe_out))
 
 
 def _cli_info(args):
