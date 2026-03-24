@@ -1,8 +1,8 @@
 {
-  "lastRepo": "FeedReader",
-  "lastFeature": "Reading Time Estimator",
-  "lastRun": "2026-03-22T22:39:00.000-07:00",
-  "runCount": 298,
+  "lastRepo": "Ocaml-sample-code",
+  "lastFeature": "Van Emde Boas tree data structure",
+  "lastRun": "2026-03-23T22:35:00.000-07:00",
+  "runCount": 342,
   "repoFeatures": {
     "sauravcode": [
       "Bitwise operation builtins",
@@ -41,7 +41,12 @@
       "3D Mesh Exporter",
       "Voronoi Treemap",
       "Voronoi Jigsaw Puzzle Generator",
-      "GPX Import/Export Module"
+      "GPX Import/Export Module",
+      "Isochrone Generator",
+      "Voronoi Cartogram",
+      "Terrain Erosion Simulator",
+      "Voronoi Fracture Simulator",
+      "Voronoi Pixel Art Generator"
     ],
     "agenticchat": [
       "Per-session notes/memos",
@@ -61,7 +66,8 @@
       "Tone Adjuster",
       "Response Length Presets",
       "Session Archive",
-      "Session Calendar"
+      "Session Calendar",
+      "Word Cloud Generator"
     ],
     "agentlens": [
       "CLI tail command",
@@ -80,7 +86,9 @@
       "CLI budget command",
       "CLI snapshot command",
       "CLI alert command",
-      "CLI forecast command"
+      "CLI forecast command",
+      "CLI leaderboard command",
+      "CLI gantt command"
     ],
     "gif-captcha": [
       "CLI tool",
@@ -97,7 +105,11 @@
       "Incident Timeline Dashboard",
       "CAPTCHA Load Tester",
       "Challenge Rotation Scheduler",
-      "Solve Time Histogram"
+      "Solve Time Histogram",
+      "Trust Score Dashboard",
+      "Session Replay Viewer",
+      "Fingerprint Explorer dashboard",
+      "Challenge Diversity Analyzer"
     ],
     "GraphVisual": [
       "SVG graph exporter",
@@ -116,7 +128,9 @@
       "Famous Graph Library",
       "Graph Complement Analyzer",
       "TikZ/LaTeX Exporter",
-      "Graph Voronoi Partitioner"
+      "Graph Voronoi Partitioner",
+      "BandwidthMinimizer (Cuthill-McKee)",
+      "Degree Sequence Randomizer"
     ],
     "Vidly": [
       "Rental extension feature",
@@ -133,7 +147,11 @@
       "Parental Controls",
       "Movie Trade-In System",
       "Damage Assessment System",
-      "Franchise Controller with full UI"
+      "Franchise Controller with full UI",
+      "Subscription Management Controller & Views",
+      "Seasonal Promotions",
+      "Movie Quotes Board",
+      "Penalty Waiver System"
     ],
     "FeedReader": [
       "Vocabulary Builder",
@@ -154,7 +172,8 @@
       "Source Credibility Scorer",
       "Reading Position Manager (resume where you left off)",
       "Article Summary Generator (extractive summarization)",
-      "Reading Time Estimator"
+      "Reading Time Estimator",
+      "Feed Snooze Manager"
     ],
     "BioBots": [
       "Cell Seeding Calculator",
@@ -175,7 +194,8 @@
       "Pipette Calibration Checker",
       "Freeze-Thaw Cycle Tracker",
       "Buffer Preparation Calculator",
-      "Cell Counter / Hemocytometer Calculator"
+      "Cell Counter / Hemocytometer Calculator",
+      "Spectrophotometer Reading Analyzer"
     ],
     "prompt": [
       "PromptChainVisualizer",
@@ -195,7 +215,10 @@
       "PromptWatermark",
       "PromptProfileSwitcher",
       "PromptLocalizationManager",
-      "PromptEmotionAnalyzer"
+      "PromptEmotionAnalyzer",
+      "PromptPlayground",
+      "PromptUsageDashboard",
+      "PromptCanary"
     ],
     "everything": [
       "Bookmark Manager",
@@ -224,7 +247,14 @@
       "Dice Roller",
       "QR Code Generator",
       "Daily Journal",
-      "Ambient Sound Mixer"
+      "Ambient Sound Mixer",
+      "Currency Converter",
+      "Text Analyzer",
+      "Birthdays & Anniversaries Tracker",
+      "Symptom Tracker",
+      "Breathing Exercise",
+      "Tally Counter",
+      "Invoice Generator"
     ],
     "ai": [
       "Safety Trend Tracker",
@@ -247,7 +277,10 @@
       "Blast Radius Analyzer",
       "Safety Metrics Aggregator CLI",
       "Privilege Escalation Detector",
-      "Supply Chain Risk Analyzer"
+      "Supply Chain Risk Analyzer",
+      "Incident Postmortem Generator",
+      "Safety Gate pre-deployment readiness checker",
+      "STRIDE Threat Model Generator"
     ],
     "getagentbox": [
       "Custom 404 page",
@@ -267,7 +300,9 @@
       "Terms of Service Page",
       "Partner Program Page",
       "Careers Page",
-      "API Documentation Page"
+      "API Documentation Page",
+      "Testimonials & Reviews Page",
+      "Blog Page"
     ],
     "Ocaml-sample-code": [
       "Interactive sorting algorithm visualizer",
@@ -288,7 +323,13 @@
       "Type Class Emulation",
       "A* Pathfinding Algorithm",
       "Dining Philosophers concurrency example",
-      "Polynomial Arithmetic module"
+      "Polynomial Arithmetic module",
+      "Ring Buffer data structure",
+      "Splay Tree data structure",
+      "Cuckoo Filter data structure",
+      "Treap data structure",
+      "Consistent Hashing module",
+      "Van Emde Boas tree data structure"
     ],
     "WinSentinel": [
       "Score Forecast CLI command",
@@ -307,7 +348,10 @@
       "Config Backup & Restore",
       "CLI --hotspots command",
       "CLI --kpi command",
-      "CLI --deps command"
+      "CLI --deps command",
+      "CLI --drift command",
+      "CLI --sla command",
+      "CLI --coverage command"
     ]
   }
 }

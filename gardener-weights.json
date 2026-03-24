@@ -1,74 +1,74 @@
 {
-  "lastUpdated": "2026-03-23T06:46:00.000Z",
-  "totalRuns": 1421,
+  "lastUpdated": "2026-03-24T01:18:56.393Z",
+  "totalRuns": 1489,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
-      "runs": 22,
-      "successes": 22
+      "runs": 23,
+      "successes": 23
     },
     "bug_fix": {
       "weight": 17.1,
-      "runs": 124,
-      "successes": 125
+      "runs": 126,
+      "successes": 127
     },
     "security_fix": {
       "weight": 18.1,
-      "runs": 127,
-      "successes": 127,
+      "runs": 139,
+      "successes": 139,
       "description": "Fix security vulnerability",
       "totalDone": 7
     },
     "perf_improvement": {
       "weight": 17.1,
-      "runs": 125,
-      "successes": 125,
+      "runs": 129,
+      "successes": 129,
       "totalDone": 10,
       "attempts": 10
     },
     "refactor": {
       "weight": 18.1,
-      "runs": 126,
-      "successes": 129
+      "runs": 141,
+      "successes": 144
     },
     "readme_overhaul": {
       "weight": 20,
-      "runs": 28,
-      "successes": 28
+      "runs": 30,
+      "successes": 29
     },
     "doc_update": {
       "weight": 16.1,
-      "runs": 72,
-      "successes": 74,
+      "runs": 74,
+      "successes": 76,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
       "weight": 18.1,
-      "runs": 61,
-      "successes": 61,
+      "runs": 63,
+      "successes": 63,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 15.1,
-      "runs": 109,
-      "successes": 112,
+      "runs": 112,
+      "successes": 115,
       "description": "Open a thoughtful issue",
       "totalDone": 2,
       "attempts": 4
     },
     "fix_issue": {
       "weight": 15.1,
-      "runs": 199,
-      "successes": 199,
+      "runs": 202,
+      "successes": 202,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
       "weight": 25,
-      "runs": 33,
-      "successes": 27,
+      "runs": 39,
+      "successes": 33,
       "description": "Review and merge open Dependabot PRs"
     },
     "add_ci_cd": {
@@ -97,26 +97,26 @@
     },
     "create_release": {
       "weight": 20,
-      "runs": 48,
-      "successes": 48,
+      "runs": 55,
+      "successes": 55,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
       "weight": 10,
-      "runs": 14,
-      "successes": 13,
+      "runs": 15,
+      "successes": 14,
       "description": "Add Dockerfile"
     },
     "docker_workflow": {
       "weight": 20,
-      "runs": 24,
-      "successes": 24,
+      "runs": 25,
+      "successes": 25,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
       "weight": 20,
-      "runs": 23,
-      "successes": 22,
+      "runs": 24,
+      "successes": 23,
       "description": "Set up package publishing (PyPI/npm/NuGet)"
     },
     "add_badges": {
@@ -151,14 +151,14 @@
     },
     "branch_protection": {
       "weight": 10,
-      "runs": 20,
-      "successes": 20,
+      "runs": 22,
+      "successes": 22,
       "description": "Configure branch protection"
     },
     "code_coverage": {
       "weight": 20,
-      "runs": 30,
-      "successes": 29,
+      "runs": 33,
+      "successes": 32,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
@@ -174,8 +174,8 @@
     },
     "add_docstrings": {
       "weight": 12,
-      "runs": 19,
-      "successes": 19
+      "runs": 22,
+      "successes": 22
     }
   },
   "repoState": {
@@ -196,10 +196,10 @@
     "everything": [],
     "prompt": []
   },
-  "notes": "Run 1468: perf_improvement on FeedReader - added pre-filters to ArticleDeduplicator.findDuplicates() (title-length ratio + n-gram cardinality bounds) to skip ~60-80% of pairs before expensive similarity computation. Run 1469: merge_dependabot on sauravbhattacharya001 - no open Dependabot PRs across any repos.",
-  "lastRepo": "sauravbhattacharya001",
-  "lastRun": "2026-03-22",
-  "runCount": 301,
+  "notes": "Run 1544: refactor on VoronoiMap - deduplicated KDE bandwidth selection, differentiated Silverman (IQR-robust) vs Scott (raw std) rules (PR #133). Run 1545: perf_improvement on gif-captcha - quickselect O(n) eviction in rate limiter (PR #84).",
+  "lastRepo": "BioBots",
+  "lastRun": "2026-03-23",
+  "runCount": 335,
   "lastWeightAdjustment": 1191,
   "adjustmentHistory": [
     {
@@ -239,14 +239,14 @@
     }
   ],
   "lastTasks": [
-    "perf_improvement",
-    "merge_dependabot"
+    "refactor",
+    "perf_improvement"
   ],
   "lastAdjusted": 910,
   "lastRepos": [
-    "FeedReader",
-    "sauravbhattacharya001"
+    "VoronoiMap",
+    "gif-captcha"
   ],
-  "lastRunTimestamp": "2026-03-23T06:46:00.000Z",
-  "runCounter": 1469
+  "lastRunTimestamp": "2026-03-24T06:45:00.000Z",
+  "runCounter": 1545
 }
