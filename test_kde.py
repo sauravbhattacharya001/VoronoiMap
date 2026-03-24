@@ -98,6 +98,31 @@ class TestBandwidthSelection:
         assert h > 0
         assert math.isfinite(h)
 
+    def test_silverman_robust_to_outliers(self):
+        """Silverman should produce smaller bandwidth than Scott when outliers exist.
+
+        The IQR-based robust spread estimate in Silverman's rule resists
+        inflation from extreme outliers, while Scott uses raw std.
+        """
+        pts = [(i, i) for i in range(20)] + [(1000, 1000)]
+        h_silv = silverman_bandwidth(pts)
+        h_scott = scott_bandwidth(pts)
+        assert h_silv < h_scott, (
+            f"Silverman ({h_silv:.2f}) should be < Scott ({h_scott:.2f}) "
+            "with outlier data"
+        )
+
+    def test_silverman_equals_scott_for_uniform_data(self):
+        """For well-behaved uniform data, both rules should agree closely."""
+        pts = [(i * 10, j * 10) for i in range(10) for j in range(10)]
+        h_silv = silverman_bandwidth(pts)
+        h_scott = scott_bandwidth(pts)
+        # They may not be identical (IQR vs std), but should be close
+        ratio = h_silv / h_scott
+        assert 0.5 < ratio <= 1.0, (
+            f"Ratio {ratio:.3f} out of expected range for uniform data"
+        )
+
 
 # ── Gaussian kernel ──────────────────────────────────────────────────
 
