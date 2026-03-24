@@ -647,6 +647,23 @@ def load_data(filename, auto_bounds=True):
     return points
 
 
+def _get_kdtree(data):
+    """Retrieve the cached KDTree for a data list, or None.
+
+    Uses the O(1) identity-keyed reverse cache first, then falls back
+    to scanning ``_file_cache`` for data lists created outside
+    ``load_data()`` (e.g. in tests).  Centralises the lookup logic
+    that was previously duplicated in ``get_NN`` and ``get_sum``.
+    """
+    tree = _tree_by_data_id.get(id(data))
+    if tree is None:
+        for entry in _file_cache.values():
+            if entry['points'] is data:
+                tree = entry['tree']
+                break
+    return tree
+
+
 def get_NN(data, lng, lat):
     """Return the nearest neighbor (lng, lat) from pre-loaded point data.
 
@@ -663,15 +680,7 @@ def get_NN(data, lng, lat):
 
     # --- Fast path: KDTree lookup ---
     if _HAS_SCIPY:
-        # O(1) lookup via identity-keyed reverse cache.  Falls back to
-        # the old linear scan only if the data list was created outside
-        # load_data() (e.g. in tests).
-        tree = _tree_by_data_id.get(id(data))
-        if tree is None:
-            for entry in _file_cache.values():
-                if entry['points'] is data:
-                    tree = entry['tree']
-                    break
+        tree = _get_kdtree(data)
 
         if tree is not None:
             # Query the 2 closest points — if the nearest is the query point
@@ -1249,13 +1258,10 @@ def find_area(data, dlng, dlat):
     at = [alat]
     i = 0
     while True:
-        ag.append(0)
-        at.append(0)
-
         a_g, a_t = find_a1(data, ag[i], at[i], dlng, dlat, dirn)
         if get_NN(data, a_g, a_t) == (dlng, dlat):
-            ag[i + 1] = a_g
-            at[i + 1] = a_t
+            ag.append(a_g)
+            at.append(a_t)
         else:
             raise RuntimeError(
                 "Voronoi vertex (%s, %s) does not map back to data point (%s, %s)"
@@ -1339,12 +1345,7 @@ def get_sum(FILENAME, N1, _depth=0):
         # than N1 individual Python-level calls due to numpy vectorisation
         # and reduced interpreter overhead.
         if _HAS_SCIPY:
-            tree = _tree_by_data_id.get(id(data))
-            if tree is None:
-                for entry in _file_cache.values():
-                    if entry['points'] is data:
-                        tree = entry['tree']
-                        break
+            tree = _get_kdtree(data)
             if tree is not None:
                 sample_pts = np.column_stack([
                     np.random.uniform(IND_W, IND_E, N1),
