@@ -122,7 +122,7 @@ vormap_transect = _try_import("vormap_transect")
 vormap_report = _try_import("vormap_report")
 
 
-# ── Step types ───────────────────────────────────────────────────────
+# ── Step types and module requirements ───────────────────────────────
 
 STEP_TYPES = [
     "hotspot", "trend", "network", "landscape", "coverage",
@@ -130,6 +130,22 @@ STEP_TYPES = [
     "report", "export",
 ]
 
+# Maps step types to their required module (if any).
+# Used by validate_pipeline() to warn about missing dependencies.
+_STEP_MODULE_MAP: Dict[str, Optional[str]] = {
+    "hotspot":     "vormap_hotspot",
+    "hotspot_svg": "vormap_hotspot",
+    "trend":       "vormap_trend",
+    "trend_svg":   "vormap_trend",
+    "network":     "vormap_network",
+    "network_svg": "vormap_network",
+    "landscape":   "vormap_landscape",
+    "coverage":    "vormap_coverage",
+    "cluster":     "vormap_cluster",
+    "transect":    "vormap_transect",
+    "report":      "vormap_report",
+    "export":      None,
+}
 
 # ── Data classes ─────────────────────────────────────────────────────
 
@@ -273,21 +289,8 @@ def validate_pipeline(config: Dict[str, Any]) -> List[ValidationIssue]:
             issues.append(ValidationIssue("error", i,
                                           f"Step {i} unknown type: {stype}"))
 
-        # Check for module availability
-        module_map = {
-            "hotspot": "vormap_hotspot",
-            "hotspot_svg": "vormap_hotspot",
-            "trend": "vormap_trend",
-            "trend_svg": "vormap_trend",
-            "network": "vormap_network",
-            "network_svg": "vormap_network",
-            "landscape": "vormap_landscape",
-            "coverage": "vormap_coverage",
-            "cluster": "vormap_cluster",
-            "transect": "vormap_transect",
-            "report": "vormap_report",
-        }
-        req_mod = module_map.get(stype)
+        # Check for module availability (uses centralised _STEP_MODULE_MAP)
+        req_mod = _STEP_MODULE_MAP.get(stype)
         if req_mod and not _AVAILABLE_MODULES.get(req_mod, False):
             issues.append(ValidationIssue("warning", i,
                                           f"Step {i} ({stype}) requires "
@@ -452,6 +455,27 @@ class Pipeline:
             steps=list(self._step_results),
         )
 
+    # ── Step dispatch table ────────────────────────────────────────
+    # Maps step type → (runner_method_name, required_args).
+    # required_args is a subset of {"step", "data", "regions", "stats"}
+    # indicating which context objects the runner needs.  This replaces
+    # the 12-branch if/elif chain with O(1) lookup + uniform invocation.
+
+    _STEP_DISPATCH: Dict[str, tuple] = {
+        "hotspot":     ("_run_hotspot",      ("step", "stats")),
+        "trend":       ("_run_trend",        ("step", "stats")),
+        "network":     ("_run_network",      ("step", "stats", "data")),
+        "landscape":   ("_run_landscape",    ("step", "stats")),
+        "coverage":    ("_run_coverage",     ("step", "stats")),
+        "cluster":     ("_run_cluster",      ("step", "stats")),
+        "transect":    ("_run_transect",     ("step", "stats", "data")),
+        "hotspot_svg": ("_run_hotspot_svg",  ("step", "regions", "data", "stats")),
+        "trend_svg":   ("_run_trend_svg",    ("step", "regions", "data", "stats")),
+        "network_svg": ("_run_network_svg",  ("step", "regions", "data", "stats")),
+        "report":      ("_run_report",       ("step",)),
+        "export":      ("_run_export",       ("step",)),
+    }
+
     def _execute_step(
         self,
         index: int,
@@ -460,35 +484,22 @@ class Pipeline:
         regions: Any,
         stats: Any,
     ) -> Any:
-        """Execute a single pipeline step."""
-        stype = step["type"]
+        """Execute a single pipeline step via dispatch table.
 
-        if stype == "hotspot":
-            return self._run_hotspot(step, stats)
-        elif stype == "trend":
-            return self._run_trend(step, stats)
-        elif stype == "network":
-            return self._run_network(step, stats, data)
-        elif stype == "landscape":
-            return self._run_landscape(step, stats)
-        elif stype == "coverage":
-            return self._run_coverage(step, stats)
-        elif stype == "cluster":
-            return self._run_cluster(step, stats)
-        elif stype == "transect":
-            return self._run_transect(step, stats, data)
-        elif stype == "hotspot_svg":
-            return self._run_hotspot_svg(step, regions, data, stats)
-        elif stype == "trend_svg":
-            return self._run_trend_svg(step, regions, data, stats)
-        elif stype == "network_svg":
-            return self._run_network_svg(step, regions, data, stats)
-        elif stype == "report":
-            return self._run_report(step)
-        elif stype == "export":
-            return self._run_export(step)
-        else:
+        Looks up the step type in ``_STEP_DISPATCH`` to find the runner
+        method and the context arguments it requires, then calls it.
+        Adding a new step type only requires a new entry in the table
+        and a corresponding ``_run_*`` method — no branching logic to touch.
+        """
+        stype = step["type"]
+        entry = self._STEP_DISPATCH.get(stype)
+        if entry is None:
             raise ValueError(f"Unknown step type: {stype}")
+
+        method_name, arg_keys = entry
+        context = {"step": step, "data": data, "regions": regions, "stats": stats}
+        args = [context[k] for k in arg_keys]
+        return getattr(self, method_name)(*args)
 
     # ── Individual step runners ──────────────────────────────────────
 
