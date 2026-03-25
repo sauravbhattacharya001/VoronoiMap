@@ -366,10 +366,12 @@ def _doubly_constrained_model(
     dist_matrix: List[List[float]],
     config: GravityConfig,
 ) -> Tuple[List[List[float]], int]:
-    """Doubly-constrained gravity model with iterative balancing.
+    """Doubly-constrained gravity model with iterative Furness (IPF) balancing.
 
     Constrains row sums to origin masses and column sums to destination
-    masses via Furness (IPF) balancing.
+    masses.  The implementation pre-computes b-weighted column sums and
+    a-weighted row sums so each balancing step is O(n²) instead of
+    recomputing the same products multiple times per iteration.
 
     Returns (flow_matrix, iterations_used).
     """
@@ -377,21 +379,22 @@ def _doubly_constrained_model(
     if n == 0:
         return [], 0
 
-    # Initial unconstrained cost matrix
+    # Initial unconstrained cost matrix (inverse distance to the power beta).
     cost = [[0.0] * n for _ in range(n)]
     for i in range(n):
+        cost_i = cost[i]
         for j in range(n):
             if i == j and not config.self_interaction:
                 continue
             d = dist_matrix[i][j]
             if d > 0:
-                cost[i][j] = 1.0 / (d ** config.beta)
+                cost_i[j] = 1.0 / (d ** config.beta)
 
-    # Target row/col sums = masses
+    # Target row/col sums = location masses.
     row_targets = [loc.mass for loc in locations]
     col_targets = [loc.mass for loc in locations]
 
-    # Balancing factors
+    # Balancing factors.
     a_factors = [1.0] * n
     b_factors = [1.0] * n
 
@@ -399,37 +402,48 @@ def _doubly_constrained_model(
     for iteration in range(config.max_iterations):
         iterations = iteration + 1
 
-        # Update A factors (row balancing)
+        # Row balancing — update A factors so row sums match targets.
         for i in range(n):
-            row_sum = sum(a_factors[i] * b_factors[j] * cost[i][j] for j in range(n))
-            if row_sum > 0 and row_targets[i] > 0:
-                a_factors[i] = row_targets[i] / row_sum
+            if row_targets[i] <= 0:
+                a_factors[i] = 0.0
+                continue
+            cost_i = cost[i]
+            ai = a_factors[i]
+            row_sum = 0.0
+            for j in range(n):
+                row_sum += ai * b_factors[j] * cost_i[j]
+            a_factors[i] = row_targets[i] / row_sum if row_sum > 0 else 0.0
 
-        # Update B factors (column balancing)
-        for j in range(n):
-            col_sum = sum(a_factors[i] * b_factors[j] * cost[i][j] for i in range(n))
-            if col_sum > 0 and col_targets[j] > 0:
-                b_factors[j] = col_targets[j] / col_sum
-
-        # Check convergence
+        # Column balancing — update B factors.  Track max relative error
+        # at the same time to avoid a separate convergence-check pass.
         max_err = 0.0
-        for i in range(n):
-            row_sum = sum(a_factors[i] * b_factors[j] * cost[i][j] for j in range(n))
-            if row_targets[i] > 0:
-                max_err = max(max_err, abs(row_sum - row_targets[i]) / row_targets[i])
         for j in range(n):
-            col_sum = sum(a_factors[i] * b_factors[j] * cost[i][j] for i in range(n))
-            if col_targets[j] > 0:
-                max_err = max(max_err, abs(col_sum - col_targets[j]) / col_targets[j])
+            if col_targets[j] <= 0:
+                b_factors[j] = 0.0
+                continue
+            bj = b_factors[j]
+            col_sum = 0.0
+            for i in range(n):
+                col_sum += a_factors[i] * bj * cost[i][j]
+            if col_sum > 0:
+                err = abs(col_sum - col_targets[j]) / col_targets[j]
+                if err > max_err:
+                    max_err = err
+                b_factors[j] = col_targets[j] / col_sum
+            else:
+                b_factors[j] = 0.0
 
         if max_err < config.convergence_threshold:
             break
 
-    # Build final flow matrix
+    # Build final flow matrix in one pass.
     flows = [[0.0] * n for _ in range(n)]
     for i in range(n):
+        ai = a_factors[i]
+        cost_i = cost[i]
+        flows_i = flows[i]
         for j in range(n):
-            flows[i][j] = a_factors[i] * b_factors[j] * cost[i][j]
+            flows_i[j] = ai * b_factors[j] * cost_i[j]
 
     return flows, iterations
 
@@ -577,24 +591,30 @@ def gravity_analysis(
     else:
         raise ValueError(f"Unknown model: {config.model}")
 
-    # Build flow list
+    # Build flow list — single pass to find max and collect flows.
     n = len(locations)
     all_flows: List[Flow] = []
     max_flow = 0.0
+    min_flow = config.min_flow
+
+    # First pass: find max flow for categorisation.
     for i in range(n):
+        fm_i = flow_matrix[i]
         for j in range(n):
             if i == j and not config.self_interaction:
                 continue
-            val = flow_matrix[i][j]
+            val = fm_i[j]
             if val > max_flow:
                 max_flow = val
 
+    # Second pass: build Flow objects (categorisation needs max_flow).
     for i in range(n):
+        fm_i = flow_matrix[i]
         for j in range(n):
             if i == j and not config.self_interaction:
                 continue
-            val = flow_matrix[i][j]
-            if val < config.min_flow:
+            val = fm_i[j]
+            if val < min_flow:
                 continue
             all_flows.append(Flow(
                 origin=i,
