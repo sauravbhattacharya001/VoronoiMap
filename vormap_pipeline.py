@@ -462,163 +462,46 @@ class Pipeline:
     ) -> Any:
         """Execute a single pipeline step."""
         stype = step["type"]
-
-        if stype == "hotspot":
-            return self._run_hotspot(step, stats)
-        elif stype == "trend":
-            return self._run_trend(step, stats)
-        elif stype == "network":
-            return self._run_network(step, stats, data)
-        elif stype == "landscape":
-            return self._run_landscape(step, stats)
-        elif stype == "coverage":
-            return self._run_coverage(step, stats)
-        elif stype == "cluster":
-            return self._run_cluster(step, stats)
-        elif stype == "transect":
-            return self._run_transect(step, stats, data)
-        elif stype == "hotspot_svg":
-            return self._run_hotspot_svg(step, regions, data, stats)
-        elif stype == "trend_svg":
-            return self._run_trend_svg(step, regions, data, stats)
-        elif stype == "network_svg":
-            return self._run_network_svg(step, regions, data, stats)
-        elif stype == "report":
-            return self._run_report(step)
-        elif stype == "export":
-            return self._run_export(step)
-        else:
+        handler = _STEP_REGISTRY.get(stype)
+        if handler is None:
             raise ValueError(f"Unknown step type: {stype}")
+        return handler(self, step, data=data, regions=regions, stats=stats)
 
-    # ── Individual step runners ──────────────────────────────────────
+    # ── Step handler helpers ─────────────────────────────────────────
 
-    def _run_hotspot(self, step: Dict[str, Any], stats: Any) -> Any:
-        if not vormap_hotspot:
-            raise ImportError("vormap_hotspot not available")
+    def _require_module(self, module: Any, name: str) -> None:
+        """Raise ImportError if a required module is not available."""
+        if not module:
+            raise ImportError(f"{name} not available")
+
+    def _require_stats(self, stats: Any) -> None:
+        """Raise ValueError if region stats are missing."""
         if stats is None:
             raise ValueError("No region stats available")
-        attr = step.get("attribute", "area")
-        weights = step.get("weights", "queen")
-        k = step.get("k", 4)
-        result = vormap_hotspot.detect_hotspots(
-            stats, attribute=attr, weights=weights, k=k)
+
+    def _resolve_from_key(self, step: Dict[str, Any],
+                          fallback_fn) -> Any:
+        """Look up a previous step result by ``from_key``, or compute."""
+        from_key = step.get("from_key")
+        result = self._results.get(from_key) if from_key else None
+        if result is None:
+            result = fallback_fn()
         return result
 
-    def _run_trend(self, step: Dict[str, Any], stats: Any) -> Any:
-        if not vormap_trend:
-            raise ImportError("vormap_trend not available")
-        if stats is None:
-            raise ValueError("No region stats available")
-        attr = step.get("attribute", "area")
-        order = step.get("order", 2)
-        result = vormap_trend.fit_trend_surface(stats, attribute=attr,
-                                                order=order)
-        return result
+    def _safe_output_path(self, step: Dict[str, Any],
+                          default: str) -> str:
+        """Resolve a step's output file path safely."""
+        return _safe_join(self.output_dir, step.get("file", default))
 
-    def _run_network(self, step: Dict[str, Any], stats: Any,
-                     data: Any) -> Any:
-        if not vormap_network:
-            raise ImportError("vormap_network not available")
-        if stats is None:
-            raise ValueError("No region stats available")
-        result = vormap_network.build_network(stats)
-        return result
-
-    def _run_landscape(self, step: Dict[str, Any], stats: Any) -> Any:
-        if not vormap_landscape:
-            raise ImportError("vormap_landscape not available")
-        if stats is None:
-            raise ValueError("No region stats available")
-        attr = step.get("attribute", "area")
-        classes = step.get("num_classes", 5)
-        result = vormap_landscape.analyze_landscape(
-            stats, attribute=attr, num_classes=classes)
-        return result
-
-    def _run_coverage(self, step: Dict[str, Any], stats: Any) -> Any:
-        if not vormap_coverage:
-            raise ImportError("vormap_coverage not available")
-        if stats is None:
-            raise ValueError("No region stats available")
-        result = vormap_coverage.analyze_coverage(stats)
-        return result
-
-    def _run_cluster(self, step: Dict[str, Any], stats: Any) -> Any:
-        if not vormap_cluster:
-            raise ImportError("vormap_cluster not available")
-        if stats is None:
-            raise ValueError("No region stats available")
-        k = step.get("k", 3)
-        attr = step.get("attributes", ["area"])
-        result = vormap_cluster.cluster_regions(stats, k=k,
-                                                attributes=attr)
-        return result
-
-    def _run_transect(self, step: Dict[str, Any], stats: Any,
-                      data: Any) -> Any:
-        if not vormap_transect:
-            raise ImportError("vormap_transect not available")
-        if stats is None:
-            raise ValueError("No region stats available")
-        start = step.get("start", [0, 0])
-        end = step.get("end", [1, 1])
-        samples = step.get("samples", 20)
-        result = vormap_transect.profile_transect(
-            stats, data, start=start, end=end, samples=samples)
-        return result
-
-    def _run_hotspot_svg(self, step: Dict[str, Any], regions: Any,
-                         data: Any, stats: Any) -> str:
-        if not vormap_hotspot:
-            raise ImportError("vormap_hotspot not available")
-        hot_key = step.get("from_key")
-        hot_result = self._results.get(hot_key) if hot_key else None
-        if hot_result is None:
-            hot_result = vormap_hotspot.detect_hotspots(
-                stats, attribute=step.get("attribute", "area"))
-        out = step.get("file", "hotspot.svg")
-        out = _safe_join(self.output_dir, out)
-        vormap_hotspot.export_hotspot_svg(hot_result, regions, data, out)
-        return out
-
-    def _run_trend_svg(self, step: Dict[str, Any], regions: Any,
-                       data: Any, stats: Any) -> str:
-        if not vormap_trend:
-            raise ImportError("vormap_trend not available")
-        trend_key = step.get("from_key")
-        trend_result = self._results.get(trend_key) if trend_key else None
-        if trend_result is None:
-            trend_result = vormap_trend.fit_trend_surface(
-                stats, attribute=step.get("attribute", "area"),
-                order=step.get("order", 2))
-        out = step.get("file", "trend.svg")
-        out = _safe_join(self.output_dir, out)
-        vormap_trend.export_trend_svg(trend_result, regions, data, out)
-        return out
-
-    def _run_network_svg(self, step: Dict[str, Any], regions: Any,
-                         data: Any, stats: Any) -> str:
-        if not vormap_network:
-            raise ImportError("vormap_network not available")
-        net_key = step.get("from_key")
-        net_result = self._results.get(net_key) if net_key else None
-        if net_result is None:
-            net_result = vormap_network.build_network(stats)
-        out = step.get("file", "network.svg")
-        out = _safe_join(self.output_dir, out)
-        vormap_network.export_network_svg(net_result, regions, data, out)
-        return out
-
-    def _run_report(self, step: Dict[str, Any]) -> str:
-        out = step.get("file", "pipeline_report.html")
-        out = _safe_join(self.output_dir, out)
+    def _run_report(self, step: Dict[str, Any], **_kw) -> str:
+        out = self._safe_output_path(step, "pipeline_report.html")
         # Collect step summaries for the report
         content = self._generate_html_report()
         with open(out, "w", encoding="utf-8") as f:
             f.write(content)
         return out
 
-    def _run_export(self, step: Dict[str, Any]) -> str:
+    def _run_export(self, step: Dict[str, Any], **_kw) -> str:
         """Export all collected results to JSON."""
         out = step.get("file")
         export_data = {
@@ -703,6 +586,141 @@ tr:hover {{ background: #ecf0f1; }}
     def results(self) -> Dict[str, Any]:
         """Access step results by output_key."""
         return dict(self._results)
+
+
+# ── Step Registry ────────────────────────────────────────────────────
+#
+# Each entry maps a step type name to a handler function with signature:
+#     handler(pipeline: Pipeline, step: dict, *, data, regions, stats) -> Any
+#
+# Analysis steps follow a uniform pattern: require module → require stats
+# → extract params → call function.  SVG export steps additionally resolve
+# a ``from_key`` reference (or compute on the fly) and write to a safe path.
+
+
+def _step_hotspot(pipe, step, *, stats, **_kw):
+    pipe._require_module(vormap_hotspot, "vormap_hotspot")
+    pipe._require_stats(stats)
+    return vormap_hotspot.detect_hotspots(
+        stats,
+        attribute=step.get("attribute", "area"),
+        weights=step.get("weights", "queen"),
+        k=step.get("k", 4),
+    )
+
+
+def _step_trend(pipe, step, *, stats, **_kw):
+    pipe._require_module(vormap_trend, "vormap_trend")
+    pipe._require_stats(stats)
+    return vormap_trend.fit_trend_surface(
+        stats,
+        attribute=step.get("attribute", "area"),
+        order=step.get("order", 2),
+    )
+
+
+def _step_network(pipe, step, *, stats, **_kw):
+    pipe._require_module(vormap_network, "vormap_network")
+    pipe._require_stats(stats)
+    return vormap_network.build_network(stats)
+
+
+def _step_landscape(pipe, step, *, stats, **_kw):
+    pipe._require_module(vormap_landscape, "vormap_landscape")
+    pipe._require_stats(stats)
+    return vormap_landscape.analyze_landscape(
+        stats,
+        attribute=step.get("attribute", "area"),
+        num_classes=step.get("num_classes", 5),
+    )
+
+
+def _step_coverage(pipe, step, *, stats, **_kw):
+    pipe._require_module(vormap_coverage, "vormap_coverage")
+    pipe._require_stats(stats)
+    return vormap_coverage.analyze_coverage(stats)
+
+
+def _step_cluster(pipe, step, *, stats, **_kw):
+    pipe._require_module(vormap_cluster, "vormap_cluster")
+    pipe._require_stats(stats)
+    return vormap_cluster.cluster_regions(
+        stats,
+        k=step.get("k", 3),
+        attributes=step.get("attributes", ["area"]),
+    )
+
+
+def _step_transect(pipe, step, *, stats, data, **_kw):
+    pipe._require_module(vormap_transect, "vormap_transect")
+    pipe._require_stats(stats)
+    return vormap_transect.profile_transect(
+        stats, data,
+        start=step.get("start", [0, 0]),
+        end=step.get("end", [1, 1]),
+        samples=step.get("samples", 20),
+    )
+
+
+def _step_hotspot_svg(pipe, step, *, regions, data, stats, **_kw):
+    pipe._require_module(vormap_hotspot, "vormap_hotspot")
+    result = pipe._resolve_from_key(
+        step,
+        lambda: vormap_hotspot.detect_hotspots(
+            stats, attribute=step.get("attribute", "area")),
+    )
+    out = pipe._safe_output_path(step, "hotspot.svg")
+    vormap_hotspot.export_hotspot_svg(result, regions, data, out)
+    return out
+
+
+def _step_trend_svg(pipe, step, *, regions, data, stats, **_kw):
+    pipe._require_module(vormap_trend, "vormap_trend")
+    result = pipe._resolve_from_key(
+        step,
+        lambda: vormap_trend.fit_trend_surface(
+            stats,
+            attribute=step.get("attribute", "area"),
+            order=step.get("order", 2)),
+    )
+    out = pipe._safe_output_path(step, "trend.svg")
+    vormap_trend.export_trend_svg(result, regions, data, out)
+    return out
+
+
+def _step_network_svg(pipe, step, *, regions, data, stats, **_kw):
+    pipe._require_module(vormap_network, "vormap_network")
+    result = pipe._resolve_from_key(
+        step,
+        lambda: vormap_network.build_network(stats),
+    )
+    out = pipe._safe_output_path(step, "network.svg")
+    vormap_network.export_network_svg(result, regions, data, out)
+    return out
+
+
+def _step_report(pipe, step, **_kw):
+    return pipe._run_report(step, **_kw)
+
+
+def _step_export(pipe, step, **_kw):
+    return pipe._run_export(step, **_kw)
+
+
+_STEP_REGISTRY: Dict[str, Any] = {
+    "hotspot":     _step_hotspot,
+    "trend":       _step_trend,
+    "network":     _step_network,
+    "landscape":   _step_landscape,
+    "coverage":    _step_coverage,
+    "cluster":     _step_cluster,
+    "transect":    _step_transect,
+    "hotspot_svg": _step_hotspot_svg,
+    "trend_svg":   _step_trend_svg,
+    "network_svg": _step_network_svg,
+    "report":      _step_report,
+    "export":      _step_export,
+}
 
 
 # ── Example Pipeline ─────────────────────────────────────────────────
