@@ -42,6 +42,12 @@ from dataclasses import dataclass
 
 import vormap
 
+try:
+    import numpy as _np
+    _HAS_NUMPY = True
+except ImportError:
+    _HAS_NUMPY = False
+
 
 # -- Result types -----------------------------------------------------
 
@@ -294,73 +300,108 @@ def kde_grid(
         y_min -= dy
         y_max += dy
 
-    values = []
-    d_min = float("inf")
-    d_max = 0.0
-
-    # Build spatial index for O(1)-neighbourhood point lookup.
-    # The cutoff radius is 4*bandwidth (matching kde_at_point).
     cutoff = 4.0 * h
     n = len(points)
     h_sq = h * h
     cutoff_sq = cutoff * cutoff
-
-    # For small point sets (< 64), spatial binning overhead isn't worth it.
-    use_bins = n >= 64
-    if use_bins:
-        bins = _SpatialBins(points, cutoff, x_min, y_min, x_max, y_max)
-
     inv_n = 1.0 / n
     coeff = 1.0 / (2.0 * math.pi * h_sq)
 
-    # Pre-compute x-coordinates to avoid repeated division in the inner loop.
-    x_coords = [x_min + col * (x_max - x_min) / (nx - 1) for col in range(nx)]
+    # ── Fast path: numpy-vectorized computation ──────────────────────
+    # When numpy is available, compute the entire density grid via
+    # broadcasting.  For large point sets (> ~500), process points in
+    # chunks to limit peak memory (each chunk needs nx*ny*chunk_size
+    # floats).  This is typically 10-100x faster than the Python loop.
+    if _HAS_NUMPY:
+        pts = _np.asarray(points, dtype=_np.float64)  # (n, 2)
+        gx = _np.linspace(x_min, x_max, nx, dtype=_np.float64)
+        gy = _np.linspace(y_min, y_max, ny, dtype=_np.float64)
+        # grid_x: (ny, nx), grid_y: (ny, nx)
+        grid_x, grid_y = _np.meshgrid(gx, gy)
+        # Flatten grid to (ny*nx, 1) for broadcasting against (1, n)
+        gx_flat = grid_x.ravel()[:, _np.newaxis]   # (G, 1)
+        gy_flat = grid_y.ravel()[:, _np.newaxis]    # (G, 1)
+        G = nx * ny
 
-    # Hoist frequently-called functions to local variables — in CPython,
-    # local name lookups (LOAD_FAST) are ~40% faster than attribute
-    # lookups (LOAD_ATTR) and global lookups (LOAD_GLOBAL).  In the
-    # tight nx*ny*k inner loop this is a measurable win.
-    _exp = math.exp
-    _neg_half_inv_h_sq = -0.5 / h_sq
-    _get_neighbours = bins.neighbours if use_bins else None
-    _y_step = (y_max - y_min) / (ny - 1)
+        neg_half_inv_h_sq = -0.5 / h_sq
+        density = _np.zeros(G, dtype=_np.float64)
 
-    for row in range(ny):
-        y = y_min + row * _y_step
-        row_vals = []
-        if _get_neighbours is not None:
-            for col in range(nx):
-                x = x_coords[col]
-                total = 0.0
-                for px, py in _get_neighbours(x, y):
-                    dx = x - px
-                    dy = y - py
-                    d_sq = dx * dx + dy * dy
-                    if d_sq <= cutoff_sq:
-                        total += _exp(d_sq * _neg_half_inv_h_sq)
-                d = total * coeff * inv_n
-                row_vals.append(d)
-                if d < d_min:
-                    d_min = d
-                if d > d_max:
-                    d_max = d
-        else:
-            for col in range(nx):
-                x = x_coords[col]
-                total = 0.0
-                for px, py in points:
-                    dx = x - px
-                    dy = y - py
-                    d_sq = dx * dx + dy * dy
-                    if d_sq <= cutoff_sq:
-                        total += _exp(d_sq * _neg_half_inv_h_sq)
-                d = total * coeff * inv_n
-                row_vals.append(d)
-                if d < d_min:
-                    d_min = d
-                if d > d_max:
-                    d_max = d
-        values.append(row_vals)
+        # Process source points in chunks to bound memory at ~128 MB.
+        # Each chunk: G floats * 3 arrays (dx, dy, d_sq) * 8 bytes.
+        max_chunk = max(1, (128 * 1024 * 1024) // (G * 8 * 3))
+        for start in range(0, n, max_chunk):
+            end = min(start + max_chunk, n)
+            chunk = pts[start:end]                   # (c, 2)
+            dx = gx_flat - chunk[:, 0]               # (G, c)
+            dy = gy_flat - chunk[:, 1]               # (G, c)
+            d_sq = dx * dx + dy * dy
+            # Zero out contributions beyond the cutoff radius.
+            mask = d_sq <= cutoff_sq
+            d_sq *= mask
+            density += _np.sum(
+                _np.exp(d_sq * neg_half_inv_h_sq) * mask, axis=1
+            )
+
+        density *= coeff * inv_n
+        d_min = float(density.min())
+        d_max = float(density.max())
+        density_grid = density.reshape(ny, nx)
+        values = [density_grid[row].tolist() for row in range(ny)]
+    else:
+        # ── Fallback: pure Python with optional spatial binning ──────
+        values = []
+        d_min = float("inf")
+        d_max = 0.0
+
+        # For small point sets (< 64), spatial binning overhead isn't worth it.
+        use_bins = n >= 64
+        if use_bins:
+            bins = _SpatialBins(points, cutoff, x_min, y_min, x_max, y_max)
+
+        # Pre-compute x-coordinates to avoid repeated division in the inner loop.
+        x_coords = [x_min + col * (x_max - x_min) / (nx - 1) for col in range(nx)]
+
+        _exp = math.exp
+        _neg_half_inv_h_sq = -0.5 / h_sq
+        _get_neighbours = bins.neighbours if use_bins else None
+        _y_step = (y_max - y_min) / (ny - 1)
+
+        for row in range(ny):
+            y = y_min + row * _y_step
+            row_vals = []
+            if _get_neighbours is not None:
+                for col in range(nx):
+                    x = x_coords[col]
+                    total = 0.0
+                    for px, py in _get_neighbours(x, y):
+                        dx = x - px
+                        dy = y - py
+                        d_sq = dx * dx + dy * dy
+                        if d_sq <= cutoff_sq:
+                            total += _exp(d_sq * _neg_half_inv_h_sq)
+                    d = total * coeff * inv_n
+                    row_vals.append(d)
+                    if d < d_min:
+                        d_min = d
+                    if d > d_max:
+                        d_max = d
+            else:
+                for col in range(nx):
+                    x = x_coords[col]
+                    total = 0.0
+                    for px, py in points:
+                        dx = x - px
+                        dy = y - py
+                        d_sq = dx * dx + dy * dy
+                        if d_sq <= cutoff_sq:
+                            total += _exp(d_sq * _neg_half_inv_h_sq)
+                    d = total * coeff * inv_n
+                    row_vals.append(d)
+                    if d < d_min:
+                        d_min = d
+                    if d > d_max:
+                        d_max = d
+            values.append(row_vals)
 
     return KDEGrid(
         values=values, nx=nx, ny=ny,
