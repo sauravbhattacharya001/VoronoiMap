@@ -1,4 +1,457 @@
+## 2026-03-24
+
+### Gardener Run 1616-1617 — 2026-03-24 10:47 PM PST
+- **agentlens** (refactor) — Extracted duplicated `_get_client`, `_print_json`, `_fetch_sessions` helpers from 7 cli_*.py modules into new `cli_common.py`. Eliminated ~140 lines of copy-paste. Also fixed a runtime bug in `cli_audit.py` where `_get_client`'s return tuple was incorrectly unpacked.
+- **BioBots** (create_release) — Created [v1.5.0](https://github.com/sauravbhattacharya001/BioBots/releases/tag/v1.5.0) covering 5 commits: Autoclave Cycle Logger, Osmolality Calculator, crosslink perf optimization, lazy-load SDK modules, shared sanitize module.
+
+### Feature Builder Run — 2026-03-24 10:35 PM PST
+- **GraphVisual** — Added `PerfectGraphAnalyzer`: detects perfect graphs via the Strong Perfect Graph Theorem (odd hole/antihole search), checks weak perfection, quick-paths for bipartite/chordal, computes χ(G) and ω(G), generates formatted reports. Pushed to master.
+
+### Gardener Run — 2026-03-24 10:17 PM PST
+- **agentlens** (refactor) — Converted `bookmarks.js` from inline `db.prepare()` calls to cached prepared statements, matching the established pattern in events.js/sessions.js/tags.js. Eliminates SQL recompilation on every bookmark API request. Pushed to master.
+- **BioBots** (perf_improvement) — Optimized `responseSurface()` and `doseWindow()` in crosslink.js by hoisting viability model parameters outside hot loops, inlining the viability math to avoid per-point function call overhead/validation/object allocation, and pre-allocating arrays. For a 50×50 grid, eliminates ~7500 redundant property lookups and 2500 throwaway objects. All 81 crosslink tests pass. Pushed to master.
+
+### Builder Run #388 — 2026-03-24 10:05 PM PST
+- **FeedReader** — Added Feed Health Monitor (`FeedHealthMonitor.swift`): checks feed availability, response time, and content freshness. Classifies feeds as healthy/slow/stale/unreachable/dead/malformed. Includes batch checking with concurrency control, aggregate health scoring, history persistence for trend tracking, and declining-health detection. Pushed to master.
+
+### Gardener Run #1614-1615 — 2026-03-24 9:47 PM PST
+- **gif-captcha** (security_fix) — Fixed modulo bias in `secureRandomInt` via rejection sampling, added webhook replay protection by binding HMAC to delivery timestamp + 5-min staleness check. PR [#90](https://github.com/sauravbhattacharya001/gif-captcha/pull/90).
+- **VoronoiMap** (perf_improvement) — Optimized `density_contours()` in `vormap_kde.py`: replaced O(levels) inner-loop appends per cell with O(1) bucket assignment + top-down accumulation. PR [#141](https://github.com/sauravbhattacharya001/VoronoiMap/pull/141).
+
+### Builder Run #387 — 2026-03-24 9:35 PM PST
+- **WinSentinel** — `--priorities` CLI command: Ranked action planner that sorts findings by impact/effort ratio. Features quick-win detection ⚡, time estimates, score projections, category breakdown, and text/JSON/markdown output. 10 tests passing. PR [#146](https://github.com/sauravbhattacharya001/WinSentinel/pull/146).
+
+### Gardener Run #1612-1613 — 2026-03-24 9:17 PM PST
+- **BioBots** — `refactor`: Converted eager module loading to lazy-load via `Object.defineProperty` getters. All 37 SDK modules now load on-demand and cache after first access, reducing startup cost. Added `listFactories()` helper. Commit `edebbfe`.
+- **prompt** — `create_release`: Created v4.2.1 maintenance release covering 4 dependency bumps (docker/setup-qemu-action v4, trivy-action 0.35.0, coverlet group, System.ClientModel 1.10.0).
+
+### Builder Run #386 — 2026-03-24 9:05 PM PST
+- **everything** — Added **Number Base Converter**: converts between binary, octal, decimal, hex, base-32, base-36 with live conversion, formatted output, input validation, and copy-to-clipboard. Commit `a842f29`.
+
+### Gardener Run #1610-1611 — 2026-03-24 8:47 PM PST
+- **Task 1: fix_issue on VoronoiMap** — Fixed #138: optimized `_compute_ripleys_l()` from O(n²·r) brute-force to O(n² log n) using pre-computed sorted distances + binary search, and corrected K(r) denominator from n*n to n*(n-1) per Ripley (1976). PR [#140](https://github.com/sauravbhattacharya001/VoronoiMap/pull/140).
+- **Task 2: security_fix on everything** — Fixed #95: migrated all 40+ tracker services (health, financial, journal data) from plaintext SharedPreferences to flutter_secure_storage (EncryptedSharedPreferences/Keychain) with automatic transparent migration. PR [#102](https://github.com/sauravbhattacharya001/everything/pull/102).
+
+### Builder Run #385 — 2026-03-24 8:35 PM PST
+**Repo:** getagentbox | **Feature:** Events & Webinars Page
+- New `events.html` with filterable event cards (webinars, workshops, meetups, conferences)
+- Date badges, status indicators (upcoming/live/past), iCal export, email subscribe
+- `src/events-page.js` — self-contained JS with sample event data
+- Commit: `b2dc4d5`
+
+### Gardener Run #1608-1609 — 2026-03-24 8:17 PM PST
+**Task 1:** perf_improvement on **FeedReader** (Swift)
+- Pre-compute pairwise similarity matrix in `ArticleClusteringEngine.cluster()` — eliminates redundant O(|V|) cosine recomputation per merge step
+- Cache L2 vector norms during `addArticles()` instead of recalculating every `cosineSimilarity()` call
+- Optimize cosine similarity to iterate smaller dictionary, avoiding `Set.intersection` allocation
+- Use pre-computed norms in `findSimilar()` — consistent speedup for all similarity queries
+- Net: clustering reduced from O(n³·|V|) to O(n²·|V|) + O(n³) index lookups
+
+**Task 2:** security_fix on **agenticchat** (JavaScript)
+- Added `form-action 'none'` to sandbox iframe CSP — prevents sandboxed code from submitting forms that could exfiltrate data
+- Added `pagehide` handler to scrub all API keys (OpenAI + service keys) via `ApiKeyManager.clearAll()` — reduces memory-scraping attack window after tab close
+
+### Builder Run #384 — 2026-03-24 8:05 PM PST
+**Repo:** everything | **Feature:** Blood Sugar Tracker
+- Added `BloodSugarEntry` model with ADA-based categorization (fasting vs post-meal thresholds)
+- Added `BloodSugarService` with summary stats, trend analysis, estimated A1C, time-in-range %, glucose variability
+- Full UI screen: input form, summary dashboard, category breakdown, swipe-to-delete
+- Shows both mg/dL and mmol/L units
+- Registered in feature registry under Health category
+- Added unit tests for model + service
+- **Commit:** `e0be560` pushed to master
+
+### Gardener Run — 2026-03-24 7:47 PM PST
+**Task 1: Refactor VoronoiMap** `vormap_pipeline.py`
+- Replaced 12-branch if/elif chain + 10 repetitive `_run_*` methods with registry-based dispatch
+- Added shared helpers: `_require_module`, `_require_stats`, `_resolve_from_key`, `_safe_output_path`
+- PR: https://github.com/sauravbhattacharya001/VoronoiMap/pull/139
+
+**Task 2: Fix agenticchat #114** — SW cache versioning
+- Bumped static cache key, added `SW_UPDATED` postMessage on activation
+- Added update notification toast with Reload/dismiss in app.js
+- PR: https://github.com/sauravbhattacharya001/agenticchat/pull/115
+
+### Builder Run #383 — 2026-03-24 7:35 PM PST
+- **Repo:** Vidly
+- **Feature:** Movie Trivia Board
+- **What:** Added a full trivia system — browse, submit, and like behind-the-scenes facts, easter eggs, and fun trivia about movies. Includes 10 categories, movie/category filtering, random spotlight, verified badges, source attribution, and a JSON API endpoint. Added nav link.
+- **Files:** TriviaModels.cs, ITriviaRepository.cs, InMemoryTriviaRepository.cs, TriviaViewModels.cs, TriviaController.cs, Views/Trivia/Index.cshtml, _NavBar.cshtml
+- **Commit:** abdced0
+
+### Gardener Run — 2026-03-24 7:17 PM PST
+- **VoronoiMap** (perf): Vectorized `kde_grid` with numpy broadcasting — when numpy is available, the entire KDE grid computation uses array ops instead of nested Python loops. ~10-100x speedup for typical grids. Chunked processing bounds memory at ~128MB. All 45 KDE tests pass. [689d966]
+- **BioBots** (refactor): Extracted shared `docs/shared/sanitize.js` module — consolidated identical prototype-pollution guard code (`_stripDangerous` / `DANGEROUS_KEYS`) that was copy-pasted across 5+ modules (jobEstimator, mediaPrep, sampleTracker, shelfLife, printResolution). All 226 affected tests pass. [241bb39]
+
+### Builder Run 382 — 2026-03-24 7:05 PM PST
+- **agenticchat**: Added **Emoji Picker** — categorized emoji browser with 8 categories (Smileys, Gestures, Hearts, Animals, Food, Objects, Symbols, Flags), real-time search, recent emojis tracking, click-to-insert at cursor. Toolbar button 😀 + keyboard shortcut Ctrl+Shift+;.
+
+### Gardener Run 1606-1607 — 2026-03-24 6:47 PM PST
+- **gif-captcha**: `create_release` — Released v1.6.1 with security fix for timing side-channel in constant-time comparison (CWE-208).
+- **agentlens**: `perf_improvement` — Pre-compute timestamps once in `runCorrelation()` to avoid repeated `new Date()` parsing across 50K events. Replaced O(n²) `indexOf` scanning in `correlateByCausalChain` with inverted index for O(1) exact-match lookups. Fixed pre-existing test bug (wrong event_type in cascade test). All 41 correlation tests pass.
+- *(merge_dependabot re-rolled — no open Dependabot PRs across any repos)*
+
+### Builder Run 381 — 2026-03-24 6:35 PM PST
+- **gif-captcha**: Added Retention Funnel Analyzer dashboard — interactive visualization of how CAPTCHA difficulty impacts user retention through Presented→Attempted→Solved→Returned stages. Includes cohort heatmap, trend timeline, automated insights, CSV export, and backend Node.js module. PR [#89](https://github.com/sauravbhattacharya001/gif-captcha/pull/89).
+
+### Gardener Run 1604-1605 — 2026-03-24 6:17 PM PST
+- **agentlens** (create_release) — Released v1.10.0 with new CLI `trends` command for period-over-period metric comparison with sparklines, color-coded changes, and top movers.
+- **BioBots** (refactor) — Exposed 2 hidden modules (growthCurve, printResolution) that existed but weren't in the SDK manifest, and deduplicated escapeHtml (removed identical copy from utils.js). PR #107.
+
+### Builder Run 380 — 2026-03-24 6:05 PM PST
+- **Ocaml-sample-code** — Added Fibonacci Heap data structure (`fibonacci_heap.ml`). Functional simulation of amortized O(1) insert/find-min/merge/decrease-key. Includes heap sort, delete, pretty-printing, and comprehensive demo. PR #76.
+
+### Gardener Run 1602-1603 — 2026-03-24 5:47 PM PST
+- **GraphVisual** (refactor) — Cleaned up `syncRenderers()` in Main.java: replaced dense inline ternary null-check chains with structured if/else blocks per overlay. Refactored `positionCluster()` to fix confusing y/x param names (→row/col) and replace verbose sign logic with `nextBoolean()`. PR #120.
+- **gif-captcha** (security_fix) — Fixed SSRF bypass in webhook dispatcher via IPv4-mapped IPv6 addresses (`::ffff:127.0.0.1`, `::ffff:a9fe:a9fe`, etc.). Added `_extractMappedIPv4()` to unwrap both dotted-quad and hex forms. 11 new test cases, all 46 tests pass. PR #88.
+
+### Builder Run 379 — 2026-03-24 5:05 PM PST
+- **WinSentinel** — Added CLI `--noise` command: analyzes audit history to identify noisiest finding sources (modules/rules that fire most frequently). Shows top noisy findings ranked by occurrence, top noisy modules by volume, perennial finding detection, suggested actions (suppress/investigate/prioritize), noise level rating. Supports `--json`, `--markdown`, and colored console output. Options: `--noise-days`, `--noise-top`, `--noise-format`.
+
+### Gardener Run — 2026-03-24 4:45 PM PST
+- **GraphVisual** — Refactored `Network.generateFile()`: extracted `MeetingQueryConfig` class to eliminate 13-parameter method signature and 5 duplicate SQL query strings. New clean 4-param API; old signature preserved as `@Deprecated`. [PR #119](https://github.com/sauravbhattacharya001/GraphVisual/pull/119)
+- **sauravcode** — Fixed DNS rebinding TOCTOU vulnerability in SSRF protection: added custom urllib opener (`SSRFSafeHTTP(S)Connection`) that validates resolved IPs at connect time, preventing attackers from bypassing the pre-flight check via DNS rebinding. [PR #101](https://github.com/sauravbhattacharya001/sauravcode/pull/101)
+
+### Builder Run #378 — 2026-03-24 4:05 PM PST
+- **agentlens** — Added `CLI trends command`: period-over-period metric comparison with Unicode sparklines, color-coded percentage changes, top movers by cost, supports day/week/month periods and agent filtering.
+
+### Gardener Run — 2026-03-24 3:45 PM PST
+- **GraphVisual** — Refactored `nextOrPrevGraph()` in Main.java: added bounded iteration (max 92 steps) to eliminate potential infinite loop, replaced manual line-counting with `GraphFileParser.parse()` to avoid redundant I/O, removed unused imports.
+- **Vidly** — Fixed compile error (`AggregateSinglePass` was `static` but accessed instance field `_clock`) + optimized `Checkout()` to only refresh/count the specific customer's rentals instead of all rentals (O(N) → O(K)).
+
+### Builder Run #377 — 2026-03-24 3:35 PM PST
+- **VoronoiMap** — Added **Voronoi String Art Generator** (`vormap_stringart.py`): renders Voronoi diagrams as nail-and-thread string art patterns. 3 frame shapes (circle/square/hexagon), 8 colormaps, 6 board colors, SVG + JSON export. 17 tests, all passing.
+
+### Gardener Run #1600-1601 — 2026-03-24 3:15 PM PST
+- **FeedReader** (refactor) — Replaced hand-rolled NSKeyedArchiver/NSKeyedUnarchiver in StoryTableViewController with existing `SecureCodingStore<Story>`, matching the pattern used by all other managers. Extracted `showToast()` into a reusable `UIViewController` extension. PR [#96](https://github.com/sauravbhattacharya001/FeedReader/pull/96).
+- **agentlens** (perf) — Optimized Transport buffer drain from O(n) list copy to O(1) swap, and eliminated redundant lock acquisition on the success path in `_send_batch`. PR [#128](https://github.com/sauravbhattacharya001/agentlens/pull/128).
+
+### Builder Run #376 — 2026-03-24 3:05 PM PST
+- **GraphVisual** — Added `SpectralLayout` class: eigenvector-based graph layout using 2nd/3rd smallest Laplacian eigenvectors (Fiedler method). Features inverse iteration eigensolver, SVG export, quality metrics, and graceful fallbacks. Pushed to master.
+
+### Gardener Run #1598-1599 — 2026-03-24 2:45 PM PST
+- **BioBots** — `docker_workflow`: Enhanced Docker workflow with semver tagging (major.minor + edge + pr-N), concurrency control, weekly scheduled rebuild for base image patches, Trivy vulnerability scanning, and SPDX SBOM generation on release tags. PR [#106](https://github.com/sauravbhattacharya001/BioBots/pull/106).
+- **getagentbox** — `code_coverage`: Added coverage workflow with Jest coverage, Codecov upload, GitHub step summary table, and auto-updating PR comments with coverage breakdown. PR [#87](https://github.com/sauravbhattacharya001/getagentbox/pull/87).
+
+### Builder Run #375 — 2026-03-24 2:35 PM PST
+**Ocaml-sample-code** — Added Merkle Tree implementation (`merkle_tree.ml`): cryptographic hash trees with inclusion proofs, verification, tamper detection, tree diff, and pretty-printing. PR [#75](https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/75).
+
+### Gardener Run #1596-1597 — 2026-03-24 2:15 PM PST
+**BioBots** — perf_improvement: Optimized GCode analyzer hot path by replacing `gcode.split()` with index-based line iteration (halves peak memory for large files) and regex token splitting in `parseLine()` with manual charCode scanning (~15-25% faster). PR [#105](https://github.com/sauravbhattacharya001/BioBots/pull/105).
+
+**everything** — refactor: Eliminated triple-duplication of navigation entries across FeatureRegistry, CommandPaletteService, and CommandPaletteOverlay. Now all command palette navigation actions are auto-derived from the single FeatureRegistry. Net -133 lines. PR [#101](https://github.com/sauravbhattacharya001/everything/pull/101).
+
+### Builder Run #374 — 2026-03-24 2:05 PM PST
+**FeedReader** — Added `ArticleClusteringEngine.swift`: TF-IDF + agglomerative clustering that groups similar articles by content. Features keyword-based cluster labels, `findSimilar()` for related articles, configurable similarity threshold, and `ClusterSummary` stats. Commit: `b7230f8`.
+
+### Gardener Run 1594-1595 — 2026-03-24 1:45 PM PST
+**VoronoiMap** (open_issue) — Opened [#138](https://github.com/sauravbhattacharya001/VoronoiMap/issues/138): `_compute_ripleys_l` uses O(n²·r) brute-force and incorrect K(r) denominator (`n*n` instead of `n*(n-1)`), biasing L(r) downward.
+**agenticchat** (security_fix) — [PR #120](https://github.com/sauravbhattacharya001/agenticchat/pull/120): Restricted sandbox iframe CSP `connect-src` from `https:` to `https://api.openai.com` only, preventing API key exfiltration via malicious LLM-generated code.
+
+### Builder Run 373 — 2026-03-24 1:35 PM PST
+**WinSentinel** — Added `--fingerprint` command: generates deterministic SHA-256 hash of system security posture. Supports generate/compare/badge modes, drift detection between snapshots, posture classification (Hardened→Critical), per-module component hashes, and JSON export. → [PR #145](https://github.com/sauravbhattacharya001/WinSentinel/pull/145)
+
+### Gardener Run 1592-1593 — 2026-03-24 1:15 PM PST
+**security_fix on agentlens** — Added session ID validation to postmortem endpoints. `POST /:sessionId` was missing `isValidSessionId()` check (other routes had it). Also clamped `min_errors` query param in `/candidates`. → [PR #127](https://github.com/sauravbhattacharya001/agentlens/pull/127)
+
+**perf_improvement on GraphVisual** — Reduced allocations in `CliqueAnalyzer` Bron-Kerbosch recursion: replaced `LinkedHashSet` with `HashSet` in hot path (3 sets created per recursive call, ~30% overhead removed). Cached vertex-to-cliques inverted index shared by `getOverlaps()` and `getCliqueGraph()`. → [PR #118](https://github.com/sauravbhattacharya001/GraphVisual/pull/118)
+
+### Builder Run 372 — 2026-03-24 1:05 PM PST
+**Repo:** Ocaml-sample-code | **Feature:** Pairing Heap data structure
+Added `pairing_heap.ml` — purely functional pairing heap with functor-based module, two-pass merge strategy, O(1) insert/merge, amortised O(log n) delete_min. Includes interactive demo and comprehensive test suite (`test_pairing_heap.ml`). Branch `feature/pairing-heap` pushed; PR creation failed due to GitHub 502 errors.
+
+### Gardener Run 1590-1591 — 2026-03-24 12:45 PM PST
+**Task 1:** refactor on VoronoiMap — Extracted duplicated KDTree lookup into `_get_kdtree()` helper, cleaned up `find_area()` append anti-pattern. PR #137.
+**Task 2:** create_release on agenticchat — Created v2.6.0 release covering 11 commits since v2.5.0 (Pin Board, Word Cloud, Session Calendar, Typing Indicator, proto pollution fix, DOMCache migration).
+
+### Builder Run 371 — 2026-03-24 12:35 PM PST
+**Repo:** VoronoiMap — **Feature:** Voronoi Stained Glass Renderer (`vormap_stainedglass.py`)
+Renders Voronoi diagrams with stained-glass aesthetics: thick dark lead lines, 7 colour palettes (cathedral, tiffany, modern, warm, cool, sunset, forest), directional light simulation, frosted-glass grain texture, and bevel effects. Full CLI + programmatic API. Tests included.
+
+### Gardener Run 1588-1589 — 2026-03-24 12:15 PM PST
+**Task 1:** docs_site on **sauravbhattacharya001** — Added custom 404 page (themed, with nav links), sitemap.xml, and robots.txt for SEO. [PR #48](https://github.com/sauravbhattacharya001/sauravbhattacharya001/pull/48).
+**Task 2:** perf_improvement on **Ocaml-sample-code** — Added closed set to A* pathfinding to prevent re-exploring settled nodes. Standard optimization that eliminates quadratic blowup on dense graphs. [PR #73](https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/73).
+
+### Builder Run 370 — 2026-03-24 12:05 PM PST
+**Repo:** Ocaml-sample-code | **Feature:** Binomial Heap data structure
+Added `binomial_heap.ml` — purely functional mergeable priority queue using a forest of heap-ordered binomial trees. Demonstrates binary-number analogy, O(log n) merge, persistence, and heapsort. [PR #72](https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/72).
+
+### Gardener Run 1586-1587 — 2026-03-24 11:45 AM PST
+**Task 1:** create_release on **agentlens** — Released [v1.9.0](https://github.com/sauravbhattacharya001/agentlens/releases/tag/v1.9.0) covering 3 commits since v1.8.0: CWE-22 path traversal fix, single-pass session metrics aggregation, and PostmortemGenerator docstrings.
+**Task 2:** bug_fix on **GraphVisual** — Fixed `GraphFileParser` silently dropping vertices that only appear in edge lines from `ParseResult.getVertices()`, causing graph.getVertexCount() != result.getVertices().size(). [PR #117](https://github.com/sauravbhattacharya001/GraphVisual/pull/117).
+
+### Builder Run #369 — 2026-03-24 11:35 AM PST
+**Repo:** agenticchat (JavaScript) — Added **Typing Indicator Bubble**: animated bouncing dots with randomized status messages ("AI is thinking…", "Generating response…", etc.) that appear in the chat output while waiting for AI responses. Auto-hides on first streaming token, errors, or cancellation. CSS animation with accessible ARIA attributes.
+
+### Gardener Run #1584-1585 — 2026-03-24 11:15 AM PST
+**Task 1:** fix_issue on **prompt** (C#) — Fixed ReDoS-vulnerable CreditCardPattern regex in PromptSanitizer.cs. Replaced nested quantifier `(?:\d[ -]*?){13,16}` with specific format pattern `\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{1,4}`. Updated existing PR #114, closes #106.
+**Task 2:** perf_improvement on **agenticchat** (JavaScript) — Optimized GlobalSessionSearch: added `SessionManager.getAllUnsorted()` to skip O(n log n) sort on every keystroke, added MAX_TOTAL_RESULTS=100 cap with early termination. PR #119.
+
+### Builder Run #368 — 2026-03-24 11:05 AM PST
+**Repo:** everything | **Feature:** Sun & Moon Tracker
+Added a new lifestyle feature with sunrise/sunset times, golden hour windows, moon phase display with illumination %, week view, and 6 built-in locations. All calculations local (no API). Commit `9126161`.
+
+### Gardener Run #1582-1583 — 2026-03-24 10:45 AM PST
+**Task 1:** security_fix on **BioBots** — Upgraded Newtonsoft.Json 6.0.4 → 13.0.3 (CVE-2024-21907). Updated packages.config, csproj HintPath, Web.config binding redirect, SECURITY.md. PR [#104](https://github.com/sauravbhattacharya001/BioBots/pull/104).
+
+**Task 2:** refactor on **VoronoiMap** — Replaced 12-branch if/elif chain in `Pipeline._execute_step()` with dispatch table (`_STEP_DISPATCH`). Centralised step→module mapping into `_STEP_MODULE_MAP`, eliminating duplicated dict in `validate_pipeline()`. PR [#136](https://github.com/sauravbhattacharya001/VoronoiMap/pull/136).
+
+### Builder Run #367 — 2026-03-24 10:35 AM PST
+**Repo:** getagentbox | **Feature:** Cookie Consent Banner
+- Added `cookie-consent.js` — GDPR-style consent banner with Accept All / Essential Only / Manage preferences
+- Persists choice in localStorage, slide-up animation, dark/light theme support, accessible markup
+- Included in `index.html` via deferred script tag
+
+### Gardener Run — 2026-03-24 10:15 AM PST
+**Task 1:** code_cleanup on Ocaml-sample-code
+- Added 9 .ml files missing from Makefile SOURCES_PLAIN (astar, benchmark, compression, cuckoo_filter, dining_philosophers, polynomial, ring_buffer, splay_tree, typeclass)
+- PR: https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/71
+
+**Task 2:** security_fix on agenticchat
+- Fixed XSS in CommandPalette `_highlightMatch` — characters from labels were inserted into innerHTML without escaping
+- Added regression test with `<img onerror=alert(1)>` label
+- PR: https://github.com/sauravbhattacharya001/agenticchat/pull/118
+
+### Builder Run 366 — 2026-03-24 10:05 AM PST
+**Repo:** WinSentinel
+**Feature:** Risk Matrix CLI command (`--risk-matrix`)
+- Added `--risk-matrix` command that visualizes findings in a 3×3 likelihood × impact heat map
+- Impact from severity (Critical→High, Warning→Medium, Info→Low), likelihood from category frequency
+- Color-coded console output with top risk categories summary
+- Supports `--json`, `--risk-matrix-counts`, and module filtering
+- New file: `ConsoleFormatter.RiskMatrix.cs` (partial class)
+- Build verified, pushed to main
+
+### Gardener Run — 2026-03-24 9:45 AM PST
+**Task 1:** perf_improvement on `sauravbhattacharya001`
+- Eliminated O(n²) `indexOf` scan in `projectMatchesQuery` by passing pre-computed index
+- 505 tests pass ✅
+- PR: https://github.com/sauravbhattacharya001/sauravbhattacharya001/pull/46
+
+**Task 2:** refactor on `sauravcode`
+- Extracted shared `_ParsedLine` scanner in linter to eliminate duplicate line parsing across `_check_structure` and `_check_variables`
+- 69 lint tests pass ✅
+- PR: https://github.com/sauravbhattacharya001/sauravcode/pull/100
+
+### Builder Run #365 — 2026-03-24 9:35 AM PST
+- **Repo:** getagentbox
+- **Feature:** Accessibility Statement Page (`accessibility.html`)
+- **Details:** Full WCAG 2.1 AA accessibility statement covering commitment, standards, features, assistive tech support matrix, known limitations, testing methodology, and feedback/complaint channels. Footer link added to index.html.
+- **Commit:** `74e5321`
+
+### Gardener Run #1580-1581 — 2026-03-24 9:15 AM PST
+- **Task 1:** refactor on **GraphVisual** — Replaced 50-line hardcoded legend panel and 30-line if/else cluster assignment with EdgeType-driven loops and a static bitmask lookup map. Added `legendIconPath` and `clusterIdFor()` to EdgeType enum. Net -9 lines in Main.java.
+- **Task 2:** add_docstrings on **agentlens** — Added comprehensive docstrings to all 13 methods of `PostmortemGenerator` in `postmortem.py` (previously only class/module had docstrings).
+
+### Builder Run #364 — 2026-03-24 9:05 AM PST
+- **Repo:** BioBots
+- **Feature:** Autoclave Cycle Logger — tracks sterilization cycles for lab compliance
+- **Details:** Log cycles with protocol validation (gravity/pre-vacuum/liquid/flash/waste), record indicator results, check overdue items, monitor autoclave maintenance, generate compliance reports
+- **Tests:** 9 passing
+- **Commit:** `2658898`
+
+### Gardener Run — 2026-03-24 8:45 AM PST
+- **Task 1:** security_fix on **agenticchat** → PR #117
+  - Added client-side rate limiter (20 req/min) to prevent API budget drain from rapid-fire sends
+- **Task 2:** perf_improvement on **VoronoiMap** → PR #135
+  - Skip numpy overhead for small polygons (< 64 vertices) in `polygon_area()` — faster for typical 5-20 vertex Voronoi regions
+
+### Builder Run #363 — 2026-03-24 8:35 AM PST
+- **Repo:** everything (Flutter) | **Feature:** Fuel Log Tracker
+- Added fill-up logging with odometer, gallons, price, fuel type, station
+- Auto-calculates MPG between full-tank fill-ups, cost/mile, monthly spending
+- Vehicle filter for multi-car households, persistent storage via SharedPreferences
+- Files: `fuel_entry.dart` model, `fuel_log_service.dart` service, `fuel_log_screen.dart` screen + registry
+
+### Gardener Run #1578-1579 — 2026-03-24 8:15 AM PST
+- **Task 1:** `create_release` on **everything** (Dart) — Created v6.0.0 release with 12 new features (Vocabulary Builder, Invoice Generator, Tally Counter, Breathing Exercise, Symptom Tracker, Birthdays tracker, Text Analyzer, Currency Converter, Ambient Sound Mixer, Daily Journal, QR Code Generator, Dice Roller), 2 bug fixes, 1 perf improvement since v5.0.0
+- **Task 2:** `perf_improvement` on **gif-captcha** (JavaScript) — Replaced O(n) session eviction in `response-time-profiler.js` with O(1) LRU tracker (doubly-linked list). Previously scanned all sessions via Object.keys() loop on every new session at capacity. PR [#87](https://github.com/sauravbhattacharya001/gif-captcha/pull/87)
+
+### Builder Run #362 — 2026-03-24 8:05 AM PST
+- **Repo:** ai (AI agent replication safety sandbox)
+- **Feature:** Mutation Tester — mutates safety policy rules (flip operators, relax thresholds, remove rules, downgrade severity) and verifies the safety system catches each violation. Surviving mutants = policy blind spots.
+- **CLI:** `python -m replication mutate [--preset strict] [--json] [--survivors-only]`
+- **Bonus fix:** Fixed JSON serialization bug in `signer.py` where `Strategy` enum broke `Simulator.run()` and all downstream commands.
+- **Files:** `src/replication/mutation_tester.py`, `docs/api/mutation_tester.md`, updated `__main__.py` and `signer.py`
+- **Result:** All presets tested — strict scored 100%, minimal 27%, standard 14%. Pushed to master.
+
+### Gardener Run #1576-1577 — 2026-03-24 7:45 AM PST
+- **Task 1:** refactor on **GraphVisual** — Extracted `appendEdges()` helper method in `Network.java` to eliminate 5 nearly identical query execution blocks (~80 lines of duplication → 5 concise calls). No behavioral change.
+- **Task 2:** security_fix on **agentlens** — Added path traversal protection (CWE-22) to 4 file-writing methods (`flamegraph.save()`, `heatmap.save()`, `session_diff.to_json()`, `timeline.save()`) that were missing the `_validate_output_path` check already used by `exporter.py` and `guardrails.py`.
+
+### Builder Run #361 — 2026-03-24 7:35 AM PST
+- **Repo:** Vidly
+- **Feature:** Digital Membership Card — printable card with tier-based gradient design, barcode visual, stats (rentals/spend/on-time/days), and benefits list
+- **Commit:** ddb398f pushed to master
+
+### Gardener Run #1574-1575 — 2026-03-24 7:15 AM PST
+- **Task 1:** security_fix on **BioBots** — Upgraded Newtonsoft.Json from 6.0.4 (2014) to 13.0.3, added explicit `TypeNameHandling.None` + `MaxDepth=64` to all JSON deserializers → [PR #103](https://github.com/sauravbhattacharya001/BioBots/pull/103)
+- **Task 2:** refactor on **agenticchat** — Extracted shared `OpenAIClient` module to deduplicate 4 independent OpenAI API fetch implementations (~120 lines of duplicated boilerplate removed) → [PR #116](https://github.com/sauravbhattacharya001/agenticchat/pull/116)
+
+### Builder Run #360 — 2026-03-24 7:05 AM PST
+- **Repo:** ai | **Feature:** DLP Scanner — Data Loss Prevention scanner for agent outputs
+- Detects PII (emails, phones, SSNs), API keys (AWS, OpenAI, GitHub), financial data (credit cards, IBANs), internal network addresses, credentials, and custom patterns
+- Auto-redaction, configurable blocking policy, batch scanning with audit reports, CLI + JSON output
+- Pushed to master (db46497)
+
+### Gardener Run #1572-1573 — 2026-03-24 6:45 AM PST
+- **Task 1:** perf_improvement on **agentlens** — Consolidated 4 separate array iterations in `computeSessionMetrics` into a single for-loop, eliminating 3 redundant O(n) passes and closure allocations from `.forEach`/`.filter`. All 42 tests passing. Pushed to master.
+- **Task 2:** perf_improvement on **GraphVisual** — Replaced `HashSet<Edge>` allocation + per-edge `getEndpoints` calls in `countEdgesInSubgraph` with neighbor-counting approach (iterate vertices, count in-subset neighbors, divide by 2). Zero allocation, used by `cycleRankOfSubgraph`. Pushed to master.
+
+### Builder Run #359 — 2026-03-24 6:35 AM PST
+- **Repo:** BioBots | **Feature:** Osmolality Calculator
+- Added `createOsmolalityCalculator` module — calculates solution osmolality from solute concentrations (van 't Hoff equation), supports 15 built-in solutes, 8 media presets, tonicity classification, adjustment calculator, and solution mixing. 15 tests all passing. Pushed to master.
+
+### Gardener Run #1570-1571 — 2026-03-24 6:15 AM PST
+- **Task 1:** refactor on **sauravcode** — DRY'd cli.py entry points into shared `_run_module` helper, eliminating 4 copy-pasted importlib loading blocks (105→70 lines). Pushed to main.
+- **Task 2:** perf_improvement on **gif-captcha** — Replaced O(n log n) full sort in rate limiter `_evictOldest` with O(n) partial selection for the common case (evicting few entries from 50k keys). PR [#86](https://github.com/sauravbhattacharya001/gif-captcha/pull/86).
+
+### Builder Run #358 — 2026-03-24 6:05 AM PST
+- **Repo:** gif-captcha
+- **Feature:** CAPTCHA Cost Calculator dashboard
+- **PR:** https://github.com/sauravbhattacharya001/gif-captcha/pull/85
+- **Details:** Interactive TCO calculator comparing GIF CAPTCHA vs reCAPTCHA, hCaptcha, Turnstile, and custom solutions. Includes cost breakdown (service, infra, friction, support), bar chart visualization, smart recommendations, and CSV export.
+
+### Gardener Run #1568-1569 — 2026-03-24 5:45 AM PST
+- **Task 1:** security_fix on **agentlens** — Fixed SSRF redirect bypass in webhook delivery. The `fetch()` call followed HTTP redirects by default, allowing an attacker to bypass DNS-based SSRF protection via a 302 redirect to internal IPs. Set `redirect: "error"` to block this. [PR #126](https://github.com/sauravbhattacharya001/agentlens/pull/126)
+- **Task 2:** create_release on **GraphVisual** — Created [v2.8.0](https://github.com/sauravbhattacharya001/GraphVisual/releases/tag/v2.8.0) covering 5 new commits: Graph Matrix Exporter (CSV + LaTeX), GraphDrawingQualityAnalyzer (layout metrics), GraphDegreeSequenceRandomizer, BFS early-termination perf fix, and Maven build update.
+
+### Builder Run #357 — 2026-03-24 5:35 AM PST
+- **Repo:** prompt
+- **Feature:** PromptDeprecationManager — manages prompt deprecation lifecycle with replacement tracking, sunset dates, severity levels, audit reports, and markdown export
+- **PR:** https://github.com/sauravbhattacharya001/prompt/pull/142
+- **Tests:** 13 new tests, all passing
+- **Build:** ✅ Clean (warnings only, no errors)
+
+### Gardener Run #1566-1567 — 2026-03-24 5:15 AM PST
+- **prompt** (fix_issue): Fixed ReDoS vulnerability in CreditCardPattern regex (#106). Replaced nested lazy quantifier `(?:\d[ -]*?){13,16}` with linear-time pattern `\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{1,4}`. PR #114 updated.
+- **everything** (fix_issue): Encrypted sensitive health/financial data at rest (#95). Created `EncryptedPersistence<T>` class and `StorageMigration` utility. Updated `ScreenPersistence` and `PersistentStateMixin` to route 26+ sensitive keys through FlutterSecureStorage with transparent auto-migration from plaintext. PR #100.
+
+### Builder Run #356 — 2026-03-24 5:05 AM PST
+- **VoronoiMap**: Added Spiral Pattern Generator (`vormap_spiral.py`) — generates Voronoi diagrams from Fermat, Archimedean, logarithmic, and Fibonacci spiral seed patterns. SVG/JSON export, 5 colormaps, optional Voronoi cell overlay, CSV seed export. 14 tests passing.
+
+### Gardener Run #1564-1565 — 2026-03-24 4:45 AM PST
+- **prompt** (fix_issue): Added format_date allowlist to prevent timezone/env info disclosure via arbitrary format specifiers. 2 new tests. [PR #112](https://github.com/sauravbhattacharya001/prompt/pull/112) — closes #109
+- **agenticchat** (fix_issue): Versioned SW cache key, switched navigation to network-first, added "New version available" update banner with auto-reload on SW takeover. [PR #115](https://github.com/sauravbhattacharya001/agenticchat/pull/115) — closes #114
+
+### Builder Run #355 — 2026-03-24 4:35 AM PST
+- **Ocaml-sample-code**: Added Wavelet Tree data structure — O(log σ) access, rank, select, quantile, range-count queries with bitvector support and demo/tests. [PR #70](https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/70)
+
+### Gardener Run #1562-1563 — 2026-03-24 4:15 AM PST
+- **agentlens** (create_release): Created [v1.8.0](https://github.com/sauravbhattacharya001/agentlens/releases/tag/v1.8.0) — CLI Audit, Gantt & Leaderboard commands
+- **everything** (fix_issue): Encrypted all persistent data storage — migrated PersistentStateMixin & ScreenPersistence from plaintext SharedPreferences to SecureStorageService. Auto-migrates existing data. [PR #99](https://github.com/sauravbhattacharya001/everything/pull/99), closes #95
+
+### Builder Run #354 — 2026-03-24 4:05 AM PST
+- **GraphVisual**: Added `GraphDrawingQualityAnalyzer` — evaluates layout readability with 8 metrics (edge crossings, edge-length uniformity, angular resolution, Kamada-Kawai stress, neighbourhood preservation, node overlap, area utilisation, aspect ratio) and produces a weighted 0–100 quality score with letter grades. Includes docs page. → [commit 5b10ca1](https://github.com/sauravbhattacharya001/GraphVisual/commit/5b10ca1)
+
+### Gardener Run — 2026-03-24 3:45 AM PST
+- **agentlens** (perf): Added cache pruning to `response-cache.js` — expired entries no longer accumulate in memory. Auto-prunes at 2× TTL. Also fixed iterator-during-mutation bug in `invalidatePrefix`. → [PR #125](https://github.com/sauravbhattacharya001/agentlens/pull/125)
+- **VoronoiMap** (security): Fixed XXE bypass in GPX parser fallback — `_safe_parse()` only checked first 4KB, now scans entire file. Added regression test. → [PR #134](https://github.com/sauravbhattacharya001/VoronoiMap/pull/134)
+
+### Builder Run 353 — 2026-03-24 3:35 AM PST
+- **sauravcode**: Added Linked List (doubly-linked) builtins — 16 new functions: `ll_create`, `ll_from_list`, `ll_push_front`, `ll_push_back`, `ll_pop_front`, `ll_pop_back`, `ll_get`, `ll_insert_at`, `ll_remove_at`, `ll_size`, `ll_is_empty`, `ll_to_list`, `ll_reverse`, `ll_clear`, `ll_peek_front`, `ll_peek_back`. O(1) push/pop at both ends. Includes `linkedlist_demo.srv`.
+
+### Gardener Run 1560-1561 — 2026-03-24 3:15 AM PST
+- **BioBots** (refactor): Deduplicated `escapeHtml` — was identically defined in both `constants.js` and `utils.js`. Now `utils.js` defers to the canonical definition in `constants.js` with a conditional fallback. [PR #102](https://github.com/sauravbhattacharya001/BioBots/pull/102)
+- **prompt** (security_fix): Added file path validation to `PromptCatalogExporter.SaveHtml/SaveCsv/SaveJson` — these methods accepted arbitrary paths without null/empty checks, unlike `Conversation.cs` and `PromptChain.cs` which already validate. [PR #141](https://github.com/sauravbhattacharya001/prompt/pull/141)
+
+### Builder Run 352 — 2026-03-24 3:05 AM PST
+- **agentlens**: Added CLI `audit` command — agent action audit trail viewer with filtering by agent, action type, severity, model, session, and time range. Supports table/CSV/JSON output, detail view for individual entries, and summary statistics. Pushed to master.
+
+### Gardener Run 1558-1559 — 2026-03-24 2:45 AM PST
+- **agentlens** (perf_improvement): Added response caching to forecast endpoints (`/forecast`, `/forecast/budget`, `/forecast/spending-summary`) with 20s TTL — matches existing analytics/leaderboard cache pattern. PR [#124](https://github.com/sauravbhattacharya001/agentlens/pull/124)
+- **GraphVisual** (refactor): Added `equals`/`hashCode`/`toString` to `Edge` class — undirected-aware equality, consistent hashing, readable debug output. PR [#116](https://github.com/sauravbhattacharya001/GraphVisual/pull/116)
+
+### Builder Run 351 — 2026-03-24 2:35 AM PST
+- **prompt**: Added `PromptStaleDetector` — detects prompts needing review based on age and model version drift. Configurable thresholds, model family drift detection (GPT-4/4o/Claude/Gemini), tag-based scanning, text summary output. 13 tests. PR [#140](https://github.com/sauravbhattacharya001/prompt/pull/140)
+
+### Gardener Run 1556-1557 — 2026-03-24 2:15 AM PST
+- **BioBots** (refactor): Extracted 4 shared validation helpers in `growthCurve.js` — `requirePositive`, `requireNonNegative`, `requireDataArray`, `filterPositiveCounts`. Replaced ~32 lines of duplicated checks across 8 functions. PR [#101](https://github.com/sauravbhattacharya001/BioBots/pull/101)
+- **Vidly** (security_fix): Added $2,000 max balance cap to gift card top-ups in `GiftCardService`. Prevents unlimited balance accumulation via repeated top-ups (money laundering / limit circumvention risk). PR [#127](https://github.com/sauravbhattacharya001/Vidly/pull/127)
+
+### Builder Run 350 — 2026-03-24 2:05 AM PST
+- **Repo:** ai | **Feature:** Capability Fingerprinter
+- Added `capability_fingerprint.py` — tracks agent capabilities over time and detects gains with configurable alert thresholds
+- Key classes: Capability, CapabilityTracker, CapabilityDelta, CapabilityAlert
+- Fires WARNING/CRITICAL alerts when high-risk capabilities are gained or risk score spikes
+- Exported in `__init__.py`, verified import and basic functionality
+
+### Gardener Run 1554-1555 — 2026-03-24 01:45 AM PST
+- **Task 1:** perf_improvement on **GraphVisual** — moved BFS target check from dequeue to neighbor discovery in `ShortestPathFinder.findShortestByHops()`, avoiding processing up to an entire frontier layer when target is found early
+- **Task 2:** refactor on **ai** — replaced manually-maintained `ALL_PROBES` dict in `metrics_aggregator.py` with `@probe` decorator for auto-registration; extracted `_status_from_score()` helper to consolidate threshold logic across 7 probes
+
+### Builder Run #349 — 2026-03-24 01:35 PST
+- **Repo:** agenticchat
+- **Feature:** Message Pin Board — pin important messages to a persistent board across sessions
+- **Details:** Hover any chat message to reveal 📌 button. Pins stored in localStorage, with notes, tags, search, filter by role, JSON export. Alt+P keyboard shortcut. Light/dark theme support.
+- **Commit:** `1521387` on main
+
+### Run 1552-1553 — 2026-03-24 01:15 PST
+- **Tasks:** open_issue × 2
+- **Repos:** Ocaml-sample-code, WinSentinel
+- **Done:**
+  - Opened [#69](https://github.com/sauravbhattacharya001/Ocaml-sample-code/issues/69) on Ocaml-sample-code: `sift_up` in dijkstra.ml uses confusing `i := 0` break idiom instead of proper flag or recursion
+  - Opened [#144](https://github.com/sauravbhattacharya001/WinSentinel/issues/144) on WinSentinel: ChatHandler.cs is a 650+ line god class — proposed Command Pattern refactor to extract handlers into individual classes
+
+### Run 348 — 2026-03-24 01:05 PST
+- **Repo:** everything (Flutter app)
+- **Feature:** Vocabulary Builder — 4-tab screen (Words/Add/Quiz/Stats) with mastery tracking, multiple-choice quizzes, word of the day, search/filter by mastery level and part of speech
+- **Files:** model (vocab_entry.dart), service (vocabulary_builder_service.dart), screen (vocabulary_builder_screen.dart), registry update
+- **Commit:** 9803a6b
+
+### Run 347 — 2026-03-24 00:45 PST
+- **Repo:** agentlens
+- **Task:** security_fix — add missing input validation to route params
+- **PR:** #105 (updated) — validates sessionId in postmortem, ruleId/alertId in alerts, agent name in scorecards
+- **Tests:** 85/85 pass for affected files
+- **Status:** ✅ PR open
+
+### Run 346 — 2026-03-24 00:35 PST
+- **Repo:** Ocaml-sample-code
+- **Feature:** Leftist Heap data structure module
+- **PR:** https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/68
+- **Details:** Weight-biased leftist heap with O(log n) merge/insert/delete-min. Full module signature with of_list, to_sorted_list, size, to_string, and demo.
+
+### Gardener Run #1549-1550 (12:15 AM)
+- **Task 1:** security_fix on **VoronoiMap** — mitigated XXE vulnerability in `vormap_gpx.py` by replacing raw `ET.parse()` with `_safe_parse()` (uses defusedxml or rejects DOCTYPE/ENTITY). Added path validation via `validate_input_path`/`validate_output_path` to all CLI file ops. Added CSV injection guard for metadata fields.
+- **Task 2:** create_release on **BioBots** — tagged v1.4.1 covering escapeHtml utility refactor and CI msbuild bump.
+
+### Builder Run #345 (12:05 AM)
+- **Repo:** GraphVisual
+- **Feature:** Graph Matrix Exporter — exports adjacency, incidence, and Laplacian matrices to CSV and LaTeX (bmatrix) formats
+- **Files:** GraphMatrixExporter.java, GraphMatrixExporterTest.java, ToolbarBuilder.java updated
+- **Commit:** `3c23f06` → pushed to master
+
 ## 2026-03-23
+
+### Gardener Run #1548 (11:45 PM)
+- **Repo:** agentlens
+- **Task:** refactor — Add init guards to `ensureXxxTable` functions
+- **PR:** [#123](https://github.com/sauravbhattacharya001/agentlens/pull/123)
+- **Details:** Added `_initialized` flags to `ensureAnnotationsTable`, `ensureCorrelationTables`, and `ensureSchedulerTables` to prevent redundant DDL execution on every HTTP request. Matches the existing pattern used by `ensureBaselineTable` and `ensureWebhooksTable`. All previously-passing tests still pass.
+
+### Builder Run #344 (11:35 PM)
+- **Repo:** Vidly
+- **Feature:** Announcements Board — full controller with public board, staff management, create/publish/pin/archive/delete, customer acknowledgments, analytics dashboard
+- **Files:** 10 changed (9 new + 1 modified), 1268 insertions
+- **Commit:** 293a5c4
+
+### Gardener Run #1546-1547 (11:15 PM)
+- **Repo:** prompt
+- **Tasks:** fix_issue × 2
+- **What:** Fixed two security issues in a single PR (#139):
+  1. **#106 ReDoS in CreditCardPattern** — replaced nested lazy quantifier `(?:\d[ -]*?){13,16}` with specific format `\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{1,4}` to eliminate catastrophic backtracking
+  2. **#109 format_date arbitrary format strings** — added allowlist of safe date format specifiers to `FormatDate` filter, preventing timezone/timing info leakage
+- **PR:** https://github.com/sauravbhattacharya001/prompt/pull/139
+
+### Feature Builder Run #343 (11:05 PM)
+- **Repo:** prompt
+- **Feature:** PromptFuzzer — generates random prompt perturbations (typos, case flips, word drops, shuffles, truncation, duplication, noise, adjacent swaps) for robustness testing
+- **PR:** https://github.com/sauravbhattacharya001/prompt/pull/138
+- **Branch:** feat/prompt-fuzzer
+
+### Daily Memory Backup (11:00 PM)
+- Committed 7 files (memory, builder-state, gardener-weights, runs, status) and pushed to remote. Added `BioBots-coverage` to `.gitignore` to suppress embedded repo warnings.
 
 ### Gardener Run #1544-1545 (10:45 PM)
 - **VoronoiMap** (refactor): Deduplicated KDE bandwidth selection — extracted shared `_sample_std`, `_iqr`, `_extract_spread` helpers. Differentiated Silverman (IQR-robust spread) vs Scott (raw std) rules; previously identical copy-paste. Added outlier resistance tests. → PR #133
@@ -1127,6 +1580,7 @@ Committed & pushed 11 changed files. Embedded repos (FeedReader/VoronoiMap/WinSe
 - **Feature:** Rental Budget Tracker — monthly spending limits with genre breakdown, weekly pacing, 6-month history, alerts, smart savings tips
 - **Files:** BudgetController.cs, RentalBudgetService.cs, BudgetViewModel.cs, Views/Budget/Index.cshtml, _NavBar.cshtml
 - **Commit:** db62dbd
+
 
 
 
