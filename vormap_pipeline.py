@@ -452,6 +452,34 @@ class Pipeline:
             steps=list(self._step_results),
         )
 
+    # Dispatch table mapping step type names to (method_name, arg_style).
+    # arg_style controls which positional args are forwarded:
+    #   "stats"       → (step, stats)
+    #   "stats_data"  → (step, stats, data)
+    #   "full"        → (step, regions, data, stats)
+    #   "step"        → (step,)
+    _STEP_DISPATCH: Dict[str, tuple] = {
+        "hotspot":     ("_run_hotspot",     "stats"),
+        "trend":       ("_run_trend",       "stats"),
+        "network":     ("_run_network",     "stats_data"),
+        "landscape":   ("_run_landscape",   "stats"),
+        "coverage":    ("_run_coverage",    "stats"),
+        "cluster":     ("_run_cluster",     "stats"),
+        "transect":    ("_run_transect",    "stats_data"),
+        "hotspot_svg": ("_run_hotspot_svg", "full"),
+        "trend_svg":   ("_run_trend_svg",   "full"),
+        "network_svg": ("_run_network_svg", "full"),
+        "report":      ("_run_report",      "step"),
+        "export":      ("_run_export",      "step"),
+    }
+
+    _ARG_BUILDERS = {
+        "stats":      lambda step, data, regions, stats: (step, stats),
+        "stats_data": lambda step, data, regions, stats: (step, stats, data),
+        "full":       lambda step, data, regions, stats: (step, regions, data, stats),
+        "step":       lambda step, data, regions, stats: (step,),
+    }
+
     def _execute_step(
         self,
         index: int,
@@ -460,35 +488,15 @@ class Pipeline:
         regions: Any,
         stats: Any,
     ) -> Any:
-        """Execute a single pipeline step."""
+        """Execute a single pipeline step via dispatch table."""
         stype = step["type"]
-
-        if stype == "hotspot":
-            return self._run_hotspot(step, stats)
-        elif stype == "trend":
-            return self._run_trend(step, stats)
-        elif stype == "network":
-            return self._run_network(step, stats, data)
-        elif stype == "landscape":
-            return self._run_landscape(step, stats)
-        elif stype == "coverage":
-            return self._run_coverage(step, stats)
-        elif stype == "cluster":
-            return self._run_cluster(step, stats)
-        elif stype == "transect":
-            return self._run_transect(step, stats, data)
-        elif stype == "hotspot_svg":
-            return self._run_hotspot_svg(step, regions, data, stats)
-        elif stype == "trend_svg":
-            return self._run_trend_svg(step, regions, data, stats)
-        elif stype == "network_svg":
-            return self._run_network_svg(step, regions, data, stats)
-        elif stype == "report":
-            return self._run_report(step)
-        elif stype == "export":
-            return self._run_export(step)
-        else:
+        entry = self._STEP_DISPATCH.get(stype)
+        if entry is None:
             raise ValueError(f"Unknown step type: {stype}")
+        method_name, arg_style = entry
+        method = getattr(self, method_name)
+        args = self._ARG_BUILDERS[arg_style](step, data, regions, stats)
+        return method(*args)
 
     # ── Individual step runners ──────────────────────────────────────
 
