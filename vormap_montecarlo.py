@@ -565,26 +565,36 @@ class MonteCarloTest:
             return [total / len(points)] * len(points)
 
     def _compute_ripleys_l(self, points, radii):
-        """Compute Besag's L(r) = sqrt(K(r)/pi) - r."""
+        """Compute Besag's L(r) = sqrt(K(r)/pi) - r.
+
+        Uses pre-computed pairwise distances with sorted binary-search
+        counting, reducing complexity from O(n²·r) to O(n² log n).
+        K(r) denominator uses n*(n-1) per Ripley (1976) eq. 2.1.
+        """
+        import bisect
+
         n = len(points)
         if n < 2:
             return [0.0] * len(radii)
 
         s, north, w, e = self.bounds
         area = (north - s) * (e - w)
-        l_values = []
 
+        # Pre-compute all unique pairwise distances once — O(n(n-1)/2)
+        dists = []
+        for i in range(n):
+            xi, yi = points[i]
+            for j in range(i + 1, n):
+                dists.append(math.hypot(xi - points[j][0],
+                                        yi - points[j][1]))
+        dists.sort()
+
+        # Each unique pair contributes twice (i→j and j→i)
+        denom = n * (n - 1)  # corrected denominator
+        l_values = []
         for r in radii:
-            count = 0
-            for i in range(n):
-                for j in range(n):
-                    if i == j:
-                        continue
-                    d = math.hypot(points[i][0] - points[j][0],
-                                   points[i][1] - points[j][1])
-                    if d <= r:
-                        count += 1
-            k_r = area * count / (n * n) if n > 0 else 0
+            count = 2 * bisect.bisect_right(dists, r)
+            k_r = area * count / denom
             l_r = math.sqrt(k_r / math.pi) - r if k_r >= 0 else -r
             l_values.append(l_r)
 
