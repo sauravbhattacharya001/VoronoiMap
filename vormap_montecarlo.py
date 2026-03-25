@@ -565,26 +565,56 @@ class MonteCarloTest:
             return [total / len(points)] * len(points)
 
     def _compute_ripleys_l(self, points, radii):
-        """Compute Besag's L(r) = sqrt(K(r)/pi) - r."""
+        """Compute Besag's L(r) = sqrt(K(r)/pi) - r.
+
+        Uses scipy KDTree when available for O(n log n) per radius,
+        falling back to a sort-once O(n²) approach that avoids
+        recomputing distances for every radius.
+
+        The denominator uses n*(n-1) per Ripley (1976) eq. 2.1 since
+        self-pairs are excluded from the count.
+        """
         n = len(points)
         if n < 2:
             return [0.0] * len(radii)
 
         s, north, w, e = self.bounds
         area = (north - s) * (e - w)
-        l_values = []
+        denom = n * (n - 1) if n > 1 else 1
 
+        try:
+            from scipy.spatial import KDTree
+            tree = KDTree(points)
+            l_values = []
+            for r in radii:
+                # count_neighbors counts all pairs (i,j) with i<j within r
+                # Multiply by 2 for both orderings (i,j) and (j,i)
+                count = tree.count_neighbors(tree, r) - n  # subtract self-pairs
+                k_r = area * count / denom
+                l_r = math.sqrt(k_r / math.pi) - r if k_r >= 0 else -r
+                l_values.append(l_r)
+            return l_values
+        except ImportError:
+            pass
+
+        # Fallback: compute all pairwise distances once, sort, then
+        # use binary search across radii (O(n² + n² log(n²) + R·log(n²))
+        # instead of O(n²·R)).
+        import bisect
+        all_dists = []
+        for i in range(n):
+            for j in range(i + 1, n):
+                d = math.hypot(points[i][0] - points[j][0],
+                               points[i][1] - points[j][1])
+                all_dists.append(d)
+        all_dists.sort()
+
+        l_values = []
         for r in radii:
-            count = 0
-            for i in range(n):
-                for j in range(n):
-                    if i == j:
-                        continue
-                    d = math.hypot(points[i][0] - points[j][0],
-                                   points[i][1] - points[j][1])
-                    if d <= r:
-                        count += 1
-            k_r = area * count / (n * n) if n > 0 else 0
+            # Number of pairs with distance <= r (each counted once)
+            pairs_within = bisect.bisect_right(all_dists, r)
+            count = pairs_within * 2  # both orderings
+            k_r = area * count / denom
             l_r = math.sqrt(k_r / math.pi) - r if k_r >= 0 else -r
             l_values.append(l_r)
 
