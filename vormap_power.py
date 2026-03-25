@@ -399,6 +399,7 @@ def _convex_hull(points):
         return pts
 
     def cross(o, a, b):
+        """Return the cross-product of vectors OA and OB (positive if counter-clockwise)."""
         return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
 
     lower = []
@@ -443,6 +444,7 @@ def _ordered_boundary(points):
 
     # Sort by angle from centroid
     def angle_key(p):
+        """Return the polar angle of *p* relative to the centroid."""
         return math.atan2(p[1] - cy, p[0] - cx)
 
     sorted_pts = sorted(set(points), key=angle_key)
@@ -488,6 +490,7 @@ class WeightedSeed:
         self.centroid = _polygon_centroid(self.region) if self.region else (x, y)
 
     def to_dict(self):
+        """Serialize this weighted seed to a JSON-compatible dictionary."""
         return {
             'index': self.index,
             'x': self.x,
@@ -515,26 +518,32 @@ class PowerDiagramResult:
 
     @property
     def num_seeds(self):
+        """Return the number of seed points in the diagram."""
         return len(self.weighted_seeds)
 
     @property
     def total_area(self):
+        """Return the sum of all region areas."""
         return sum(ws.area for ws in self.weighted_seeds)
 
     @property
     def weights(self):
+        """Return the list of seed weights."""
         return [ws.weight for ws in self.weighted_seeds]
 
     @property
     def seeds(self):
+        """Return the list of seed coordinates as ``(x, y)`` tuples."""
         return [(ws.x, ws.y) for ws in self.weighted_seeds]
 
     @property
     def regions(self):
+        """Return the list of region vertex lists, one per seed."""
         return [ws.region for ws in self.weighted_seeds]
 
     @property
     def areas(self):
+        """Return the list of region areas, one per seed."""
         return [ws.area for ws in self.weighted_seeds]
 
     def weight_area_correlation(self):
@@ -656,6 +665,7 @@ class PowerDiagramResult:
         return '\n'.join(lines)
 
     def to_dict(self):
+        """Serialize the full diagram result to a JSON-compatible dictionary."""
         return {
             'mode': self.mode,
             'bounds': list(self.bounds),
@@ -759,6 +769,7 @@ def weight_effect_analysis(seeds, weights, mode='power', bounds=None,
 
     # Gini coefficient of area distribution
     def gini(values):
+        """Compute the Gini coefficient of a list of non-negative values."""
         if not values or all(v == 0 for v in values):
             return 0.0
         vals = sorted(values)
@@ -847,9 +858,11 @@ def export_power_svg(result, path=None, width=800, height=600,
     oy = height * 0.05
 
     def tx(x):
+        """Transform data x-coordinate to SVG pixel coordinate."""
         return ox + (x - x_min) * scale
 
     def ty(y):
+        """Transform data y-coordinate to SVG pixel coordinate (y-axis flipped)."""
         return oy + (y_max - y) * scale  # flip y
 
     parts = [f'<svg xmlns="http://www.w3.org/2000/svg" '
