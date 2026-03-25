@@ -627,22 +627,27 @@ def distance_summary(
         "q3": _percentile(all_dists, 75),
     }
 
-    # Build histogram
-    lo = min(all_dists)
-    hi = max(all_dists)
+    # Build histogram using bisect on sorted data: O(n log n + bins)
+    # instead of the previous O(n × bins) linear-scan approach.
+    sorted_dists = sorted(all_dists)
+    lo = sorted_dists[0]
+    hi = sorted_dists[-1]
     bin_width = (hi - lo) / bins if hi > lo else 1.0
     if bin_width == 0:
         bin_width = 1.0
 
     histogram = []
-    total = len(all_dists)
+    total = len(sorted_dists)
     for i in range(bins):
         b_start = lo + i * bin_width
         b_end = lo + (i + 1) * bin_width
+        left = bisect.bisect_left(sorted_dists, b_start)
         if i == bins - 1:
-            count = sum(1 for d in all_dists if b_start <= d <= b_end)
+            # Last bin is inclusive on both ends: [b_start, b_end]
+            count = bisect.bisect_right(sorted_dists, b_end) - left
         else:
-            count = sum(1 for d in all_dists if b_start <= d < b_end)
+            # Other bins are half-open: [b_start, b_end)
+            count = bisect.bisect_left(sorted_dists, b_end) - left
         histogram.append({
             "bin_start": b_start,
             "bin_end": b_end,
