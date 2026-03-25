@@ -170,7 +170,9 @@ class SmoothResult:
 
 def _compute_distance(p1, p2):
     """Euclidean distance between two points."""
-    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
+    dx = p1[0] - p2[0]
+    dy = p1[1] - p2[1]
+    return math.sqrt(dx * dx + dy * dy)
 
 
 def _smooth_once(values, adjacency, seeds, config):
@@ -196,6 +198,9 @@ def _smooth_once(values, adjacency, seeds, config):
     """
     new_values = {}
     max_change = 0.0
+
+    # Precompute Gaussian denominator to avoid repeated division per-neighbor.
+    _gauss_denom = 2.0 * config.sigma * config.sigma
 
     for seed in seeds:
         if seed not in values:
@@ -240,7 +245,7 @@ def _smooth_once(values, adjacency, seeds, config):
         elif config.method == "gaussian":
             weights = []
             for d in ndists_with_self:
-                w = math.exp(-(d * d) / (2.0 * config.sigma * config.sigma))
+                w = math.exp(-(d * d) / _gauss_denom)
                 weights.append(w)
             total_w = sum(weights)
             if total_w > 0:
@@ -249,12 +254,13 @@ def _smooth_once(values, adjacency, seeds, config):
                 smoothed = values[seed]
 
         elif config.method == "inverse_distance":
+            _power = config.power
             weights = []
             for d in ndists_with_self:
                 if d < 1e-12:
                     weights.append(1e12)  # self-point gets huge weight
                 else:
-                    weights.append(1.0 / (d ** config.power))
+                    weights.append(1.0 / (d ** _power))
             total_w = sum(weights)
             if total_w > 0:
                 smoothed = sum(v * w for v, w in zip(nvals_with_self, weights)) / total_w
