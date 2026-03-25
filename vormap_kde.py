@@ -491,9 +491,9 @@ def find_hotspots(
 def density_contours(grid: KDEGrid, levels: int = 5) -> list[DensityContour]:
     """Extract iso-density contour levels from the KDE grid.
 
-    Uses a single pass over the grid to classify each cell into all
-    applicable contour levels, replacing the previous O(levels × nx × ny)
-    approach with O(nx × ny + levels).
+    Uses a single pass over the grid to bucket each cell by its level,
+    then accumulates from the top down so that each contour contains
+    all cells at-or-above its threshold.  Complexity: O(nx × ny + levels).
     """
     if levels < 1:
         raise ValueError("levels must be at least 1")
@@ -504,40 +504,53 @@ def density_contours(grid: KDEGrid, levels: int = 5) -> list[DensityContour]:
 
     total_cells = grid.nx * grid.ny
 
-    # Pre-compute level thresholds.
+    # Pre-compute level thresholds (ascending).
     level_vals = [
         grid.density_min + d_range * i / levels
         for i in range(1, levels + 1)
     ]
 
-    # Single pass: for each cell, determine the highest level it meets
-    # and add it to that level and all lower levels.  We accumulate cell
-    # lists per level, then build contours.
-    level_cells: list[list[tuple[int, int]]] = [[] for _ in range(levels)]
+    # For each cell, find the *highest* level it satisfies and add it
+    # only to that level's bucket.  We'll accumulate downward afterward.
+    buckets: list[list[tuple[int, int]]] = [[] for _ in range(levels)]
+    inv_d_range = levels / d_range  # pre-compute for fast bucket mapping
 
     for r in range(grid.ny):
         row = grid.values[r]
         for c in range(grid.nx):
             val = row[c]
-            # level_vals is ascending; the cell meets level li if
-            # val >= level_vals[li].  Once val < a threshold, it
-            # won't meet any higher threshold either.
-            for li in range(levels - 1, -1, -1):
-                if val >= level_vals[li]:
-                    # Cell meets this level and all levels below it.
-                    for lj in range(li + 1):
-                        level_cells[lj].append((r, c))
-                    break
+            # Map value directly to the highest bucket it qualifies for.
+            # bucket index = floor((val - density_min) / d_range * levels) - 1
+            # but clamped to [0, levels-1].
+            bi = int((val - grid.density_min) * inv_d_range) - 1
+            if bi < 0:
+                # Below the lowest level threshold — check explicitly.
+                if val >= level_vals[0]:
+                    bi = 0
+                else:
+                    continue
+            elif bi >= levels:
+                bi = levels - 1
+            # Verify against exact threshold (floating point guard).
+            while bi >= 0 and val < level_vals[bi]:
+                bi -= 1
+            if bi >= 0:
+                buckets[bi].append((r, c))
 
-    contours = []
-    for li in range(levels):
-        cells = level_cells[li]
-        contours.append(DensityContour(
-            level=level_vals[li], cells=cells,
-            area_fraction=len(cells) / total_cells if total_cells > 0 else 0.0,
-        ))
+    # Accumulate top-down: level i includes its own cells plus all
+    # cells from higher levels.  Build from the top so each lower
+    # contour extends the one above it.
+    contours: list[DensityContour | None] = [None] * levels  # type: ignore[assignment]
+    cumulative: list[tuple[int, int]] = []
+    for li in range(levels - 1, -1, -1):
+        cumulative = buckets[li] + cumulative
+        contours[li] = DensityContour(
+            level=level_vals[li],
+            cells=list(cumulative),  # snapshot
+            area_fraction=len(cumulative) / total_cells if total_cells > 0 else 0.0,
+        )
 
-    return contours
+    return contours  # type: ignore[return-value]
 
 
 # -- SVG export ---------------------------------------------------------
