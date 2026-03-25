@@ -335,12 +335,12 @@ def kde_grid(
             dx = gx_flat - chunk[:, 0]               # (G, c)
             dy = gy_flat - chunk[:, 1]               # (G, c)
             d_sq = dx * dx + dy * dy
-            # Zero out contributions beyond the cutoff radius.
-            mask = d_sq <= cutoff_sq
-            d_sq *= mask
-            density += _np.sum(
-                _np.exp(d_sq * neg_half_inv_h_sq) * mask, axis=1
-            )
+            # Only compute exp() for points within the cutoff radius.
+            # Setting beyond-cutoff entries to -inf avoids wasting FLOPs
+            # on exp() calls that would be masked to zero anyway.
+            d_sq = _np.where(d_sq <= cutoff_sq, d_sq * neg_half_inv_h_sq,
+                             -_np.inf)
+            density += _np.sum(_np.exp(d_sq), axis=1)
 
         density *= coeff * inv_n
         d_min = float(density.min())
