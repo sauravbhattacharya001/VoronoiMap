@@ -24,6 +24,7 @@ from vormap_hotspot import (
     _distance,
     _shared_edge_or_vertex,
 )
+from vormap_geometry import mean as _mean, std as _std
 
 
 # ── Helpers ─────────────────────────────────────────────────────────
@@ -146,7 +147,7 @@ class TestGiStar(unittest.TestCase):
     def test_uniform_values_zero_z(self):
         values = [10.0] * 9
         weights = {i: {j for j in range(9) if j != i} for i in range(9)}
-        z, p = _gi_star(values, weights, 0)
+        z, p = _gi_star(values, weights, 0, _mean(values), _std(values, population=True))
         self.assertAlmostEqual(z, 0.0, places=5)
 
     def test_high_cluster_positive_z(self):
@@ -154,25 +155,25 @@ class TestGiStar(unittest.TestCase):
         values = [100.0, 100.0, 100.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         weights = {0: {1, 2}, 1: {0, 2}, 2: {0, 1},
                    3: set(), 4: set(), 5: set(), 6: set(), 7: set(), 8: set()}
-        z, p = _gi_star(values, weights, 0)
+        z, p = _gi_star(values, weights, 0, _mean(values), _std(values, population=True))
         self.assertGreater(z, 0)
 
     def test_low_cluster_negative_z(self):
         values = [1.0, 1.0, 1.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
         weights = {0: {1, 2}, 1: {0, 2}, 2: {0, 1},
                    3: set(), 4: set(), 5: set(), 6: set(), 7: set(), 8: set()}
-        z, p = _gi_star(values, weights, 0)
+        z, p = _gi_star(values, weights, 0, _mean(values), _std(values, population=True))
         self.assertLess(z, 0)
 
     def test_single_region(self):
-        z, p = _gi_star([5.0], {}, 0)
+        z, p = _gi_star([5.0], {}, 0, 5.0, 0.0)
         self.assertEqual(z, 0.0)
         self.assertEqual(p, 1.0)
 
     def test_p_value_range(self):
         values = [100.0, 50.0, 10.0, 10.0, 10.0]
         weights = {0: {1}, 1: {0, 2}, 2: {1, 3}, 3: {2, 4}, 4: {3}}
-        _, p = _gi_star(values, weights, 0)
+        _, p = _gi_star(values, weights, 0, _mean(values), _std(values, population=True))
         self.assertGreaterEqual(p, 0.0)
         self.assertLessEqual(p, 1.0)
 

@@ -242,7 +242,7 @@ def build_knn_weights(stats, k=4):
 
 # ── Getis-Ord Gi* ──────────────────────────────────────────────────
 
-def _gi_star(values, weights, i):
+def _gi_star(values, weights, i, x_bar, s):
     """Compute Getis-Ord Gi* statistic for region *i*.
 
     Gi* = (Σ_j w_ij x_j  -  X̄ Σ_j w_ij) /
@@ -250,14 +250,25 @@ def _gi_star(values, weights, i):
 
     where the sum includes j == i (star variant).
 
+    Parameters
+    ----------
+    values : list of float
+        Attribute values for all regions.
+    weights : dict
+        Weight matrix (index → set of neighbor indices).
+    i : int
+        Focal region index.
+    x_bar : float
+        Pre-computed global mean of *values*.
+    s : float
+        Pre-computed global standard deviation (population) of *values*.
+
     Returns (z_score, p_value).
     """
     n = len(values)
     if n < 2:
         return 0.0, 1.0
 
-    x_bar = _mean(values)
-    s = _std(values, population=True)
     if s < 1e-15:
         return 0.0, 1.0
 
@@ -494,7 +505,7 @@ def detect_hotspots(
     )
 
     for i, s in enumerate(stats):
-        z, p = _gi_star(values, weights, i)
+        z, p = _gi_star(values, weights, i, global_mean, global_std)
         classification = _classify_spot(z, p, confidence)
 
         entry = {
