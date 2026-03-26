@@ -1218,6 +1218,7 @@ def lloyd_relaxation(data, iterations=10, *, bounds=None, callback=None):
 
     s, n, w, e = bounds
     convergence_threshold = 1e-6 * max(e - w, n - s)
+    convergence_threshold_sq = convergence_threshold * convergence_threshold
 
     # Work with a mutable copy
     current_points = [tuple(p) for p in data]
@@ -1230,7 +1231,7 @@ def lloyd_relaxation(data, iterations=10, *, bounds=None, callback=None):
 
         # Move each point to its region's centroid
         new_points = []
-        max_displacement = 0.0
+        max_displacement_sq = 0.0
 
         for i, pt in enumerate(current_points):
             if pt in regions:
@@ -1238,12 +1239,18 @@ def lloyd_relaxation(data, iterations=10, *, bounds=None, callback=None):
                 # Clamp to bounds to prevent drift outside the domain
                 cx = max(w, min(e, cx))
                 cy = max(s, min(n, cy))
-                disp = math.sqrt((cx - pt[0]) ** 2 + (cy - pt[1]) ** 2)
-                max_displacement = max(max_displacement, disp)
+                dx = cx - pt[0]
+                dy = cy - pt[1]
+                disp_sq = dx * dx + dy * dy
+                if disp_sq > max_displacement_sq:
+                    max_displacement_sq = disp_sq
                 new_points.append((cx, cy))
             else:
                 # Point has no region (edge case) — keep it in place
                 new_points.append(pt)
+
+        # Convert back to actual displacement for history/callback reporting
+        max_displacement = math.sqrt(max_displacement_sq)
 
         history.append({
             "iteration": it,
@@ -1257,7 +1264,7 @@ def lloyd_relaxation(data, iterations=10, *, bounds=None, callback=None):
 
         current_points = new_points
 
-        if max_displacement < convergence_threshold:
+        if max_displacement_sq < convergence_threshold_sq:
             converged = True
             break
 
