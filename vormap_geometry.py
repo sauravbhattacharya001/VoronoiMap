@@ -11,29 +11,8 @@ vormap_pattern.  They now live here as the single source of truth.
 
 import math
 
-
-def polygon_area(vertices):
-    """Compute polygon area using the Shoelace formula.
-
-    Parameters
-    ----------
-    vertices : list[tuple[float, float]]
-        Ordered polygon vertices (x, y).
-
-    Returns
-    -------
-    float
-        Absolute area of the polygon. Returns 0.0 for fewer than 3 vertices.
-    """
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
+from vormap_utils import polygon_area  # noqa: F401 — canonical implementation
+from vormap_utils import polygon_centroid  # noqa: F401 — canonical implementation
 
 
 def polygon_perimeter(vertices):
@@ -61,41 +40,7 @@ def polygon_perimeter(vertices):
     return p
 
 
-def polygon_centroid(vertices):
-    """Centroid of a simple polygon using the Shoelace-weighted formula.
-
-    Parameters
-    ----------
-    vertices : list[tuple[float, float]]
-        Ordered polygon vertices.
-
-    Returns
-    -------
-    tuple[float, float]
-        (cx, cy) centroid. Falls back to arithmetic mean for degenerate cases.
-    """
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n == 1:
-        return vertices[0]
-    if n == 2:
-        return ((vertices[0][0] + vertices[1][0]) / 2,
-                (vertices[0][1] + vertices[1][1]) / 2)
-    cx, cy, a6 = 0.0, 0.0, 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = (vertices[i][0] * vertices[j][1] -
-                 vertices[j][0] * vertices[i][1])
-        cx += (vertices[i][0] + vertices[j][0]) * cross
-        cy += (vertices[i][1] + vertices[j][1]) * cross
-        a6 += cross
-    if abs(a6) < 1e-12:
-        return (sum(v[0] for v in vertices) / n,
-                sum(v[1] for v in vertices) / n)
-    cx /= (3.0 * a6)
-    cy /= (3.0 * a6)
-    return (cx, cy)
+# polygon_centroid is imported from vormap_utils above
 
 
 def isoperimetric_quotient(area, perimeter):
