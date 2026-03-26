@@ -67,6 +67,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
+import numpy as np
+
 from vormap import validate_output_path
 
 
@@ -260,15 +262,12 @@ def _euclidean(a: Location, b: Location) -> float:
 
 
 def _build_distance_matrix(locations: List[Location]) -> List[List[float]]:
-    """Compute pairwise distance matrix."""
-    n = len(locations)
-    matrix = [[0.0] * n for _ in range(n)]
-    for i in range(n):
-        for j in range(i + 1, n):
-            d = _euclidean(locations[i], locations[j])
-            matrix[i][j] = d
-            matrix[j][i] = d
-    return matrix
+    """Compute pairwise distance matrix using vectorised NumPy ops."""
+    coords = np.array([(loc.x, loc.y) for loc in locations], dtype=np.float64)
+    # Broadcast: diff[i,j] = coords[i] - coords[j]
+    diff = coords[:, np.newaxis, :] - coords[np.newaxis, :, :]
+    matrix_np = np.sqrt((diff ** 2).sum(axis=2))
+    return matrix_np.tolist()
 
 
 def _categorise_flow(flow: float, max_flow: float) -> FlowCategory:
@@ -295,18 +294,24 @@ def _classic_model(
     dist_matrix: List[List[float]],
     config: GravityConfig,
 ) -> List[List[float]]:
-    """Classic gravity model: F_ij = k * M_i * M_j / d_ij^beta."""
+    """Classic gravity model: F_ij = k * M_i * M_j / d_ij^beta (vectorised)."""
+    masses = np.array([loc.mass for loc in locations], dtype=np.float64)
+    dist = np.array(dist_matrix, dtype=np.float64)
     n = len(locations)
-    flows = [[0.0] * n for _ in range(n)]
-    for i in range(n):
-        for j in range(n):
-            if i == j and not config.self_interaction:
-                continue
-            d = dist_matrix[i][j]
-            if d <= 0:
-                continue
-            flows[i][j] = config.k * locations[i].mass * locations[j].mass / (d ** config.beta)
-    return flows
+
+    # mass_i * mass_j outer product
+    mass_prod = masses[:, np.newaxis] * masses[np.newaxis, :]
+
+    # Avoid division by zero
+    with np.errstate(divide='ignore', invalid='ignore'):
+        inv_dist_beta = np.where(dist > 0, dist ** (-config.beta), 0.0)
+
+    flows_np = config.k * mass_prod * inv_dist_beta
+
+    if not config.self_interaction:
+        np.fill_diagonal(flows_np, 0.0)
+
+    return flows_np.tolist()
 
 
 def _huff_model(
@@ -314,28 +319,21 @@ def _huff_model(
     dist_matrix: List[List[float]],
     config: GravityConfig,
 ) -> List[List[float]]:
-    """Huff model: P_ij = (M_j / d_ij^beta) / sum_k(M_k / d_ik^beta).
+    """Huff model (vectorised): P_ij = (M_j / d_ij^beta) / sum_k(M_k / d_ik^beta)."""
+    masses = np.array([loc.mass for loc in locations], dtype=np.float64)
+    dist = np.array(dist_matrix, dtype=np.float64)
 
-    Returns probability matrix (rows sum to 1).
-    """
-    n = len(locations)
-    probs = [[0.0] * n for _ in range(n)]
-    for i in range(n):
-        attractiveness = []
-        for j in range(n):
-            if i == j and not config.self_interaction:
-                attractiveness.append(0.0)
-                continue
-            d = dist_matrix[i][j]
-            if d <= 0:
-                attractiveness.append(0.0)
-                continue
-            attractiveness.append(locations[j].mass / (d ** config.beta))
-        total = sum(attractiveness)
-        if total > 0:
-            for j in range(n):
-                probs[i][j] = attractiveness[j] / total
-    return probs
+    with np.errstate(divide='ignore', invalid='ignore'):
+        attractiveness = np.where(dist > 0, masses[np.newaxis, :] / (dist ** config.beta), 0.0)
+
+    if not config.self_interaction:
+        np.fill_diagonal(attractiveness, 0.0)
+
+    row_totals = attractiveness.sum(axis=1, keepdims=True)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        probs = np.where(row_totals > 0, attractiveness / row_totals, 0.0)
+
+    return probs.tolist()
 
 
 def _hansen_model(
@@ -343,22 +341,17 @@ def _hansen_model(
     dist_matrix: List[List[float]],
     config: GravityConfig,
 ) -> List[List[float]]:
-    """Hansen accessibility: A_i = sum_j(M_j / d_ij^beta).
+    """Hansen accessibility (vectorised): A_i = sum_j(M_j / d_ij^beta)."""
+    masses = np.array([loc.mass for loc in locations], dtype=np.float64)
+    dist = np.array(dist_matrix, dtype=np.float64)
 
-    Returns matrix where flows[i][j] = M_j / d_ij^beta (contribution
-    of j to i's accessibility).
-    """
-    n = len(locations)
-    flows = [[0.0] * n for _ in range(n)]
-    for i in range(n):
-        for j in range(n):
-            if i == j and not config.self_interaction:
-                continue
-            d = dist_matrix[i][j]
-            if d <= 0:
-                continue
-            flows[i][j] = locations[j].mass / (d ** config.beta)
-    return flows
+    with np.errstate(divide='ignore', invalid='ignore'):
+        flows_np = np.where(dist > 0, masses[np.newaxis, :] / (dist ** config.beta), 0.0)
+
+    if not config.self_interaction:
+        np.fill_diagonal(flows_np, 0.0)
+
+    return flows_np.tolist()
 
 
 def _doubly_constrained_model(
