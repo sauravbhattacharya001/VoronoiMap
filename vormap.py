@@ -684,16 +684,21 @@ def get_NN(data, lng, lat):
             _tree_by_data_id[id(data)] = tree
 
         if tree is not None:
-            # Query the 2 closest points — if the nearest is the query point
-            # itself (dist ≈ 0), we return the second-nearest instead.
+            # Query k=2 to handle self-match (dist ≈ 0) cases, but use
+            # the result of the first valid neighbor.  k=2 is required
+            # for correctness when the query point is itself a data point.
             k = min(2, len(data))
             dists, idxs = tree.query([lng, lat], k=k)
             if k == 1:
-                dists = [dists]
-                idxs = [idxs]
-            for d, idx in zip(dists, idxs):
-                if d > 0:
-                    return data[idx]
+                # Scalar results for single-point datasets
+                if dists > 0:
+                    return data[idxs]
+            else:
+                # Return first neighbor with dist > 0
+                if dists[0] > 0:
+                    return data[idxs[0]]
+                if dists[1] > 0:
+                    return data[idxs[1]]
             raise ValueError(
                 "No valid nearest neighbor found for query (%s, %s)"
                 % (lng, lat)
@@ -930,6 +935,9 @@ def isect_B(alng, alat, dirn):
 
     Returns a flat list ``[x1, y1, x2, y2]`` of the two intersection
     points with the search boundary ``[IND_W, IND_E] × [IND_S, IND_N]``.
+
+    Optimized: avoids set/round deduplication overhead in the common case
+    where exactly 2 intersection points are found (no corner passes).
     """
     if math.isinf(dirn):
         return [alng, IND_N, alng, IND_S]
@@ -937,34 +945,51 @@ def isect_B(alng, alat, dirn):
         return [IND_W, alat, IND_E, alat]
 
     # Compute intersections with all four boundary edges
-    xt = float(IND_N - alat) / dirn + alng  # top edge (y = IND_N)
-    xb = float(IND_S - alat) / dirn + alng  # bottom edge (y = IND_S)
-    yr = dirn * (IND_E - alng) + alat       # right edge (x = IND_E)
-    yl = dirn * (IND_W - alng) + alat       # left edge (x = IND_W)
+    inv_dirn = 1.0 / dirn
+    xt = (IND_N - alat) * inv_dirn + alng  # top edge (y = IND_N)
+    xb = (IND_S - alat) * inv_dirn + alng  # bottom edge (y = IND_S)
+    yr = dirn * (IND_E - alng) + alat      # right edge (x = IND_E)
+    yl = dirn * (IND_W - alng) + alat      # left edge (x = IND_W)
 
-    # Collect points that actually lie on the boundary, deduplicating
-    # corners where two edges share a vertex (e.g. (IND_W, IND_N) is
-    # on both the top and left edges).  Without dedup, corner-passing
-    # lines produce 6+ values → RuntimeError.  (Fixes #42)
-    candidates = []
-    if IND_W <= xt <= IND_E:
-        candidates.append((xt, IND_N))
-    if IND_W <= xb <= IND_E:
-        candidates.append((xb, IND_S))
-    if IND_S <= yl <= IND_N:
-        candidates.append((IND_W, yl))
-    if IND_S <= yr <= IND_N:
-        candidates.append((IND_E, yr))
-
-    # Deduplicate: two boundary edges can share a corner point
-    seen = set()
+    # Collect points that actually lie on the boundary.
+    # Fast path: build the result list directly and only deduplicate
+    # if more than 2 candidates are found (corner cases).
     ret = []
-    for pt in candidates:
-        # Round to avoid floating-point near-duplicates at corners
-        key = (round(pt[0], 10), round(pt[1], 10))
-        if key not in seen:
-            seen.add(key)
-            ret.extend(pt)
+    if IND_W <= xt <= IND_E:
+        ret.append(xt)
+        ret.append(IND_N)
+    if IND_W <= xb <= IND_E:
+        ret.append(xb)
+        ret.append(IND_S)
+
+    if len(ret) == 4:
+        return ret  # Common case: top + bottom intersections, no dedup needed
+
+    if IND_S <= yl <= IND_N:
+        ret.append(IND_W)
+        ret.append(yl)
+    if len(ret) == 4:
+        return ret
+
+    if IND_S <= yr <= IND_N:
+        ret.append(IND_E)
+        ret.append(yr)
+
+    if len(ret) == 4:
+        return ret
+
+    # Corner case: >4 values means line passes through a boundary corner.
+    # Deduplicate using rounded keys.
+    if len(ret) > 4:
+        seen = set()
+        deduped = []
+        for i in range(0, len(ret), 2):
+            key = (round(ret[i], 10), round(ret[i + 1], 10))
+            if key not in seen:
+                seen.add(key)
+                deduped.append(ret[i])
+                deduped.append(ret[i + 1])
+        ret = deduped
 
     if len(ret) == 4:
         return ret
