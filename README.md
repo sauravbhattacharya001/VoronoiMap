@@ -564,6 +564,90 @@ VoronoiMap includes security hardening in its data loading pipeline:
 - **Bounded iterations** — All loops have explicit iteration limits to prevent denial-of-service
 - **Convergence guards** — Binary search and vertex discovery have failsafes against infinite loops
 
+## ❓ Troubleshooting & FAQ
+
+<details>
+<summary><strong>ImportError: No module named 'vormap'</strong></summary>
+
+Make sure you installed the package, not just cloned the repo:
+
+```bash
+# From PyPI
+pip install voronoimap
+
+# From source (editable)
+pip install -e .
+```
+
+If using a virtual environment, ensure it's activated.
+</details>
+
+<details>
+<summary><strong>Slow performance on large datasets</strong></summary>
+
+Install SciPy for KDTree-accelerated nearest-neighbor lookups (O(log n) vs O(n)):
+
+```bash
+pip install voronoimap[fast]
+```
+
+Run the built-in benchmark to verify the speedup:
+
+```bash
+python vormap_benchmark.py --sizes 100 500 1000
+```
+
+See the [Benchmarking Guide](https://sauravbhattacharya001.github.io/VoronoiMap/guide/benchmarking/) for detailed performance tuning.
+</details>
+
+<details>
+<summary><strong>get_sum() returns wildly inaccurate estimates</strong></summary>
+
+- **Increase sample size `n`** — Small `n` values produce high-variance estimates
+- **Run multiple times** — Use `--runs 5` on the CLI to average results
+- **Check your data** — Ensure coordinates are reasonable (no NaN/Inf values, which are silently dropped)
+- **Check search bounds** — The auto-detected bounds might miss outlier points; see `vormap.py` padding parameter
+</details>
+
+<details>
+<summary><strong>FileNotFoundError when loading data files</strong></summary>
+
+VoronoiMap looks for data files inside a `data/` directory relative to the working directory. Either:
+
+1. Run from the project root where `data/` exists
+2. Use absolute paths
+3. Create a `data/` directory and place your files there
+</details>
+
+<details>
+<summary><strong>How do I export results for use in GIS software?</strong></summary>
+
+```python
+from vormap import load_data
+from vormap_viz import compute_regions
+from vormap_geojson import export_geojson
+
+data = load_data("mydata.txt")
+regions = compute_regions(data)
+export_geojson(regions, data, "output.geojson")
+```
+
+The GeoJSON output is compatible with QGIS, Mapbox, Leaflet, ArcGIS, and Google Earth.
+
+For Google Earth specifically, use `vormap_kml`:
+
+```python
+from vormap_kml import export_kml
+export_kml(regions, data, "output.kml")
+```
+</details>
+
+<details>
+<summary><strong>Can I use VoronoiMap with geographic (lat/lon) coordinates?</strong></summary>
+
+VoronoiMap works in Euclidean 2D space. For small geographic areas (city-scale), lat/lon coordinates work reasonably well. For larger areas where Earth's curvature matters, project to a local coordinate system (e.g., UTM) first, then feed the projected coordinates to VoronoiMap.
+</details>
+
 ## 🤝 Contributing
 
 Contributions are welcome! See the **[Contributing Guide](CONTRIBUTING.md)** for full details on setup, code style, testing, and submitting PRs.
