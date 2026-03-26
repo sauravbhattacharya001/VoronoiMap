@@ -76,6 +76,7 @@ nav:
     - CLI Reference: guide/cli.md
     - Python API: guide/api.md
     - Extension Modules: guide/extensions.md
+    - Benchmarking & Performance: guide/benchmarking.md
     - Data Format: guide/data-format.md
   - Algorithm:
     - Overview: algorithm/overview.md
