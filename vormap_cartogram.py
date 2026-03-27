@@ -42,6 +42,7 @@ except ImportError:
     _HAS_SCIPY = False
 
 import vormap
+from vormap import validate_input_path, validate_output_path
 from vormap_utils import polygon_area as _polygon_area
 from vormap_utils import polygon_centroid as _polygon_centroid
 
@@ -250,6 +251,7 @@ def export_svg(result, output_path, width=800, height=600,
     values : list of float or None — original values for color mapping
     title : str or None
     """
+    output_path = validate_output_path(output_path, allow_absolute=True)
     regions = result["regions"]
     seeds = result["seeds"]
     areas = result["areas"]
@@ -344,6 +346,7 @@ def export_svg(result, output_path, width=800, height=600,
 
 def export_json(result, output_path):
     """Export cartogram result to JSON."""
+    output_path = validate_output_path(output_path, allow_absolute=True)
     with open(output_path, 'w') as f:
         json.dump(result, f, indent=2, default=str)
 
@@ -428,7 +431,8 @@ def _cli():
     if args.values:
         vals = [float(v.strip()) for v in args.values.split(",")]
     elif args.values_file:
-        with open(args.values_file) as f:
+        validated_path = validate_input_path(args.values_file, allow_absolute=True)
+        with open(validated_path) as f:
             vals = [float(line.strip()) for line in f if line.strip()]
 
     if vals is None:

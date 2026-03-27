@@ -39,6 +39,8 @@ import math
 import os
 import sys
 
+from vormap import validate_input_path, validate_output_path
+
 try:
     from vormap_viz import compute_regions, _COLOR_SCHEMES, _hsl_color
     _HAS_VIZ = True
@@ -280,6 +282,7 @@ def _load_points(filepath):
 
     Supports space-separated and comma-separated formats.
     """
+    filepath = validate_input_path(filepath, allow_absolute=True)
     points = []
     with open(filepath, 'r', encoding='utf-8') as fh:
         for line in fh:
@@ -543,6 +546,7 @@ def animate(snapshots, output_path, *, config=None):
         info_text=info_text,
     )
 
+    output_path = validate_output_path(output_path, allow_absolute=True)
     out_dir = os.path.dirname(output_path)
     if out_dir:
         os.makedirs(out_dir, exist_ok=True)
