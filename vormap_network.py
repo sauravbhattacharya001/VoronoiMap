@@ -467,6 +467,7 @@ def export_network_svg(
     height=600,
     show_labels=False,
     highlight_hubs=True,
+    betweenness=None,
 ):
     """Export the spatial network as an SVG visualization.
 
@@ -487,6 +488,9 @@ def export_network_svg(
         Whether to label nodes with their index.
     highlight_hubs : bool
         Whether to size nodes by betweenness centrality.
+    betweenness : dict or None
+        Pre-computed betweenness centrality from :func:`network_stats`.
+        When provided, avoids redundant O(n²) BFS re-computation.
     """
     nodes = graph["nodes"]
     edges = graph["edges"]
@@ -554,8 +558,11 @@ def export_network_svg(
                 stroke="#fbbf24", **{"stroke-width": "2", "stroke-opacity": "0.9"},
             )
 
-    # Draw nodes
-    bc = _betweenness_centrality(graph["adjacency"], len(nodes)) if highlight_hubs else {}
+    # Draw nodes — reuse pre-computed betweenness if provided to avoid
+    # redundant O(n²) BFS traversals from every node.
+    bc = betweenness if betweenness is not None else (
+        _betweenness_centrality(graph["adjacency"], len(nodes)) if highlight_hubs else {}
+    )
     max_bc = max(bc.values()) if bc else 1
     node_group = ET.SubElement(svg, "g", id="nodes")
 
