@@ -336,15 +336,13 @@ def kde_grid(
             dy = gy_flat - chunk[:, 1]               # (G, c)
             d_sq = dx * dx + dy * dy
             # Only compute exp() for points within the cutoff radius.
-            # Previously, exp() was evaluated on ALL entries (masked to 0
-            # then multiplied back by mask), wasting ~30-60% of compute
-            # on exp(0)=1 results that get discarded.
-            density += _np.sum(
-                _np.where(d_sq <= cutoff_sq,
-                          _np.exp(d_sq * neg_half_inv_h_sq),
-                          0.0),
-                axis=1,
-            )
+            # np.where evaluates BOTH branches eagerly, so we mask first
+            # and call exp() only on the qualifying elements to avoid
+            # wasted FLOPs on entries that will be discarded.
+            mask = d_sq <= cutoff_sq
+            contrib = _np.zeros_like(d_sq)
+            contrib[mask] = _np.exp(d_sq[mask] * neg_half_inv_h_sq)
+            density += _np.sum(contrib, axis=1)
 
         density *= coeff * inv_n
         d_min = float(density.min())
@@ -514,24 +512,26 @@ def density_contours(grid: KDEGrid, levels: int = 5) -> list[DensityContour]:
         for i in range(1, levels + 1)
     ]
 
-    # Single pass: for each cell, determine the highest level it meets
-    # and add it to that level and all lower levels.  We accumulate cell
-    # lists per level, then build contours.
+    # Single pass: for each cell, find the highest level it meets and
+    # record the cell only under that level.  Then build cumulative
+    # lists with a single reverse accumulation (O(nx*ny + levels)
+    # instead of the previous O(nx*ny*levels) approach).
     level_cells: list[list[tuple[int, int]]] = [[] for _ in range(levels)]
 
     for r in range(grid.ny):
         row = grid.values[r]
         for c in range(grid.nx):
             val = row[c]
-            # level_vals is ascending; the cell meets level li if
-            # val >= level_vals[li].  Once val < a threshold, it
-            # won't meet any higher threshold either.
+            # level_vals is ascending; find the highest level this cell meets.
             for li in range(levels - 1, -1, -1):
                 if val >= level_vals[li]:
-                    # Cell meets this level and all levels below it.
-                    for lj in range(li + 1):
-                        level_cells[lj].append((r, c))
+                    level_cells[li].append((r, c))
                     break
+
+    # Accumulate from highest to lowest: each lower level includes all
+    # cells from higher levels too.
+    for li in range(levels - 2, -1, -1):
+        level_cells[li].extend(level_cells[li + 1])
 
     contours = []
     for li in range(levels):
