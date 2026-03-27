@@ -884,6 +884,10 @@ def isect(x1, y1, x2, y2, x3, y3, x4, y4):
 
     Returns the intersection point as ``(x, y)`` or ``(-1, -1)`` when
     the segments do not intersect (or are parallel/coincident).
+
+    Note: ``_between`` checks are inlined to avoid per-call function
+    overhead — this function is in the innermost hot loop of Voronoi
+    boundary tracing (called from ``new_dir`` → ``find_a1`` → ``find_area``).
     """
     if (x1 == x2 and x3 == x4):
         return -1, -1
@@ -891,14 +895,18 @@ def isect(x1, y1, x2, y2, x3, y3, x4, y4):
     if (x1 == x2 and x3 != x4):
         m = float(y4 - y3) / (x4 - x3)
         y_test = m * (x1 - x3) + y3
-        if _between(y1, y2, y_test) and _between(y3, y4, y_test):
+        # Inlined _between(y1, y2, y_test) and _between(y3, y4, y_test)
+        if (((y1 >= y_test and y2 <= y_test) or (y1 <= y_test and y2 >= y_test))
+                and ((y3 >= y_test and y4 <= y_test) or (y3 <= y_test and y4 >= y_test))):
             return x1, y_test
         return -1, -1
 
     if (x1 != x2 and x3 == x4):
         m = float(y2 - y1) / (x2 - x1)
         y_test = m * (x3 - x1) + y1
-        if _between(y1, y2, y_test) and _between(y3, y4, y_test):
+        # Inlined _between(y1, y2, y_test) and _between(y3, y4, y_test)
+        if (((y1 >= y_test and y2 <= y_test) or (y1 <= y_test and y2 >= y_test))
+                and ((y3 >= y_test and y4 <= y_test) or (y3 <= y_test and y4 >= y_test))):
             return x3, y_test
         return -1, -1
 
@@ -919,8 +927,11 @@ def isect(x1, y1, x2, y2, x3, y3, x4, y4):
     y_test1 = m1 * (x_test - x1) + y1
     y_test2 = m2 * (x_test - x3) + y3
 
-    if (_between(x1, x2, x_test) and _between(x3, x4, x_test)
-            and _between(y1, y2, y_test1) and _between(y3, y4, y_test2)):
+    # Inlined _between checks for all four containment tests
+    if (((x1 >= x_test and x2 <= x_test) or (x1 <= x_test and x2 >= x_test))
+            and ((x3 >= x_test and x4 <= x_test) or (x3 <= x_test and x4 >= x_test))
+            and ((y1 >= y_test1 and y2 <= y_test1) or (y1 <= y_test1 and y2 >= y_test1))
+            and ((y3 >= y_test2 and y4 <= y_test2) or (y3 <= y_test2 and y4 >= y_test2))):
         return round(x_test, 2), round(y_test1, 2)
     return -1, -1
 
@@ -942,37 +953,72 @@ def isect_B(alng, alat, dirn):
     yr = dirn * (IND_E - alng) + alat       # right edge (x = IND_E)
     yl = dirn * (IND_W - alng) + alat       # left edge (x = IND_W)
 
-    # Collect points that actually lie on the boundary, deduplicating
-    # corners where two edges share a vertex (e.g. (IND_W, IND_N) is
-    # on both the top and left edges).  Without dedup, corner-passing
-    # lines produce 6+ values → RuntimeError.  (Fixes #42)
-    candidates = []
+    # Collect points that actually lie on the boundary.  Optimised for
+    # the common case (2 distinct intersections) to avoid creating a
+    # set and calling round() on every invocation.  This function sits
+    # in the innermost hot loop (called 2× per new_dir iteration ×
+    # up to 200 iterations × vertices per region × regions), so even
+    # small constant-factor savings compound significantly.
+    #
+    # Corner dedup is still needed when a line passes exactly through
+    # a boundary corner (e.g. (IND_W, IND_N) appears in both the top
+    # and left edge candidates).  We defer the set-based dedup to a
+    # slow path that is rarely taken.  (Fixes #42)
+    r0x = r0y = r1x = r1y = None
+    count = 0
+
     if IND_W <= xt <= IND_E:
-        candidates.append((xt, IND_N))
+        r0x, r0y = xt, IND_N
+        count = 1
     if IND_W <= xb <= IND_E:
-        candidates.append((xb, IND_S))
+        if count == 0:
+            r0x, r0y = xb, IND_S
+        else:
+            r1x, r1y = xb, IND_S
+        count += 1
     if IND_S <= yl <= IND_N:
-        candidates.append((IND_W, yl))
+        if count == 0:
+            r0x, r0y = IND_W, yl
+        elif count == 1:
+            r1x, r1y = IND_W, yl
+        count += 1
     if IND_S <= yr <= IND_N:
-        candidates.append((IND_E, yr))
+        if count == 0:
+            r0x, r0y = IND_E, yr
+        elif count == 1:
+            r1x, r1y = IND_E, yr
+        count += 1
 
-    # Deduplicate: two boundary edges can share a corner point
-    seen = set()
-    ret = []
-    for pt in candidates:
-        # Round to avoid floating-point near-duplicates at corners
-        key = (round(pt[0], 10), round(pt[1], 10))
-        if key not in seen:
-            seen.add(key)
-            ret.extend(pt)
+    # Fast path: exactly 2 candidates, no corner dedup needed
+    if count == 2:
+        return [r0x, r0y, r1x, r1y]
 
-    if len(ret) == 4:
-        return ret
+    # Fast path: single intersection (tangent to corner)
+    if count == 1:
+        return [r0x, r0y, r0x, r0y]
 
-    # Single intersection (tangent to corner): duplicate it so callers
-    # get the expected 4-element format
-    if len(ret) == 2:
-        return ret + ret
+    # Slow path: 3+ candidates means a corner hit — deduplicate
+    if count >= 3:
+        candidates = []
+        if IND_W <= xt <= IND_E:
+            candidates.append((xt, IND_N))
+        if IND_W <= xb <= IND_E:
+            candidates.append((xb, IND_S))
+        if IND_S <= yl <= IND_N:
+            candidates.append((IND_W, yl))
+        if IND_S <= yr <= IND_N:
+            candidates.append((IND_E, yr))
+        seen = set()
+        ret = []
+        for pt in candidates:
+            key = (round(pt[0], 10), round(pt[1], 10))
+            if key not in seen:
+                seen.add(key)
+                ret.extend(pt)
+        if len(ret) == 4:
+            return ret
+        if len(ret) == 2:
+            return ret + ret
 
     raise RuntimeError(
         "Line from (%s, %s) with slope %s does not intersect search "
