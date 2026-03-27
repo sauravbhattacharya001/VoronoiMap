@@ -1,0 +1,26 @@
+// compression_demo.srv - Compression builtins demo
+
+let text = "Hello World! This is a test of the compression builtins in sauravcode."
+let compressed = compress(text)
+print("Original: " + text)
+print("Compressed (base64): " + compressed)
+
+let restored = decompress(compressed)
+print("Decompressed: " + restored)
+
+let fast = compress(text, 1)
+let best = compress(text, 9)
+print("Fast compression: " + fast)
+print("Best compression: " + best)
+
+let gz = gzip_compress(text)
+print("Gzip compressed: " + gz)
+let gz_restored = gzip_decompress(gz)
+print("Gzip decompressed: " + gz_restored)
+
+let ratio = compress_ratio(text)
+print("Compression ratio: " + to_string(ratio) + "x")
+
+let big = repeat("abcdefghij", 100)
+let big_ratio = compress_ratio(big)
+print("Repetitive string ratio: " + to_string(big_ratio) + "x")
