@@ -842,22 +842,52 @@ def new_dir(data, aplng, aplat, alng, alat, dlng, dlat):
     a1 = math.atan(m1)
     tth = 0.5
     th = math.atan(tth)
+    # Local references for hot-loop functions — avoids module-level
+    # dict lookups on every iteration (~200 iterations typical).
+    _isect_B = isect_B
+    _find_CXY = find_CXY
+    _bin_search = bin_search
+    _collinear = collinear
+    _math_tan = math.tan
+    prev_c1 = None
     for _iter in range(NEW_DIR_MAX_ITER):
+        # When th is below float64 meaningful precision the angular
+        # difference between ac1 and ac2 vanishes — further iterations
+        # only burn CPU without refining the result.
+        if th < 1e-12:
+            break
+
         ac1 = a1 + th
         ac2 = ac1 + th
-        tac1 = math.tan(ac1)
-        tac2 = math.tan(ac2)
+        tac1 = _math_tan(ac1)
+        tac2 = _math_tan(ac2)
 
-        Bc1 = isect_B(dlng, dlat, tac1)
-        Bc2 = isect_B(dlng, dlat, tac2)
+        Bc1 = _isect_B(dlng, dlat, tac1)
+        Bc1x, Bc1y = _find_CXY(Bc1, aplng, aplat)
+        c1x, c1y = _bin_search(data, Bc1x, Bc1y, dlng, dlat, dlng, dlat)
 
-        Bc1x, Bc1y = find_CXY(Bc1, aplng, aplat)
-        Bc2x, Bc2y = find_CXY(Bc2, aplng, aplat)
-        c1x, c1y = bin_search(data, Bc1x, Bc1y, dlng, dlat, dlng, dlat)
-        c2x, c2y = bin_search(data, Bc2x, Bc2y, dlng, dlat, dlng, dlat)
+        # If c1 is identical to the previous iteration's c1, the search
+        # has converged — the boundary point isn't moving any more.
+        if prev_c1 is not None and c1x == prev_c1[0] and c1y == prev_c1[1]:
+            break
+        prev_c1 = (c1x, c1y)
+
+        Bc2 = _isect_B(dlng, dlat, tac2)
+        Bc2x, Bc2y = _find_CXY(Bc2, aplng, aplat)
+
+        # Skip the expensive second bin_search when the two boundary
+        # query points are nearly identical — they'll produce the same
+        # Voronoi boundary point, making the collinearity check trivially
+        # true.  Threshold chosen to be well above BIN_PREC (1e-6).
+        _dx = Bc1x - Bc2x
+        _dy = Bc1y - Bc2y
+        if _dx * _dx + _dy * _dy < 1e-8:
+            break
+
+        c2x, c2y = _bin_search(data, Bc2x, Bc2y, dlng, dlat, dlng, dlat)
 
         th /= 2
-        if (collinear(alng, alat, c1x, c1y, c2x, c2y) is True):
+        if _collinear(alng, alat, c1x, c1y, c2x, c2y) is True:
             break
 
     if (c1x == alng):
