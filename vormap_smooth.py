@@ -218,7 +218,7 @@ _SMOOTH_STRATEGIES = {
 }
 
 
-def _smooth_once(values, adjacency, seeds, config):
+def _smooth_once(values, adjacency, seeds, config, *, dist_cache=None):
     """Apply one smoothing pass.
 
     Parameters
@@ -231,6 +231,9 @@ def _smooth_once(values, adjacency, seeds, config):
         All seed points.
     config : SmoothConfig
         Smoothing configuration.
+    dist_cache : dict or None
+        Pre-computed (seed, neighbour) -> distance lookup.  When provided,
+        avoids redundant sqrt calls on repeated iterations.
 
     Returns
     -------
@@ -258,7 +261,10 @@ def _smooth_once(values, adjacency, seeds, config):
         for nb in neighbours:
             if nb in values:
                 nvals.append(values[nb])
-                ndists.append(_compute_distance(seed, nb))
+                if dist_cache is not None:
+                    ndists.append(dist_cache[(seed, nb)])
+                else:
+                    ndists.append(_compute_distance(seed, nb))
 
         if not nvals:
             new_values[seed] = values[seed]
@@ -346,12 +352,28 @@ def smooth_attributes(data, regions, values, config=None):
     original = dict(val_dict)
     seeds = list(val_dict.keys())
 
+    # Pre-compute inter-seed distances once.  `_smooth_once` previously
+    # called `_compute_distance` for every (seed, neighbour) pair on
+    # every iteration — O(iterations × edges) sqrt calls.  Since seed
+    # positions never change during smoothing, we cache all distances
+    # upfront (O(edges)) and pass the lookup table through, eliminating
+    # redundant computation on subsequent iterations.
+    dist_cache: Dict[Tuple, float] = {}
+    for seed in seeds:
+        for nb in adjacency.get(seed, []):
+            key = (seed, nb)
+            if key not in dist_cache:
+                dist_cache[key] = _compute_distance(seed, nb)
+                dist_cache[(nb, seed)] = dist_cache[key]
+
     # Iterative smoothing
     current = dict(val_dict)
     convergence = []
 
     for i in range(config.iterations):
-        current, max_change = _smooth_once(current, adjacency, seeds, config)
+        current, max_change = _smooth_once(
+            current, adjacency, seeds, config, dist_cache=dist_cache,
+        )
         convergence.append(max_change)
 
     return SmoothResult(
