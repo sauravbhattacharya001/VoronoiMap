@@ -67,6 +67,30 @@ def polygon_centroid(vertices):
     return (cx, cy)
 
 
+def polygon_centroid_mean(vertices):
+    """Centroid of a polygon as the simple geometric mean of vertices.
+
+    Unlike :func:`polygon_centroid` (which uses the shoelace-derived
+    area-weighted formula), this returns the arithmetic mean of the
+    vertex coordinates.  Useful when a quick approximate centroid is
+    sufficient or when the polygon may be degenerate.
+
+    Parameters
+    ----------
+    vertices : list of (x, y)
+
+    Returns
+    -------
+    tuple of (float, float)
+    """
+    n = len(vertices)
+    if n == 0:
+        return (0.0, 0.0)
+    cx = sum(v[0] for v in vertices) / n
+    cy = sum(v[1] for v in vertices) / n
+    return (cx, cy)
+
+
 def bounding_box(points):
     """Return (x_min, y_min, x_max, y_max) for a list of (x, y) points."""
     xs = [p[0] for p in points]

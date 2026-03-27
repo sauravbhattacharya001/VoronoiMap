@@ -24,6 +24,7 @@ import sys
 import warnings
 
 import vormap
+from vormap_utils import polygon_centroid_mean as _polygon_centroid
 
 
 # ── Voronoi cell polygon tracer ─────────────────────────────────────
@@ -144,14 +145,7 @@ def _fan_triangulate(polygon):
     return tris
 
 
-def _polygon_centroid(polygon):
-    """Compute centroid of a polygon."""
-    n = len(polygon)
-    if n == 0:
-        return (0, 0)
-    cx = sum(p[0] for p in polygon) / n
-    cy = sum(p[1] for p in polygon) / n
-    return cx, cy
+## _polygon_centroid imported from vormap_utils
 
 
 def _sort_polygon_ccw(polygon):

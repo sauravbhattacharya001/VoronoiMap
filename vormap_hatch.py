@@ -37,6 +37,8 @@ import random as _random
 from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
+from vormap_utils import polygon_centroid_mean as _polygon_centroid
+
 # ── Core Voronoi computation (pure-Python fallback) ──
 
 try:
@@ -94,20 +96,13 @@ def _line_segment_clip(x1, y1, x2, y2, polygon):
     return (cx1, cy1, cx2, cy2)
 
 
-def _polygon_centroid(poly):
-    """Centroid of a simple polygon."""
-    n = len(poly)
-    if n == 0:
-        return (0, 0)
-    cx = sum(p[0] for p in poly) / n
-    cy = sum(p[1] for p in poly) / n
-    return cx, cy
+## _polygon_centroid imported from vormap_utils
 
 
 def _polygon_bbox(poly):
-    xs = [p[0] for p in poly]
-    ys = [p[1] for p in poly]
-    return min(xs), min(ys), max(xs), max(ys)
+    # Thin wrapper — same as vormap_utils.bounding_box
+    from vormap_utils import bounding_box
+    return bounding_box(poly)
 
 
 def _point_in_polygon(px, py, poly):

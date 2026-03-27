@@ -34,6 +34,8 @@ import os
 import random
 from typing import List, Tuple, Optional, Dict, Any
 
+from vormap_utils import polygon_area as _polygon_area, polygon_centroid_mean as _polygon_centroid_raw
+
 
 # ── Optional dependency detection ──
 
@@ -293,26 +295,9 @@ def _scipy_voronoi_regions(
 
 # ── Fragment analysis ──
 
-def _polygon_area(vertices: List[Tuple[float, float]]) -> float:
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
-
-
 def _polygon_centroid(vertices: List[Tuple[float, float]]) -> Tuple[float, float]:
-    """Compute centroid of a polygon."""
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    cx = sum(v[0] for v in vertices) / n
-    cy = sum(v[1] for v in vertices) / n
+    """Compute centroid of a polygon (rounded to 2 decimals)."""
+    cx, cy = _polygon_centroid_raw(vertices)
     return (round(cx, 2), round(cy, 2))
 
 
