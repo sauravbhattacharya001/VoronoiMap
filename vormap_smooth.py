@@ -173,6 +173,51 @@ def _compute_distance(p1, p2):
     return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
 
+def _smooth_mean(vals, dists, config):
+    """Arithmetic mean of values (ignores distances)."""
+    return sum(vals) / len(vals)
+
+
+def _smooth_median(vals, dists, config):
+    """Median of values (robust to outliers)."""
+    sorted_vals = sorted(vals)
+    n = len(sorted_vals)
+    if n % 2 == 1:
+        return sorted_vals[n // 2]
+    return (sorted_vals[n // 2 - 1] + sorted_vals[n // 2]) / 2.0
+
+
+def _smooth_gaussian(vals, dists, config):
+    """Distance-weighted Gaussian kernel average."""
+    two_sigma_sq = 2.0 * config.sigma * config.sigma
+    weights = [math.exp(-(d * d) / two_sigma_sq) for d in dists]
+    total_w = sum(weights)
+    if total_w <= 0:
+        return None  # signal fallback to original value
+    return sum(v * w for v, w in zip(vals, weights)) / total_w
+
+
+def _smooth_inverse_distance(vals, dists, config):
+    """Inverse-distance-weighted average."""
+    weights = [
+        1e12 if d < 1e-12 else 1.0 / (d ** config.power)
+        for d in dists
+    ]
+    total_w = sum(weights)
+    if total_w <= 0:
+        return None  # signal fallback to original value
+    return sum(v * w for v, w in zip(vals, weights)) / total_w
+
+
+# Dispatch table for smoothing strategies — add new methods here.
+_SMOOTH_STRATEGIES = {
+    "mean": _smooth_mean,
+    "median": _smooth_median,
+    "gaussian": _smooth_gaussian,
+    "inverse_distance": _smooth_inverse_distance,
+}
+
+
 def _smooth_once(values, adjacency, seeds, config):
     """Apply one smoothing pass.
 
@@ -194,6 +239,7 @@ def _smooth_once(values, adjacency, seeds, config):
     float
         Max absolute change.
     """
+    strategy = _SMOOTH_STRATEGIES[config.method]
     new_values = {}
     max_change = 0.0
 
@@ -225,43 +271,9 @@ def _smooth_once(values, adjacency, seeds, config):
             nvals_with_self = nvals
             ndists_with_self = ndists
 
-        # Compute smoothed value based on method
-        if config.method == "mean":
-            smoothed = sum(nvals_with_self) / len(nvals_with_self)
-
-        elif config.method == "median":
-            sorted_vals = sorted(nvals_with_self)
-            n = len(sorted_vals)
-            if n % 2 == 1:
-                smoothed = sorted_vals[n // 2]
-            else:
-                smoothed = (sorted_vals[n // 2 - 1] + sorted_vals[n // 2]) / 2.0
-
-        elif config.method == "gaussian":
-            weights = []
-            for d in ndists_with_self:
-                w = math.exp(-(d * d) / (2.0 * config.sigma * config.sigma))
-                weights.append(w)
-            total_w = sum(weights)
-            if total_w > 0:
-                smoothed = sum(v * w for v, w in zip(nvals_with_self, weights)) / total_w
-            else:
-                smoothed = values[seed]
-
-        elif config.method == "inverse_distance":
-            weights = []
-            for d in ndists_with_self:
-                if d < 1e-12:
-                    weights.append(1e12)  # self-point gets huge weight
-                else:
-                    weights.append(1.0 / (d ** config.power))
-            total_w = sum(weights)
-            if total_w > 0:
-                smoothed = sum(v * w for v, w in zip(nvals_with_self, weights)) / total_w
-            else:
-                smoothed = values[seed]
-
-        else:
+        # Compute smoothed value via strategy function
+        smoothed = strategy(nvals_with_self, ndists_with_self, config)
+        if smoothed is None:
             smoothed = values[seed]
 
         # Blend with original
