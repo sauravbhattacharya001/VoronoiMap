@@ -2011,8 +2011,13 @@ def _cmd_circlepack(args, regions, data):
         print('Circle packing HTML saved to %s' % args.circlepack_html)
 
 
-def main():
-    """CLI entry point for VoronoiMap estimation."""
+def _build_parser():
+    """Construct the argparse parser for the VoronoiMap CLI.
+
+    Extracted from main() to keep the entry point focused on execution
+    logic and to allow programmatic access to the parser (e.g. for
+    generating documentation or testing argument parsing).
+    """
     import argparse
 
     parser = argparse.ArgumentParser(
@@ -2765,6 +2770,12 @@ def main():
         help='Print circle packing efficiency statistics to stdout.',
     )
 
+    return parser
+
+
+def main():
+    """CLI entry point for VoronoiMap estimation."""
+    parser = _build_parser()
     args = parser.parse_args()
 
     # ── Handle --generate before normal flow ─────────────────────────
