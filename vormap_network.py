@@ -46,6 +46,9 @@ from dataclasses import dataclass, field
 
 from vormap_geometry import edge_length
 
+# Alias for backward compatibility (used by tests)
+_euclidean = edge_length
+
 
 # ── Graph construction ──────────────────────────────────────────────
 
@@ -60,11 +63,6 @@ def _centroids_from_stats(stats):
             cy = s.get("centroid_y", 0)
         centroids.append((cx, cy))
     return centroids
-
-
-def _euclidean(p1, p2):
-    """Euclidean distance between two 2D points."""
-    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
 
 def build_delaunay_graph(stats):
@@ -123,7 +121,7 @@ def build_delaunay_graph(stats):
         if count >= 2 and (i, j) not in seen:
             seen.add((i, j))
             seen.add((j, i))
-            dist = _euclidean(centroids[i], centroids[j])
+            dist = edge_length(centroids[i], centroids[j])
             edges.append({"source": i, "target": j, "weight": dist})
             adjacency[i].append(j)
             adjacency[j].append(i)

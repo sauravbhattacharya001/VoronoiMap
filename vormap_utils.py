@@ -91,6 +91,25 @@ def polygon_centroid_mean(vertices):
     return (cx, cy)
 
 
+def euclidean(p1, p2):
+    """Euclidean distance between two 2D points.
+
+    Parameters
+    ----------
+    p1, p2 : tuple of (float, float)
+        2D point coordinates.
+
+    Returns
+    -------
+    float
+        Euclidean distance.
+    """
+    import math
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    return math.sqrt(dx * dx + dy * dy)
+
+
 def bounding_box(points):
     """Return (x_min, y_min, x_max, y_max) for a list of (x, y) points."""
     xs = [p[0] for p in points]

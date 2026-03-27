@@ -55,8 +55,10 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from vormap import validate_output_path
 
+from vormap_utils import polygon_centroid, polygon_area, euclidean as _dist
+
 try:
-    from vormap_geometry import polygon_centroid, polygon_area, edge_length as _dist
+    from vormap_geometry import edge_length as _geom_dist  # noqa: F401
 except ImportError:  # pragma: no cover
     pass
 
@@ -192,32 +194,17 @@ def _edge_key(p1, p2) -> Tuple:
 
 def _centroid(poly) -> Tuple[float, float]:
     """Compute centroid of a polygon."""
-    try:
-        return polygon_centroid(poly)
-    except Exception:
-        if not poly:
-            return (0.0, 0.0)
-        cx = sum(p[0] for p in poly) / len(poly)
-        cy = sum(p[1] for p in poly) / len(poly)
-        return (cx, cy)
+    if not poly:
+        return (0.0, 0.0)
+    return polygon_centroid(poly)
 
 
 
 def _poly_area(poly) -> float:
     """Compute polygon area."""
-    try:
-        return polygon_area(poly)
-    except Exception:
-        # Shoelace
-        n = len(poly)
-        if n < 3:
-            return 0.0
-        area = 0.0
-        for i in range(n):
-            j = (i + 1) % n
-            area += poly[i][0] * poly[j][1]
-            area -= poly[j][0] * poly[i][1]
-        return abs(area) / 2.0
+    if not poly or len(poly) < 3:
+        return 0.0
+    return polygon_area(poly)
 
 
 # ── Core analysis ───────────────────────────────────────────────────

@@ -112,8 +112,7 @@ class StringArtResult:
 # ---------------------------------------------------------------------------
 
 
-def _distance(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    return math.hypot(a[0] - b[0], a[1] - b[1])
+from vormap_utils import euclidean as _distance
 
 
 def _circumcircle(p1, p2, p3):

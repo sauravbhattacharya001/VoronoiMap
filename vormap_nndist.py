@@ -66,9 +66,7 @@ def _percentile(values: list, p: float) -> float:
     return _percentile_sorted(sorted(values), p) if values else 0.0
 
 
-def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    """Euclidean distance between two 2D points."""
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+from vormap_utils import euclidean as _euclidean
 
 
 
