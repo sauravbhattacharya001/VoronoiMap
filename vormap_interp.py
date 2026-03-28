@@ -216,22 +216,55 @@ def natural_neighbor_interp(points, values, query, fallback_idw=True):
     return sum(weights[i] * values[i] for i in weights) / w_sum
 
 
-def _natural_neighbor_interp_precomputed(pts_array, areas_orig, values, query):
+def _make_augmented_array(pts_array):
+    """Pre-allocate an (n+1, 2) array for natural neighbor queries.
+
+    The last row is a placeholder for the query point, updated in-place
+    by ``_natural_neighbor_interp_precomputed`` to avoid an O(n) copy
+    per grid cell (``np.vstack`` allocates a new array every call).
+    """
+    import numpy as np
+    n = len(pts_array)
+    aug = np.empty((n + 1, 2), dtype=pts_array.dtype)
+    aug[:n] = pts_array
+    return aug
+
+
+def _natural_neighbor_interp_precomputed(pts_array, areas_orig, values, query,
+                                         _aug=None, _tree=None):
     """Natural neighbor interpolation with precomputed original areas.
 
     Avoids recomputing the original Voronoi diagram on every query,
     cutting the per-query cost roughly in half for grid interpolation.
+
+    When *_aug* is provided (a pre-allocated (n+1, 2) array from
+    ``_make_augmented_array``), the query point is written in-place
+    instead of calling ``np.vstack`` — saving one O(n) array copy
+    per query.
+
+    When *_tree* (a cKDTree) is provided, exact-point detection uses an
+    O(log n) tree query instead of an O(n) linear scan.
     """
     import numpy as np
     qx, qy = query
     n = len(values)
 
     # Exact-point short-circuit
-    for i in range(n):
-        if abs(pts_array[i, 0] - qx) < 1e-12 and abs(pts_array[i, 1] - qy) < 1e-12:
-            return values[i]
+    if _tree is not None:
+        d, idx = _tree.query(query)
+        if d < 1e-12:
+            return values[idx]
+    else:
+        for i in range(n):
+            if abs(pts_array[i, 0] - qx) < 1e-12 and abs(pts_array[i, 1] - qy) < 1e-12:
+                return values[i]
 
-    pts_new = np.vstack([pts_array, [[qx, qy]]])
+    if _aug is not None:
+        _aug[n, 0] = qx
+        _aug[n, 1] = qy
+        pts_new = _aug
+    else:
+        pts_new = np.vstack([pts_array, [[qx, qy]]])
     areas_new = _voronoi_cell_areas(pts_new)
 
     query_area = areas_new.get(n)
@@ -286,8 +319,10 @@ def grid_interpolate(points, values, nx=50, ny=50, bounds=None,
         import numpy as np
         pts_array = np.array(points, dtype=float)
         areas_orig = _voronoi_cell_areas(pts_array)
+        aug = _make_augmented_array(pts_array)
+        nn_tree = _KDTree(pts_array) if _HAS_KDTREE else None
         interp_fn = lambda q: _natural_neighbor_interp_precomputed(
-            pts_array, areas_orig, values, q)
+            pts_array, areas_orig, values, q, _aug=aug, _tree=nn_tree)
     elif _HAS_KDTREE and method in ('nearest', 'idw'):
         # Build a single KDTree for the scalar fallback path.
         # When scipy+numpy are available the vectorized fast path below
