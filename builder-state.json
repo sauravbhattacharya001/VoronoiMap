@@ -1,8 +1,8 @@
 {
-  "lastRepo": "agenticchat",
-  "lastFeature": "ChatGPT conversation import",
-  "lastRun": "2026-03-26T22:38:00-07:00",
-  "runCount": 488,
+  "lastRepo": "everything",
+  "lastFeature": "ASCII Art Generator",
+  "lastRun": "2026-03-27T22:38:00-07:00",
+  "runCount": 549,
   "repoFeatures": {
     "sauravcode": [
       "Bitwise operation builtins",
@@ -30,7 +30,9 @@
       "HTTP/Network builtins",
       "Deque (double-ended queue) builtins",
       "Interval data structure builtins",
-      "Compression builtins"
+      "Compression builtins",
+      "Table formatting builtins",
+      "Logging & Diagnostics builtins"
     ],
     "VoronoiMap": [
       "Terminal ASCII/Unicode Voronoi rendering",
@@ -59,7 +61,8 @@
       "Voronoi Watercolor Painter",
       "Voronoi Kaleidoscope Generator",
       "Crystal Growth Simulator",
-      "Voronoi Emboss/Relief Renderer"
+      "Voronoi Emboss/Relief Renderer",
+      "Cross-Stitch Pattern Generator"
     ],
     "agenticchat": [
       "Per-session notes/memos",
@@ -89,7 +92,9 @@
       "Notification Sound",
       "PDF Export",
       "Conversation Export (Markdown/Text/HTML/JSON)",
-      "ChatGPT conversation import"
+      "ChatGPT conversation import",
+      "Mood Tracker",
+      "Message Highlighter"
     ],
     "agentlens": [
       "CLI tail command",
@@ -117,7 +122,8 @@
       "CLI diff command",
       "CLI profile command",
       "CLI correlate command",
-      "CLI capacity command"
+      "CLI capacity command",
+      "CLI watch command"
     ],
     "gif-captcha": [
       "CLI tool",
@@ -206,7 +212,10 @@
       "Return Receipt Page",
       "Store Hours & Locations",
       "Staff Schedule Manager",
-      "Movie Director Spotlight"
+      "Movie Director Spotlight",
+      "Customer Merge Tool",
+      "Refund Management System",
+      "Insurance Controller with full UI"
     ],
     "FeedReader": [
       "Vocabulary Builder",
@@ -237,7 +246,12 @@
       "Reading Goals Manager",
       "Article Mood Tracker",
       "Smart Feed Search",
-      "Article Deduplicator"
+      "Article Deduplicator",
+      "Article Comparison View",
+      "Article Flashback (On This Day)",
+      "Article Dark Mode Formatter",
+      "Word Cloud Generator",
+      "Vocabulary Frequency Profiler"
     ],
     "BioBots": [
       "Cell Seeding Calculator",
@@ -269,7 +283,13 @@
       "PCR Master Mix Calculator",
       "Flow Cytometry Data Analyzer",
       "Sample Tracking System (LIMS-lite)",
-      "Molarity Calculator"
+      "Molarity Calculator",
+      "Serial Dilution Calculator",
+      "Western Blot Band Analyzer",
+      "Lab Timer Dashboard",
+      "Lab Notebook Entry Generator",
+      "Lab Safety Checklist",
+      "Statistical Analysis Calculator"
     ],
     "prompt": [
       "PromptChainVisualizer",
@@ -301,7 +321,10 @@
       "PromptRollbackManager",
       "PromptCostOptimizer",
       "PromptFeatureFlagManager",
-      "PromptExpander"
+      "PromptExpander",
+      "PromptMerger",
+      "PromptMinifier",
+      "PromptSanitizer"
     ],
     "everything": [
       "Bookmark Manager",
@@ -353,7 +376,21 @@
       "Daily Affirmation",
       "Eye Break Reminder",
       "Countdown Timer",
-      "Date Calculator"
+      "Date Calculator",
+      "Library Book Tracker",
+      "Personal Wiki",
+      "Color Blindness Simulator",
+      "Typing Speed Test",
+      "Pantry Tracker",
+      "Pixel Art Editor",
+      "Dream Journal",
+      "Quick Poll",
+      "Unit Price Comparator",
+      "Allergy Tracker",
+      "Movie Tracker",
+      "Percentage Calculator",
+      "Periodic Table",
+      "ASCII Art Generator"
     ],
     "ai": [
       "Safety Trend Tracker",
@@ -388,7 +425,11 @@
       "Decommission Planner",
       "Incident Cost Estimator",
       "Regulatory Compliance Mapper",
-      "Capability Catalog CLI command"
+      "Capability Catalog CLI command",
+      "Hardening Advisor CLI command",
+      "Exposure Window Analyzer",
+      "Incident Communication Drafter",
+      "Vulnerability Scanner"
     ],
     "getagentbox": [
       "Custom 404 page",
@@ -419,7 +460,8 @@
       "Webhooks Documentation Page",
       "Community Page",
       "SLA Page",
-      "Incident Postmortems Page"
+      "Incident Postmortems Page",
+      "Interactive Tutorials Page"
     ],
     "Ocaml-sample-code": [
       "Interactive sorting algorithm visualizer",
@@ -461,7 +503,12 @@
       "2-3 Tree data structure",
       "Simplex Linear Programming Solver",
       "Order Statistics Tree data structure",
-      "Persistent Array data structure"
+      "Persistent Array data structure",
+      "Sparse Table data structure",
+      "Dancing Links (Algorithm X) exact cover solver",
+      "Link-Cut Tree data structure",
+      "B+ Tree data structure",
+      "Y-Fast Trie data structure"
     ],
     "WinSentinel": [
       "Score Forecast CLI command",
@@ -492,7 +539,8 @@
       "Regression Detector CLI command",
       "Calendar Heatmap CLI command",
       "Security Maturity Assessment CLI command",
-      "CLI --watch command for continuous security monitoring"
+      "CLI --watch command for continuous security monitoring",
+      "Attack Surface Analyzer CLI command"
     ]
   }
 }
