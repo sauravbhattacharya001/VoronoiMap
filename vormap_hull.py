@@ -51,13 +51,11 @@ from vormap_geometry import (
     polygon_centroid,
     polygon_perimeter,
     edge_length,
+    edge_length as _dist,
 )
 
 
 # ── Helpers ─────────────────────────────────────────────────────────
-
-def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    return edge_length(a, b)
 
 
 # ── Convex Hull (Andrew's monotone chain) ───────────────────────────

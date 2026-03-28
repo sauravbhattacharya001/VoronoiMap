@@ -13,6 +13,7 @@ import math
 
 from vormap_utils import polygon_area  # noqa: F401 — canonical implementation
 from vormap_utils import polygon_centroid  # noqa: F401 — canonical implementation
+from vormap_utils import euclidean  # noqa: F401 — canonical implementation
 
 
 def polygon_perimeter(vertices):

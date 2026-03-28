@@ -63,8 +63,7 @@ from vormap_geometry import mean as _mean, median as _median, std as _std
 # ── Helpers ─────────────────────────────────────────────────────────
 
 
-def _euclidean(a, b):
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+from vormap_utils import euclidean as _euclidean
 
 
 def _nn_distances(points):
