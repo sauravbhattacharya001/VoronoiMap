@@ -280,6 +280,11 @@ def _get_cell_areas(points):
     """
     if len(points) < 2:
         return {}
+    # Recompute bounds so that compute_regions covers all points —
+    # without this, snapshots whose extents differ from the initial
+    # data produce silently incorrect cell areas.
+    s, n, w, e = vormap.compute_bounds(points)
+    vormap.set_bounds(s, n, w, e)
     regions = compute_regions(points)
     areas = {}
     for i, seed in enumerate(points):
