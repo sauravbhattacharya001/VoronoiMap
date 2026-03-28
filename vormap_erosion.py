@@ -54,7 +54,6 @@ CLI::
 from __future__ import annotations
 
 import argparse
-import copy
 import json
 import math
 import os
@@ -102,32 +101,41 @@ def hydraulic_erosion(
         raise ValueError("rate must be in (0, 1]")
 
     current = {s: float(v) for s, v in elevations.items()}
-    frames: list[dict] = [copy.deepcopy(current)]
+    frames: list[dict] = [current.copy()]
+
+    # Pre-allocate delta dict and reuse across steps to avoid
+    # per-step dict construction overhead.
+    delta: dict[object, float] = dict.fromkeys(current, 0.0)
 
     for _ in range(steps):
-        delta: dict[object, float] = {s: 0.0 for s in current}
+        # Reset deltas to zero (faster than rebuilding the dict)
+        for s in delta:
+            delta[s] = 0.0
 
         for seed, nbrs in adjacency.items():
             h = current[seed]
-            lower = [(n, h - current[n]) for n in nbrs if current[n] < h]
-            if not lower:
-                continue
-
-            total_slope = sum(d for _, d in lower)
-            if total_slope <= 0:
+            # Inline lower-neighbour collection to avoid intermediate list
+            total_slope = 0.0
+            lower_nbrs: list[tuple] = []
+            for n in nbrs:
+                diff = h - current[n]
+                if diff > 0.0:
+                    total_slope += diff
+                    lower_nbrs.append((n, diff))
+            if total_slope <= 0.0:
                 continue
 
             eroded = min(rate * total_slope, sediment_capacity, h * 0.5)
             delta[seed] -= eroded
 
-            for nbr, slope in lower:
-                fraction = slope / total_slope
-                delta[nbr] += eroded * fraction
+            inv_slope = eroded / total_slope
+            for nbr, slope in lower_nbrs:
+                delta[nbr] += slope * inv_slope
 
         for s in current:
             current[s] = max(0.0, current[s] + delta[s])
 
-        frames.append(copy.deepcopy(current))
+        frames.append(current.copy())
 
     return frames
 
@@ -172,24 +180,29 @@ def thermal_erosion(
         raise ValueError("fraction must be in (0, 1]")
 
     current = {s: float(v) for s, v in elevations.items()}
-    frames: list[dict] = [copy.deepcopy(current)]
+    frames: list[dict] = [current.copy()]
+
+    # Pre-allocate delta dict and reuse across steps
+    delta: dict[object, float] = dict.fromkeys(current, 0.0)
+    half_fraction = fraction * 0.5
 
     for _ in range(steps):
-        delta: dict[object, float] = {s: 0.0 for s in current}
+        for s in delta:
+            delta[s] = 0.0
 
         for seed, nbrs in adjacency.items():
             h = current[seed]
             for nbr in nbrs:
                 diff = h - current[nbr]
                 if diff > talus:
-                    transfer = fraction * (diff - talus) * 0.5
+                    transfer = half_fraction * (diff - talus)
                     delta[seed] -= transfer
                     delta[nbr] += transfer
 
         for s in current:
             current[s] = max(0.0, current[s] + delta[s])
 
-        frames.append(copy.deepcopy(current))
+        frames.append(current.copy())
 
     return frames
 
