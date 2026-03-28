@@ -522,7 +522,11 @@ class MonteCarloTest:
         return obs_mean / expected if expected > 0 else 1.0
 
     def _compute_vmr(self, points, nx=None, ny=None):
-        """Compute Variance-to-Mean Ratio from quadrat counts."""
+        """Compute Variance-to-Mean Ratio from quadrat counts.
+
+        Uses a flat 1D array instead of 2D list-of-lists to reduce
+        allocation overhead and improve cache locality.
+        """
         n = len(points)
         if nx is None:
             nx = max(2, int(math.sqrt(n / 2)))
@@ -535,18 +539,18 @@ class MonteCarloTest:
         if cell_w <= 0 or cell_h <= 0:
             return 1.0
 
-        counts = [[0] * ny for _ in range(nx)]
+        total_cells = nx * ny
+        counts = [0] * total_cells
         for x, y in points:
             ci = min(int((x - w) / cell_w), nx - 1)
             ri = min(int((y - s) / cell_h), ny - 1)
             if 0 <= ci < nx and 0 <= ri < ny:
-                counts[ci][ri] += 1
+                counts[ci * ny + ri] += 1
 
-        flat = [counts[i][j] for i in range(nx) for j in range(ny)]
-        mean_c = _mean(flat)
+        mean_c = sum(counts) / total_cells
         if mean_c == 0:
             return 1.0
-        var_c = sum((c - mean_c) ** 2 for c in flat) / len(flat)
+        var_c = sum((c - mean_c) ** 2 for c in counts) / total_cells
         return var_c / mean_c
 
     def _compute_voronoi_areas(self, points):
