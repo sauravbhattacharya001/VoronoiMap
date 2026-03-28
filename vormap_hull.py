@@ -182,17 +182,39 @@ def convex_hull(points: List[Tuple[float, float]]) -> ConvexHullResult:
     if perimeter > 0:
         compactness = 4.0 * math.pi * area / (perimeter ** 2)
 
-    # Diameter: farthest pair (rotating calipers for large hulls,
-    # brute force is fine for typical point sets)
+    # Diameter: farthest pair via rotating calipers — O(n)
     diameter = 0.0
     dp = (hull[0], hull[0])
     nh = len(hull)
-    for i in range(nh):
-        for j in range(i + 1, nh):
-            d = _dist(hull[i], hull[j])
+    if nh <= 4:
+        # Brute force for tiny hulls
+        for i in range(nh):
+            for j in range(i + 1, nh):
+                d = _dist(hull[i], hull[j])
+                if d > diameter:
+                    diameter = d
+                    dp = (hull[i], hull[j])
+    else:
+        # Rotating calipers: find antipodal pairs in O(n)
+        q = 1
+        for p_idx in range(nh):
+            p_next = (p_idx + 1) % nh
+            # Advance q while the triangle area increases
+            while True:
+                q_next = (q + 1) % nh
+                # Cross product to compare area of triangles
+                ax = hull[p_next][0] - hull[p_idx][0]
+                ay = hull[p_next][1] - hull[p_idx][1]
+                bx = hull[q_next][0] - hull[q][0]
+                by = hull[q_next][1] - hull[q][1]
+                if ax * by - ay * bx > 0:
+                    q = q_next
+                else:
+                    break
+            d = _dist(hull[p_idx], hull[q])
             if d > diameter:
                 diameter = d
-                dp = (hull[i], hull[j])
+                dp = (hull[p_idx], hull[q])
 
     return ConvexHullResult(
         vertices=hull,
