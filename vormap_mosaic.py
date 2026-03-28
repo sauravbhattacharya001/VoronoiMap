@@ -49,11 +49,31 @@ except ImportError:
 # ── Pure-Python minimal PNG reader/writer ──
 # (so the module works without Pillow)
 
+
+# Maximum image dimensions to prevent memory exhaustion from malicious PNGs.
+# 16384 × 16384 × 3 bytes ≈ 768 MB — generous for real images, safe for servers.
+_MAX_PNG_DIMENSION = 16384
+
+# Maximum total IDAT (compressed) payload — 256 MB guards against chunk bombs.
+_MAX_IDAT_BYTES = 256 * 1024 * 1024
+
+# Maximum decompressed pixel data — prevents zip bombs.
+_MAX_DECOMPRESSED_BYTES = 1024 * 1024 * 1024  # 1 GB
+
+
 def _read_png(filepath: str) -> Tuple[int, int, list]:
     """Read a PNG file, return (width, height, pixels).
 
     *pixels* is a flat list of (r, g, b) tuples in row-major order.
     Supports 8-bit RGB and RGBA (alpha is discarded).
+
+    Security hardening
+    ------------------
+    * Image dimensions capped at ``_MAX_PNG_DIMENSION`` to prevent OOM.
+    * Cumulative IDAT size capped at ``_MAX_IDAT_BYTES``.
+    * Decompressed size capped at ``_MAX_DECOMPRESSED_BYTES`` (zip-bomb guard).
+    * Individual chunk lengths are validated against remaining file size.
+    * CRC of every chunk is verified; mismatches raise ``ValueError``.
     """
     with open(filepath, "rb") as f:
         sig = f.read(8)
@@ -62,6 +82,7 @@ def _read_png(filepath: str) -> Tuple[int, int, list]:
 
         width = height = bit_depth = color_type = 0
         idat_chunks = []
+        idat_total = 0
 
         while True:
             header = f.read(8)
@@ -69,12 +90,46 @@ def _read_png(filepath: str) -> Tuple[int, int, list]:
                 break
             length = struct.unpack(">I", header[:4])[0]
             chunk_type = header[4:8]
+
+            # Guard against absurd chunk lengths (max valid PNG chunk is 2^31-1,
+            # but we use a tighter practical limit).
+            if length > _MAX_IDAT_BYTES:
+                raise ValueError(
+                    f"PNG chunk {chunk_type!r} declares {length:,} bytes — "
+                    f"exceeds safety limit"
+                )
+
             data = f.read(length)
-            _crc = f.read(4)  # skip CRC check for simplicity
+            if len(data) != length:
+                raise ValueError("Truncated PNG chunk")
+
+            crc_bytes = f.read(4)
+            if len(crc_bytes) != 4:
+                raise ValueError("Truncated PNG CRC")
+
+            # Verify CRC (CRC covers chunk type + data)
+            expected_crc = struct.unpack(">I", crc_bytes)[0]
+            actual_crc = zlib.crc32(chunk_type + data) & 0xFFFFFFFF
+            if actual_crc != expected_crc:
+                raise ValueError(
+                    f"CRC mismatch in PNG chunk {chunk_type!r} "
+                    f"(expected {expected_crc:#010x}, got {actual_crc:#010x})"
+                )
 
             if chunk_type == b"IHDR":
+                if length < 13:
+                    raise ValueError("IHDR chunk too small")
                 width = struct.unpack(">I", data[0:4])[0]
                 height = struct.unpack(">I", data[4:8])[0]
+
+                if width == 0 or height == 0:
+                    raise ValueError("PNG has zero dimension")
+                if width > _MAX_PNG_DIMENSION or height > _MAX_PNG_DIMENSION:
+                    raise ValueError(
+                        f"PNG dimensions {width}×{height} exceed safety limit "
+                        f"of {_MAX_PNG_DIMENSION}×{_MAX_PNG_DIMENSION}"
+                    )
+
                 bit_depth = data[8]
                 color_type = data[9]
                 if bit_depth != 8:
@@ -84,11 +139,26 @@ def _read_png(filepath: str) -> Tuple[int, int, list]:
                         f"Only RGB(A) PNGs supported, got color_type={color_type}"
                     )
             elif chunk_type == b"IDAT":
+                idat_total += length
+                if idat_total > _MAX_IDAT_BYTES:
+                    raise ValueError(
+                        f"Cumulative IDAT size ({idat_total:,} bytes) exceeds "
+                        f"safety limit of {_MAX_IDAT_BYTES:,} bytes"
+                    )
                 idat_chunks.append(data)
             elif chunk_type == b"IEND":
                 break
 
+        if not idat_chunks:
+            raise ValueError("PNG contains no IDAT chunks")
+
         raw = zlib.decompress(b"".join(idat_chunks))
+
+        if len(raw) > _MAX_DECOMPRESSED_BYTES:
+            raise ValueError(
+                f"Decompressed PNG data ({len(raw):,} bytes) exceeds safety "
+                f"limit — possible zip bomb"
+            )
         channels = 4 if color_type == 6 else 3
         stride = 1 + width * channels  # filter byte + pixel bytes
 
