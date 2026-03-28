@@ -218,7 +218,36 @@ _SMOOTH_STRATEGIES = {
 }
 
 
-def _smooth_once(values, adjacency, seeds, config):
+def _precompute_distances(adjacency, seeds_set):
+    """Pre-compute distances between each seed and its neighbours.
+
+    Building this cache once avoids redundant ``math.sqrt`` calls on
+    every smoothing iteration — a significant win when ``iterations``
+    is large (e.g. gaussian/IDW smoothing with 10+ passes).
+
+    Parameters
+    ----------
+    adjacency : dict
+        Seed -> list of neighbour seeds.
+    seeds_set : set
+        Set of seed points that have values.
+
+    Returns
+    -------
+    dict
+        Mapping ``(seed, neighbour) -> float`` distance.
+    """
+    cache = {}
+    for seed in seeds_set:
+        for nb in adjacency.get(seed, []):
+            if nb in seeds_set:
+                key = (seed, nb)
+                if key not in cache:
+                    cache[key] = _compute_distance(seed, nb)
+    return cache
+
+
+def _smooth_once(values, adjacency, seeds, config, dist_cache=None):
     """Apply one smoothing pass.
 
     Parameters
@@ -231,6 +260,10 @@ def _smooth_once(values, adjacency, seeds, config):
         All seed points.
     config : SmoothConfig
         Smoothing configuration.
+    dist_cache : dict or None
+        Pre-computed ``(seed, neighbour) -> distance`` mapping.
+        When provided, avoids recomputing Euclidean distances each
+        iteration.
 
     Returns
     -------
@@ -242,6 +275,7 @@ def _smooth_once(values, adjacency, seeds, config):
     strategy = _SMOOTH_STRATEGIES[config.method]
     new_values = {}
     max_change = 0.0
+    use_cache = dist_cache is not None
 
     for seed in seeds:
         if seed not in values:
@@ -258,7 +292,10 @@ def _smooth_once(values, adjacency, seeds, config):
         for nb in neighbours:
             if nb in values:
                 nvals.append(values[nb])
-                ndists.append(_compute_distance(seed, nb))
+                if use_cache:
+                    ndists.append(dist_cache.get((seed, nb), _compute_distance(seed, nb)))
+                else:
+                    ndists.append(_compute_distance(seed, nb))
 
         if not nvals:
             new_values[seed] = values[seed]
@@ -346,12 +383,19 @@ def smooth_attributes(data, regions, values, config=None):
     original = dict(val_dict)
     seeds = list(val_dict.keys())
 
+    # Pre-compute inter-seed distances once (avoids redundant sqrt calls
+    # across iterations — especially beneficial for gaussian/IDW with
+    # many passes).
+    dist_cache = _precompute_distances(adjacency, set(seeds))
+
     # Iterative smoothing
     current = dict(val_dict)
     convergence = []
 
     for i in range(config.iterations):
-        current, max_change = _smooth_once(current, adjacency, seeds, config)
+        current, max_change = _smooth_once(
+            current, adjacency, seeds, config, dist_cache
+        )
         convergence.append(max_change)
 
     return SmoothResult(
