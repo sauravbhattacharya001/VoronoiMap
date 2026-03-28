@@ -108,31 +108,64 @@ class DensityContour:
 
 # -- Bandwidth selection -----------------------------------------------
 
+def _sample_std(vals: list[float]) -> float:
+    """Compute sample standard deviation (Bessel-corrected)."""
+    m = sum(vals) / len(vals)
+    var = sum((v - m) ** 2 for v in vals) / (len(vals) - 1)
+    return math.sqrt(max(var, 1e-12))
+
+
+def _iqr(vals: list[float]) -> float:
+    """Compute interquartile range (Q3 - Q1) of a list of values."""
+    s = sorted(vals)
+    n = len(s)
+    q1 = s[n // 4]
+    q3 = s[(3 * n) // 4]
+    return q3 - q1
+
+
+def _extract_spread(points: list[tuple[float, float]]) -> tuple[float, float]:
+    """Return (mean_std, mean_robust_spread) from 2D point coordinates.
+
+    mean_std is the average of per-axis sample standard deviations.
+    mean_robust_spread uses min(std, IQR/1.34) per axis (Silverman's
+    robust scale estimate to handle heavy-tailed or skewed data).
+    """
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
+
+    sx, sy = _sample_std(xs), _sample_std(ys)
+    mean_std = (sx + sy) / 2.0
+
+    iqr_x, iqr_y = _iqr(xs), _iqr(ys)
+    robust_x = min(sx, iqr_x / 1.34) if iqr_x > 0 else sx
+    robust_y = min(sy, iqr_y / 1.34) if iqr_y > 0 else sy
+    mean_robust = (robust_x + robust_y) / 2.0
+
+    return mean_std, mean_robust
+
+
 def silverman_bandwidth(points: list[tuple[float, float]]) -> float:
     """Silverman's rule-of-thumb bandwidth for 2D Gaussian KDE.
 
-    h = n^(-1/(d+4)) * mean_std, where d=2 gives n^(-1/6).
+    Uses the robust scale estimate min(std, IQR/1.34) per axis to
+    avoid over-smoothing multimodal or heavy-tailed distributions.
+
+    h = n^(-1/6) * mean(min(std_i, IQR_i / 1.34))
     """
     n = len(points)
     if n < 2:
         return 1.0
 
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
-
-    def _std(vals):
-        m = sum(vals) / len(vals)
-        var = sum((v - m) ** 2 for v in vals) / (len(vals) - 1)
-        return math.sqrt(max(var, 1e-12))
-
-    sx, sy = _std(xs), _std(ys)
-    mean_std = (sx + sy) / 2.0
-    h = (n ** (-1.0 / 6.0)) * mean_std
+    _, mean_robust = _extract_spread(points)
+    h = (n ** (-1.0 / 6.0)) * mean_robust
     return max(h, 1e-6)
 
 
 def scott_bandwidth(points: list[tuple[float, float]]) -> float:
     """Scott's rule bandwidth for 2D Gaussian KDE.
+
+    Uses sample standard deviation directly (no IQR robustification).
 
     h = n^(-1/6) * mean_std
     """
@@ -140,16 +173,7 @@ def scott_bandwidth(points: list[tuple[float, float]]) -> float:
     if n < 2:
         return 1.0
 
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
-
-    def _std(vals):
-        m = sum(vals) / len(vals)
-        var = sum((v - m) ** 2 for v in vals) / (len(vals) - 1)
-        return math.sqrt(max(var, 1e-12))
-
-    sx, sy = _std(xs), _std(ys)
-    mean_std = (sx + sy) / 2.0
+    mean_std, _ = _extract_spread(points)
     h = (n ** (-1.0 / 6.0)) * mean_std
     return max(h, 1e-6)
 
