@@ -167,48 +167,93 @@ def _chain_segments(
     segments: list[tuple[tuple[float, float], tuple[float, float]]],
     tol: float = 1e-6,
 ) -> list[list[tuple[float, float]]]:
-    """Chain disconnected line segments into polylines."""
+    """Chain disconnected line segments into polylines.
+
+    Uses a spatial hash (grid-based endpoint index) for ~O(n) chaining
+    instead of the previous O(n²) brute-force scan.  Each endpoint is
+    snapped to a grid cell of size *tol*, and lookups check only the
+    3×3 neighborhood of cells around the query point.
+
+    Chains are stored as ``collections.deque`` for O(1) append/prepend,
+    avoiding the O(n) cost of ``list.insert(0, ...)`` on long polylines.
+    """
     if not segments:
         return []
 
-    remaining = list(segments)
+    from collections import defaultdict, deque
+
+    inv_tol = 1.0 / tol if tol > 0 else 1e12
+
+    def _grid_key(pt):
+        return (int(pt[0] * inv_tol), int(pt[1] * inv_tol))
+
+    # Build spatial index: grid cell → set of segment indices whose
+    # endpoints fall in that cell.
+    index: dict[tuple[int, int], set[int]] = defaultdict(set)
+    for i, (p, q) in enumerate(segments):
+        index[_grid_key(p)].add(i)
+        index[_grid_key(q)].add(i)
+
+    used = [False] * len(segments)
+
+    def _pop_neighbor(pt, exclude_idx):
+        """Find and consume a segment with an endpoint near *pt*."""
+        gk = _grid_key(pt)
+        # Check 3×3 neighborhood to handle points near cell boundaries.
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                cell = (gk[0] + dx, gk[1] + dy)
+                bucket = index.get(cell)
+                if not bucket:
+                    continue
+                for j in list(bucket):
+                    if j == exclude_idx or used[j]:
+                        continue
+                    sp, sq = segments[j]
+                    if _pt_close(sp, pt, tol):
+                        used[j] = True
+                        _remove_from_index(j, sp, sq)
+                        return j, sq      # matched start → return end
+                    if _pt_close(sq, pt, tol):
+                        used[j] = True
+                        _remove_from_index(j, sp, sq)
+                        return j, sp      # matched end → return start
+        return None
+
+    def _remove_from_index(j, p, q):
+        for pt in (p, q):
+            gk = _grid_key(pt)
+            bucket = index.get(gk)
+            if bucket:
+                bucket.discard(j)
+
     polylines: list[list[tuple[float, float]]] = []
 
-    while remaining:
-        seg = remaining.pop(0)
-        chain = [seg[0], seg[1]]
+    for i, (p, q) in enumerate(segments):
+        if used[i]:
+            continue
+        used[i] = True
+        _remove_from_index(i, p, q)
 
-        changed = True
-        while changed:
-            changed = False
-            for i, s in enumerate(remaining):
-                head = chain[0]
-                tail = chain[-1]
-                if _pt_close(s[1], tail, tol):
-                    chain.append(s[0])
-                    # swap direction and append
-                    chain[-2], chain[-1] = chain[-1], chain[-2]
-                    chain.append(s[1])
-                    remaining.pop(i)
-                    changed = True
-                    break
-                elif _pt_close(s[0], tail, tol):
-                    chain.append(s[1])
-                    remaining.pop(i)
-                    changed = True
-                    break
-                elif _pt_close(s[1], head, tol):
-                    chain.insert(0, s[0])
-                    remaining.pop(i)
-                    changed = True
-                    break
-                elif _pt_close(s[0], head, tol):
-                    chain.insert(0, s[1])
-                    remaining.pop(i)
-                    changed = True
-                    break
+        chain: deque[tuple[float, float]] = deque([p, q])
 
-        polylines.append(chain)
+        # Extend tail
+        while True:
+            result = _pop_neighbor(chain[-1], -1)
+            if result is None:
+                break
+            _, other_end = result
+            chain.append(other_end)
+
+        # Extend head
+        while True:
+            result = _pop_neighbor(chain[0], -1)
+            if result is None:
+                break
+            _, other_end = result
+            chain.appendleft(other_end)
+
+        polylines.append(list(chain))
 
     return polylines
 
