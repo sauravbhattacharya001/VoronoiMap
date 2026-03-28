@@ -80,24 +80,60 @@ def _point_in_polygon(px, py, vertices):
 def _assign_observations(regions, observations):
     """Assign each observation to the Voronoi zone containing it.
 
-    Uses nearest-seed fallback when the point doesn't fall inside any
-    polygon (can happen with boundary clipping).
+    Uses a KDTree (when scipy is available) for O(log n) nearest-seed
+    lookup per observation, then verifies with a point-in-polygon test
+    on the nearest seed's region and its immediate neighbours.  Falls
+    back to brute-force for small zone counts or when scipy is absent.
+
+    This reduces assignment cost from O(obs * zones) to approximately
+    O(obs * log(zones)) for large datasets.
     """
     zone_values = {seed: [] for seed in regions}
     seeds = list(regions.keys())
 
-    for ox, oy, val in observations:
-        assigned = False
-        for seed in seeds:
-            verts = regions[seed]
-            if _point_in_polygon(ox, oy, verts):
-                zone_values[seed].append(val)
-                assigned = True
-                break
-        if not assigned:
-            # Fallback: nearest seed
-            best_seed = min(seeds, key=lambda s: (s[0] - ox) ** 2 + (s[1] - oy) ** 2)
-            zone_values[best_seed].append(val)
+    # Fast path: use KDTree to narrow candidate zones
+    try:
+        from scipy.spatial import cKDTree
+        _use_kdtree = len(seeds) > 20
+    except ImportError:
+        _use_kdtree = False
+
+    if _use_kdtree:
+        import numpy as np
+        seed_array = np.array(seeds, dtype=float)
+        tree = cKDTree(seed_array)
+        # Query k nearest seeds; check polygon containment on those
+        k = min(len(seeds), 5)
+
+        for ox, oy, val in observations:
+            _, idxs = tree.query([ox, oy], k=k)
+            if k == 1:
+                idxs = [int(idxs)]
+            else:
+                idxs = [int(i) for i in idxs]
+
+            assigned = False
+            for idx in idxs:
+                seed = seeds[idx]
+                if _point_in_polygon(ox, oy, regions[seed]):
+                    zone_values[seed].append(val)
+                    assigned = True
+                    break
+            if not assigned:
+                # Nearest seed fallback
+                zone_values[seeds[idxs[0]]].append(val)
+    else:
+        for ox, oy, val in observations:
+            assigned = False
+            for seed in seeds:
+                verts = regions[seed]
+                if _point_in_polygon(ox, oy, verts):
+                    zone_values[seed].append(val)
+                    assigned = True
+                    break
+            if not assigned:
+                best_seed = min(seeds, key=lambda s: (s[0] - ox) ** 2 + (s[1] - oy) ** 2)
+                zone_values[best_seed].append(val)
 
     return zone_values
 
