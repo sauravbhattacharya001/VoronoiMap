@@ -11,8 +11,50 @@ continue to work.
 
 from typing import List, Tuple
 
-# Re-export from the canonical location to eliminate duplicate code.
-from vormap_geometry import polygon_area, polygon_centroid  # noqa: F401
+# polygon_area is defined in vormap_geometry with full precision.
+# Re-export it here for backward compatibility.
+# NOTE: Lazy import to avoid circular dependency (vormap_geometry imports
+# from vormap_utils).
+def polygon_area(vertices):
+    """Re-export of ``vormap_geometry.polygon_area`` — see that module for docs."""
+    from vormap_geometry import polygon_area as _pa
+    return _pa(vertices)
+
+
+def polygon_centroid(vertices):
+    """Area-weighted centroid of a polygon using the shoelace approach.
+
+    Parameters
+    ----------
+    vertices : list of (x, y)
+        Ordered polygon vertices.
+
+    Returns
+    -------
+    tuple of (float, float)
+        Centroid coordinates. Returns (0, 0) for degenerate input.
+    """
+    n = len(vertices)
+    if n == 0:
+        return (0.0, 0.0)
+    if n <= 2:
+        return polygon_centroid_mean(vertices)
+
+    cx = 0.0
+    cy = 0.0
+    signed_area = 0.0
+    for i in range(n):
+        j = (i + 1) % n
+        cross = vertices[i][0] * vertices[j][1] - vertices[j][0] * vertices[i][1]
+        cx += (vertices[i][0] + vertices[j][0]) * cross
+        cy += (vertices[i][1] + vertices[j][1]) * cross
+        signed_area += cross
+    signed_area *= 0.5
+    if abs(signed_area) < 1e-12:
+        return polygon_centroid_mean(vertices)
+    cx /= (6.0 * signed_area)
+    cy /= (6.0 * signed_area)
+    return (cx, cy)
 
 
 def polygon_centroid_mean(vertices):
