@@ -188,6 +188,29 @@ def test_file_not_found():
         pass
 
 
+def test_xxe_rejection_padded():
+    """Ensure DOCTYPE after >4KB of padding is still rejected."""
+    padding = b"<?xml version='1.0'?>\n" + b"<!-- " + b"A" * 8000 + b" -->\n"
+    malicious = padding + b"""<!DOCTYPE foo [
+      <!ENTITY xxe SYSTEM "file:///etc/passwd">
+    ]>
+    <gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+      <wpt lat="0" lon="0"><name>&xxe;</name></wpt>
+    </gpx>"""
+    path = tempfile.mktemp(suffix=".gpx")
+    try:
+        with open(path, "wb") as f:
+            f.write(malicious)
+        try:
+            load_gpx(path)
+            assert False, "Should have raised ValueError for XXE"
+        except ValueError as e:
+            assert "DOCTYPE" in str(e) or "ENTITY" in str(e)
+    finally:
+        if os.path.exists(path):
+            os.unlink(path)
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     for t in tests:

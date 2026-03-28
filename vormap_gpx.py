@@ -52,11 +52,13 @@ def _safe_parse(filepath):
         return _SafeET.parse(filepath)
 
     # Fallback: use iterparse and reject any DOCTYPE / entity declarations
-    # by pre-scanning the first 4 KB for risky preambles.
+    # by scanning the entire file for risky preambles.  Earlier versions
+    # only checked the first 4 KB which could be bypassed by padding the
+    # file with whitespace or comments before the DOCTYPE.
     with open(filepath, "rb") as fh:
-        head = fh.read(4096)
-    head_lower = head.lower()
-    if b"<!entity" in head_lower or b"<!doctype" in head_lower:
+        content = fh.read()
+    content_lower = content.lower()
+    if b"<!entity" in content_lower or b"<!doctype" in content_lower:
         raise ValueError(
             "GPX file contains a DOCTYPE or ENTITY declaration — "
             "refusing to parse (possible XXE attack). "
