@@ -492,8 +492,9 @@ class MonteCarloTest:
             px, py = points[i]
             cx = int((px - w) * inv_cell)
             cy = int((py - s) * inv_cell)
-            min_d = float("inf")
-            # Search 3x3 neighbourhood of grid cells
+            min_d_sq = float("inf")
+            # Search 3x3 neighbourhood of grid cells using squared
+            # distances to avoid sqrt in the inner loop.
             for dx in (-1, 0, 1):
                 for dy in (-1, 0, 1):
                     bucket = grid.get((cx + dx, cy + dy))
@@ -502,21 +503,23 @@ class MonteCarloTest:
                     for j in bucket:
                         if j == i:
                             continue
-                        d = math.hypot(px - points[j][0],
-                                       py - points[j][1])
-                        if d < min_d:
-                            min_d = d
+                        ddx = px - points[j][0]
+                        ddy = py - points[j][1]
+                        d_sq = ddx * ddx + ddy * ddy
+                        if d_sq < min_d_sq:
+                            min_d_sq = d_sq
             # Fallback: if no neighbor found in 3x3 (extremely sparse
             # or degenerate), widen search
-            if min_d == float("inf"):
+            if min_d_sq == float("inf"):
                 for j in range(n):
                     if j == i:
                         continue
-                    d = math.hypot(px - points[j][0],
-                                   py - points[j][1])
-                    if d < min_d:
-                        min_d = d
-            total_nn += min_d
+                    ddx = px - points[j][0]
+                    ddy = py - points[j][1]
+                    d_sq = ddx * ddx + ddy * ddy
+                    if d_sq < min_d_sq:
+                        min_d_sq = d_sq
+            total_nn += math.sqrt(min_d_sq)
         obs_mean = total_nn / n
 
         return obs_mean / expected if expected > 0 else 1.0
@@ -547,10 +550,13 @@ class MonteCarloTest:
             if 0 <= ci < nx and 0 <= ri < ny:
                 counts[ci * ny + ri] += 1
 
-        mean_c = sum(counts) / total_cells
+        total = sum(counts)
+        mean_c = total / total_cells
         if mean_c == 0:
             return 1.0
-        var_c = sum((c - mean_c) ** 2 for c in counts) / total_cells
+        # Use E[X²] - E[X]² to avoid two passes through counts.
+        sum_sq = sum(c * c for c in counts)
+        var_c = sum_sq / total_cells - mean_c * mean_c
         return var_c / mean_c
 
     def _compute_voronoi_areas(self, points):
@@ -606,11 +612,13 @@ class MonteCarloTest:
         # instead of O(n²·R)).
         import bisect
         all_dists = []
+        _sqrt = math.sqrt
         for i in range(n):
+            xi, yi = points[i]
             for j in range(i + 1, n):
-                d = math.hypot(points[i][0] - points[j][0],
-                               points[i][1] - points[j][1])
-                all_dists.append(d)
+                dx = xi - points[j][0]
+                dy = yi - points[j][1]
+                all_dists.append(_sqrt(dx * dx + dy * dy))
         all_dists.sort()
 
         l_values = []
