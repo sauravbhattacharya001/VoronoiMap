@@ -113,7 +113,14 @@ def _build_adjacency_scipy(points):
 
 
 def _snap_to(pt, points, tol=1e-6):
-    """Snap a point to the nearest original point within tolerance."""
+    """Snap a point to the nearest original point within tolerance.
+
+    Returns the closest point as a tuple if within *tol* Euclidean
+    distance, otherwise ``None``.  The previous implementation used
+    ``best_d < tol * tol or best is not None`` which always returned
+    the nearest point regardless of distance — defeating the purpose
+    of the tolerance check.
+    """
     best = None
     best_d = float('inf')
     for p in points:
@@ -121,7 +128,9 @@ def _snap_to(pt, points, tol=1e-6):
         if d < best_d:
             best_d = d
             best = p
-    return tuple(best) if best_d < tol * tol or best is not None else None
+    if best is not None and best_d <= tol * tol:
+        return tuple(best)
+    return None
 
 
 def _build_adjacency_brute(points, regions):
