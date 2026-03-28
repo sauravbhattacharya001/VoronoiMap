@@ -32,12 +32,17 @@ from vormap_geometry import (
 
 
 def _escape_html(text):
-    """Escape HTML special characters."""
+    """Escape HTML special characters.
+
+    Escapes all five characters recommended by OWASP to prevent XSS:
+    &, <, >, ", and ' (single quote).
+    """
     return (str(text)
             .replace("&", "&amp;")
             .replace("<", "&lt;")
             .replace(">", "&gt;")
-            .replace('"', "&quot;"))
+            .replace('"', "&quot;")
+            .replace("'", "&#x27;"))
 
 
 def _format_number(value, decimals=2):
