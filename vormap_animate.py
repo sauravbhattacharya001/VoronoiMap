@@ -37,6 +37,7 @@ import html as _html_mod
 import json
 import math
 import os
+import re
 import sys
 
 from vormap import validate_input_path, validate_output_path
@@ -46,6 +47,24 @@ try:
     _HAS_VIZ = True
 except ImportError:
     _HAS_VIZ = False
+
+
+# ── Security: sanitize values injected into HTML/CSS/JS context ──────
+
+_CSS_COLOR_RE = re.compile(
+    r"^(?:#[0-9a-fA-F]{3,8}|(?:rgb|hsl)a?\([^)]{1,80}\)|[a-zA-Z]{1,30})$"
+)
+
+
+def _sanitize_css_color(value, default="#ffffff"):
+    """Validate a CSS color value to prevent injection into HTML templates.
+
+    Only allows hex colors, rgb/hsl functions with limited length, and
+    simple named colors.  Returns *default* if the value looks suspicious.
+    """
+    if not isinstance(value, str) or not _CSS_COLOR_RE.match(value.strip()):
+        return default
+    return value.strip()
 
 
 # ── Configuration ────────────────────────────────────────────────────
@@ -113,8 +132,8 @@ class AnimationConfig:
         self.trails = trails
         self.interpolate = max(0, interpolate)
         self.title = title
-        self.background = background
-        self.stroke_color = stroke_color
+        self.background = _sanitize_css_color(background, "#ffffff")
+        self.stroke_color = _sanitize_css_color(stroke_color, "#444444")
         self.stroke_width = stroke_width
         self.point_radius = point_radius
         self.loop = loop
