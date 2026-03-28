@@ -960,6 +960,13 @@ def isect_B(alng, alat, dirn):
 
     Returns a flat list ``[x1, y1, x2, y2]`` of the two intersection
     points with the search boundary ``[IND_W, IND_E] × [IND_S, IND_N]``.
+
+    Performance: this function is called on every iteration of new_dir
+    (~200 iterations per edge × many edges per region).  The fast path
+    collects candidates directly into a flat result list and only falls
+    back to set-based deduplication when 3+ raw intersections are found
+    (corner-passing lines), avoiding per-call allocation of a set, a
+    candidates list, and a result list in the common case.
     """
     if math.isinf(dirn):
         return [alng, IND_N, alng, IND_S]
@@ -972,37 +979,69 @@ def isect_B(alng, alat, dirn):
     yr = dirn * (IND_E - alng) + alat       # right edge (x = IND_E)
     yl = dirn * (IND_W - alng) + alat       # left edge (x = IND_W)
 
-    # Collect points that actually lie on the boundary, deduplicating
-    # corners where two edges share a vertex (e.g. (IND_W, IND_N) is
-    # on both the top and left edges).  Without dedup, corner-passing
-    # lines produce 6+ values → RuntimeError.  (Fixes #42)
-    candidates = []
+    # Fast path: collect valid intersections into a flat list directly.
+    # Most lines hit exactly 2 of the 4 boundary edges, so we avoid
+    # creating a candidates list, a seen set, and a ret list.
+    count = 0
+    r0x = r0y = r1x = r1y = r2x = r2y = r3x = r3y = 0.0
+
     if IND_W <= xt <= IND_E:
-        candidates.append((xt, IND_N))
+        r0x, r0y = xt, IND_N
+        count += 1
     if IND_W <= xb <= IND_E:
-        candidates.append((xb, IND_S))
+        if count == 0:
+            r0x, r0y = xb, IND_S
+        elif count == 1:
+            r1x, r1y = xb, IND_S
+        else:
+            r2x, r2y = xb, IND_S
+        count += 1
     if IND_S <= yl <= IND_N:
-        candidates.append((IND_W, yl))
+        if count == 0:
+            r0x, r0y = IND_W, yl
+        elif count == 1:
+            r1x, r1y = IND_W, yl
+        elif count == 2:
+            r2x, r2y = IND_W, yl
+        else:
+            r3x, r3y = IND_W, yl
+        count += 1
     if IND_S <= yr <= IND_N:
-        candidates.append((IND_E, yr))
+        if count == 0:
+            r0x, r0y = IND_E, yr
+        elif count == 1:
+            r1x, r1y = IND_E, yr
+        elif count == 2:
+            r2x, r2y = IND_E, yr
+        else:
+            r3x, r3y = IND_E, yr
+        count += 1
 
-    # Deduplicate: two boundary edges can share a corner point
-    seen = set()
-    ret = []
-    for pt in candidates:
-        # Round to avoid floating-point near-duplicates at corners
-        key = (round(pt[0], 10), round(pt[1], 10))
-        if key not in seen:
-            seen.add(key)
-            ret.extend(pt)
+    # Common case: exactly 2 intersections, no dedup needed
+    if count == 2:
+        return [r0x, r0y, r1x, r1y]
 
-    if len(ret) == 4:
-        return ret
+    # Single intersection (tangent to boundary corner): duplicate
+    if count == 1:
+        return [r0x, r0y, r0x, r0y]
 
-    # Single intersection (tangent to corner): duplicate it so callers
-    # get the expected 4-element format
-    if len(ret) == 2:
-        return ret + ret
+    # 3+ intersections: corner-passing line hits adjacent edges at the
+    # same point.  Fall back to set-based dedup.  (Fixes #42)
+    if count >= 3:
+        candidates = [(r0x, r0y), (r1x, r1y), (r2x, r2y)]
+        if count >= 4:
+            candidates.append((r3x, r3y))
+        seen = set()
+        ret = []
+        for pt in candidates:
+            key = (round(pt[0], 10), round(pt[1], 10))
+            if key not in seen:
+                seen.add(key)
+                ret.extend(pt)
+        if len(ret) == 4:
+            return ret
+        if len(ret) == 2:
+            return ret + ret
 
     raise RuntimeError(
         "Line from (%s, %s) with slope %s does not intersect search "
