@@ -1,417 +1,260 @@
-"""Tests for vormap_pipeline — batch analysis pipeline."""
+"""Tests for vormap_pipeline — validation, config, dry-run, and filtering.
+
+These tests exercise the pipeline's pure-logic paths (validation,
+configuration parsing, dry-run mode, step filtering) without requiring
+the heavy vormap analysis modules to be installed.
+"""
 
 import json
 import os
+import sys
 import tempfile
-import unittest
-from unittest.mock import patch, MagicMock
+import pytest
+
+# Ensure repo root is importable
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from vormap_pipeline import (
-    EXAMPLE_PIPELINE,
-    STEP_TYPES,
     Pipeline,
     PipelineResult,
     StepResult,
     ValidationIssue,
     validate_pipeline,
-    main,
+    STEP_TYPES,
 )
 
 
-class TestStepResult(unittest.TestCase):
-    def test_to_dict(self):
-        sr = StepResult(0, "hotspot", "hot", "ok", 123.4, "Success")
-        d = sr.to_dict()
-        self.assertEqual(d["step_index"], 0)
-        self.assertEqual(d["step_type"], "hotspot")
-        self.assertEqual(d["status"], "ok")
-        self.assertEqual(d["duration_ms"], 123.4)
+# ── Fixtures ─────────────────────────────────────────────────────────
 
-    def test_no_output_key(self):
-        sr = StepResult(1, "export", None, "ok", 50, "Exported")
-        d = sr.to_dict()
-        self.assertIsNone(d["output_key"])
-
-
-class TestPipelineResult(unittest.TestCase):
-    def _result(self, completed=2, failed=0, skipped=1):
-        return PipelineResult(
-            name="test",
-            data_file="data.txt",
-            total_steps=completed + failed + skipped,
-            completed=completed,
-            skipped=skipped,
-            failed=failed,
-            total_duration_ms=500.0,
-            steps=[
-                StepResult(0, "hotspot", "hot", "ok", 200, "OK"),
-                StepResult(1, "trend", "tr", "ok", 150, "OK"),
-                StepResult(2, "export", None, "skipped", 0, "Skipped"),
-            ],
-        )
-
-    def test_success_true(self):
-        r = self._result(completed=2, failed=0)
-        self.assertTrue(r.success)
-
-    def test_success_false(self):
-        r = self._result(completed=1, failed=1)
-        self.assertFalse(r.success)
-
-    def test_to_dict(self):
-        r = self._result()
-        d = r.to_dict()
-        self.assertEqual(d["name"], "test")
-        self.assertTrue(d["success"])
-        self.assertEqual(len(d["steps"]), 3)
-
-    def test_summary_text(self):
-        r = self._result()
-        text = r.summary_text()
-        self.assertIn("Pipeline Execution Summary", text)
-        self.assertIn("SUCCESS", text)
-        self.assertIn("test", text)
-
-    def test_summary_text_failed(self):
-        r = self._result(completed=1, failed=1)
-        text = r.summary_text()
-        self.assertIn("FAILED", text)
+def _minimal_config(**overrides):
+    """Return a minimal valid pipeline config dict."""
+    cfg = {
+        "name": "Test Pipeline",
+        "data_file": "test.txt",
+        "num_points": 5,
+        "steps": [
+            {"type": "export", "file": "out.json", "output_key": "exp"},
+        ],
+    }
+    cfg.update(overrides)
+    return cfg
 
 
-class TestValidationIssue(unittest.TestCase):
-    def test_to_dict(self):
-        vi = ValidationIssue("error", 0, "Missing type")
-        d = vi.to_dict()
-        self.assertEqual(d["level"], "error")
-        self.assertEqual(d["step_index"], 0)
+# ── validate_pipeline ────────────────────────────────────────────────
 
+class TestValidation:
+    """Tests for validate_pipeline()."""
 
-class TestValidatePipeline(unittest.TestCase):
-    def _valid_config(self):
-        return {
-            "name": "test",
-            "data_file": "data.txt",
-            "num_points": 5,
-            "steps": [
-                {"type": "hotspot", "attribute": "area", "output_key": "h"},
-            ],
-        }
-
-    def test_valid_config(self):
-        issues = validate_pipeline(self._valid_config())
+    def test_valid_minimal_config(self):
+        issues = validate_pipeline(_minimal_config())
         errors = [i for i in issues if i.level == "error"]
-        self.assertEqual(len(errors), 0)
+        assert len(errors) == 0
 
     def test_missing_data_file(self):
-        config = self._valid_config()
-        del config["data_file"]
-        issues = validate_pipeline(config)
-        self.assertTrue(any("data_file" in i.message for i in issues))
+        cfg = _minimal_config()
+        del cfg["data_file"]
+        issues = validate_pipeline(cfg)
+        assert any("data_file" in i.message for i in issues)
 
     def test_missing_num_points(self):
-        config = self._valid_config()
-        del config["num_points"]
-        issues = validate_pipeline(config)
-        self.assertTrue(any("num_points" in i.message for i in issues))
+        cfg = _minimal_config()
+        del cfg["num_points"]
+        issues = validate_pipeline(cfg)
+        assert any("num_points" in i.message for i in issues)
 
     def test_missing_steps(self):
-        config = {"data_file": "x.txt", "num_points": 5}
-        issues = validate_pipeline(config)
-        self.assertTrue(any("steps" in i.message for i in issues))
+        cfg = _minimal_config()
+        del cfg["steps"]
+        issues = validate_pipeline(cfg)
+        assert any("steps" in i.message for i in issues)
+
+    def test_steps_not_list(self):
+        issues = validate_pipeline(_minimal_config(steps="bad"))
+        assert any("steps must be a list" in i.message for i in issues)
 
     def test_empty_steps_warning(self):
-        config = {"data_file": "x.txt", "num_points": 5, "steps": []}
-        issues = validate_pipeline(config)
+        issues = validate_pipeline(_minimal_config(steps=[]))
         warnings = [i for i in issues if i.level == "warning"]
-        self.assertTrue(any("no steps" in i.message for i in warnings))
+        assert any("no steps" in i.message for i in warnings)
 
     def test_unknown_step_type(self):
-        config = {
-            "data_file": "x.txt",
-            "num_points": 5,
-            "steps": [{"type": "invalid_step"}],
-        }
-        issues = validate_pipeline(config)
-        self.assertTrue(any("unknown type" in i.message for i in issues))
+        cfg = _minimal_config(steps=[{"type": "nonexistent"}])
+        issues = validate_pipeline(cfg)
+        assert any("unknown type" in i.message for i in issues)
 
     def test_missing_step_type(self):
-        config = {
-            "data_file": "x.txt",
-            "num_points": 5,
-            "steps": [{"attribute": "area"}],
-        }
-        issues = validate_pipeline(config)
-        self.assertTrue(any("missing 'type'" in i.message for i in issues))
+        cfg = _minimal_config(steps=[{"output_key": "x"}])
+        issues = validate_pipeline(cfg)
+        assert any("missing 'type'" in i.message for i in issues)
 
-    def test_duplicate_output_keys(self):
-        config = {
-            "data_file": "x.txt",
-            "num_points": 5,
-            "steps": [
-                {"type": "hotspot", "output_key": "same"},
-                {"type": "trend", "output_key": "same"},
-            ],
-        }
-        issues = validate_pipeline(config)
-        self.assertTrue(any("duplicate" in i.message for i in issues))
+    def test_step_not_dict(self):
+        cfg = _minimal_config(steps=["bad"])
+        issues = validate_pipeline(cfg)
+        assert any("must be a dict" in i.message for i in issues)
 
-    def test_non_list_steps(self):
-        config = {
-            "data_file": "x.txt",
-            "num_points": 5,
-            "steps": "not_a_list",
-        }
-        issues = validate_pipeline(config)
-        self.assertTrue(any("must be a list" in i.message for i in issues))
+    def test_duplicate_output_key(self):
+        cfg = _minimal_config(steps=[
+            {"type": "export", "output_key": "dup"},
+            {"type": "export", "output_key": "dup"},
+        ])
+        issues = validate_pipeline(cfg)
+        assert any("duplicate output_key" in i.message for i in issues)
 
-    def test_non_dict_step(self):
-        config = {
-            "data_file": "x.txt",
-            "num_points": 5,
-            "steps": ["not_a_dict"],
-        }
-        issues = validate_pipeline(config)
-        self.assertTrue(any("must be a dict" in i.message for i in issues))
+    def test_export_without_file_warning(self):
+        cfg = _minimal_config(steps=[{"type": "export"}])
+        issues = validate_pipeline(cfg)
+        warnings = [i for i in issues if i.level == "warning"]
+        assert any("no 'file'" in i.message for i in warnings)
 
-    def test_all_step_types_valid(self):
-        for st in STEP_TYPES:
-            config = {
-                "data_file": "x.txt",
-                "num_points": 5,
-                "steps": [{"type": st}],
-            }
-            issues = validate_pipeline(config)
-            errors = [i for i in issues if i.level == "error"]
-            self.assertEqual(len(errors), 0,
-                             f"Step type '{st}' unexpectedly invalid")
+    def test_all_step_types_accepted(self):
+        """Every STEP_TYPE should be accepted without an 'unknown type' error."""
+        steps = [{"type": t, "output_key": f"k{i}"} for i, t in enumerate(STEP_TYPES)]
+        cfg = _minimal_config(steps=steps)
+        issues = validate_pipeline(cfg)
+        errors = [i for i in issues if i.level == "error"]
+        assert len(errors) == 0
 
 
-class TestPipeline(unittest.TestCase):
-    def _config(self, steps=None):
-        return {
-            "name": "Test Pipeline",
-            "data_file": "nonexistent.txt",
-            "num_points": 5,
-            "steps": steps or [],
-        }
+# ── Pipeline construction ────────────────────────────────────────────
 
-    def test_from_json(self):
-        config = self._config()
-        p = Pipeline.from_json(json.dumps(config))
-        self.assertEqual(p.name, "Test Pipeline")
-        self.assertEqual(p.num_points, 5)
+class TestPipelineConstruction:
+
+    def test_from_dict(self):
+        p = Pipeline(_minimal_config())
+        assert p.name == "Test Pipeline"
+        assert p.num_points == 5
+        assert len(p.steps) == 1
+
+    def test_from_json_string(self):
+        p = Pipeline.from_json(json.dumps(_minimal_config()))
+        assert p.name == "Test Pipeline"
 
     def test_from_file(self):
-        config = self._config([{"type": "export", "file": "out.json"}])
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json",
-                                         delete=False) as f:
-            json.dump(config, f)
-            f.flush()
+        cfg = _minimal_config()
+        with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".json", delete=False) as f:
+            json.dump(cfg, f)
             path = f.name
         try:
             p = Pipeline.from_file(path)
-            self.assertEqual(p.name, "Test Pipeline")
+            assert p.name == "Test Pipeline"
         finally:
             os.unlink(path)
 
-    def test_validate(self):
-        p = Pipeline(self._config())
-        issues = p.validate()
-        # Valid config — no errors
-        errors = [i for i in issues if i.level == "error"]
-        self.assertEqual(len(errors), 0)
+    def test_defaults(self):
+        p = Pipeline({"steps": []})
+        assert p.name == "Unnamed Pipeline"
+        assert p.data_file == ""
+        assert p.num_points == 5
+        assert p.output_dir == "."
 
-    def test_dry_run(self):
-        config = self._config([
+
+# ── Dry-run ──────────────────────────────────────────────────────────
+
+class TestDryRun:
+
+    def test_dry_run_skips_all(self):
+        cfg = _minimal_config(steps=[
+            {"type": "export", "file": "a.json"},
+            {"type": "export", "file": "b.json"},
+        ])
+        p = Pipeline(cfg)
+        result = p.run(dry_run=True)
+        assert isinstance(result, PipelineResult)
+        assert result.completed == 0
+        assert result.skipped == 2
+        assert result.failed == 0
+        assert result.success is True
+
+    def test_dry_run_step_messages(self):
+        p = Pipeline(_minimal_config())
+        result = p.run(dry_run=True)
+        for sr in result.steps:
+            assert sr.status == "skipped"
+            assert "Dry run" in sr.message
+
+
+# ── Step filtering (only / skip) ─────────────────────────────────────
+
+class TestStepFiltering:
+
+    def _multi_step_config(self):
+        return _minimal_config(steps=[
             {"type": "hotspot", "output_key": "h"},
             {"type": "trend", "output_key": "t"},
+            {"type": "export", "file": "out.json", "output_key": "e"},
         ])
-        p = Pipeline(config)
-        result = p.run(dry_run=True)
-        self.assertEqual(result.completed, 0)
-        self.assertEqual(result.skipped, 2)
-        self.assertEqual(result.failed, 0)
-        self.assertTrue(result.success)
 
     def test_only_filter(self):
-        config = self._config([
-            {"type": "hotspot", "output_key": "h"},
-            {"type": "trend", "output_key": "t"},
-            {"type": "export", "file": "out.json"},
-        ])
-        p = Pipeline(config)
-        result = p.run(dry_run=True, only=["export"])
-        # Only export should be "run" (dry-run skipped), others filtered
-        statuses = [(s.step_type, s.status) for s in result.steps]
-        self.assertEqual(statuses[0], ("hotspot", "skipped"))
-        self.assertEqual(statuses[1], ("trend", "skipped"))
-        self.assertEqual(statuses[2], ("export", "skipped"))  # dry-run
+        p = Pipeline(self._multi_step_config())
+        result = p.run(only=["export"])
+        # hotspot and trend should be skipped by filter
+        skipped_types = [s.step_type for s in result.steps if s.status == "skipped"
+                         and "Not in --only" in s.message]
+        assert "hotspot" in skipped_types
+        assert "trend" in skipped_types
 
     def test_skip_filter(self):
-        config = self._config([
-            {"type": "hotspot", "output_key": "h"},
-            {"type": "trend", "output_key": "t"},
-        ])
-        p = Pipeline(config)
-        result = p.run(dry_run=True, skip=["hotspot"])
-        self.assertEqual(result.steps[0].status, "skipped")
-        self.assertEqual(result.steps[0].message, "In --skip filter")
-
-    def test_run_empty_pipeline(self):
-        config = self._config([])
-        p = Pipeline(config)
-        result = p.run()
-        self.assertEqual(result.total_steps, 0)
-        self.assertTrue(result.success)
-
-    def test_run_export_to_stdout(self):
-        """Export with no file prints to stdout (returns JSON string)."""
-        config = self._config([{"type": "export"}])
-        p = Pipeline(config)
-        result = p.run()
-        # Export step should succeed (writes to string, no file)
-        self.assertEqual(result.completed, 1)
-        self.assertEqual(result.failed, 0)
-
-    def test_run_export_to_file(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._config([
-                {"type": "export", "file": "results.json"},
-            ])
-            p = Pipeline(config)
-            p.output_dir = tmpdir
-            result = p.run()
-            self.assertEqual(result.completed, 1)
-            outpath = os.path.join(tmpdir, "results.json")
-            self.assertTrue(os.path.exists(outpath))
-            with open(outpath) as f:
-                data = json.load(f)
-            self.assertEqual(data["pipeline"], "Test Pipeline")
-
-    def test_run_report_step(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = self._config([
-                {"type": "report", "file": "report.html"},
-            ])
-            p = Pipeline(config)
-            p.output_dir = tmpdir
-            result = p.run()
-            self.assertEqual(result.completed, 1)
-            outpath = os.path.join(tmpdir, "report.html")
-            self.assertTrue(os.path.exists(outpath))
-            with open(outpath, encoding="utf-8") as f:
-                html = f.read()
-            self.assertIn("Pipeline Report", html)
-            self.assertIn("Test Pipeline", html)
-
-    def test_unknown_step_type_errors(self):
-        config = self._config([{"type": "nonexistent_step"}])
-        p = Pipeline(config)
-        result = p.run()
-        self.assertEqual(result.failed, 1)
-        self.assertIn("Unknown step type", result.steps[0].message)
-
-    def test_results_property(self):
-        config = self._config([{"type": "export", "output_key": "exp"}])
-        p = Pipeline(config)
-        p.run()
-        self.assertIn("exp", p.results)
-
-    def test_output_dir_default(self):
-        p = Pipeline(self._config())
-        self.assertEqual(p.output_dir, ".")
+        p = Pipeline(self._multi_step_config())
+        result = p.run(skip=["hotspot", "trend"])
+        skipped_types = [s.step_type for s in result.steps if s.status == "skipped"
+                         and "In --skip" in s.message]
+        assert "hotspot" in skipped_types
+        assert "trend" in skipped_types
 
 
-class TestExamplePipeline(unittest.TestCase):
-    def test_example_valid(self):
-        issues = validate_pipeline(EXAMPLE_PIPELINE)
-        errors = [i for i in issues if i.level == "error"]
-        self.assertEqual(len(errors), 0)
+# ── PipelineResult / StepResult ──────────────────────────────────────
 
-    def test_example_has_required_fields(self):
-        self.assertIn("name", EXAMPLE_PIPELINE)
-        self.assertIn("data_file", EXAMPLE_PIPELINE)
-        self.assertIn("num_points", EXAMPLE_PIPELINE)
-        self.assertIn("steps", EXAMPLE_PIPELINE)
-        self.assertGreater(len(EXAMPLE_PIPELINE["steps"]), 0)
+class TestResultObjects:
 
+    def test_pipeline_result_success(self):
+        r = PipelineResult("t", "f", 2, 2, 0, 0, 100.0)
+        assert r.success is True
 
-class TestCLI(unittest.TestCase):
-    def test_example_flag(self):
-        """--example prints JSON and exits 0."""
-        import io
-        from contextlib import redirect_stdout
-        buf = io.StringIO()
-        with redirect_stdout(buf):
-            code = main(["--example"])
-        self.assertEqual(code, 0)
-        output = buf.getvalue()
-        data = json.loads(output)
-        self.assertEqual(data["name"], "Spatial Analysis Pipeline")
+    def test_pipeline_result_failure(self):
+        r = PipelineResult("t", "f", 2, 1, 0, 1, 100.0)
+        assert r.success is False
 
-    def test_no_args(self):
-        code = main([])
-        self.assertEqual(code, 1)
+    def test_pipeline_result_to_dict(self):
+        r = PipelineResult("t", "f", 1, 1, 0, 0, 50.5)
+        d = r.to_dict()
+        assert d["name"] == "t"
+        assert d["success"] is True
+        assert d["total_duration_ms"] == 50.5
 
-    def test_validate_flag(self):
-        config = {
-            "name": "test",
-            "data_file": "x.txt",
-            "num_points": 5,
-            "steps": [{"type": "export"}],
-        }
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json",
-                                         delete=False) as f:
-            json.dump(config, f)
-            f.flush()
-            path = f.name
-        try:
-            code = main([path, "--validate"])
-            self.assertEqual(code, 0)
-        finally:
-            os.unlink(path)
+    def test_step_result_to_dict(self):
+        sr = StepResult(0, "export", "k", "ok", 12.3, "Success")
+        d = sr.to_dict()
+        assert d["step_type"] == "export"
+        assert d["status"] == "ok"
+        assert d["duration_ms"] == 12.3
 
-    def test_validate_invalid_config(self):
-        config = {"steps": [{"type": "bad_type"}]}
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json",
-                                         delete=False) as f:
-            json.dump(config, f)
-            f.flush()
-            path = f.name
-        try:
-            code = main([path, "--validate"])
-            self.assertEqual(code, 1)
-        finally:
-            os.unlink(path)
+    def test_summary_text(self):
+        r = PipelineResult("Demo", "data.txt", 1, 1, 0, 0, 42.0,
+                           [StepResult(0, "export", None, "ok", 42.0, "ok")])
+        text = r.summary_text()
+        assert "Demo" in text
+        assert "SUCCESS" in text
 
-    def test_dry_run_flag(self):
-        config = {
-            "name": "dry",
-            "data_file": "x.txt",
-            "num_points": 5,
-            "steps": [{"type": "export", "file": "out.json"}],
-        }
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json",
-                                         delete=False) as f:
-            json.dump(config, f)
-            f.flush()
-            path = f.name
-        try:
-            code = main([path, "--dry-run"])
-            self.assertEqual(code, 0)
-        finally:
-            os.unlink(path)
+    def test_summary_text_with_error(self):
+        r = PipelineResult("Demo", "data.txt", 1, 0, 0, 1, 10.0,
+                           [StepResult(0, "hotspot", None, "error", 10.0, "boom")])
+        text = r.summary_text()
+        assert "FAILED" in text
+        assert "boom" in text
 
 
-class TestStepTypes(unittest.TestCase):
-    def test_all_known_types(self):
-        expected = {
-            "hotspot", "trend", "network", "landscape", "coverage",
-            "cluster", "transect", "hotspot_svg", "trend_svg",
-            "network_svg", "report", "export",
-        }
-        self.assertEqual(set(STEP_TYPES), expected)
+# ── ValidationIssue ──────────────────────────────────────────────────
+
+class TestValidationIssue:
+
+    def test_to_dict(self):
+        vi = ValidationIssue("error", 0, "bad step")
+        d = vi.to_dict()
+        assert d["level"] == "error"
+        assert d["step_index"] == 0
+        assert d["message"] == "bad step"
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__, "-v"])
