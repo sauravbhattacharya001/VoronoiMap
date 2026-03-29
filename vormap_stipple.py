@@ -33,6 +33,8 @@ import math
 import os
 import sys
 
+import vormap
+
 try:
     import numpy as np
     from scipy.spatial import Voronoi
@@ -402,7 +404,8 @@ def main():
     if args.svg:
         svg = points_to_svg(points, width, height, args.dot_size,
                             args.bg_color, args.dot_color)
-        with open(args.svg, "w") as f:
+        safe_svg = vormap.validate_output_path(args.svg, allow_absolute=True)
+        with open(safe_svg, "w") as f:
             f.write(svg)
         print(f"SVG written to {args.svg}")
 
@@ -411,12 +414,14 @@ def main():
             "iterations_run": iters_run,
             "final_displacement": round(disp, 4),
         })
-        with open(args.json, "w") as f:
+        safe_json = vormap.validate_output_path(args.json, allow_absolute=True)
+        with open(safe_json, "w") as f:
             f.write(js)
         print(f"JSON written to {args.json}")
 
     if args.output:
-        with open(args.output, "w") as f:
+        safe_out = vormap.validate_output_path(args.output, allow_absolute=True)
+        with open(safe_out, "w") as f:
             for x, y in points:
                 f.write(f"{x:.4f} {y:.4f}\n")
         print(f"Coordinates written to {args.output}")

@@ -52,6 +52,8 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional
 
+import vormap
+
 
 # ── Cell Layer ───────────────────────────────────────────────────────
 
@@ -107,8 +109,8 @@ class CellLayer:
                 "adjacency": {"0": [1, 2], "1": [0, 3], ...}
             }
         """
-        with open(path) as f:
-            data = json.load(f)
+        safe = vormap.validate_input_path(path, allow_absolute=True)
+        with open(safe) as f:
         values = {int(k): float(v) for k, v in data["values"].items()}
         adjacency = {int(k): [int(n) for n in v] for k, v in data["adjacency"].items()}
         return cls(
@@ -155,7 +157,8 @@ class CellLayer:
 
     def to_json(self, path: str, indent: int = 2) -> None:
         """Write layer to a JSON file."""
-        with open(path, "w", encoding="utf-8") as f:
+        safe = vormap.validate_output_path(path, allow_absolute=True)
+        with open(safe, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=indent)
 
     def stats(self) -> Dict[str, float]:
@@ -710,7 +713,8 @@ def export_algebra_json(layer: CellLayer, path: str) -> None:
 
 def export_algebra_csv(layer: CellLayer, path: str) -> None:
     """Export layer values to CSV."""
-    with open(path, "w", encoding="utf-8") as f:
+    safe = vormap.validate_output_path(path, allow_absolute=True)
+    with open(safe, "w", encoding="utf-8") as f:
         f.write("cell,value\n")
         for cell in sorted(layer.values):
             f.write(f"{cell},{layer.values[cell]}\n")
@@ -718,7 +722,8 @@ def export_algebra_csv(layer: CellLayer, path: str) -> None:
 
 def export_zonal_csv(results: Dict[Any, ZonalResult], path: str) -> None:
     """Export zonal statistics to CSV."""
-    with open(path, "w", encoding="utf-8") as f:
+    safe = vormap.validate_output_path(path, allow_absolute=True)
+    with open(safe, "w", encoding="utf-8") as f:
         f.write("zone_id,count,sum,mean,min,max,std,range,dominant\n")
         for zone_id in sorted(results, key=str):
             r = results[zone_id]
@@ -837,7 +842,8 @@ def main(argv: Optional[List[str]] = None) -> None:
         result = local_threshold(layer, args.value)
     elif args.command == "zonal-stats":
         layer = CellLayer.from_json(args.input)
-        with open(args.zones) as f:
+        safe_zones = vormap.validate_input_path(args.zones, allow_absolute=True)
+        with open(safe_zones) as f:
             zone_data = json.load(f)
         zones = {int(k): v for k, v in zone_data.items()}
         stats = zonal_stats(layer, zones)
