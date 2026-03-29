@@ -1,8 +1,8 @@
 {
-  "lastRepo": "everything",
-  "lastFeature": "ASCII Art Generator",
-  "lastRun": "2026-03-27T22:38:00-07:00",
-  "runCount": 549,
+  "lastRepo": "agenticchat",
+  "lastFeature": "Conversation Share Link",
+  "lastRun": "2026-03-28T22:43:04.0985328-07:00",
+  "runCount": 601,
   "repoFeatures": {
     "sauravcode": [
       "Bitwise operation builtins",
@@ -32,7 +32,9 @@
       "Interval data structure builtins",
       "Compression builtins",
       "Table formatting builtins",
-      "Logging & Diagnostics builtins"
+      "Logging & Diagnostics builtins",
+      "Number Theory builtins",
+      "Ordered Map (Sorted Dictionary) builtins"
     ],
     "VoronoiMap": [
       "Terminal ASCII/Unicode Voronoi rendering",
@@ -62,7 +64,9 @@
       "Voronoi Kaleidoscope Generator",
       "Crystal Growth Simulator",
       "Voronoi Emboss/Relief Renderer",
-      "Cross-Stitch Pattern Generator"
+      "Cross-Stitch Pattern Generator",
+      "Voronoi Gradient Fill Renderer",
+      "Voronoi Displacement & Normal Map Generator"
     ],
     "agenticchat": [
       "Per-session notes/memos",
@@ -94,7 +98,10 @@
       "Conversation Export (Markdown/Text/HTML/JSON)",
       "ChatGPT conversation import",
       "Mood Tracker",
-      "Message Highlighter"
+      "Message Highlighter",
+      "Auto-Save Draft",
+      "ScrollLock (auto-scroll suppression with jump-to-bottom pill)",
+      "Conversation Share Link (Alt+S)"
     ],
     "agentlens": [
       "CLI tail command",
@@ -123,7 +130,11 @@
       "CLI profile command",
       "CLI correlate command",
       "CLI capacity command",
-      "CLI watch command"
+      "CLI watch command",
+      "CLI baseline command",
+      "CLI retention command",
+      "CLI scatter command",
+      "CLI config command"
     ],
     "gif-captcha": [
       "CLI tool",
@@ -150,7 +161,8 @@
       "Anomaly Explorer Dashboard",
       "Performance Profiler page",
       "Queue Manager Dashboard",
-      "Entropy Analyzer"
+      "Entropy Analyzer",
+      "Challenge Preview Gallery"
     ],
     "GraphVisual": [
       "SVG graph exporter",
@@ -181,7 +193,10 @@
       "Graph Regularity Analyzer",
       "Clique Cover Analyzer",
       "DIMACS Format Exporter",
-      "Random Graph Generator"
+      "Random Graph Generator",
+      "Wiener Index Calculator",
+      "Graph Isomorphism Checker",
+      "Multi-format Adjacency List Exporter"
     ],
     "Vidly": [
       "Rental extension feature",
@@ -215,7 +230,9 @@
       "Movie Director Spotlight",
       "Customer Merge Tool",
       "Refund Management System",
-      "Insurance Controller with full UI"
+      "Insurance Controller with full UI",
+      "Gift Registry",
+      "Inventory Dashboard"
     ],
     "FeedReader": [
       "Vocabulary Builder",
@@ -251,7 +268,9 @@
       "Article Flashback (On This Day)",
       "Article Dark Mode Formatter",
       "Word Cloud Generator",
-      "Vocabulary Frequency Profiler"
+      "Vocabulary Frequency Profiler",
+      "Article Quiz Generator",
+      "Feed Engagement Scoreboard"
     ],
     "BioBots": [
       "Cell Seeding Calculator",
@@ -289,7 +308,10 @@
       "Lab Timer Dashboard",
       "Lab Notebook Entry Generator",
       "Lab Safety Checklist",
-      "Statistical Analysis Calculator"
+      "Statistical Analysis Calculator",
+      "Sample Label Generator",
+      "Cell Viability Calculator",
+      "Contamination Risk Scorer"
     ],
     "prompt": [
       "PromptChainVisualizer",
@@ -324,7 +346,11 @@
       "PromptExpander",
       "PromptMerger",
       "PromptMinifier",
-      "PromptSanitizer"
+      "PromptSanitizer",
+      "PromptDiffViewer",
+      "PromptNormalizer",
+      "PromptComparator",
+      "PromptShadowRunner"
     ],
     "everything": [
       "Bookmark Manager",
@@ -390,7 +416,18 @@
       "Movie Tracker",
       "Percentage Calculator",
       "Periodic Table",
-      "ASCII Art Generator"
+      "ASCII Art Generator",
+      "Mortgage Calculator",
+      "Reaction Time Test",
+      "Sketch Pad",
+      "Interval Timer",
+      "Cipher Tool",
+      "Regex Tester",
+      "Spin the Wheel",
+      "Sobriety Counter",
+      "Bill Reminder",
+      "Aspect Ratio Calculator",
+      "Wheel of Life"
     ],
     "ai": [
       "Safety Trend Tracker",
@@ -429,7 +466,9 @@
       "Hardening Advisor CLI command",
       "Exposure Window Analyzer",
       "Incident Communication Drafter",
-      "Vulnerability Scanner"
+      "Vulnerability Scanner",
+      "Anomaly Clustering",
+      "Escape Route Analyzer"
     ],
     "getagentbox": [
       "Custom 404 page",
@@ -461,7 +500,9 @@
       "Community Page",
       "SLA Page",
       "Incident Postmortems Page",
-      "Interactive Tutorials Page"
+      "Interactive Tutorials Page",
+      "Sandbox Playground",
+      "Developer SDK Page"
     ],
     "Ocaml-sample-code": [
       "Interactive sorting algorithm visualizer",
@@ -508,7 +549,10 @@
       "Dancing Links (Algorithm X) exact cover solver",
       "Link-Cut Tree data structure",
       "B+ Tree data structure",
-      "Y-Fast Trie data structure"
+      "Y-Fast Trie data structure",
+      "Adaptive Radix Tree (ART) data structure",
+      "Weight-Balanced Tree data structure",
+      "Succinct Bit Vector data structure"
     ],
     "WinSentinel": [
       "Score Forecast CLI command",
@@ -540,7 +584,11 @@
       "Calendar Heatmap CLI command",
       "Security Maturity Assessment CLI command",
       "CLI --watch command for continuous security monitoring",
-      "Attack Surface Analyzer CLI command"
+      "Attack Surface Analyzer CLI command",
+      "Quick Scan CLI command",
+      "Incident Response Playbook CLI command",
+      "Security Habit Tracker CLI command",
+      "Grep CLI command for regex finding search"
     ]
   }
 }
