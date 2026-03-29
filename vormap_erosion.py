@@ -64,6 +64,86 @@ import sys
 # Erosion models
 # ---------------------------------------------------------------------------
 
+def _run_erosion(
+    adjacency: dict,
+    elevations: dict,
+    steps: int,
+    step_fn,
+) -> list[dict]:
+    """Generic erosion simulation driver.
+
+    Eliminates duplicated frame-management boilerplate between erosion
+    models.  Each model only needs to supply a *step_fn(current, adjacency)*
+    that returns a delta dict of elevation changes.
+
+    Parameters
+    ----------
+    adjacency : dict
+        {seed: [neighbour_seeds, …]}
+    elevations : dict
+        {seed: float} initial terrain heights.
+    steps : int
+        Number of simulation steps.
+    step_fn : callable(current, adjacency) -> dict
+        Computes per-seed elevation deltas for one time step.
+
+    Returns
+    -------
+    list[dict]
+        One dict per step mapping seed → elevation.
+    """
+    if steps < 0:
+        raise ValueError("steps must be non-negative")
+
+    current = {s: float(v) for s, v in elevations.items()}
+    frames: list[dict] = [copy.deepcopy(current)]
+
+    for _ in range(steps):
+        delta = step_fn(current, adjacency)
+        for s in current:
+            current[s] = max(0.0, current[s] + delta.get(s, 0.0))
+        frames.append(copy.deepcopy(current))
+
+    return frames
+
+
+def _hydraulic_step(rate: float, sediment_capacity: float):
+    """Return a step function for hydraulic erosion."""
+    def step_fn(current, adjacency):
+        delta: dict[object, float] = {s: 0.0 for s in current}
+        for seed, nbrs in adjacency.items():
+            h = current[seed]
+            lower = [(n, h - current[n]) for n in nbrs if current[n] < h]
+            if not lower:
+                continue
+            total_slope = sum(d for _, d in lower)
+            if total_slope <= 0:
+                continue
+            eroded = min(rate * total_slope, sediment_capacity, h * 0.5)
+            delta[seed] -= eroded
+            for nbr, slope in lower:
+                fraction = slope / total_slope
+                delta[nbr] += eroded * fraction
+        return delta
+    return step_fn
+
+
+def _thermal_step(talus: float, fraction: float):
+    """Return a step function for thermal erosion."""
+    def step_fn(current, adjacency):
+        delta: dict[object, float] = {s: 0.0 for s in current}
+        for seed, nbrs in adjacency.items():
+            h = current[seed]
+            for nbr in nbrs:
+                diff = h - current[nbr]
+                if diff > talus:
+                    transfer = fraction * (diff - talus) * 0.5
+                    delta[seed] -= transfer
+                    delta[nbr] += transfer
+        return delta
+    return step_fn
+
+
 def hydraulic_erosion(
     adjacency: dict,
     elevations: dict,
@@ -96,40 +176,10 @@ def hydraulic_erosion(
     list[dict]
         One dict per step mapping seed → elevation.
     """
-    if steps < 0:
-        raise ValueError("steps must be non-negative")
     if not (0 < rate <= 1):
         raise ValueError("rate must be in (0, 1]")
-
-    current = {s: float(v) for s, v in elevations.items()}
-    frames: list[dict] = [copy.deepcopy(current)]
-
-    for _ in range(steps):
-        delta: dict[object, float] = {s: 0.0 for s in current}
-
-        for seed, nbrs in adjacency.items():
-            h = current[seed]
-            lower = [(n, h - current[n]) for n in nbrs if current[n] < h]
-            if not lower:
-                continue
-
-            total_slope = sum(d for _, d in lower)
-            if total_slope <= 0:
-                continue
-
-            eroded = min(rate * total_slope, sediment_capacity, h * 0.5)
-            delta[seed] -= eroded
-
-            for nbr, slope in lower:
-                fraction = slope / total_slope
-                delta[nbr] += eroded * fraction
-
-        for s in current:
-            current[s] = max(0.0, current[s] + delta[s])
-
-        frames.append(copy.deepcopy(current))
-
-    return frames
+    return _run_erosion(adjacency, elevations, steps,
+                        _hydraulic_step(rate, sediment_capacity))
 
 
 def thermal_erosion(
@@ -164,34 +214,12 @@ def thermal_erosion(
     list[dict]
         One dict per step mapping seed → elevation.
     """
-    if steps < 0:
-        raise ValueError("steps must be non-negative")
     if talus <= 0:
         raise ValueError("talus must be positive")
     if not (0 < fraction <= 1):
         raise ValueError("fraction must be in (0, 1]")
-
-    current = {s: float(v) for s, v in elevations.items()}
-    frames: list[dict] = [copy.deepcopy(current)]
-
-    for _ in range(steps):
-        delta: dict[object, float] = {s: 0.0 for s in current}
-
-        for seed, nbrs in adjacency.items():
-            h = current[seed]
-            for nbr in nbrs:
-                diff = h - current[nbr]
-                if diff > talus:
-                    transfer = fraction * (diff - talus) * 0.5
-                    delta[seed] -= transfer
-                    delta[nbr] += transfer
-
-        for s in current:
-            current[s] = max(0.0, current[s] + delta[s])
-
-        frames.append(copy.deepcopy(current))
-
-    return frames
+    return _run_erosion(adjacency, elevations, steps,
+                        _thermal_step(talus, fraction))
 
 
 # ---------------------------------------------------------------------------
