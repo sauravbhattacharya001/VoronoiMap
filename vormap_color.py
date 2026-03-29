@@ -363,6 +363,7 @@ def export_colored_svg(
     show_labels=False,
     stroke_color="#333",
     stroke_width=1,
+    color_result=None,
 ):
     """Export an SVG with map-colored Voronoi regions.
 
@@ -390,18 +391,26 @@ def export_colored_svg(
         CSS color for polygon borders.
     stroke_width : float
         Border thickness.
+    color_result : ColorResult or None
+        Pre-computed coloring result from ``color_voronoi()``.  When
+        provided, skips redundant region computation, graph extraction,
+        and coloring — *algorithm*, *num_colors*, and *palette* args
+        are ignored in favour of the values stored in *color_result*.
 
     Returns
     -------
     str
         Path to the generated SVG file.
     """
-    result = color_voronoi(
-        data_or_file,
-        algorithm=algorithm,
-        num_colors=num_colors,
-        palette=palette,
-    )
+    if color_result is not None:
+        result = color_result
+    else:
+        result = color_voronoi(
+            data_or_file,
+            algorithm=algorithm,
+            num_colors=num_colors,
+            palette=palette,
+        )
 
     regions = result.regions
     graph = result.graph
@@ -417,32 +426,12 @@ def export_colored_svg(
 
     margin = 40
 
-    # Compute coordinate transform
-    all_xs = [pt[0] for pt in data]
-    all_ys = [pt[1] for pt in data]
-    for verts in regions.values():
-        for vx, vy in verts:
-            all_xs.append(vx)
-            all_ys.append(vy)
-
-    if not all_xs or not all_ys:
-        raise ValueError("No data to visualize")
-
-    min_x, max_x = min(all_xs), max(all_xs)
-    min_y, max_y = min(all_ys), max(all_ys)
-    range_x = max(max_x - min_x, 1e-6)
-    range_y = max(max_y - min_y, 1e-6)
-    draw_w = width - 2 * margin
-    draw_h = height - 2 * margin
-    scale = min(draw_w / range_x, draw_h / range_y)
-    offset_x = margin + (draw_w - range_x * scale) / 2
-    offset_y = margin + (draw_h - range_y * scale) / 2
-
-    def tx(x):
-        return offset_x + (x - min_x) * scale
-
-    def ty(y):
-        return offset_y + (max_y - y) * scale
+    # Use shared coordinate transform (same logic as vormap_viz/vormap_heatmap)
+    transform = vormap_viz._CoordinateTransform(
+        regions, data, width=width, height=height, margin=margin,
+    )
+    tx = transform.tx
+    ty = transform.ty
 
     # Build SVG
     svg = ET.Element("svg", {
@@ -591,13 +580,11 @@ def main(args=None):
         palette=palette,
     )
 
-    # Export SVG
+    # Export SVG (pass pre-computed result to avoid redundant work)
     export_colored_svg(
         opts.datafile,
         output_path,
-        algorithm=opts.algorithm,
-        num_colors=opts.colors,
-        palette=palette,
+        color_result=result,
         show_seeds=not opts.no_seeds,
         show_labels=opts.labels,
     )
