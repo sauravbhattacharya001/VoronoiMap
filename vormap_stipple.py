@@ -35,7 +35,7 @@ import sys
 
 try:
     import numpy as np
-    from scipy.spatial import Voronoi
+    from scipy.spatial import Voronoi, cKDTree
     _HAS_DEPS = True
 except ImportError:
     _HAS_DEPS = False
@@ -112,72 +112,12 @@ def _sample_initial_points(density, n_points, rng=None):
     return np.column_stack([xs, ys])
 
 
-def _weighted_lloyd_step(points, density, width, height):
-    """One step of density-weighted Lloyd relaxation.
-
-    Returns new points and max displacement.
-    """
-    n = len(points)
-    h, w = density.shape
-
-    # Add mirror points for bounded Voronoi
-    mirrored = np.vstack([
-        points,
-        np.column_stack([-points[:, 0], points[:, 1]]),
-        np.column_stack([2 * width - points[:, 0], points[:, 1]]),
-        np.column_stack([points[:, 0], -points[:, 1]]),
-        np.column_stack([points[:, 0], 2 * height - points[:, 1]]),
-    ])
-
-    vor = Voronoi(mirrored)
-
-    new_points = points.copy()
-    for i in range(n):
-        region_idx = vor.point_region[i]
-        region = vor.regions[region_idx]
-        if not region or -1 in region:
-            continue
-
-        verts = vor.vertices[region]
-
-        # Bounding box of the cell
-        xmin = max(0, int(np.floor(verts[:, 0].min())))
-        xmax = min(w - 1, int(np.ceil(verts[:, 0].max())))
-        ymin = max(0, int(np.floor(verts[:, 1].min())))
-        ymax = min(h - 1, int(np.ceil(verts[:, 1].max())))
-
-        if xmin >= xmax or ymin >= ymax:
-            continue
-
-        # Sample grid points in cell bounding box
-        gx = np.arange(xmin, xmax + 1, dtype=np.float64)
-        gy = np.arange(ymin, ymax + 1, dtype=np.float64)
-        gxx, gyy = np.meshgrid(gx, gy)
-        grid_pts = np.column_stack([gxx.ravel(), gyy.ravel()])
-
-        # Point-in-polygon test using cross product
-        inside = _points_in_polygon(grid_pts, verts)
-        if not inside.any():
-            continue
-
-        ix = gxx.ravel()[inside].astype(int)
-        iy = gyy.ravel()[inside].astype(int)
-
-        weights = density[iy, ix]
-        total_w = weights.sum()
-        if total_w < 1e-12:
-            continue
-
-        cx = (ix * weights).sum() / total_w
-        cy = (iy * weights).sum() / total_w
-        new_points[i] = [cx, cy]
-
-    displacement = np.sqrt(((new_points - points) ** 2).sum(axis=1)).max()
-    return new_points, displacement
-
-
 def _points_in_polygon(points, polygon):
-    """Vectorized ray-casting point-in-polygon test."""
+    """Vectorized ray-casting point-in-polygon test.
+
+    Retained for backward compatibility and direct polygon queries.
+    The main Lloyd relaxation now uses KD-tree instead.
+    """
     n = len(polygon)
     inside = np.zeros(len(points), dtype=bool)
 
@@ -194,6 +134,51 @@ def _points_in_polygon(points, polygon):
         j = i
 
     return inside
+
+
+def _weighted_lloyd_step(points, density, width, height):
+    """One step of density-weighted Lloyd relaxation.
+
+    Uses a KD-tree to assign every pixel to its nearest seed in bulk,
+    then computes density-weighted centroids via numpy aggregation.
+    This is dramatically faster than the previous per-cell polygon
+    rasterization approach (O(pixels) vs O(cells * cell_area * vertices)).
+
+    Returns new points and max displacement.
+    """
+    n = len(points)
+    h, w = density.shape
+
+    # Build KD-tree of seed points
+    tree = cKDTree(points)
+
+    # Create grid of all pixel coordinates
+    gy, gx = np.mgrid[0:h, 0:w]
+    pixel_coords = np.column_stack([gx.ravel(), gy.ravel()])
+
+    # Assign each pixel to nearest seed — single bulk query
+    _, labels = tree.query(pixel_coords)
+
+    # Flatten density for vectorized aggregation
+    flat_density = density.ravel()
+
+    # Compute weighted centroids using np.bincount (vectorized, no loops)
+    weights_per_seed = np.bincount(labels, weights=flat_density, minlength=n)
+    wx_per_seed = np.bincount(labels, weights=flat_density * pixel_coords[:, 0], minlength=n)
+    wy_per_seed = np.bincount(labels, weights=flat_density * pixel_coords[:, 1], minlength=n)
+
+    # Update points where weight is sufficient
+    new_points = points.copy()
+    valid = weights_per_seed > 1e-12
+    new_points[valid, 0] = wx_per_seed[valid] / weights_per_seed[valid]
+    new_points[valid, 1] = wy_per_seed[valid] / weights_per_seed[valid]
+
+    # Clamp to image bounds
+    new_points[:, 0] = np.clip(new_points[:, 0], 0, w - 1)
+    new_points[:, 1] = np.clip(new_points[:, 1], 0, h - 1)
+
+    displacement = np.sqrt(((new_points - points) ** 2).sum(axis=1)).max()
+    return new_points, displacement
 
 
 def stipple_image(image_path, n_points=5000, iterations=30,
