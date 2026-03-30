@@ -336,19 +336,8 @@ def _cell_stats(pixels: List[Tuple[int, int, int]], assignment: List[int],
 def _draw_filled_circle(canvas: List[Tuple[int, int, int]], w: int, h: int,
                         cx: int, cy: int, radius: float,
                         colour: Tuple[int, int, int]) -> None:
-    """Draw a filled circle onto the canvas."""
-    r_int = int(math.ceil(radius))
-    r_sq = radius * radius
-    for dy in range(-r_int, r_int + 1):
-        py = cy + dy
-        if py < 0 or py >= h:
-            continue
-        for dx in range(-r_int, r_int + 1):
-            px = cx + dx
-            if px < 0 or px >= w:
-                continue
-            if dx * dx + dy * dy <= r_sq:
-                canvas[py * w + px] = colour
+    """Draw a filled circle onto the canvas (opaque)."""
+    _draw_blended_circle(canvas, w, h, cx, cy, radius, colour, 1.0)
 
 
 # ---------------------------------------------------------------------------
@@ -374,29 +363,41 @@ def _rgb_to_cmyk(r: int, g: int, b: int) -> Tuple[float, float, float, float]:
 def _blend(base: Tuple[int, int, int], overlay: Tuple[int, int, int],
            alpha: float) -> Tuple[int, int, int]:
     """Alpha blend overlay onto base."""
+    inv = 1.0 - alpha
     return (
-        int(base[0] * (1 - alpha) + overlay[0] * alpha),
-        int(base[1] * (1 - alpha) + overlay[1] * alpha),
-        int(base[2] * (1 - alpha) + overlay[2] * alpha),
+        int(base[0] * inv + overlay[0] * alpha),
+        int(base[1] * inv + overlay[1] * alpha),
+        int(base[2] * inv + overlay[2] * alpha),
     )
 
 
 def _draw_blended_circle(canvas: List[Tuple[int, int, int]], w: int, h: int,
                           cx: int, cy: int, radius: float,
-                          colour: Tuple[int, int, int], alpha: float) -> None:
-    """Draw a filled circle with alpha blending."""
+                          colour: Tuple[int, int, int],
+                          alpha: float = 1.0) -> None:
+    """Draw a filled circle with optional alpha blending.
+
+    When *alpha* is 1.0, the colour overwrites existing pixels directly
+    (no blending overhead).
+    """
     r_int = int(math.ceil(radius))
     r_sq = radius * radius
-    for dy in range(-r_int, r_int + 1):
-        py = cy + dy
-        if py < 0 or py >= h:
-            continue
-        for dx in range(-r_int, r_int + 1):
-            px = cx + dx
-            if px < 0 or px >= w:
-                continue
-            if dx * dx + dy * dy <= r_sq:
-                canvas[py * w + px] = _blend(canvas[py * w + px], colour, alpha)
+    opaque = alpha >= 1.0
+    y_lo = max(0, cy - r_int)
+    y_hi = min(h - 1, cy + r_int)
+    x_lo = max(0, cx - r_int)
+    x_hi = min(w - 1, cx + r_int)
+    for py in range(y_lo, y_hi + 1):
+        dy = py - cy
+        dy_sq = dy * dy
+        row_off = py * w
+        for px in range(x_lo, x_hi + 1):
+            dx = px - cx
+            if dx * dx + dy_sq <= r_sq:
+                if opaque:
+                    canvas[row_off + px] = colour
+                else:
+                    canvas[row_off + px] = _blend(canvas[row_off + px], colour, alpha)
 
 
 # ---------------------------------------------------------------------------
