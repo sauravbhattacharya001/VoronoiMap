@@ -161,8 +161,11 @@ def _clip_infinite_region(vor, region_idx, bounds, point_idx=None):
             normal = -normal
 
         # Project to a far point (well beyond bounds)
+        norm_len = np.linalg.norm(normal)
+        if norm_len < 1e-12:
+            continue  # degenerate ridge (coincident points) — skip
         scale = max(x_max - x_min, y_max - y_min) * 10
-        far_point = fin_vert + normal / np.linalg.norm(normal) * scale
+        far_point = fin_vert + normal / norm_len * scale
         new_verts.append(far_point)
 
     if len(new_verts) < 3:
