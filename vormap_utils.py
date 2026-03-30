@@ -81,6 +81,27 @@ def polygon_centroid_mean(vertices):
     return (cx, cy)
 
 
+def euclidean_coords(x1, y1, x2, y2):
+    """Euclidean distance between two 2D points given as separate coordinates.
+
+    Parameters
+    ----------
+    x1, y1 : float
+        First point coordinates.
+    x2, y2 : float
+        Second point coordinates.
+
+    Returns
+    -------
+    float
+        Euclidean distance.
+    """
+    import math
+    dx = x2 - x1
+    dy = y2 - y1
+    return math.sqrt(dx * dx + dy * dy)
+
+
 def euclidean(p1, p2):
     """Euclidean distance between two 2D points.
 

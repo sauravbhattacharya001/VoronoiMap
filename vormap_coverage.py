@@ -49,6 +49,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 from vormap import IND_S, IND_N, IND_W, IND_E, validate_output_path
+from vormap_utils import euclidean_coords as _euclidean
 
 
 # ---------------------------------------------------------------------------
@@ -157,10 +158,6 @@ class CoverageResult:
 # ---------------------------------------------------------------------------
 # Core helpers
 # ---------------------------------------------------------------------------
-
-def _euclidean(x1, y1, x2, y2):
-    """Euclidean distance between two points."""
-    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 
 def _flood_fill(grid, rows, cols, r, c, visited):
