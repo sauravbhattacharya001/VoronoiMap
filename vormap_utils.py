@@ -100,6 +100,30 @@ def euclidean(p1, p2):
     return math.sqrt(dx * dx + dy * dy)
 
 
+def euclidean_xy(x1: float, y1: float, x2: float, y2: float) -> float:
+    """Euclidean distance between two 2D points given as scalar coordinates.
+
+    This is the scalar-argument variant of :func:`euclidean`, provided to
+    eliminate duplicated private ``_euclidean`` helpers across modules.
+
+    Parameters
+    ----------
+    x1, y1 : float
+        First point coordinates.
+    x2, y2 : float
+        Second point coordinates.
+
+    Returns
+    -------
+    float
+        Euclidean distance.
+    """
+    import math
+    dx = x2 - x1
+    dy = y2 - y1
+    return math.sqrt(dx * dx + dy * dy)
+
+
 def bounding_box(points):
     """Return (x_min, y_min, x_max, y_max) for a list of (x, y) points."""
     xs = [p[0] for p in points]

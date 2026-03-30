@@ -37,6 +37,7 @@ import argparse
 import math
 import os
 import random
+from vormap_utils import euclidean_xy as _euclidean
 import struct
 import sys
 
@@ -100,9 +101,6 @@ def _tile_seeds(seeds, width, height):
 # ---------------------------------------------------------------------------
 # Distance helpers
 # ---------------------------------------------------------------------------
-
-def _euclidean(px, py, sx, sy):
-    return math.sqrt((px - sx) ** 2 + (py - sy) ** 2)
 
 
 def _manhattan(px, py, sx, sy):

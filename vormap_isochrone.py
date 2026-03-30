@@ -51,6 +51,7 @@ import json
 import math
 import sys
 import xml.etree.ElementTree as ET
+from vormap_utils import euclidean_xy as _euclidean
 
 import vormap
 
@@ -71,9 +72,6 @@ _BAND_COLORS = [
     "#1a9850",
 ]
 
-
-def _euclidean(ax, ay, bx, by):
-    return math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
 
 
 # ---------------------------------------------------------------------------

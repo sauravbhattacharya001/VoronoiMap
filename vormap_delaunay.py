@@ -52,6 +52,7 @@ All functions are pure and depend only on the Python standard library
 import json
 import math
 import os
+from vormap_utils import euclidean as _edge_length
 import statistics
 
 __all__ = [
@@ -210,10 +211,6 @@ def delaunay_triangulate(points):
 # ═══════════════════════════════════════════════════════════════════
 #  Triangle Quality Metrics
 # ═══════════════════════════════════════════════════════════════════
-
-def _edge_length(p1, p2):
-    """Euclidean distance between two 2D points."""
-    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
 
 def _triangle_area(p1, p2, p3):
