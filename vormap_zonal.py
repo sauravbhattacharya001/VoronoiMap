@@ -39,6 +39,8 @@ import json
 import argparse
 import sys
 
+import vormap
+
 try:
     import numpy as np
     from scipy.spatial import KDTree
@@ -217,7 +219,8 @@ def export_csv(results, filepath):
                 vals.append(str(v))
         lines.append(','.join(vals))
 
-    with open(filepath, 'w', newline='') as f:
+    safe = vormap.validate_output_path(filepath, allow_absolute=True)
+    with open(safe, 'w', newline='') as f:
         f.write('\n'.join(lines) + '\n')
 
 
@@ -231,7 +234,8 @@ def export_json(results, filepath, indent=2):
     filepath : str
         Path to write the JSON file.
     """
-    with open(filepath, 'w') as f:
+    safe = vormap.validate_output_path(filepath, allow_absolute=True)
+    with open(safe, 'w') as f:
         json.dump(results, f, indent=indent)
 
 
@@ -349,7 +353,8 @@ def export_svg(results, seeds, filepath, stat_key='mean',
 
     lines.append('</svg>')
 
-    with open(filepath, 'w') as f:
+    safe = vormap.validate_output_path(filepath, allow_absolute=True)
+    with open(safe, 'w') as f:
         f.write('\n'.join(lines))
 
 
@@ -406,15 +411,16 @@ def main(argv=None):
 
 def _load_points_file(filepath):
     """Load (x, y) points from CSV or JSON."""
-    ext = os.path.splitext(filepath)[1].lower()
+    safe = vormap.validate_input_path(filepath, allow_absolute=True)
+    ext = os.path.splitext(safe)[1].lower()
     if ext == '.json':
-        with open(filepath) as f:
+        with open(safe) as f:
             data = json.load(f)
         return [(float(p[0]), float(p[1])) for p in data]
     else:
         # CSV
         points = []
-        with open(filepath) as f:
+        with open(safe) as f:
             for lineno, line in enumerate(f):
                 line = line.strip()
                 if not line or (lineno == 0 and not line[0].isdigit()):
@@ -426,8 +432,9 @@ def _load_points_file(filepath):
 
 def _load_observations_file(filepath, value_columns):
     """Load observations (x, y, v1, ...) from CSV."""
+    safe = vormap.validate_input_path(filepath, allow_absolute=True)
     observations = []
-    with open(filepath) as f:
+    with open(safe) as f:
         for lineno, line in enumerate(f):
             line = line.strip()
             if not line or (lineno == 0 and not line[0].isdigit()):

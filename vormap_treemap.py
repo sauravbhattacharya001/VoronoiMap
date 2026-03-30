@@ -40,6 +40,8 @@ import os
 import random
 import sys
 
+import vormap
+
 try:
     import numpy as np
     from scipy.spatial import Voronoi
@@ -346,7 +348,8 @@ def _cell_to_dict(cell):
 
 def export_treemap_json(root, filepath):
     """Export treemap to JSON."""
-    with open(filepath, "w") as f:
+    safe = vormap.validate_output_path(filepath, allow_absolute=True)
+    with open(safe, "w") as f:
         json.dump(_cell_to_dict(root), f, indent=2)
 
 
@@ -415,14 +418,16 @@ def export_treemap_svg(root, filepath, width=None, height=None):
 
     parts.append('</svg>')
 
-    with open(filepath, "w") as f:
+    safe = vormap.validate_output_path(filepath, allow_absolute=True)
+    with open(safe, "w") as f:
         f.write("\n".join(parts))
 
 
 def export_treemap_csv(root, filepath):
     """Export leaf cells to CSV."""
     leaves = _flatten_cells(root)
-    with open(filepath, "w") as f:
+    safe = vormap.validate_output_path(filepath, allow_absolute=True)
+    with open(safe, "w") as f:
         f.write("name,weight,depth,area,centroid_x,centroid_y\n")
         for cell in leaves:
             cx, cy = cell.centroid
@@ -451,7 +456,8 @@ def main():
     args = parser.parse_args()
 
     # Load input
-    with open(args.input) as f:
+    safe_input = vormap.validate_input_path(args.input, allow_absolute=True)
+    with open(safe_input) as f:
         data = json.load(f)
 
     # Build treemap
@@ -475,7 +481,8 @@ def main():
         if args.output == "treemap.svg":
             print(report)
         else:
-            with open(args.output, "w") as f:
+            safe_out = vormap.validate_output_path(args.output, allow_absolute=True)
+            with open(safe_out, "w") as f:
                 f.write(report)
     else:
         export_treemap_svg(root, args.output)
