@@ -2810,7 +2810,99 @@ def _build_parser():
         help='Print circle packing efficiency statistics to stdout.',
     )
 
+    # ── Dataset summary ──────────────────────────────────────────────
+    parser.add_argument(
+        '--summary',
+        action='store_true',
+        help='Print a quick dataset overview: point count, bounding box, '
+             'area, density, and nearest-neighbor distance statistics.',
+    )
+    parser.add_argument(
+        '--summary-json',
+        action='store_true',
+        help='Print the dataset summary as JSON (implies --summary).',
+    )
+
     return parser
+
+
+def _cmd_summary(args, data):
+    """Print a quick dataset overview with key spatial statistics."""
+    import json as _json
+
+    if data is None:
+        data = load_data(args.datafile)
+
+    n = len(data)
+    xs = [p[0] for p in data]
+    ys = [p[1] for p in data]
+
+    x_min, x_max = min(xs), max(xs)
+    y_min, y_max = min(ys), max(ys)
+    width = x_max - x_min
+    height = y_max - y_min
+    area = width * height
+    density = n / area if area > 0 else 0
+
+    # Centroid
+    cx = sum(xs) / n
+    cy = sum(ys) / n
+
+    # Nearest-neighbor distances
+    nn_dists = []
+    if _HAS_SCIPY:
+        pts = np.array(data)
+        tree = KDTree(pts)
+        dists, _ = tree.query(pts, k=2)
+        nn_dists = dists[:, 1].tolist()
+    else:
+        # Brute force for small datasets
+        for i, (x1, y1) in enumerate(data):
+            best = float('inf')
+            for j, (x2, y2) in enumerate(data):
+                if i != j:
+                    d = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+                    if d < best:
+                        best = d
+            nn_dists.append(best)
+
+    nn_min = min(nn_dists) if nn_dists else 0
+    nn_max = max(nn_dists) if nn_dists else 0
+    nn_mean = sum(nn_dists) / len(nn_dists) if nn_dists else 0
+    nn_sorted = sorted(nn_dists)
+    nn_median = nn_sorted[len(nn_sorted) // 2] if nn_sorted else 0
+
+    summary = {
+        'point_count': n,
+        'bounding_box': {
+            'x_min': round(x_min, 4), 'x_max': round(x_max, 4),
+            'y_min': round(y_min, 4), 'y_max': round(y_max, 4),
+            'width': round(width, 4), 'height': round(height, 4),
+        },
+        'area': round(area, 4),
+        'density': round(density, 6),
+        'centroid': {'x': round(cx, 4), 'y': round(cy, 4)},
+        'nearest_neighbor': {
+            'min': round(nn_min, 4),
+            'max': round(nn_max, 4),
+            'mean': round(nn_mean, 4),
+            'median': round(nn_median, 4),
+        },
+    }
+
+    if args.summary_json:
+        print(_json.dumps(summary, indent=2))
+    else:
+        print('\n=== Dataset Summary ===')
+        print('Points:       %d' % n)
+        print('Bounding box: (%.4f, %.4f) to (%.4f, %.4f)'
+              % (x_min, y_min, x_max, y_max))
+        print('Extent:       %.4f x %.4f (area: %.4f)' % (width, height, area))
+        print('Density:      %.6f points/unit²' % density)
+        print('Centroid:     (%.4f, %.4f)' % (cx, cy))
+        print('NN distances: min=%.4f  max=%.4f  mean=%.4f  median=%.4f'
+              % (nn_min, nn_max, nn_mean, nn_median))
+        print()
 
 
 def main():
@@ -2866,6 +2958,7 @@ def main():
         args.buffers_csv, args.buffers_svg,
         args.kde_svg, args.kde_csv, args.kde_hotspots,
         args.pattern, args.pattern_json,
+        args.summary, args.summary_json,
     ])
 
     data = None
@@ -2967,6 +3060,10 @@ def main():
 
     # Circle packing
     _cmd_circlepack(args, regions, data)
+
+    # Dataset summary
+    if args.summary or args.summary_json:
+        _cmd_summary(args, data)
 
 
 if __name__ == '__main__':
