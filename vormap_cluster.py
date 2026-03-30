@@ -170,8 +170,7 @@ def _cluster_threshold(seeds, adjacency, stats_lookup, metric,
         while queue:
             current = queue.popleft()
             labels[current] = cluster_id
-            for neighbor in adjacency.get(current, []):
-                nb = tuple(neighbor) if not isinstance(neighbor, tuple) else neighbor
+            for nb in adjacency.get(current, []):
                 if nb in in_range and nb not in visited:
                     visited.add(nb)
                     queue.append(nb)
@@ -233,8 +232,7 @@ def _cluster_dbscan(seeds, adjacency, stats_lookup, metric,
             current = queue.popleft()
             labels[current] = cluster_id
 
-            for neighbor in adjacency.get(current, []):
-                nb = tuple(neighbor) if not isinstance(neighbor, tuple) else neighbor
+            for nb in adjacency.get(current, []):
                 if nb in visited:
                     continue
                 visited.add(nb)
@@ -300,39 +298,31 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
 
     n_clusters = len(cluster_members)
 
-    # Build edge set from adjacency (each pair once).
-    seen_edges = set()
-    edges = []
-    for seed in seeds:
-        for neighbor in adjacency.get(seed, []):
-            nb = tuple(neighbor) if not isinstance(neighbor, tuple) else neighbor
-            pair = (min(seed, nb), max(seed, nb))
-            if pair not in seen_edges and seed in seed_to_cluster and nb in seed_to_cluster:
-                seen_edges.add(pair)
-                edges.append(pair)
-
     def _merge_cost(c1, c2):
         mean1 = cluster_metric_sum[c1] / cluster_size[c1]
         mean2 = cluster_metric_sum[c2] / cluster_size[c2]
         return abs(mean1 - mean2)
 
-    # Heap entries: (cost, cluster_a, cluster_b, gen_a, gen_b)
-    # Storing generation at push time allows O(1) staleness checks
-    # without recomputing merge cost, preventing unbounded heap growth
-    # from repeated re-pushes of updated costs.
+    # Build cluster adjacency directly from the seed adjacency graph.
+    # Previous implementation built an intermediate edge list then
+    # iterated it again to populate cluster_adj — O(2E) with extra
+    # memory.  Building cluster_adj in one pass halves the work and
+    # avoids allocating the edge list entirely.
     heap = []
     cluster_adj = {}  # cluster_id -> set of adjacent cluster_ids
-    for s1, s2 in edges:
-        c1 = seed_to_cluster.get(s1)
-        c2 = seed_to_cluster.get(s2)
-        if c1 is not None and c2 is not None and c1 != c2:
+    pushed = set()    # deduplicate initial heap entries
+    for seed in seeds:
+        c1 = seed_to_cluster.get(seed)
+        if c1 is None:
+            continue
+        for neighbor in adjacency.get(seed, []):
+            nb = tuple(neighbor) if not isinstance(neighbor, tuple) else neighbor
+            c2 = seed_to_cluster.get(nb)
+            if c2 is None or c1 == c2:
+                continue
             cluster_adj.setdefault(c1, set()).add(c2)
             cluster_adj.setdefault(c2, set()).add(c1)
-
-    # Deduplicate cluster adjacencies and push initial costs
-    pushed = set()
-    for c1, neighbors in cluster_adj.items():
-        for c2 in neighbors:
+            # Push heap entry once per cluster pair
             pair = (min(c1, c2), max(c1, c2))
             if pair not in pushed:
                 pushed.add(pair)
