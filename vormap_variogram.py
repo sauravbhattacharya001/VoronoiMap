@@ -63,6 +63,8 @@ from typing import Dict, List, Optional, Tuple
 
 from vormap_geometry import edge_length as _dist
 
+import vormap
+
 
 # ── Data Structures ──────────────────────────────────────────────────
 
@@ -712,6 +714,7 @@ def export_variogram_svg(
 
     svg_parts.append("</svg>")
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(svg_parts))
     return output_path
@@ -743,6 +746,7 @@ def export_variogram_csv(
     if model:
         headers.append("model_value")
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(headers)
@@ -807,6 +811,7 @@ def export_variogram_json(
             "r_squared": model.r_squared,
         }
 
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     return output_path

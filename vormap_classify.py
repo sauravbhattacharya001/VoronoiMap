@@ -66,6 +66,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+import vormap
+
 
 # ── Classification result ────────────────────────────────────────
 
@@ -568,6 +570,7 @@ def export_csv(
     output_path: str,
 ) -> None:
     """Export classification results to CSV."""
+    output_path = vormap.validate_output_path(output_path, allow_absolute=True)
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["value", "class", "label"])

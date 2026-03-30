@@ -30,6 +30,8 @@ import zlib
 from collections import defaultdict
 from typing import List, Tuple, Optional, Dict
 
+import vormap
+
 # ── Optional dependency detection ──
 
 try:
@@ -53,6 +55,7 @@ def _read_png(filepath: str) -> Tuple[int, int, list]:
     *pixels* is a flat list of (r, g, b) tuples in row-major order.
     Supports 8-bit RGB and RGBA (alpha is discarded).
     """
+    filepath = vormap.validate_input_path(filepath, allow_absolute=True)
     with open(filepath, "rb") as f:
         sig = f.read(8)
         if sig != b"\x89PNG\r\n\x1a\n":
@@ -135,6 +138,7 @@ def _read_png(filepath: str) -> Tuple[int, int, list]:
 def _write_png_rgba(filepath: str, width: int, height: int,
                     pixels: list) -> None:
     """Write an RGBA PNG. *pixels* is a flat list of (r, g, b, a) tuples."""
+    filepath = vormap.validate_output_path(filepath, allow_absolute=True)
 
     def _chunk(chunk_type: bytes, data: bytes) -> bytes:
         c = chunk_type + data
@@ -162,6 +166,7 @@ def _write_png_rgba(filepath: str, width: int, height: int,
 def _write_png_rgb(filepath: str, width: int, height: int,
                    pixels: list) -> None:
     """Write an RGB PNG. *pixels* is a flat list of (r, g, b) tuples."""
+    filepath = vormap.validate_output_path(filepath, allow_absolute=True)
 
     def _chunk(chunk_type: bytes, data: bytes) -> bytes:
         c = chunk_type + data
@@ -416,6 +421,7 @@ def generate_jigsaw(
 
     import json
     manifest_path = os.path.join(output_dir, "manifest.json")
+    manifest_path = vormap.validate_output_path(manifest_path, allow_absolute=True)
     with open(manifest_path, "w") as f:
         json.dump(manifest, f, indent=2)
 
