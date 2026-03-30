@@ -9,6 +9,7 @@ compatibility so existing ``from vormap_utils import …`` lines
 continue to work.
 """
 
+import math
 from typing import List, Tuple
 
 # polygon_area is defined in vormap_geometry with full precision.
@@ -94,17 +95,33 @@ def euclidean(p1, p2):
     float
         Euclidean distance.
     """
-    import math
-    dx = p2[0] - p1[0]
-    dy = p2[1] - p1[1]
-    return math.sqrt(dx * dx + dy * dy)
+    return math.hypot(p2[0] - p1[0], p2[1] - p1[1])
 
 
 def bounding_box(points):
-    """Return (x_min, y_min, x_max, y_max) for a list of (x, y) points."""
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
-    return min(xs), min(ys), max(xs), max(ys)
+    """Return (x_min, y_min, x_max, y_max) for a list of (x, y) points.
+
+    Uses a single pass over the points instead of building intermediate
+    lists, which halves memory usage for large point sets.
+    """
+    it = iter(points)
+    try:
+        first = next(it)
+    except StopIteration:
+        raise ValueError("bounding_box requires at least one point")
+    x_min = x_max = first[0]
+    y_min = y_max = first[1]
+    for p in it:
+        px, py = p[0], p[1]
+        if px < x_min:
+            x_min = px
+        elif px > x_max:
+            x_max = px
+        if py < y_min:
+            y_min = py
+        elif py > y_max:
+            y_max = py
+    return x_min, y_min, x_max, y_max
 
 
 def validate_points(points: list) -> List[Tuple[float, float]]:
@@ -123,7 +140,8 @@ def validate_points(points: list) -> List[Tuple[float, float]]:
     ValueError
         If any point is invalid or fewer than 2 points remain.
     """
-    import math
+    _isnan = math.isnan
+    _isinf = math.isinf
     validated = []
     for i, pt in enumerate(points):
         if not isinstance(pt, (list, tuple)) or len(pt) != 2:
@@ -134,7 +152,7 @@ def validate_points(points: list) -> List[Tuple[float, float]]:
             x, y = float(pt[0]), float(pt[1])
         except (TypeError, ValueError):
             raise ValueError(f"Point at index {i} has non-numeric coordinates: {pt}")
-        if math.isnan(x) or math.isnan(y) or math.isinf(x) or math.isinf(y):
+        if _isnan(x) or _isnan(y) or _isinf(x) or _isinf(y):
             raise ValueError(f"Point at index {i} has NaN or Inf coordinates: {pt}")
         validated.append((x, y))
     if len(validated) < 2:
@@ -146,7 +164,7 @@ def compute_nn_distances(points):
     """Compute nearest-neighbor distance for each point.
 
     Uses scipy KDTree when available (O(n log n)), otherwise brute
-    force O(n^2).
+    force O(n²).
 
     Parameters
     ----------
@@ -166,16 +184,16 @@ def compute_nn_distances(points):
     except ImportError:
         pass
 
-    # Brute force fallback
-    import math
+    # Brute force fallback — use math.hypot for C-level speed
+    _hypot = math.hypot
     nn_dists = []
     for i in range(n):
+        xi, yi = points[i]
         best = float("inf")
         for j in range(n):
             if i == j:
                 continue
-            d = math.hypot(points[i][0] - points[j][0],
-                           points[i][1] - points[j][1])
+            d = _hypot(xi - points[j][0], yi - points[j][1])
             if d < best:
                 best = d
         nn_dists.append(best)
