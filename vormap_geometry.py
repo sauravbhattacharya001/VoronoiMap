@@ -11,9 +11,34 @@ vormap_pattern.  They now live here as the single source of truth.
 
 import math
 
-from vormap_utils import polygon_area  # noqa: F401 — canonical implementation
-from vormap_utils import polygon_centroid  # noqa: F401 — canonical implementation
-from vormap_utils import euclidean  # noqa: F401 — canonical implementation
+from vormap_utils import polygon_centroid  # noqa: F401
+from vormap_utils import euclidean  # noqa: F401
+
+
+def polygon_area(vertices):
+    """Compute the area of a polygon using the Shoelace formula.
+
+    Unlike ``vormap.polygon_area(alng, alat)`` which rounds to 2 decimal
+    places (suitable for its geographic use-case), this version returns
+    full-precision results for geometric analysis.
+
+    Parameters
+    ----------
+    vertices : list[tuple[float, float]]
+        Ordered polygon vertices.
+
+    Returns
+    -------
+    float
+        Absolute area of the polygon. Returns 0.0 for fewer than 3 vertices.
+    """
+    n = len(vertices)
+    if n < 3:
+        return 0.0
+    area = vertices[-1][1] * vertices[0][0] - vertices[0][1] * vertices[-1][0]
+    for i in range(n - 1):
+        area += vertices[i][1] * vertices[i + 1][0] - vertices[i + 1][1] * vertices[i][0]
+    return abs(area) * 0.5
 
 
 def polygon_perimeter(vertices):
