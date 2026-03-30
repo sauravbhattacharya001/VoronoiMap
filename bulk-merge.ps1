@@ -1,89 +1,80 @@
-$repos = @("sauravbhattacharya001","agenticchat","agentlens","BioBots","everything","FeedReader","getagentbox","gif-captcha","GraphVisual","Ocaml-sample-code","prompt","sauravcode","Vidly","VoronoiMap","WinSentinel","ai")
+$repos = @("prompt","WinSentinel","VoronoiMap","agentlens","GraphVisual","agenticchat","Vidly","gif-captcha","sauravcode","FeedReader","BioBots","everything","Ocaml-sample-code","getagentbox","ai")
 $owner = "sauravbhattacharya001"
-$protectionRemoved = 0
-$totalMerged = 0
-$totalSkipped = 0
-$skippedDetails = @()
-$errors = @()
+$results = @()
+$statusPath = "C:\Users\onlin\.openclaw\workspace\status.md"
 
 foreach ($repo in $repos) {
     Write-Host "=== Processing $repo ==="
+    $merged = 0; $skipped = 0; $total = 0; $notes = @()
     
     # Get default branch
-    $branch = gh repo view "$owner/$repo" --json defaultBranchRef -q ".defaultBranchRef.name" 2>&1
+    $repoInfo = gh api "repos/$owner/$repo" --jq '.default_branch' 2>&1
+    $branch = if ($repoInfo -match "^(main|master)$") { $repoInfo.Trim() } else { "main" }
     Write-Host "Default branch: $branch"
     
-    # Remove branch protection
-    $delResult = gh api -X DELETE "repos/$owner/$repo/branches/$branch/protection" 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "Branch protection removed for $repo"
-        $protectionRemoved++
-    } else {
-        Write-Host "No protection or error: $delResult"
+    # Delete branch protection
+    $delResult = gh api "repos/$owner/$repo/branches/$branch/protection" -X DELETE 2>&1
+    Write-Host "Protection delete: $delResult"
+    
+    # List open PRs
+    $prsJson = gh pr list -R "$owner/$repo" --state open --limit 200 --json number 2>&1
+    try {
+        $prs = $prsJson | ConvertFrom-Json
+    } catch {
+        $prs = @()
     }
+    $total = $prs.Count
+    Write-Host "Open PRs: $total"
     
-    # Get open PRs
-    $prs = gh pr list -R "$owner/$repo" --state open --limit 200 --json number -q ".[].number" 2>&1
-    if ([string]::IsNullOrWhiteSpace($prs)) {
-        Write-Host "No open PRs"
-        # Update status
-        Set-Content "C:\Users\onlin\.openclaw\workspace\status.md" "# Status`nProcessing: $repo done`nProtection removed: $protectionRemoved`nMerged so far: $totalMerged`nSkipped so far: $totalSkipped"
-        continue
-    }
-    
-    $prNumbers = $prs -split "`n" | Where-Object { $_ -match '^\d+$' }
-    Write-Host "Found $($prNumbers.Count) open PRs"
-    
-    foreach ($pr in $prNumbers) {
-        $mergeResult = gh pr merge $pr -R "$owner/$repo" --merge 2>&1
+    foreach ($pr in $prs) {
+        $num = $pr.number
+        $mergeOut = gh pr merge $num -R "$owner/$repo" --merge --admin 2>&1
         if ($LASTEXITCODE -eq 0) {
-            $totalMerged++
+            $merged++
+            Write-Host "  Merged PR #$num"
         } else {
-            $totalSkipped++
-            $reason = "$mergeResult" -replace "`n"," "
-            $skippedDetails += "$owner/$repo#$pr : $reason"
-            Write-Host "Skipped PR #$pr : $reason"
+            $skipped++
+            $notes += "#$num"
+            Write-Host "  Skipped PR #$num : $mergeOut"
         }
     }
     
-    Write-Host "Repo $repo done. Merged total: $totalMerged, Skipped total: $totalSkipped"
-    Set-Content "C:\Users\onlin\.openclaw\workspace\status.md" "# Status`nProcessing: $repo done`nProtection removed: $protectionRemoved`nMerged so far: $totalMerged`nSkipped so far: $totalSkipped"
+    $skipNote = if ($notes.Count -gt 0) { " (skipped: $($notes -join ', '))" } else { "" }
+    $results += [PSCustomObject]@{Repo=$repo; Total=$total; Merged=$merged; Skipped=$skipped; Notes=$skipNote}
+    Write-Host "Done: $repo - $merged merged, $skipped skipped / $total total"
+    
+    # Update status
+    $status = "# Bulk Merge Progress`n`nLast updated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n`n| Repo | Total | Merged | Skipped | Notes |`n|------|-------|--------|---------|-------|`n"
+    foreach ($r in $results) {
+        $status += "| $($r.Repo) | $($r.Total) | $($r.Merged) | $($r.Skipped) | $($r.Notes) |`n"
+    }
+    $remaining = $repos.Count - $results.Count
+    $status += "`nRemaining: $remaining repos`n"
+    Set-Content -Path $statusPath -Value $status -Encoding UTF8
 }
 
-# Write final status
-$summary = @"
-# Bulk Repo Operations - Complete
-Date: 2026-03-27
+# Final summary
+$totalAll = ($results | Measure-Object -Property Total -Sum).Sum
+$mergedAll = ($results | Measure-Object -Property Merged -Sum).Sum
+$skippedAll = ($results | Measure-Object -Property Skipped -Sum).Sum
 
-## Results
-- Repos with branch protection removed: $protectionRemoved
-- PRs merged: $totalMerged
-- PRs skipped: $totalSkipped
-
-## Skipped PRs
-$($skippedDetails | ForEach-Object { "- $_" } | Out-String)
-
-## Errors
-$($errors | ForEach-Object { "- $_" } | Out-String)
-"@
-
-Set-Content "C:\Users\onlin\.openclaw\workspace\status.md" $summary
+$final = "# Bulk Merge Complete`n`nFinished: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')`n`n**Totals: $mergedAll merged, $skippedAll skipped out of $totalAll PRs across $($repos.Count) repos**`n`n| Repo | Total | Merged | Skipped | Notes |`n|------|-------|--------|---------|-------|`n"
+foreach ($r in $results) {
+    $final += "| $($r.Repo) | $($r.Total) | $($r.Merged) | $($r.Skipped) | $($r.Notes) |`n"
+}
+Set-Content -Path $statusPath -Value $final -Encoding UTF8
 
 # Append to runs.md
-$runsEntry = @"
-
-## 2026-03-27 - Bulk Branch Protection + PR Merge
-- Branch protection removed: $protectionRemoved repos
-- PRs merged: $totalMerged
-- PRs skipped: $totalSkipped
-$(if ($skippedDetails.Count -gt 0) { "- Skip reasons:`n" + ($skippedDetails | ForEach-Object { "  - $_" } | Out-String) })
-"@
-
-if (Test-Path "C:\Users\onlin\.openclaw\workspace\runs.md") {
-    $existing = Get-Content "C:\Users\onlin\.openclaw\workspace\runs.md" -Raw
-    Set-Content "C:\Users\onlin\.openclaw\workspace\runs.md" ($runsEntry + "`n" + $existing)
+$runsPath = "C:\Users\onlin\.openclaw\workspace\runs.md"
+$runEntry = "`n## 2026-03-29 - Bulk PR Merge`n`n$mergedAll merged, $skippedAll skipped across $($repos.Count) repos ($totalAll total PRs)`n`n| Repo | Total | Merged | Skipped |`n|------|-------|--------|---------|`n"
+foreach ($r in $results) {
+    $runEntry += "| $($r.Repo) | $($r.Total) | $($r.Merged) | $($r.Skipped) |`n"
+}
+if (Test-Path $runsPath) {
+    $existing = Get-Content $runsPath -Raw
+    Set-Content -Path $runsPath -Value ($existing + $runEntry) -Encoding UTF8
 } else {
-    Set-Content "C:\Users\onlin\.openclaw\workspace\runs.md" ("# Runs`n" + $runsEntry)
+    Set-Content -Path $runsPath -Value ("# Runs`n" + $runEntry) -Encoding UTF8
 }
 
-Write-Host "DONE. Merged: $totalMerged, Skipped: $totalSkipped, Protection removed: $protectionRemoved"
+Write-Host "`n=== ALL DONE === $mergedAll merged, $skippedAll skipped, $totalAll total ==="
