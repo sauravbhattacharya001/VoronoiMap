@@ -95,6 +95,21 @@ class TestKDEAtPoint:
         d = vormap_kde.kde_at_point(100, 100, CLUSTER_POINTS, 50.0)
         assert d > 0
 
+    def test_binned_matches_unbinned(self):
+        """Spatial-binned kde_at_point should return the same density."""
+        bw = 30.0
+        bins = vormap_kde.make_kde_bins(CLUSTER_POINTS, bw)
+        for qx, qy in [(100, 100), (400, 400), (300, 300), (0, 0)]:
+            d_plain = vormap_kde.kde_at_point(qx, qy, CLUSTER_POINTS, bw)
+            d_binned = vormap_kde.kde_at_point(qx, qy, CLUSTER_POINTS, bw, _bins=bins)
+            assert abs(d_plain - d_binned) < 1e-12, (
+                f"Mismatch at ({qx},{qy}): {d_plain} vs {d_binned}"
+            )
+
+    def test_make_kde_bins_empty_raises(self):
+        with pytest.raises(ValueError):
+            vormap_kde.make_kde_bins([], 1.0)
+
 
 # -- KDE grid -----------------------------------------------------------
 
