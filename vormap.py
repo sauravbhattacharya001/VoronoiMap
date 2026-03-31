@@ -2841,6 +2841,15 @@ def _build_parser():
         help='Print the dataset summary as JSON (implies --summary).',
     )
 
+    # ── Interactive playground ───────────────────────────────────────
+    parser.add_argument(
+        '--playground',
+        metavar='FILE',
+        help='Generate a standalone interactive HTML Voronoi playground. '
+             'Click to place points, right-click to remove, scroll to zoom. '
+             'If a datafile is provided, points are pre-loaded.',
+    )
+
     return parser
 
 
@@ -3082,6 +3091,12 @@ def main():
     # Dataset summary
     if args.summary or args.summary_json:
         _cmd_summary(args, data)
+
+    # Interactive playground
+    if args.playground:
+        import vormap_playground
+        out = vormap_playground.generate_playground(args.playground, data)
+        print('Playground written to %s' % out)
 
 
 if __name__ == '__main__':
