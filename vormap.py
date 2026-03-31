@@ -117,9 +117,23 @@ def compute_bounds(points, padding=0.1):
     """
     if not points:
         raise ValueError("Cannot compute bounds from an empty point list.")
-    lngs, lats = zip(*points)
-    w, e = min(lngs), max(lngs)
-    s, n = min(lats), max(lats)
+    # Single-pass min/max avoids zip(*points) which materialises two
+    # full tuples — a significant allocation for large point sets
+    # (up to MAX_POINT_COUNT = 10M).  This halves peak memory and
+    # replaces 4 passes (2×min + 2×max) with 1.
+    it = iter(points)
+    first = next(it)
+    w = e = first[0]
+    s = n = first[1]
+    for lng, lat in it:
+        if lng < w:
+            w = lng
+        elif lng > e:
+            e = lng
+        if lat < s:
+            s = lat
+        elif lat > n:
+            n = lat
     pad_x = max((e - w) * padding, 1.0)  # at least 1 unit padding
     pad_y = max((n - s) * padding, 1.0)
     return s - pad_y, n + pad_y, w - pad_x, e + pad_x
@@ -1437,7 +1451,10 @@ def get_sum(FILENAME, N1, _depth=0):
                 data_arr = np.asarray(data)
                 use_second = dists[:, 0] == 0
                 chosen_idx = np.where(use_second, idxs[:, 1], idxs[:, 0])
-                nn_coords = [tuple(row) for row in data_arr[chosen_idx]]
+                # Keep as a numpy array — avoids creating N1 Python tuples.
+                # Indexing nn_coords[i] returns a numpy row that unpacks
+                # into (dlng, dlat) just as efficiently.
+                nn_coords = data_arr[chosen_idx]
                 Oracle.calls += N1
             else:
                 nn_coords = None  # fall back to per-point loop
@@ -1446,7 +1463,8 @@ def get_sum(FILENAME, N1, _depth=0):
 
         for i in range(N1):
             if nn_coords is not None:
-                dlng, dlat = nn_coords[i]
+                row = nn_coords[i]
+                dlng, dlat = float(row[0]), float(row[1])
             else:
                 plng = random.uniform(IND_W, IND_E)
                 plat = random.uniform(IND_S, IND_N)
