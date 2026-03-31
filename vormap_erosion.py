@@ -61,6 +61,7 @@ import os
 import sys
 
 import vormap
+from vormap_geometry import SVGCoordinateTransform
 
 # ---------------------------------------------------------------------------
 # Erosion models
@@ -281,19 +282,12 @@ def export_erosion_svg(
     seeds = list(frames[0].keys())
     max_elev = max(max(f.values()) for f in frames) or 1.0
 
-    # Compute bounding box from data
-    xs = [p[0] for p in data]
-    ys = [p[1] for p in data]
-    min_x, max_x = min(xs), max(xs)
-    min_y, max_y = min(ys), max(ys)
-    x_range = max_x - min_x or 1
-    y_range = max_y - min_y or 1
-
-    def tx(x):
-        return 10 + (x - min_x) / x_range * (width - 20)
-
-    def ty(y):
-        return 10 + (max_y - y) / y_range * (height - 20)
+    # Use centralised coordinate transform (stretch mode to fill canvas)
+    transform = SVGCoordinateTransform.from_points(
+        data, width, height, margin=10, mode="stretch",
+    )
+    tx = transform.tx
+    ty = transform.ty
 
     total_dur = len(frames) * duration
 
