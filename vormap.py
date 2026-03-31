@@ -257,22 +257,27 @@ class _DataCacheView(dict):
     """Dict-like view over _file_cache that exposes filename → points."""
 
     def __contains__(self, key):
+        """Return True if *key* (filename) is present in the cache."""
         return key in _file_cache
 
     def __getitem__(self, key):
+        """Return the point list for *key*, raising KeyError if absent."""
         return _file_cache[key]['points']
 
     def get(self, key, default=None):
+        """Return points for *key*, or *default* if not cached."""
         entry = _file_cache.get(key)
         return entry['points'] if entry else default
 
     def pop(self, key, *args):
+        """Remove *key* from the cache and return its point list."""
         entry = _file_cache.pop(key, *args)
         if isinstance(entry, dict):
             return entry['points']
         return entry
 
     def clear(self):
+        """Flush the entire file cache and KD-tree-by-id index."""
         _file_cache.clear()
         _tree_by_data_id.clear()
 
@@ -281,16 +286,20 @@ class _KDTreeCacheView(dict):
     """Dict-like view over _file_cache that exposes filename → KDTree."""
 
     def __contains__(self, key):
+        """Return True if a KDTree is cached for *key*."""
         return key in _file_cache and _file_cache[key].get('tree') is not None
 
     def __getitem__(self, key):
+        """Return the KDTree for *key*, raising KeyError if absent."""
         return _file_cache[key]['tree']
 
     def get(self, key, default=None):
+        """Return the KDTree for *key*, or *default* if not cached."""
         entry = _file_cache.get(key)
         return entry['tree'] if entry else default
 
     def pop(self, key, *args):
+        """Remove and return the KDTree for *key*, keeping other cache data."""
         entry = _file_cache.get(key)
         if entry is not None:
             tree = entry.get('tree')
@@ -301,6 +310,7 @@ class _KDTreeCacheView(dict):
         raise KeyError(key)
 
     def clear(self):
+        """Nullify all cached KDTrees without removing other cache entries."""
         for entry in _file_cache.values():
             entry['tree'] = None
 
@@ -313,18 +323,21 @@ class _KDTreeByIdView(dict):
     """
 
     def __contains__(self, obj_id):
+        """Return True if any cached entry's point-list id matches *obj_id*."""
         for entry in _file_cache.values():
             if id(entry['points']) == obj_id and entry.get('tree') is not None:
                 return True
         return False
 
     def get(self, obj_id, default=None):
+        """Return the KDTree whose point-list id matches *obj_id*."""
         for entry in _file_cache.values():
             if id(entry['points']) == obj_id:
                 return entry.get('tree', default)
         return default
 
     def pop(self, obj_id, *args):
+        """Remove and return the KDTree whose point-list id matches *obj_id*."""
         for entry in _file_cache.values():
             if id(entry['points']) == obj_id:
                 tree = entry.get('tree')
