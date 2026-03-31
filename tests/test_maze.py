@@ -27,7 +27,7 @@ def _make_regions(n=50, seed=42):
 
 def test_adjacency_extraction():
     regions, _ = _make_regions()
-    adj = vormap_maze._extract_adjacency(regions)
+    adj, edge_geometry, boundary_edges = vormap_maze._extract_adjacency(regions)
     assert len(adj) == len(regions)
     for cell, neighbours in adj.items():
         for n in neighbours:

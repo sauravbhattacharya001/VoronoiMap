@@ -65,34 +65,54 @@ def _extract_adjacency(regions_list, tol=0.5):
     -------
     adj : dict[int, set[int]]
         Adjacency mapping: cell index → set of neighbour indices.
+    edge_geometry : dict[frozenset[int, int], list[tuple]]
+        Maps each adjacent cell pair to its shared edge segments
+        (original vertex coordinates for SVG rendering).
+    boundary_edges : list[tuple[tuple, tuple]]
+        Polygon edges that belong to only one cell (boundary).
     """
     # Round vertices to tolerance grid for matching
     def _round(pt):
         return (round(pt[0] / tol) * tol, round(pt[1] / tol) * tol)
 
+    # Map rounded edges → cells AND collect original vertex coords
     edge_to_cells = {}
+    edge_to_coords = {}
     for idx, poly in enumerate(regions_list):
         n = len(poly)
         for i in range(n):
-            p1 = _round(poly[i])
-            p2 = _round(poly[(i + 1) % n])
+            p1_orig = poly[i]
+            p2_orig = poly[(i + 1) % n]
+            p1 = _round(p1_orig)
+            p2 = _round(p2_orig)
             edge = tuple(sorted([p1, p2]))
             edge_to_cells.setdefault(edge, set()).add(idx)
+            # Keep original coords (first occurrence wins)
+            if edge not in edge_to_coords:
+                edge_to_coords[edge] = (p1_orig, p2_orig)
 
     adj = {}
-    for cells in edge_to_cells.values():
+    edge_geometry = {}
+    boundary_edges = []
+
+    for edge, cells in edge_to_cells.items():
         cells = list(cells)
+        coords = edge_to_coords[edge]
         if len(cells) == 2:
             a, b = cells[0], cells[1]
             if a != b:
                 adj.setdefault(a, set()).add(b)
                 adj.setdefault(b, set()).add(a)
+                pair = frozenset((a, b))
+                edge_geometry.setdefault(pair, []).append(coords)
+        elif len(cells) == 1:
+            boundary_edges.append(coords)
 
     # Ensure every cell appears even if isolated
     for idx in range(len(regions_list)):
         adj.setdefault(idx, set())
 
-    return adj
+    return adj, edge_geometry, boundary_edges
 
 
 def _centroid(poly):
@@ -217,7 +237,7 @@ def build_maze_graph(regions, algorithm="dfs", start=0, seed=None):
         ``'walls'``: set of frozenset pairs (edges not in passages),
         ``'cell_count'``: int.
     """
-    adj = _extract_adjacency(regions)
+    adj, edge_geometry, boundary_edges = _extract_adjacency(regions)
     rng = random.Random(seed)
     n_cells = len(regions)
 
@@ -242,6 +262,8 @@ def build_maze_graph(regions, algorithm="dfs", start=0, seed=None):
         "passages": passages,
         "walls": walls,
         "cell_count": n_cells,
+        "edge_geometry": edge_geometry,
+        "boundary_edges": boundary_edges,
     }
 
 
@@ -276,18 +298,27 @@ def solve_maze(maze, start, goal):
     if start not in pass_adj:
         return None
 
-    visited = {start}
-    queue = deque([(start, [start])])
+    # Use parent-pointer backtracking instead of copying the full path
+    # at every BFS step.  The naive ``path + [n]`` approach allocates
+    # O(depth) lists at each of O(V) nodes, giving O(V·D) memory and
+    # time overhead.  Parent pointers reduce this to O(V).
+    parent = {start: None}
+    queue = deque([start])
     while queue:
-        current, path = queue.popleft()
+        current = queue.popleft()
         if current == goal:
+            # Reconstruct path from parent pointers
+            path = []
+            node = goal
+            while node is not None:
+                path.append(node)
+                node = parent[node]
+            path.reverse()
             return path
         for n in pass_adj.get(current, []):
-            if n not in visited:
-                visited.add(n)
-                queue.append((n, path + [n]))
-
-    return None
+            if n not in parent:
+                parent[n] = current
+                queue.append(n)
 
 
 # ── SVG export ───────────────────────────────────────────────────────
@@ -353,37 +384,26 @@ def export_maze_svg(regions, maze, solution=None, width=800, height=800,
             fill = cell_fill
         lines.append(f'<polygon points="{pts_str}" fill="{fill}" stroke="none"/>')
 
-    # Draw walls (edges NOT in passages)
-    edge_midpoints = {}
-    for idx, poly in enumerate(regions):
-        n = len(poly)
-        for i in range(n):
-            p1 = poly[i]
-            p2 = poly[(i + 1) % n]
-            edge_key = tuple(sorted([p1, p2]))
-            edge_midpoints.setdefault(edge_key, []).append(idx)
+    # Draw walls using pre-computed edge geometry (avoids O(V·E)
+    # re-scan of polygon vertices that duplicated _extract_adjacency work)
+    edge_geometry = maze.get("edge_geometry", {})
+    boundary_edges = maze.get("boundary_edges", [])
 
-    for edge_key, cells in edge_midpoints.items():
-        if len(cells) == 2:
-            a, b = cells[0], cells[1]
-            pair = frozenset((a, b))
-            if pair in maze["walls"]:
-                p1, p2 = edge_key
-                lines.append(
-                    f'<line x1="{tx(p1[0]):.1f}" y1="{ty(p1[1]):.1f}" '
-                    f'x2="{tx(p2[0]):.1f}" y2="{ty(p2[1]):.1f}" '
-                    f'stroke="{wall_color}" stroke-width="{stroke_width}" stroke-linecap="round"/>'
-                )
-
-    # Draw boundary edges (edges with only one cell)
-    for edge_key, cells in edge_midpoints.items():
-        if len(cells) == 1:
-            p1, p2 = edge_key
+    for pair in maze["walls"]:
+        for p1, p2 in edge_geometry.get(pair, []):
             lines.append(
                 f'<line x1="{tx(p1[0]):.1f}" y1="{ty(p1[1]):.1f}" '
                 f'x2="{tx(p2[0]):.1f}" y2="{ty(p2[1]):.1f}" '
                 f'stroke="{wall_color}" stroke-width="{stroke_width}" stroke-linecap="round"/>'
             )
+
+    # Draw boundary edges (edges with only one cell)
+    for p1, p2 in boundary_edges:
+        lines.append(
+            f'<line x1="{tx(p1[0]):.1f}" y1="{ty(p1[1]):.1f}" '
+            f'x2="{tx(p2[0]):.1f}" y2="{ty(p2[1]):.1f}" '
+            f'stroke="{wall_color}" stroke-width="{stroke_width}" stroke-linecap="round"/>'
+        )
 
     # Draw solution path as line through centroids
     if solution and len(solution) > 1:
