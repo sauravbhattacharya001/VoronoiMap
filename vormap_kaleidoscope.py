@@ -69,9 +69,6 @@ DEFAULT_PALETTE = "jewel"
 
 # ── Geometry helpers ─────────────────────────────────────────────────────
 
-def _distance(ax, ay, bx, by):
-    return math.hypot(bx - ax, by - ay)
-
 
 def _generate_wedge_seeds(n_seeds, wedge_angle, radius, rng):
     """Generate random points inside a triangular wedge [0, wedge_angle] from origin."""

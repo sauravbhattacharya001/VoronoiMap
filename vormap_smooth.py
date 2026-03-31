@@ -38,6 +38,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 import vormap
+from vormap_utils import euclidean as _compute_distance
 
 # Try importing graph extraction
 try:
@@ -167,10 +168,6 @@ class SmoothResult:
             for k in self.original if k in self.smoothed
         }
 
-
-def _compute_distance(p1, p2):
-    """Euclidean distance between two points."""
-    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
 
 def _smooth_mean(vals, dists, config):

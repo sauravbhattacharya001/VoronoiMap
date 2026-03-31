@@ -158,10 +158,6 @@ class CoverageResult:
 # Core helpers
 # ---------------------------------------------------------------------------
 
-def _euclidean(x1, y1, x2, y2):
-    """Euclidean distance between two points."""
-    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-
 
 def _flood_fill(grid, rows, cols, r, c, visited):
     """Flood-fill connected uncovered cells.  Returns list of (r, c)."""
