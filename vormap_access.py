@@ -62,6 +62,7 @@ import json
 import math
 import os
 from dataclasses import dataclass, field
+from vormap_utils import euclidean_xy as _euclidean
 from typing import List, Optional, Tuple
 
 import vormap

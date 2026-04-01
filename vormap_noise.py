@@ -37,6 +37,7 @@ import argparse
 import math
 import os
 import random
+from vormap_utils import euclidean_xy as _euclidean
 import struct
 import sys
 from vormap_utils import euclidean_coords as _euclidean

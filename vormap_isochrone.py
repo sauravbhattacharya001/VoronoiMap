@@ -51,6 +51,7 @@ import json
 import math
 import sys
 import xml.etree.ElementTree as ET
+from vormap_utils import euclidean_xy as _euclidean
 
 import vormap
 from vormap_utils import euclidean_coords as _euclidean

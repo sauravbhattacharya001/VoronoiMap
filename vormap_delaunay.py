@@ -52,6 +52,7 @@ All functions are pure and depend only on the Python standard library
 import json
 import math
 import os
+from vormap_utils import euclidean as _edge_length
 import statistics
 
 from vormap_utils import euclidean as _edge_length

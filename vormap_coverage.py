@@ -47,6 +47,7 @@ import json
 import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
+from vormap_utils import euclidean_xy as _euclidean
 
 from vormap import IND_S, IND_N, IND_W, IND_E, validate_output_path
 from vormap_utils import euclidean_coords as _euclidean
