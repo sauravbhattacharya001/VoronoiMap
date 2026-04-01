@@ -54,6 +54,12 @@ from vormap_geometry import (
     edge_length as _distance,
 )
 
+try:
+    from scipy.spatial import cKDTree as _KDTree
+    _HAS_KDTREE = True
+except ImportError:
+    _HAS_KDTREE = False
+
 
 # ── Spatial weights ─────────────────────────────────────────────────
 
@@ -138,6 +144,9 @@ def build_queen_weights(regions, stats):
 def build_distance_weights(stats, threshold=None):
     """Build distance-band weight matrix.
 
+    Uses scipy cKDTree when available for O(n log n) neighbour queries
+    instead of the O(n²) pairwise distance computation.
+
     Parameters
     ----------
     stats : list of dict
@@ -154,17 +163,34 @@ def build_distance_weights(stats, threshold=None):
     centroids = _centroids_from_stats(stats)
     n = len(centroids)
 
-    # Pre-compute the upper triangle of the distance matrix once.
-    # This avoids computing each pair distance twice (once for threshold
-    # estimation, once for weight construction).
+    if _HAS_KDTREE and n >= 4:
+        import numpy as np
+        pts = np.array(centroids, dtype=float)
+        tree = _KDTree(pts)
+
+        if threshold is None:
+            # O(n log n) nearest-neighbor query for threshold estimation
+            dists, _ = tree.query(pts, k=2)  # k=2: self + nearest
+            nn_dists = dists[:, 1].tolist()
+            threshold = _mean(nn_dists) * 1.5 if nn_dists else 1.0
+
+        # query_ball_tree returns all pairs within threshold — O(n·k)
+        # where k is the average number of neighbours per point.
+        weights = {i: set() for i in range(n)}
+        neighbours = tree.query_ball_tree(tree, threshold)
+        for i in range(n):
+            for j in neighbours[i]:
+                if j != i:
+                    weights[i].add(j)
+        return weights
+
+    # Fallback: O(n²) pairwise distances
     pair_dists = {}  # (i, j) -> distance, i < j
     for i in range(n):
         for j in range(i + 1, n):
             pair_dists[(i, j)] = _distance(centroids[i], centroids[j])
 
     if threshold is None:
-        # Compute mean nearest-neighbor distance using pre-computed pairs.
-        # For each point find its nearest neighbor in O(n) per point.
         nn_dists = []
         for i in range(n):
             min_d = float("inf")
@@ -179,7 +205,6 @@ def build_distance_weights(stats, threshold=None):
                 nn_dists.append(min_d)
         threshold = _mean(nn_dists) * 1.5 if nn_dists else 1.0
 
-    # Build weight matrix using pre-computed distances — no redundant calls
     weights = {i: set() for i in range(n)}
     for (i, j), d in pair_dists.items():
         if d <= threshold:
@@ -191,10 +216,8 @@ def build_distance_weights(stats, threshold=None):
 def build_knn_weights(stats, k=4):
     """Build k-nearest-neighbor weight matrix.
 
-    Pre-computes the upper-triangle distance matrix in a single O(n²)
-    pass, then selects k nearest neighbors per point using a bounded
-    max-heap (O(n² log k) total, down from O(n² · distance-call)
-    overhead of recomputing distances per point).
+    Uses scipy cKDTree when available for O(n log n) kNN queries
+    instead of the O(n² log k) brute-force approach.
 
     Parameters
     ----------
@@ -212,8 +235,22 @@ def build_knn_weights(stats, k=4):
     n = len(centroids)
     k = min(k, n - 1)
 
-    # Pre-compute upper-triangle distance matrix once — O(n²) distance
-    # calls instead of O(n²) per point.
+    weights = {i: set() for i in range(n)}
+
+    if _HAS_KDTREE and n >= 4:
+        import numpy as np
+        pts = np.array(centroids, dtype=float)
+        tree = _KDTree(pts)
+        # k+1 because first result is self (distance=0)
+        _, indices = tree.query(pts, k=k + 1)
+        for i in range(n):
+            for j in indices[i, 1:k + 1]:
+                j = int(j)
+                weights[i].add(j)
+                weights[j].add(i)
+        return weights
+
+    # Fallback: O(n²) pairwise + heap selection
     pair_dists = {}
     for i in range(n):
         xi, yi = centroids[i]
@@ -221,7 +258,6 @@ def build_knn_weights(stats, k=4):
             xj, yj = centroids[j]
             pair_dists[(i, j)] = math.sqrt((xi - xj) ** 2 + (yi - yj) ** 2)
 
-    weights = {i: set() for i in range(n)}
     for i in range(n):
         # Max-heap of size k: store (-dist, j) so largest dist is popped first
         heap = []
