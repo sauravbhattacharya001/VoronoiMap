@@ -250,8 +250,17 @@ def kde_at_point(
     qx: float, qy: float,
     points: list[tuple[float, float]],
     bandwidth: float,
+    _bins: _SpatialBins | None = None,
 ) -> float:
-    """Compute KDE density estimate at a single query point."""
+    """Compute KDE density estimate at a single query point.
+
+    When *_bins* is provided (a ``_SpatialBins`` instance built from the
+    same *points* and a cutoff of ``4 * bandwidth``), only nearby points
+    are considered, reducing complexity from O(n) to O(k) where k is the
+    number of points within the bandwidth cutoff.  Callers that evaluate
+    many query points against the same dataset should pre-build the bins
+    once and pass them here for a significant speed-up.
+    """
     n = len(points)
     if n == 0:
         return 0.0
@@ -263,7 +272,8 @@ def kde_at_point(
     coeff = 1.0 / (2.0 * math.pi * h_sq)
 
     total = 0.0
-    for px, py in points:
+    source = _bins.neighbours(qx, qy) if _bins is not None else points
+    for px, py in source:
         dx = qx - px
         dy = qy - py
         d_sq = dx * dx + dy * dy
@@ -271,6 +281,47 @@ def kde_at_point(
             total += _exp(d_sq * neg_half_inv_h_sq)
 
     return total * coeff / n
+
+
+def make_kde_bins(
+    points: list[tuple[float, float]],
+    bandwidth: float,
+    bounds: tuple[float, float, float, float] | None = None,
+    padding: float = 0.1,
+) -> _SpatialBins:
+    """Pre-build spatial bins for repeated ``kde_at_point`` calls.
+
+    Returns a ``_SpatialBins`` instance that can be passed as the
+    *_bins* parameter to ``kde_at_point`` to avoid the O(n) scan on
+    every query.
+
+    Args:
+        points: Source point locations.
+        bandwidth: KDE bandwidth.
+        bounds: Optional (x_min, y_min, x_max, y_max); auto-computed
+            with *padding* if not given.
+        padding: Fraction of range to add when auto-computing bounds.
+
+    Returns:
+        A _SpatialBins object ready for neighbour queries.
+    """
+    if not points:
+        raise ValueError("No points provided")
+    cutoff = 4.0 * bandwidth
+    if bounds is not None:
+        x_min, y_min, x_max, y_max = bounds
+    else:
+        xs = [p[0] for p in points]
+        ys = [p[1] for p in points]
+        x_min, x_max = min(xs), max(xs)
+        y_min, y_max = min(ys), max(ys)
+        dx = max((x_max - x_min) * padding, cutoff)
+        dy = max((y_max - y_min) * padding, cutoff)
+        x_min -= dx
+        x_max += dx
+        y_min -= dy
+        y_max += dy
+    return _SpatialBins(points, cutoff, x_min, y_min, x_max, y_max)
 
 
 def kde_grid(
