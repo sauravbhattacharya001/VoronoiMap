@@ -39,6 +39,7 @@ import os
 import random
 import struct
 import sys
+from vormap_utils import euclidean_coords as _euclidean
 
 try:
     import vormap as _vormap
@@ -100,9 +101,6 @@ def _tile_seeds(seeds, width, height):
 # ---------------------------------------------------------------------------
 # Distance helpers
 # ---------------------------------------------------------------------------
-
-def _euclidean(px, py, sx, sy):
-    return math.sqrt((px - sx) ** 2 + (py - sy) ** 2)
 
 
 def _manhattan(px, py, sx, sy):

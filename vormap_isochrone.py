@@ -53,6 +53,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 import vormap
+from vormap_utils import euclidean_coords as _euclidean
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -71,9 +72,6 @@ _BAND_COLORS = [
     "#1a9850",
 ]
 
-
-def _euclidean(ax, ay, bx, by):
-    return math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
 
 
 # ---------------------------------------------------------------------------

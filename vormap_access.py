@@ -65,6 +65,7 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
 import vormap
+from vormap_utils import euclidean_coords as _euclidean
 
 
 # ── Data Structures ──────────────────────────────────────────────────
@@ -122,12 +123,6 @@ class AccessReport:
 
 # ── Distance & Decay ─────────────────────────────────────────────────
 
-
-def _euclidean(x1: float, y1: float, x2: float, y2: float) -> float:
-    """Euclidean distance between two points."""
-    dx = x2 - x1
-    dy = y2 - y1
-    return math.sqrt(dx * dx + dy * dy)
 
 
 def _gaussian_decay(distance: float, bandwidth: float) -> float:
