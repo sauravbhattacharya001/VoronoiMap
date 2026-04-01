@@ -171,24 +171,48 @@ def heat_diffusion(
         median_degree = degrees[len(degrees) // 2] if degrees else 0
         boundary_cells = {s for s in seeds if len(adjacency.get(s, [])) < median_degree}
 
-    values = dict(initial_values)
-    frames = [DiffusionFrame(step=0, values=dict(values))]
+    # --- Performance optimisation: convert to array-indexed computation ---
+    # Pre-build index mappings so the inner loop uses list indexing
+    # instead of dict lookups and repeated tuple() conversions.
+    n = len(seeds)
+    seed_to_idx = {s: i for i, s in enumerate(seeds)}
+
+    # Build adjacency as list-of-lists of integer indices
+    adj_indices: List[List[int]] = []
+    for s in seeds:
+        raw_neighbors = adjacency.get(s, [])
+        idx_list = []
+        for nb in raw_neighbors:
+            key = tuple(nb) if not isinstance(nb, tuple) else nb
+            if key in seed_to_idx:
+                idx_list.append(seed_to_idx[key])
+        adj_indices.append(idx_list)
+
+    # Pre-compute boundary mask as a set of integer indices
+    boundary_idx = {seed_to_idx[s] for s in boundary_cells}
+
+    # Initial value arrays
+    vals = [initial_values[s] for s in seeds]
+    init_vals_arr = list(vals)  # copy for fixed-boundary resets
+
+    frames = [DiffusionFrame(step=0, values={s: vals[i] for i, s in enumerate(seeds)})]
 
     for t in range(1, steps + 1):
-        new_values = {}
-        for seed in seeds:
-            if seed in boundary_cells:
-                new_values[seed] = initial_values[seed]
+        new_vals = [0.0] * n
+        for i in range(n):
+            if i in boundary_idx:
+                new_vals[i] = init_vals_arr[i]
                 continue
-            neighbors = adjacency.get(seed, [])
-            v = values[seed]
-            delta = sum(values.get(tuple(n), v) - v for n in neighbors)
-            new_values[seed] = v + alpha * delta
-        values = new_values
-        frames.append(DiffusionFrame(step=t, values=dict(values)))
+            v = vals[i]
+            delta = 0.0
+            for j in adj_indices[i]:
+                delta += vals[j] - v
+            new_vals[i] = v + alpha * delta
+        vals = new_vals
+        frames.append(DiffusionFrame(step=t, values={s: vals[i] for i, s in enumerate(seeds)}))
 
     # Summary stats
-    final_vals = list(values.values())
+    final_vals = list(vals)
     init_vals = list(initial_values.values())
     summary = {
         "total_steps": steps,
@@ -276,29 +300,46 @@ def sir_simulation(
     peak_infected = sum(1 for v in states.values() if v == "I")
     peak_step = 0
 
+    # Pre-build array-indexed adjacency for inner loop performance
+    n = len(seeds)
+    seed_to_idx = {s: i for i, s in enumerate(seeds)}
+    adj_indices: List[List[int]] = []
+    for s in seeds:
+        raw_neighbors = adjacency.get(s, [])
+        idx_list = []
+        for nb in raw_neighbors:
+            key = tuple(nb) if not isinstance(nb, tuple) else nb
+            if key in seed_to_idx:
+                idx_list.append(seed_to_idx[key])
+        adj_indices.append(idx_list)
+
+    # Use integer-coded states for fast comparison: 0=S, 1=I, 2=R
+    STATE_S, STATE_I, STATE_R = 0, 1, 2
+    state_map = {"S": STATE_S, "I": STATE_I, "R": STATE_R}
+    reverse_map = {STATE_S: "S", STATE_I: "I", STATE_R: "R"}
+    state_arr = [state_map[states[s]] for s in seeds]
+
     for t in range(1, steps + 1):
-        new_states = dict(states)
-        for s in seeds:
-            if states[s] == "S":
-                # Count infected neighbours
+        new_arr = list(state_arr)
+        for i in range(n):
+            if state_arr[i] == STATE_S:
                 infected_neighbors = sum(
-                    1 for n in adjacency.get(s, [])
-                    if states.get(tuple(n), "S") == "I"
+                    1 for j in adj_indices[i] if state_arr[j] == STATE_I
                 )
                 if infected_neighbors > 0:
-                    # Probability of NOT getting infected from any neighbour
                     prob_safe = (1 - beta) ** infected_neighbors
                     if rng.random() > prob_safe:
-                        new_states[s] = "I"
-            elif states[s] == "I":
+                        new_arr[i] = STATE_I
+            elif state_arr[i] == STATE_I:
                 if rng.random() < gamma:
-                    new_states[s] = "R"
+                    new_arr[i] = STATE_R
             # R stays R
 
-        states = new_states
-        frames.append(DiffusionFrame(step=t, values=dict(states)))
+        state_arr = new_arr
+        states_dict = {seeds[i]: reverse_map[state_arr[i]] for i in range(n)}
+        frames.append(DiffusionFrame(step=t, values=states_dict))
 
-        current_infected = sum(1 for v in states.values() if v == "I")
+        current_infected = sum(1 for v in state_arr if v == STATE_I)
         if current_infected > peak_infected:
             peak_infected = current_infected
             peak_step = t
@@ -308,8 +349,8 @@ def sir_simulation(
             break
 
     final_counts = {"S": 0, "I": 0, "R": 0}
-    for v in states.values():
-        final_counts[v] += 1
+    for v in state_arr:
+        final_counts[reverse_map[v]] += 1
 
     summary = {
         "total_steps": len(frames) - 1,
@@ -374,37 +415,48 @@ def threshold_diffusion(
     if initial_adopters is None:
         initial_adopters = [0]
 
-    states = {s: 0 for s in seeds}
-    for idx in initial_adopters:
-        if 0 <= idx < len(seeds):
-            states[seeds[idx]] = 1
+    # Pre-build array-indexed adjacency
+    n_cells = len(seeds)
+    seed_to_idx = {s: i for i, s in enumerate(seeds)}
+    adj_indices: List[List[int]] = []
+    for s in seeds:
+        raw_neighbors = adjacency.get(s, [])
+        idx_list = []
+        for nb in raw_neighbors:
+            key = tuple(nb) if not isinstance(nb, tuple) else nb
+            if key in seed_to_idx:
+                idx_list.append(seed_to_idx[key])
+        adj_indices.append(idx_list)
 
-    frames = [DiffusionFrame(step=0, values=dict(states))]
+    state_arr = [0] * n_cells
+    for idx in initial_adopters:
+        if 0 <= idx < n_cells:
+            state_arr[idx] = 1
+
+    frames = [DiffusionFrame(step=0, values={seeds[i]: state_arr[i] for i in range(n_cells)})]
 
     for t in range(1, steps + 1):
-        new_states = dict(states)
+        new_arr = list(state_arr)
         changed = False
-        for s in seeds:
-            if states[s] == 1:
+        for i in range(n_cells):
+            if state_arr[i] == 1:
                 continue  # Already adopted
-            neighbors = adjacency.get(s, [])
+            neighbors = adj_indices[i]
             if not neighbors:
                 continue
-            adopted_frac = sum(
-                1 for n in neighbors if states.get(tuple(n), 0) == 1
-            ) / len(neighbors)
-            if adopted_frac >= threshold:
-                new_states[s] = 1
+            adopted_count = sum(1 for j in neighbors if state_arr[j] == 1)
+            if adopted_count / len(neighbors) >= threshold:
+                new_arr[i] = 1
                 changed = True
 
-        states = new_states
-        frames.append(DiffusionFrame(step=t, values=dict(states)))
+        state_arr = new_arr
+        frames.append(DiffusionFrame(step=t, values={seeds[i]: state_arr[i] for i in range(n_cells)}))
 
         # Early termination if nothing changed (steady state)
         if not changed:
             break
 
-    total_adopted = sum(1 for v in states.values() if v == 1)
+    total_adopted = sum(state_arr)
     summary = {
         "total_steps": len(frames) - 1,
         "total_adopted": total_adopted,
