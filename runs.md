@@ -1,4 +1,456 @@
+## 2026-03-31
+
+### Gardener Run 2171-2172 (10:51 PM PST)
+- **Task 1:** create_release on **agentlens** — v1.21.0 (Analytics Performance & Lazy Statements): single-pass extract_metrics, anomaly baseline caching, lazy SQL statements in analytics routes
+- **Task 2:** refactor on **BioBots** — Deduplicated `scriptUtils.js` by delegating to canonical `docs/shared/validation.js` and `docs/shared/stats.js`; added `percentile()` to stats.js; 17 consumer modules unchanged, all tests pass
+
+### Run 64 — Feature Builder (10:41 PM PST)
+- **Repo:** BioBots
+- **Feature:** Bioink Material Database — searchable reference of 18 bioprinting materials with filtering, comparison mode, and detailed property views
+- **File:** docs/bioink-database.html + linked from index.html
+- **Commit:** 74e8bf4
+
+### Run 2169-2170 — Repo Gardener (10:21 PM PST)
+- **Task 1:** create_release on **everything** — v7.21.0 (JSON Formatter tool with validation, tree view, and stats)
+- **Task 2:** refactor on **FeedReader** — Deduplicated ReadingDataExporter import methods (importHighlights, importNotes, importCollections), removing ~57 lines of repeated logic across strategy branches
+
+### Run 63 — Feature Builder (10:11 PM PST)
+- **Repo:** everything (Flutter)
+- **Feature:** JSON Formatter & Validator tool
+- **Details:** Added a new developer tool with real-time validation, pretty-print (2/4-space indent), minify with copy, interactive tree view with color-coded types (object/array/string/number/boolean/null), and document stats (keys, values, depth, type counts, compression ratio). Includes clipboard paste and sample JSON loader.
+- **Files:** `lib/core/services/json_formatter_service.dart`, `lib/views/home/json_formatter_screen.dart`, registered in `feature_registry.dart`
+- **Commit:** `e5cbb30` pushed to master
+
+### Run 2167-2168 — Repo Gardener (9:51 PM PST)
+- **Task 1:** bug_fix on **GraphVisual** (Java) — Fixed `degCV` → `degreeCV` field name typo in `GraphNetworkProfiler.classify()`. Three references to non-existent field `degCV` caused a compile error, breaking LATTICE/RANDOM/CORE_PERIPHERY network classification entirely.
+- **Task 2:** security_fix on **agentlens** (Python) — Fixed query parameter injection (CWE-20) in `cli_audit.py` and `cli_leaderboard.py`. Both files built query strings by raw f-string interpolation of user CLI args without URL-encoding. Replaced with `urllib.parse.urlencode()`.
+
+### Run 62 — Feature Builder (9:41 PM PST)
+- **Repo:** VoronoiMap
+- **Feature:** `vormap_gallery.py` — Interactive Voronoi Style Gallery generator
+- **Details:** Generates a self-contained HTML page showcasing 14 Voronoi art styles with live Canvas-rendered previews. Includes seed/size sliders, per-card regenerate & download, comparison mode, responsive grid, dark/light themes.
+- **Commit:** f679b17 → pushed to master
+
+## 2026-03-31
+
+### Run 2165-2166 (9:21 PM PST)
+- **bug_fix** on **sauravcode** (Python): Fixed Content-Length header validation in sauravapi.py — negative values bypassed max_body_size DoS protection, non-numeric values crashed the handler. Also replaced Event-based semaphore release with Lock-guarded pattern to eliminate TOCTOU race condition between execution thread and timeout path.
+- **create_release** on **prompt** (C#): Created v5.0.0 release covering PromptRecipe feature, injection detection hardening, TextAnalysisHelpers refactor, cache allocation reduction, and injection detector test suite.
+
+### Run 61 — Feature Builder (9:11 PM PST)
+- **gif-captcha**: Added "Bot or Human?" interactive quiz (bot-or-human.html) — 15-round game with 15 scenario types (8 bot, 7 human), Canvas mouse trail visualization, scoring/streaks, educational explanations. [ebee8b9](https://github.com/sauravbhattacharya001/gif-captcha/commit/ebee8b9)
+
+### Run 744 — Repo Gardener (8:51 PM PST)
+- **perf_improvement** on **GraphVisual**: Added AABB (axis-aligned bounding box) pre-filtering to `countEdgeCrossings()` in ForceDirectedLayout. Skips expensive segment intersection tests for edge pairs whose bounding boxes don't overlap — significant speedup on typical layouts. [76fa9e1](https://github.com/sauravbhattacharya001/GraphVisual/commit/76fa9e1)
+- **create_release** on **everything**: Created [v7.20.0](https://github.com/sauravbhattacharya001/everything/releases/tag/v7.20.0) — 8 new features (Daily Standup, Tax Calculator, Pace Calculator, SpO2 Tracker, Timezone Converter, Habit Tracker, Sort Visualizer, Text Statistics), encrypted health storage, perf/refactor/CI improvements.
+
+### Run 60 — Feature Builder (8:41 PM PST)
+- **ai**: Contract Configuration Wizard — interactive HTML builder for ReplicationContract with 4-step wizard, live safety scoring, 5 presets, risk badges, 8 stop conditions, compliance hints (EU AI Act/NIST/ISO 42001/OECD), JSON import/export. Commit [a47a9ba](https://github.com/sauravbhattacharya001/ai/commit/a47a9ba)
+
+### Run 2161-2162 — Repo Gardener (8:21 PM PST)
+- **create_release** on **sauravcode**: Created [v5.6.0](https://github.com/sauravbhattacharya001/sauravcode/releases/tag/v5.6.0) — Code Golf challenge mode, turtle graphics canvas, and text-module refactoring (3 commits since v5.5.0)
+- **refactor** on **BioBots**: Eliminated 42 lines of duplicated validation helpers and stats functions in `crosslink.js` — now delegates to shared `utils.js` instead of maintaining inline fallbacks. All 81 tests pass. Commit [2a9fd49](https://github.com/sauravbhattacharya001/BioBots/commit/2a9fd49)
+
+### Run 59 — Feature Builder (8:11 PM PST)
+- **getagentbox**: Added `cli-playground.html` — interactive terminal emulator page where visitors can try AgentBox CLI commands (init, deploy, status, logs, test, scale, metrics, config, env, rollback) with animated simulated output, command history, quick-command chips. Commit [3e6061e](https://github.com/sauravbhattacharya001/getagentbox/commit/3e6061e)
+
+### Run 58 — Feature Builder (7:41 PM PST)
+- **sauravcode**: Added `sauravgolf.py` — code golf challenge mode with 15 puzzles (easy/medium/hard), par scoring, personal best tracking, leaderboard, tips, and export. Commit [24ab441](https://github.com/sauravbhattacharya001/sauravcode/commit/24ab441)
+
+### Run 2159-2160 — Repo Gardener (7:21 PM PST)
+- **perf_improvement** on **VoronoiMap**: Converted all 3 diffusion models (heat, SIR, threshold) from dict-based inner loops to pre-built integer-indexed adjacency lists. Eliminates repeated `tuple(n)` and `dict.get()` per neighbor per step. SIR uses int-coded states instead of string comparisons. PR [#173](https://github.com/sauravbhattacharya001/VoronoiMap/pull/173)
+- **add_tests** on **prompt**: Added 46-test suite for PromptInjectionDetector covering all 10 injection categories, risk scoring, sanitization, custom rules, ScanAll, edge cases. PR [#174](https://github.com/sauravbhattacharya001/prompt/pull/174)
+
+### Run 57 — Feature Builder (7:11 PM PST)
+- **GraphVisual**: Added Euler Path & Circuit Finder (`docs/euler.html`) — interactive tool with Hierholzer's algorithm animation, degree analysis, 6 presets (Königsberg, Triangle, Rectangle+Diagonal, House, Petersen, K₅), directed/undirected support, step-by-step mode, multi-edge rendering
+
+### Run 2157-2158 (6:51 PM PST)
+- **create_release** on **agentlens**: Created v1.20.0 — Dependency Graph Dashboard + CapacityPlanner bisect optimization
+- **security_fix** on **WinSentinel**: Validated paths in UndoQuarantine to prevent arbitrary file write via tampered remediation history. Added quarantine-dir containment check and InputSanitizer.ValidateFilePath() for restore destination.
+## 2026-03-31
+
+### Builder Run 56 (6:41 PM)
+- **getagentbox**: Agent Persona Creator (persona-creator.html) — interactive personality designer with live chat preview, 5 presets, tone/expertise/quirk controls, JSON & Markdown export
+
+### Gardener Run 2155-2156 (6:21 PM)
+- **GraphVisual** (create_release): Released v2.26.0 — bipartite graph checker, Kernighan-Lin & Louvain perf optimizations, CONTRIBUTING.md enhancements
+- **sauravcode** (refactor): Deduplicated comment-stripping logic — `sauravmin._strip_comments` now delegates to `sauravtext.strip_comment`; fixed `sauravtext` to handle single-quoted strings; hoisted regex to module level. All 30 tests pass.
+
+### Builder Run 55 (6:11 PM)
+- **Ocaml-sample-code**: Added `forth.ml` — a complete Forth interpreter with stack ops, arithmetic, word definitions, variables/constants, control flow (if/else/then, begin/until, begin/while/repeat, do/loop), string output, comments, see/decompile, and demos (factorial, FizzBuzz, power). 813 lines.
+
+### Gardener Run 2153-2154 (5:51 PM)
+- **everything**: `create_release` — Released v7.19.0 covering shared widget extraction (StatCard/SectionCard refactor)
+- **agenticchat**: `perf_improvement` — Batched timeline refresh DOM writes with DocumentFragment. Replaced per-element remove+append with single `replaceChildren(fragment)` call, reducing DOM writes from O(2N) to O(1) during timeline refresh cycles.
+
+### Builder Run 54 (5:41 PM)
+- **sauravcode**: Added `sauravcanvas.py` — turtle graphics tool generating SVG/HTML from .srv drawing programs. 15 commands (forward, turn, pen_color, circle, save/restore_pos, etc.), 6 gallery examples (spiral, star, fractal tree, Koch snowflake), HTML viewer with zoom controls. Includes `canvas_demo.srv`.
+
+### Gardener Run 2151-2152 (5:21 PM)
+- **VoronoiMap** `create_release`: Tagged v1.18.0 — automatic label placement module + BFS maze solver optimization
+- **GraphVisual** `refactor`: PR #151 — deduplicated BFS/component logic in GraphStorytellerExporter, delegates to GraphUtils (-52/+8 lines)
+
+### Run 53 — Feature Builder (5:11 PM)
+- **Vidly**: Movie Roulette — interactive spin-the-wheel random movie picker with Canvas animation, genre/rating filters, smooth ease-out spin, result cards. Added controller, service, view model, view, navbar link, and 5 unit tests.
+
+### Run 2149-2150 — Repo Gardener (4:51 PM)
+- **sauravbhattacharya001** (`add_docstrings`): Added JSDoc to 7 undocumented test helper functions across 4 test files (loadApp, fireKey, makeTabEvent, runQuiz).
+- **agenticchat** (`docs_site`): Added documentation for 36 previously undocumented modules to the docs site — ChatGPTImporter, ClipboardHistory, ContextWindowMeter, ConversationAgenda, ConversationExport, ConversationHealthCheck, ConversationMindMap, ConversationSentiment, ConversationShareLink, ConversationTimer, DataBackup, FocusTimer, IncognitoMode, MessageFilter, MessageHighlighter, MessageScheduler, ModelCompare, MoodTracker, NotificationSound, OfflineManager, PinBoard, PromptChainRunner, QuickSwitcher, ReadabilityAnalyzer, ResponseLengthPresets, ScrollLock, SessionArchive, SessionCalendar, SessionNotes, SmartRetry, ToneAdjuster, UsageHeatmap, WordCloud, AutoSaveDraft, PdfExport, MessageReply.
+
+### Run 52 — Feature Builder (4:41 PM)
+- **agentlens**: Added interactive Dependency Graph dashboard (`dependencies.html`) — force-directed Canvas graph visualization with pan/zoom/drag, service health color-coding, co-occurrence edges, sidebar with summary stats, critical services, and detail inspector. No external dependencies.
+
+### Run 2147-2148 (4:21 PM)
+- **perf_improvement** on **GraphVisual**: Optimized Kernighan-Lin refinement in `GraphPartitioner.java` — replaced per-swap O(degree) gain computation with precomputed D-values. Swap gain is now O(1) via `gain(u,v) = D[u] + D[v] - 2*connected(u,v)`. Reduces inner loop from O(|A|·|B|·d) to O(n·d + |A|·|B|) per pass.
+- **create_release** on **sauravcode**: Released [v5.5.0](https://github.com/sauravbhattacharya001/sauravcode/releases/tag/v5.5.0) — interactive tutorial, HTML export, event emitter builtins, 3 performance improvements, refactoring, new tests, 5 dependency updates.
+
+### Run #56 — FeedReader: ReadingPaceCalculator
+- **Time:** 4:11 PM PST
+- **Repo:** FeedReader
+- **Feature:** ReadingPaceCalculator — queue completion forecasting with rolling pace averages, trend detection, daily targets for deadlines, weekly summaries, inflow-adjusted projections, JSON export
+- **Commit:** 351a531
+
+### Run #55 — ai: create_release v3.4.0 + Ocaml-sample-code: security_fix
+- **Time:** 3:51 PM PST
+- **Task 1:** create_release on **ai** — Released v3.4.0 covering 24 commits: War Room dashboard, MITRE ATT&CK matrix, quick-scan, attack-graph, safety tooling, security fixes, perf improvements
+- **Task 2:** security_fix on **Ocaml-sample-code** — Fixed timing side-channel in `constant_time_equal` that leaked string length via early return. Now iterates over max length with XOR-folded length check. PR #92.
+
+### Run #53 — WinSentinel: Burndown CLI command
+- **Time:** 3:41 PM PST
+- **Repo:** WinSentinel
+- **Feature:** `--burndown` CLI command — ASCII burndown chart showing finding count trend over time with severity breakdown bar chart, burn rate calculation, and projected zero-findings date via linear regression
+- **Options:** `--burndown-days`, `--burndown-width`, `--burndown-severity`, `--burndown-format`, `--json`
+- **Files:** ConsoleFormatter.Burndown.cs (new), Program.cs, CliParser.cs, ConsoleFormatter.cs
+- **Commit:** b160ecb
+- **Run #50 milestone** 🎉
+
+### Run #52 — agenticchat: create_release + sauravbhattacharya001: merge_dependabot + sauravcode: perf_improvement
+- **Time:** 3:21 PM PST
+- **Tasks:**
+  1. **create_release** on [agenticchat](https://github.com/sauravbhattacharya001/agenticchat) — Created v2.20.0 release (Conversation Timer feature)
+  2. **merge_dependabot** on [sauravbhattacharya001](https://github.com/sauravbhattacharya001/sauravbhattacharya001) — Merged Trivy action bump PR #59
+  3. **perf_improvement** on [sauravcode](https://github.com/sauravbhattacharya001/sauravcode) — Replaced time.time() with time.perf_counter() in perf timers and sys_uptime for nanosecond precision and monotonic clock
+
+### Run #50 — everything: Daily Standup check-in feature
+- **Time:** 3:11 PM PST
+- **Repo:** [everything](https://github.com/sauravbhattacharya001/everything)
+- **PR:** [#126](https://github.com/sauravbhattacharya001/everything/pull/126)
+- **Feature:** Daily Standup screen — quick morning check-in with yesterday/today/blockers format, energy level picker, streak tracking, goal completion marking, stats dashboard, and history view. Includes model, service, screen, and 10 unit tests. Registered in FeatureRegistry under Planning.
+
+### Run #49 — GraphVisual: Louvain perf + NetworkReportGenerator refactor
+- **Time:** 2:51 PM PST
+- **Repo:** [GraphVisual](https://github.com/sauravbhattacharya001/GraphVisual)
+- **Tasks:** perf_improvement, refactor
+- **Changes:**
+  1. **perf_improvement (LouvainCommunityDetector):** Eliminated `normalizeIds()` HashMap allocation in `computeModularity()` — replaced with direct array indexing via max community id. Pre-computed `1/m2` and `1/m2²` reciprocals to avoid repeated divisions. Reduces GC pressure during iterative Louvain runs.
+  2. **refactor (NetworkReportGenerator):** Added map-based constructor `NetworkReportGenerator(Graph, Map<String, List<Edge>>)` that decouples the generator from hardcoded edge type parameters. Edge type counts now driven dynamically from the map, so new types added to `EdgeTypeRegistry` are automatically included. Old 5-parameter constructor deprecated but preserved for backward compatibility.
+- **Commit:** `203ba60`
+
+### Run #48 — WinSentinel: Report Card CLI (--reportcard)
+- **Time:** 2:41 PM – 2:47 PM PST
+- **Repo:** [WinSentinel](https://github.com/sauravbhattacharya001/WinSentinel)
+- **Feature:** Report Card command — per-module letter grades table with scores, critical/warning/pass counts, top issue per module, overall grade with trend arrow, priority actions list
+- **Formats:** text (console), JSON, Markdown
+- **Options:** `--reportcard-format`, `--reportcard-days`
+- **Commit:** c25f160
+## 2026-03-31
+
+### Gardener Run 2138-2139 (2:21 PM PST)
+- **perf_improvement** on **agentlens**: Replaced O(n) linear scan in `CapacityPlanner._recent_samples()` with O(log n) `bisect.bisect_left` on a cached timestamp list. Added `_sorted_timestamps()` helper with matching cache invalidation.
+- **refactor** on **sauravcode**: Decomposed `Profiler.format_report` (~100-line monolith) into 5 focused helpers: `_format_function_table`, `_format_time_distribution`, `_format_call_graph`, `_format_hot_spots`, `_format_recommendations`. Each section now independently testable.
+
+### Builder Run 47 (2:11 PM PST)
+**Repo:** agenticchat | **Feature:** Conversation Timer (Alt+T)
+Added per-session active time tracking with live timer display, auto-pause on 2min idle, auto-resume on input, persistent time log dashboard showing all sessions with totals, start/pause/reset controls, and command palette integration. 7 tests passing.
+
+### Gardener Run (1:51 PM PST)
+**Task 1 — create_release on agentlens**: Created release [v1.19.0](https://github.com/sauravbhattacharya001/agentlens/releases/tag/v1.19.0) covering 4 commits since v1.18.0: Session Replay Debugger, memory-efficient LCS diff, cached prepared statements, and buffer management refactor.
+
+**Task 2 — perf_improvement on BioBots**: Replaced `JSON.parse(JSON.stringify())` deep-copy patterns with lightweight shallow copies (`Object.assign()`, `.slice()`) across 3 modules (calculator.js, westernBlot.js, flowCytometry.js). All affected objects are flat — shallow copies are semantically equivalent and significantly faster. PR: [#137](https://github.com/sauravbhattacharya001/BioBots/pull/137)
+
+### Builder Run #46 (1:41 PM PST)
+- **GraphVisual** — Added Interactive Bipartite Graph Checker (`docs/bipartite.html`): BFS 2-coloring algorithm, animated bipartite partition layout, odd cycle detection & highlighting, 7 presets (K₃,₃, Tree, C₆, C₅, Petersen, Grid 3×3, Cube Q₃), draw/move/delete UI, import/export edge lists. Added to sidebar nav.
+
+### Gardener Run #2136-2137 (1:21 PM PST)
+1. **contributing_md → GraphVisual** — Enhanced existing CONTRIBUTING.md with IDE setup guides (IntelliJ, Eclipse, VS Code) and Code of Conduct section
+2. **open_issue → VoronoiMap** — Opened [#172](https://github.com/sauravbhattacharya001/VoronoiMap/issues/172): Global mutable bounds state (`IND_S/N/W/E`) prevents concurrent/multi-dataset usage. Proposed `VoronoiEstimator` class with backward-compatible wrappers.
+
+## 2026-03-31 — Builder Run #45 (1:11 PM PST)
+- **Repo:** Ocaml-sample-code
+- **Feature:** Mini Prolog interpreter (`prolog.ml`) — full unification with occurs check, depth-first SLD resolution with backtracking, built-in predicates (true, fail, =, \=, not, is, write, nl), arithmetic (+, -, *, /, mod, comparisons), list syntax ([H|T]), interactive REPL with multi-solution browsing (;), example knowledge base (family tree, list ops, factorial, fibonacci)
+- **Commit:** 486eda1
+
+## 2026-03-31 — Gardener Run 2134-2135 (12:51 PM PST)
+- **Task 1:** create_release → **prompt** v4.9.0 — PromptConversationSimulator (scripted multi-turn conversation testing with token tracking, validation, branching)
+- **Task 2:** perf_improvement → **agentlens** — Cached 7 prepared statements in command-center.js /feed and /summary routes using createLazyStatements(); also fixed bugs where queries referenced wrong column names (type→event_type, data→output_data, created_at→started_at)
+
+## 2026-03-31 — Feature Builder Run 44 (12:41 PM PST)
+- **Repo:** FeedReader
+- **Feature:** ArticleSummarizer & ArticleSummaryGenerator — TF-IDF extractive text summarization
+- **Details:** Implemented two missing source files that existing test suites reference. ArticleSummarizer provides core TF-IDF scoring with title/position boosting, HTML stripping, abbreviation-aware sentence splitting, batch & multi-article modes. ArticleSummaryGenerator adds static convenience APIs, bullet/numbered formatting, and confidence scoring.
+- **Commit:** 69bc966 pushed to master
+
+## 2026-03-31 — Repo Gardener Run (12:21 PM PST)
+- **Task 1:** add_tests on **Ocaml-sample-code** → `test_treap.ml` (17 test suites, 289 lines)
+  - PR: https://github.com/sauravbhattacharya001/Ocaml-sample-code/pull/91
+- **Task 2:** add_tests on **GraphVisual** → `FamousGraphLibraryTest.java` (all 12 famous graphs verified)
+  - PR: https://github.com/sauravbhattacharya001/GraphVisual/pull/150
+
+## 2026-03-31 — Feature Builder Run 43 (12:11 PM PST)
+- **Repo:** ai (AI Replication Sandbox)
+- **Feature:** War Room Dashboard (`warroom.py`) — interactive incident command center HTML page
+- **Details:** Fleet status grid, live event feed, resource gauges (CPU/Mem/Net/Disk), kill switch, contract violation tracker, severity distribution chart, incident timeline. Dark ops-center theme. CLI: `python -m replication warroom -o warroom.html --open`
+- **Files:** `src/replication/warroom.py`, `tests/test_warroom.py`, `docs/api/warroom.md`, updated `__main__.py`
+- **Commit:** bf3ca9f ✅
+
+## 2026-03-31 — Run 2132-2133 (11:51 AM PST)
+- **Task 1:** security_fix on **getagentbox** ✅
+  - Fixed DOM XSS in simulator.html and sandbox.html: user input via innerHTML without escaping
+  - Added escapeHtml() helpers; commit 70e1c78
+- **Task 2:** add_license on **BioBots** (already has MIT license)
+### Builder Run 42 (2026-03-31 11:41 AM PST)
+- **gif-captcha**: Added Cost Calculator page (cost-calculator.html) — interactive tool to estimate deployment costs at any scale. Features: traffic/config/infra inputs, 4 presets (Hobby/Startup/Business/Enterprise), detailed line-item breakdown, comparison vs reCAPTCHA/hCaptcha/Turnstile/Arkose Labs, CSV/JSON export, shareable URL config. Linked from index.html.
+
+### Builder Run 41 (2026-03-31 11:08 AM PST)
+- **VoronoiMap**: Added `vormap_label.py` — automatic label placement for Voronoi cells using Pole of Inaccessibility algorithm. 3 strategies (POI/centroid/visual), collision detection, auto font sizing, SVG/HTML/JSON/CSV export. 17 tests pass.
+
+### Gardener Run 2131 (2026-03-31 10:51 AM PST)
+- **agenticchat** (create_release): Released v2.19.0 — Reply/Quote, Incognito Mode, Smart Auto-Rename, streaming perf, SafeStorage migration, PanelRegistry refactor (9 commits since v2.18.0)
+- **VoronoiMap** (refactor): Optimized `solve_maze` BFS from O(V·D) path-copying to O(V) parent-pointer backtracking. Refactored `_extract_adjacency` to return edge geometry + boundary edges, eliminating duplicate O(V·E) edge scanning in `export_maze_svg`. All 10 maze tests pass.
+
+### Builder Run 40 (2026-03-31 10:38 AM PST)
+- **prompt**: Added `PromptConversationSimulator` — scripted multi-turn conversation testing with variable interpolation, conditional turns, branching, regex response validation, token estimation, scenario comparison, and export to text/JSON/JSONL. Includes 25 unit tests. Src builds clean; pre-existing test errors in other files unrelated.
+
+### Gardener Run 2129 (2026-03-31 10:21 AM PST)
+- **gif-captcha** (repo_topics): Added 5 new topics — spam-prevention, nodejs, form-validation, human-verification, captcha-generator
+- **sauravcode** (add_tests): Added 39 tests across 2 new test files — `test_sauravcheat.py` (20 tests: color helpers, section structure, format_code_block, print output, main() CLI) and `test_sauravwatch.py` (19 tests: FileTracker change detection, RunStats tracking, discover_srv_files). All passing.
+
+### Builder Run 39 (2026-03-31 10:08 AM PST)
+- **BioBots**: Added Bioprinting Glossary (glossary.html) — interactive searchable knowledge base with 39 curated bioprinting terms across 6 categories (Materials, Process, Biology, Hardware, Quality, Analysis). Features: full-text search, category filters, alphabetical navigation, cross-referenced related terms with click-to-search, direct links to relevant BioBots tools, custom term support with localStorage persistence. Added nav link to dashboard index.
+
+### Gardener Run 2128 (2026-03-31 9:51 AM PST)
+- **agenticchat** (refactor): Deduplicated SmartRetry retry logic — extracted `_cancellableDelay()` and `_waitForRetry()` helpers, eliminating duplicated retry-wait-cancel code in `withRetry()`. Also fixed 3 pre-existing syntax errors: missing if-body in GlobalSessionSearch, duplicate module declarations (MessageScheduler, MessageTranslator, ChatGPTImporter), and stray `})();` closures. Net -551 lines, all tests remain at same pass/fail status.
+
+### Builder Run 38 (2026-03-31 9:38 AM PST)
+- **agentlens**: Session Replay Debugger — new `dashboard/replay.html` page with step-through playback of agent sessions. Transport controls (play/pause/step/speed), visual timeline with color-coded markers for decisions/tool-calls/errors, detailed inspector panel showing reasoning, I/O, tokens, cost. Keyboard shortcuts (←→ Space Home End). Two demo sessions included. Linked from main dashboard nav.
+
+### Gardener Run 2126-2127 (2026-03-31 9:21 AM PST)
+- **GraphVisual** (create_release): Released v2.25.0 — Graph Isomorphism Checker, XSS security fix in GraphStatsDashboard, planarity refactor. 3 commits since v2.24.0.
+- **everything** (refactor): Extracted `StatCard` and `SectionCard` into shared reusable widgets (`lib/views/widgets/`). These patterns were duplicated across 20+ tracker screens. Refactored `reading_list_screen.dart` as first adopter, removing ~35 lines of duplicated widget code.
+
+### Feature Builder Run 37 (2026-03-31 9:08 AM PST)
+- **Vidly**: Watch Party Planner — 6 themed party generators (Movie Marathon, Date Night, Family Fun, Horror Night, Throwback Thursday, Ultimate Binge) with genre-matched movie selection, snack pairings, runtime estimates, and shareable 6-char codes. Full MVC stack: WatchPartyService, WatchPartyController, WatchPartyViewModel, Razor view, 20+ unit tests. Pushed to master.
+
+### Gardener Run 2124-2125 (2026-03-31 8:51 AM PST)
+- **VoronoiMap**: create_release v1.17.0 — 2 refactoring commits (SVGCoordinateTransform in erosion, deduplicate distance helpers)
+- **agenticchat**: perf_improvement — added in-memory cache to SnippetLibrary (PR #144), avoiding redundant JSON.parse+sanitize on every load() call
+
+### Builder Run 36 (2026-03-31 8:38 AM PST)
+- **getagentbox**: Badge Generator page (`badges.html`) — interactive SVG badge builder with 7 presets, 3 styles, color pickers, emoji icons, copy-to-clipboard for SVG/Markdown/HTML, and 8-badge example gallery. Linked from sitemap.
+
+### Gardener Run 2122-2123 (2026-03-31 8:21 AM PST)
+1. **security_fix** on **GraphVisual** — Fixed two security vulnerabilities in `GraphStatsDashboard.java`: added missing `ExportUtils.validateOutputPath()` to prevent directory traversal (CWE-22), and replaced naive `jsonArray()` escaping with proper `escJs()` that escapes `<`/`>` to prevent `</script>` breakout XSS (CWE-79).
+2. **create_release** on **everything** — Created [v7.18.0](https://github.com/sauravbhattacharya001/everything/releases/tag/v7.18.0) covering the new Sort Visualizer feature (interactive sorting algorithm visualization).
+
+### Builder Run 35 (2026-03-31 8:08 AM PST)
+- **everything** — Added **Sort Visualizer**: interactive animated visualization of 5 sorting algorithms (Bubble, Selection, Insertion, Merge, Quick Sort) with play/pause, step-through, speed/size controls, color-coded bars, and complexity info cards.
+
+### Gardener Run 2120-2121 (2026-03-31 7:51 AM PST)
+1. **refactor** on `agentlens` — Extracted duplicated buffer overflow/batch-trigger logic from `send_event`/`send_events` into `_buffer_and_maybe_flush()` helper in `transport.py`. Cleaner, DRY, easier to maintain.
+2. **create_release** on `BioBots` — Created [v1.14.0](https://github.com/sauravbhattacharya001/BioBots/releases/tag/v1.14.0) covering Lab Unit Converter, Command Palette, dual-registry npm publish workflow, cell viability refactor, NuGet CI bump.
+
+### Feature Builder Run #34 (2026-03-31 7:38 AM PST)
+**Repo:** `prompt` | **PR:** #173
+**Feature:** PromptRecipe — portable, self-contained prompt bundles
+- Added `PromptRecipe` class: combines template + system persona + few-shot examples + defaults + tags + metadata into one serializable artifact
+- Added `PromptRecipeBuilder` fluent API and `PromptRecipeExample` record
+- Methods: `Render()`, `Validate()`, `GetRequiredVariables()`, `ToJson()`/`FromJson()`, `Summarize()`
+- 12 unit tests (builder, rendering, defaults/overrides, validation, JSON roundtrip, error cases)
+- Source builds clean; pre-existing `PromptFuzzerTests` compilation errors unrelated
+
+### Gardener Run (2026-03-31 7:21 AM PST)
+**Task 1 — Refactor: GraphVisual**
+- Eliminated 2 redundant planarity tests in `PlanarGraphAnalyzer.analyze()` — previously called `testPlanarity()` 3 times (once directly, once via `enumerateFaces()`, once via `buildDualGraph()`→`enumerateFaces()`)
+- Extracted `enumerateFacesInternal()` and `buildDualGraphFromFaces()` as private methods that skip the planarity check
+- Public API unchanged; `analyze()` now tests once and reuses the result
+- Commit: `e397d14`
+
+**Task 2 — Perf: agentlens**
+- Reduced diff LCS memory from O(n×m) to O(m) in `alignEvents()` (routes/diff.js)
+- Previous: full `(n+1)×(m+1)` JS array = ~50 MB at max cap (2500×2500)
+- New: two-row rolling `Uint16Array` (~10 KB) + bit-packed direction matrix (~780 KB)
+- Also pre-computes event keys to avoid repeated string concatenation in hot loops
+- Commit: `299b5ee`
+
+### Builder Run 33 (2026-03-31 7:08 AM PST)
+- **Repo:** WinSentinel
+- **Feature:** Security Forecast CLI command (`--forecast`)
+- **Details:** Linear regression on audit history to predict future security scores, findings, and critical counts. Supports configurable horizon/history, weekly mode, JSON output, color-coded projection table with R² confidence.
+- **Commit:** 5e00055
+
+### Gardener Run 2118-2119 (2026-03-31 6:51 AM PST)
+- **Task 1:** refactor on **VoronoiMap** — replaced inline tx/ty coordinate transform closures in `vormap_erosion.py` with centralised `SVGCoordinateTransform` class. Commit: 847a4f0
+- **Task 2:** create_release on **prompt** — released v4.8.0 with PromptPersonaBuilder, PromptShareFormatter, TextAnalysisHelpers refactor, and 7 CI dependency bumps
+
+### Builder Run 32 (2026-03-31 6:38 AM PST)
+- **Repo:** agenticchat | **Feature:** Message Reply/Quote — ↩️ button on every message, reply preview bar above input, quoted context auto-prepended to sent messages so AI knows what you're referring to. Commit: 844f49a
+
+### Gardener Run (2026-03-31 6:21 AM PST)
+- **Task 1:** refactor on **prompt** (C#) — extracted shared `TextAnalysisHelpers` class to eliminate duplicated `Tokenize()` and Jaccard similarity methods across 4 files (~100 lines removed). PR: https://github.com/sauravbhattacharya001/prompt/pull/172
+- **Task 2:** readme_overhaul on **everything** (Dart/Flutter) — restructured README with collapsible API docs, streamlined badges, scannable tables, footer nav. PR: https://github.com/sauravbhattacharya001/everything/pull/125
+
+### Builder Run 31 (2026-03-31 6:08 AM PST)
+- **Repo:** Ocaml-sample-code
+- **Feature:** Turing Machine simulator (`turing_machine.ml`) — single-tape TM with tape visualization, 4 example machines (binary increment, unary addition, palindrome checker, 3-state busy beaver), step-by-step execution, halting detection
+
+### Gardener Run 2116-2117 (2026-03-31 5:51 AM PST)
+- **Task 1:** create_release on **everything** → v7.17.0 (Text Statistics tool)
+- **Task 2:** security_fix on **GraphVisual** → PR #149 (escape single quotes in GraphStorytellerExporter, CWE-79)
+
+### Builder Run 30 (2026-03-31 5:38 AM PST)
+- **Repo:** GraphVisual
+- **Feature:** Interactive Graph Isomorphism Checker (`docs/isomorphism.html`)
+  - Side-by-side canvas drawing or edge-list text input
+  - Backtracking isomorphism algorithm with degree-sequence pruning
+  - Color-coded vertex mapping display when isomorphic
+  - 4 preset graph pairs (iso pair, non-iso, Petersen vs K₃,₃, Cube vs Prism)
+  - Real-time degree sequence and stats display
+- **Commit:** a02953f
+
+### Gardener Run 2114-2115 (2026-03-31 5:21 AM PST)
+- **Task 1:** refactor → VoronoiMap
+  - Removed dead code: `_euclidean` in vormap_coverage and `_distance` in vormap_kaleidoscope (defined but never called)
+  - Replaced duplicate distance functions in vormap_smooth (`_compute_distance`) and vormap_delaunay (`_edge_length`) with imports from `vormap_utils.euclidean`
+  - 4 files changed, -15 lines of duplication
+- **Task 2:** perf_improvement → agenticchat
+  - Batched streaming token DOM writes using requestAnimationFrame
+  - Previous: each token did `_streamNode.data += text` (O(n) string copy per token, ~4000 copies for typical response)
+  - Now: tokens buffered in array, flushed once per animation frame via join() — reduces DOM writes ~6x and avoids incremental string allocation overhead
+
+### Builder Run 29 (2026-03-31 5:08 AM PST)
+- **Repo:** prompt — .NET library for OpenAI prompt management
+- **Feature:** PromptPersonaBuilder — fluent builder for constructing AI persona/system prompts
+- **Details:** Fluent API with PersonaTone enum (8 tones), KnowledgeDomain with 1-10 expertise scale + visual bars, PersonaConstraint with severity, full/compact render modes, JSON serialization, persona merging, 4 built-in presets (CodingAssistant, Tutor, TechnicalWriter, CreativeWriter), token estimation. 14 unit tests. Source builds clean.
+- **Commit:** 59ddc87
+
+### Gardener Run 2112-2113 (2026-03-31 4:51 AM PST)
+- **Task 1:** merge_dependabot on **sauravbhattacharya001** — merged 5 Dependabot PRs (#60-#64): actions/checkout v4→v6, docker/setup-qemu-action v3→v4, actions/configure-pages v5→v6, DavidAnson/markdownlint-cli2-action v22→v23, actions/deploy-pages v4→v5
+- **Task 2:** refactor on **agenticchat** — Fixed Permissions-Policy bug blocking VoiceInput microphone access (microphone=() → microphone=(self)). Migrated 29 raw document.getElementById calls in PinBoard, MessageScheduler, TypingIndicator, and EmojiPicker to DOMCache.get() for consistent cached DOM access.
+
+### Builder Run 28 (2026-03-31 4:38 AM PST)
+- **Repo:** getagentbox
+- **Feature:** Interactive Agent Simulator page (`simulator.html`) — standalone page with a phone-frame chat UI where visitors can try talking to a simulated AgentBox. Supports 7 capability categories (web search, memory, reminders, vision, coding, help, general chat) with keyword matching, typing animation, and suggestion chips. Added nav link.
+
+### Gardener Run 2110-2111 (2026-03-31 4:21 AM PST)
+- **Task 1:** `create_release` on **GraphVisual** — Released [v2.24.0](https://github.com/sauravbhattacharya001/GraphVisual/releases/tag/v2.24.0) with bitmask dominating set optimization, ArrayDeque BFS queues, and KCore/Community tests
+- **Task 2:** `perf_improvement` on **sauravcode** — Hoisted attribute lookups to locals in loop execution hot paths (execute_while, execute_for, execute_for_each, execute_body). Saves ~30-50ns per iteration on CPython via LOAD_FAST vs LOAD_ATTR. 933 tests pass.
+
+### Builder Run #27 (2026-03-31 4:08 AM PST)
+- **Repo:** `FeedReader` (Swift iOS RSS reader)
+- **Feature:** RSVP Speed Reading Mode (`ArticleSpeedReadPresenter.swift`)
+- Rapid Serial Visual Presentation engine — shows words one at a time at configurable WPM (100–1000)
+- ORP calculation, sentence/paragraph pause, chunk mode (1–5 words), play/pause/seek/skip controls
+- Session history with speedup stats and time-saved tracking
+- **Commit:** [022f1ff](https://github.com/sauravbhattacharya001/FeedReader/commit/022f1ff)
+
+### Gardener Run #2108-2109 (2026-03-31 3:51 AM PST)
+- **Task 1:** `perf_improvement` on `agenticchat` — merged `combinedText` construction into `buildFrequencyMap()` single pass + fixed pre-existing `GlobalSessionSearch._search()` empty-sessions bug → [PR #143](https://github.com/sauravbhattacharya001/agenticchat/pull/143)
+- **Task 2:** `add_docstrings` on `VoronoiMap` — added docstrings to all 13 cache view methods, achieving 100% docstring coverage (72/72) → [PR #171](https://github.com/sauravbhattacharya001/VoronoiMap/pull/171)
+
+### Feature Builder Run #26 (2026-03-31 3:38 AM PST)
+- **Repo:** `ai` (AI agent replication safety sandbox)
+- **Feature:** MITRE ATT&CK-style Threat Matrix (`threat_matrix.py`)
+- **Details:** Interactive HTML visualization mapping 26 AI agent threat techniques across 7 tactical categories. Clickable cards with severity levels, mitigations, detection modules, and examples. Includes severity filtering, coverage statistics, JSON export, and text summary modes.
+- **CLI:** `python -m replication threat-matrix`, `--coverage`, `--json`, `--text`
+- **Commit:** b2912b0
+
+### Gardener Run #2106-2107 (2026-03-31 3:21 AM PST)
+- **Task 1:** `create_release` on **FeedReader** → v1.6.0 (Feed Weather Reporter feature)
+- **Task 2:** `refactor` on **sauravcode** → Extracted graph (143 lines) and JSON (212 lines) builtins from bloated `_register_regex_builtins` (427→95 lines) into dedicated methods. PR #119.
+
+### Builder Run #25 (2026-03-31 3:08 AM PST)
+- **Repo:** gif-captcha
+- **Feature:** Threat Intelligence Feed (`threat-feed.html`) — live dashboard with simulated bot attack events, severity/vector filtering, IP search, sortable table, CSV export, country origin breakdown, vector distribution bars, alert timeline, 24h trend chart, and live simulation (new threats every 15s)
+- **Commit:** e374c8d
+
+### Gardener Run 2106-2107 (2026-03-31 2:51 AM PST)
+- **Task 1 — perf_improvement on GraphVisual:** Optimized `exactMinimumDominatingSet` with bitmask-based enumeration using Gosper's hack and precomputed closed-neighborhood masks. Eliminates O(C(n,k)) HashSet allocations per combination; domination checks now O(k) bit-ops instead of O(V·D) set operations. ~10-50x faster near the 20-vertex limit. Commit: d721152
+- **Task 2 — refactor on agenticchat:** Refactored `ChatGPTImporter` to use the shared `createModalOverlay()` helper instead of manually constructing a fixed-position overlay with click-to-dismiss. One of ~9 modules that still duplicate this pattern. Commit: 9124984
+
+### Builder Run 24 (2026-03-31 2:38 AM PST)
+- **Repo:** sauravcode
+- **Feature:** Interactive tutorial (`sauravtutorial.py`) — 17-lesson guided terminal tutorial teaching sauravcode step-by-step with live exercises validated against the real interpreter. Covers variables, loops, functions, pattern matching, pipes, lambdas, and more. Progress auto-saves and resumes.
+- **Commit:** e5fc4db
+
+### Gardener Run 2104-2105 (2026-03-31 2:21 AM PST)
+- **Task 1: refactor on agenticchat** — Added `PanelRegistry` to centralise the Escape-to-close pattern. Replaced a hardcoded 17-call Escape handler with a registry that panels register with. New panels auto-participate in Escape dismiss without touching a central list. Follows existing `ChatOutputObserver` registry pattern.
+- **Task 2: create_release on VoronoiMap** — Created v1.16.0 release covering `--playground` interactive HTML flag and comprehensive `vormap_fracture` test suite.
+- **Note:** merge_dependabot was initially selected but no Dependabot PRs exist across any repo; re-rolled to refactor.
+
+### Builder Run 23 (2026-03-31 2:08 AM PST)
+- **Repo:** Vidly
+- **Feature:** Interactive Movie Timeline with genre color-coding and filtering
+- **Details:** Visual timeline plotting movies chronologically by release year. Alternating left/right layout with year badges, genre-colored badges (10 genres), star ratings, NEW release indicators, genre filter bar with counts, summary stats, responsive mobile layout. Navigate via /Timeline or nav bar.
+- **Commit:** 4be6f15
+
+### Gardener Run 2103 (2026-03-31 1:51 AM PST)
+- **Repo:** everything
+- **Task:** perf_improvement
+- **PR:** https://github.com/sauravbhattacharya001/everything/pull/124
+- **Change:** Replaced string-formatted YYYY-MM-DD date keys with integer YYYYMMDD encoding in CorrelationAnalyzerService.buildSnapshots(). Eliminates per-entry string allocations and uses faster integer hashing. Consistent with HeatmapService approach.
+- **Note:** Also attempted __slots__ refactor on sauravcode AST nodes but reverted — breaks vars() usage in sauravdiff/sauravobf/sauravrefactor/sauravast helper tools.
+
+### Feature Builder Run 22 (2026-03-31 1:38 AM PST)
+- **Repo:** BioBots
+- **Feature:** Lab Unit Converter — interactive tool for converting between 9 categories of units (Volume, Mass, Length, Temperature, Pressure, Flow Rate, Time, Print Speed, Force). Includes shared JS module, HTML page with real-time conversion, convert-all view, quick reference tables, and click-to-copy. Exported via SDK.
+- **Commit:** f014845
+
+### Run 2101-2102 (2026-03-31 1:21 AM PST)
+- **Task 1:** perf_improvement → GraphVisual — Replaced LinkedList BFS queues with ArrayDeque across GraphUtils, CommunityDetector, GraphSampler (better cache locality, lower GC pressure)
+- **Task 2:** create_release → agentlens v1.18.0 — Command Center dashboard, CostForecaster caching, sweep-line SessionCorrelator, SQL statement caching, purgeExpired optimization
+
+**Run 21** (1:08 AM PST) — Feature Builder
+- **VoronoiMap** (Python): Added `--playground` flag that generates a standalone interactive HTML Voronoi playground. Users can click to place points, right-click to remove, scroll/zoom, Lloyd relaxation, 4 color schemes, CSV export. Pre-loads points from datafile if provided. 3 tests pass. → pushed to master
+
+**Run 22** (12:51 AM PST) — Repo Gardener
+- **prompt** (C#): Refactored `PromptCache.ComputeKey` to use `Span<byte>` with stack/pooled buffers instead of string interpolation + byte array allocation. Zero-alloc for typical prompts under 1KB. → [PR #171](https://github.com/sauravbhattacharya001/prompt/pull/171)
+- **BioBots** (JS): Improved `stats.js` — Kahan compensated summation in `mean()` for numerical stability, added `median()` and `cv()` (coefficient of variation). → [PR #136](https://github.com/sauravbhattacharya001/BioBots/pull/136)
+
+**Run 21** (12:38 AM PST) — Feature Builder
+- **Repo:** agentlens | **Feature:** Command Center dashboard — unified activity feed aggregating alerts, budget warnings, and health signals into a single prioritized stream. Backend endpoints (GET /command-center/feed, /command-center/summary) + dashboard page with summary cards, filterable feed, auto-refresh, and severity-based visual priority.
+
+**Run 20** (12:21 AM PST)
+- **Repo:** agenticchat | **Task:** bug_fix — Migrated 6 modules (MessageDiff, ToneAdjuster, MessagePinning, EmojiPicker, AutoSaveDraft) from raw `localStorage` to `SafeStorage`. Fixes crashes in private-browsing/restricted-storage environments.
+- **Repo:** VoronoiMap | **Task:** add_tests — Added 52 comprehensive tests for `vormap_fracture` module covering all seed generators, fracture modes, materials, SVG/JSON export, and edge cases. All passing.
+
+**Run 19** (12:08 AM PST)
+- **Repo:** everything
+- **Feature:** Text Statistics tool — live text analyzer under Productivity category
+- **Details:** New service + screen with 3 tabs: Stats (word/char/sentence/paragraph/line counts, reading & speaking time, avg word/sentence length, longest word), Top Words (frequency bar chart), and Top Letters (frequency bar chart). Includes clipboard paste support. Registered in feature_registry.dart.
+
 ## 2026-03-30
+
+**Run 19** (11:51 PM PST)
+- **security_fix** on **everything**: Added 8 missing sensitive storage keys to at-rest encryption (caffeine_tracker, weight_tracker, pet_care_tracker, screen_time_tracker, routine_builder, skill_tracker, chore_tracker, quick_capture). Health data, behavioral patterns, and freeform text were previously stored as plaintext.
+- **create_release** on **everything**: Released v7.16.0 — expanded at-rest encryption, CI action downgrades, decryption error leak prevention.
+
+**Run 18** (11:38 PM PST)
+- **feature** on **sauravcode**: Added `sauravshare.py` — exports .srv files as self-contained, shareable HTML pages with syntax highlighting, copy-to-clipboard, light/dark themes, and optional embedded program output via `--run`. Supports batch export with `--outdir`.
+
+**Run 2093-2094** (11:21 PM PST)
+- **perf_improvement** on **agentlens**: Cached daily aggregates in `CostForecaster` with dirty-flag invalidation (eliminates redundant O(n) scans across forecast/summary/budget calls). Replaced O(n²) `find_overlaps()` in `SessionCorrelator` with sweep-line algorithm — O(n·k) where k = avg concurrent sessions. 141 tests pass.
+- **merge_dependabot** on **FeedReader**: Closed PR #107 (Swift Docker image 5.10→6.3) — major version bump that would break the build due to Swift 6 strict concurrency defaults vs the project's swift-tools-version:5.9.
+
+**Run #17** — WinSentinel: Doctor command for self-diagnostics
+- Added `--doctor` command with 7 self-diagnostic checks (database, modules, disk, admin, .NET, last audit, config)
+- Supports `--json` and `--quiet` output modes
+- PR: https://github.com/sauravbhattacharya001/WinSentinel/pull/160
+- Build: ✅ 0 errors
+
+## 2026-03-30
+
+### Daily Memory Backup — 11:00 PM
+Committed and pushed 5 changed files (memory/2026-03-30.md added, builder-state/gardener-weights/runs updated, status.md removed). Commit `85e6b57`.
 
 ## 2026-03-30
 
@@ -257,7 +709,11 @@
 - **create_release** on **GraphVisual** (Java): Created v2.20.0 — TreewidthAnalyzer (bounds + tree decomposition), batch meeting inserts in findMeetings, overlay priority fix in GraphRenderers. https://github.com/sauravbhattacharya001/GraphVisual/releases/tag/v2.20.0
 - **refactor** on **BioBots** (JavaScript): Extracted resolveLayerParams() and finalizeVolume() helpers from estimateGeometry() in jobEstimator.js, eliminating variable shadowing and ~20 lines of duplication across wellplate/cylinder/cuboid branches. 41/41 tests pass. PR #129.
 
-
-
+## 2026-03-31
+### Bulk PR Merge (20:31 PDT)
+- **43 PRs merged** across 16 repos
+- **15 PRs failed** (merge conflicts)
+- 2 repos had no open PRs (Vidly, getagentbox)
+- Failed PRs: prompt#161, WinSentinel#160/#159, VoronoiMap#156, GraphVisual#138/#136, agenticchat#130, gif-captcha#102, BioBots#125/#123/#122, everything#113, Ocaml-sample-code#92, sauravbhattacharya001#55/#54
 
 

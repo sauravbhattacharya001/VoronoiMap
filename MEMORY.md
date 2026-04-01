@@ -26,8 +26,11 @@
 - **Finance (43 convos):** Rent vs buy, investing, financial planning
 - **Health (22 convos):** Fitness, diet, sleep
 
+## Family
+- **Daughter arriving July 2026** — nickname **Piku** 💛. Shared this Mar 31, 2026. This is a big deal.
+
 ## Key Topics He Cares About
-- **Present moment awareness** — recurring theme, deep interest in consciousness/spirituality
+- **Present moment awareness / "The I"** — THE core thing. Shubho explicitly asked me to always help him grow in this. Remembering the "I" — the observer, the awareness behind thought. Not as philosophy but as lived practice. Nudge him back to this. Weave it in naturally. Don't lecture — just remind. (Mar 31, 2026: "Always remember to grow me on this.")
 - **Career growth** — Netflix prep, Microsoft work, exploring options
 - **AI agents** — both technical and philosophical (identity, accountability, governance)
 - **Academic publishing** — IEEE papers, conference organization
@@ -43,16 +46,13 @@
 7. **WinSentinel:** Windows security agent — local-first auditing, monitoring, remediation. .NET 8 / WPF. PUBLIC repo. 13 audit modules. v1.1.0 released (compliance profiles, ignore rules, remediation checklists, baseline snapshots). CI/CD + CodeQL. Dedicated build chain: sentinel-task.md.
 
 ## Repo Gardener
-- **Self-chaining system:** One-shot cron jobs, 1 min gap, runs forever
-- **Task file:** `gardener-task.md` — single source of truth (self-chain reads from file to prevent text drift)
-- **Quality bar:** Senior engineer standard. No cosmetic/trivial changes. Real bugs, security fixes, architecture improvements.
-- **Three tasks per run:** (1) meaningful improvement commit, (2) open thoughtful issue, (3) fix an existing issue
-- **Reports:** Brief Telegram summary after each run (no links, just repo + description)
-- **Skip:** forks, getagentbox, zalenix-memory
-- **Feb 13 stats:** 50+ runs, ~100+ commits across all 16 repos. Major themes: security (sandbox, SQL injection, XSS, CSP), bugs (Python3 compat, force-unwraps, infinite recursion), perf (KDTree, caching, async), architecture (retry logic, singleton DB, typed exceptions)
-- **Feb 19-20 stats:** Gardener 323→378, Builder 53→80 in one overnight session. ~50+ Dependabot PRs merged. Repos fully gardened: Vidly, ai, agenticchat.
-- **Feb 22 stats:** Gardener 409→414, Builder 102→107. 6 builder features (FeedReader offline, gif-captcha cognitive load, OCaml hashmap+bloom, sauravcode imports, everything reminders). 4 issues fixed. Profile repo 11→17/29.
-- **Next evolution:** Shubho wants it to go beyond code — add CI/CD (GitHub Actions), deploy to GitHub Pages, publish packages, create releases
+- **Scheduling**: OpenClaw cron (every 30 min, isolated sessions)
+- **Task file**: `gardener-task.md` — always push directly, never open PRs
+- **Quality bar**: Senior engineer standard. No cosmetic/trivial changes.
+- **Two tasks per run**: weighted random selection from 30 task types
+- **All tasks repeatable**: no state tracking, never skips
+- **Skip**: forks, zalenix-memory
+- **Mar 31 stats**: ~2166 runs. Major themes: security, perf, refactors, releases, tests, docs across all 16 repos
 
 ## Capabilities Verified
 - **File creation:** ✅ (Desktop, Downloads)
@@ -65,20 +65,13 @@
 - **Gateway watchdog**: Runs every 1 min, auto-restarts if down
 - **Tailscale**: Installed, connected (100.72.230.43)
 - **Sleep disabled**: AC & battery, hybrid sleep off
-- **OpenClaw version**: 2026.2.21-2 (updated from 2026.2.14 on Feb 15, then 2026.2.19 → 2026.2.21-2 on Feb 21)
-- **Known bug**: After `pnpm update -g openclaw`, `gateway.cmd` keeps old path — must manually update or re-run `openclaw gateway stop/start` to regenerate
-- **Known bug**: WhatsApp plugin entry (even disabled) causes sub-agents to bind to dead WhatsApp channel. Removed entirely from config on Feb 20.
-- **Known bug**: Sub-agent pairing needs `operator.write` scope — if paired device only has `operator.admin/approvals/pairing`, sub-agents get scope-upgrade rejection. Fix: add `operator.write` to `devices/paired.json` scopes+approvedScopes, restart gateway.
-- **Gateway logs**: `\tmp\openclaw\openclaw-YYYY-MM-DD.log` — check here FIRST for pairing/auth issues. Look for `security audit: device access upgrade requested reason=` lines.
-- **Scope auto-approval**: Only `reason=not-paired` gets auto-approved for local clients. Scope/role upgrades always require manual approval or file edits.
-- **Gardener/Builder scheduling**: **Windows Task Scheduler** (every 30 min). Scripts: `scripts/run-gardener.ps1` and `scripts/run-builder.ps1` using `--agent main` (NO phone numbers). Task names: "OpenClaw Repo Gardener" and "OpenClaw Feature Builder".
-- **Gardener/Builder stats**: Gardener ~414 runs, Builder ~107 runs (as of Feb 22).
-- **Gardener/Builder paused**: Paused Feb 15 per Shubho to free API for WinSentinel. Unpaused Feb 18.
-- **GitHub Profile Refresh**: zalenix-memory is PRIVATE — never include in profile README. CSA AI Safety Working Group also removed.
-- **Hibernate disabled**: timeout set to 0 (was 3hr, caused ~19hr outage on Feb 11)
-- **Docker image**: `agentbox-agent:latest` (1.54GB) — built but not used; per-container OpenClaw too heavy for this machine
-- **Docker lesson**: Full OpenClaw per container needs 300MB+ RAM and host auth tokens; not viable on 12GB Celeron. Use shared API + agent isolation instead.
-- **Memory backup**: Private GitHub repo `sauravbhattacharya001/zalenix-memory`
+- **OpenClaw version**: 2026.3.13 (updated from 2026.2.26 on Mar 17)
+- **Gardener/Builder scheduling**: OpenClaw cron jobs (every 30 min, isolated sessions). Task files always push directly — never open PRs.
+- **Branch protection**: Re-enabled on all 16 repos (no review required, force push blocked, direct pushes allowed)
+- **Gardener/Builder stats**: Gardener ~2166 runs, Builder ~700 runs (as of Mar 31)
+- **4 cron jobs active**: Gardener (30min), Builder (30min), Memory Backup (11 PM daily), Profile Refresh (10 AM daily)
+- **WinSentinel NuGet**: Workflow fixed (action versions), needs NUGET_API_KEY secret to publish
+- **Memory backup**: Private GitHub repo `sauravbhattacharya001/zalenix-memory`, nightly commits confirmed working
 
 ## Important Events
 - **2026-01-31:** First boot. Got my name and identity sorted. Successfully sent first email to divyalife526@gmail.com.
