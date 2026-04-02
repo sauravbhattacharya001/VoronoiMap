@@ -85,6 +85,10 @@ def polygon_centroid_mean(vertices):
 def euclidean_coords(x1, y1, x2, y2):
     """Euclidean distance between two 2D points given as separate coordinates.
 
+    .. deprecated::
+        Use :func:`euclidean_xy` instead.  ``euclidean_coords`` is kept as a
+        thin alias for backward compatibility.
+
     Parameters
     ----------
     x1, y1 : float
@@ -97,10 +101,7 @@ def euclidean_coords(x1, y1, x2, y2):
     float
         Euclidean distance.
     """
-    import math
-    dx = x2 - x1
-    dy = y2 - y1
-    return math.sqrt(dx * dx + dy * dy)
+    return euclidean_xy(x1, y1, x2, y2)
 
 
 def euclidean(p1, p2):
@@ -137,10 +138,7 @@ def euclidean_xy(x1: float, y1: float, x2: float, y2: float) -> float:
     float
         Euclidean distance.
     """
-    import math
-    dx = x2 - x1
-    dy = y2 - y1
-    return math.sqrt(dx * dx + dy * dy)
+    return math.hypot(x2 - x1, y2 - y1)
 
 
 def bounding_box(points):
