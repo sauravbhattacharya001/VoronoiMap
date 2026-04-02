@@ -391,23 +391,35 @@ def _detect_format(filepath):
 
 
 def _parse_points_txt(filepath):
-    """Parse space-separated text file (original format)."""
+    """Parse space-separated text file (original format).
+
+    Uses ``split(None, 2)`` to limit splitting to the first two
+    whitespace-separated tokens — avoids allocating extra list elements
+    for lines with trailing columns or comments (common in GIS exports).
+    The ``None`` first argument also handles leading whitespace and
+    empty lines implicitly (returning an empty list), removing the need
+    for a separate ``strip()`` check.
+
+    Binds ``float`` and ``math.isfinite`` as locals to eliminate
+    per-iteration global/module-level dict lookups.
+    """
     points = []
+    _float = float
+    _isfinite = math.isfinite
+    _append = points.append
     with open(filepath, 'r') as objf:
         for line in objf:
-            if not line.strip():
-                continue
-            coord = line.split()
+            coord = line.split(None, 2)
             if len(coord) < 2:
                 continue
             try:
-                lng_val = float(coord[0])
-                lat_val = float(coord[1])
+                lng_val = _float(coord[0])
+                lat_val = _float(coord[1])
             except (ValueError, OverflowError):
                 continue
-            if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
+            if not (_isfinite(lng_val) and _isfinite(lat_val)):
                 continue
-            points.append((lng_val, lat_val))
+            _append((lng_val, lat_val))
     return points
 
 
@@ -491,7 +503,14 @@ def _parse_points_csv(filepath):
 
 
 def _parse_points_json(filepath):
-    """Parse JSON file — array of [x, y] pairs or array of {x, y} objects."""
+    """Parse JSON file — array of [x, y] pairs or array of {x, y} objects.
+
+    For dict items, detects the x/y key names from the first valid dict
+    and reuses them for all subsequent items — eliminates the O(k) key
+    scan per item (where k = 6 + 4 candidate names) for homogeneous
+    datasets, which is the common case.  Falls back to per-item scanning
+    for heterogeneous data.
+    """
     import json
 
     with open(filepath, 'r') as f:
@@ -500,32 +519,59 @@ def _parse_points_json(filepath):
     if not isinstance(data, list):
         raise ValueError("JSON file must contain an array of points")
 
+    _X_KEYS = ('x', 'lng', 'lon', 'long', 'longitude', 'easting')
+    _Y_KEYS = ('y', 'lat', 'latitude', 'northing')
+
     points = []
+    _float = float
+    _isfinite = math.isfinite
+    _append = points.append
+
+    # Cache discovered key names for dict items — avoids rescanning
+    # 6+4 candidate keys on every item in homogeneous datasets.
+    _cached_xk = None
+    _cached_yk = None
+
     for item in data:
         try:
-            if isinstance(item, (list, tuple)) and len(item) >= 2:
-                lng_val = float(item[0])
-                lat_val = float(item[1])
-            elif isinstance(item, dict):
-                # Try common key names
-                lng_val = None
-                lat_val = None
-                for xk in ('x', 'lng', 'lon', 'long', 'longitude', 'easting'):
-                    if xk in item:
-                        lng_val = float(item[xk])
-                        break
-                for yk in ('y', 'lat', 'latitude', 'northing'):
-                    if yk in item:
-                        lat_val = float(item[yk])
-                        break
-                if lng_val is None or lat_val is None:
+            if isinstance(item, (list, tuple)):
+                if len(item) < 2:
                     continue
+                lng_val = _float(item[0])
+                lat_val = _float(item[1])
+            elif isinstance(item, dict):
+                # Fast path: reuse previously discovered keys
+                if _cached_xk is not None and _cached_xk in item and _cached_yk in item:
+                    lng_val = _float(item[_cached_xk])
+                    lat_val = _float(item[_cached_yk])
+                else:
+                    lng_val = None
+                    lat_val = None
+                    xk_found = None
+                    yk_found = None
+                    for xk in _X_KEYS:
+                        if xk in item:
+                            lng_val = _float(item[xk])
+                            xk_found = xk
+                            break
+                    for yk in _Y_KEYS:
+                        if yk in item:
+                            lat_val = _float(item[yk])
+                            yk_found = yk
+                            break
+                    if lng_val is None or lat_val is None:
+                        continue
+                    # Cache for subsequent items
+                    if _cached_xk is None:
+                        _cached_xk = xk_found
+                        _cached_yk = yk_found
             else:
                 continue
         except (ValueError, TypeError, OverflowError):
             continue
-        if not (math.isfinite(lng_val) and math.isfinite(lat_val)):
+        if not (_isfinite(lng_val) and _isfinite(lat_val)):
             continue
+        _append((lng_val, lat_val))
         points.append((lng_val, lat_val))
 
     return points
