@@ -505,11 +505,58 @@ def export_json(result, output_path):
         json.dump(output, f, indent=2)
 
 
+def _value_color(t, colormap):
+    """Map a normalised value ``t`` ∈ [0, 1] to an RGB color string.
+
+    Extracted from ``export_svg`` so it can be unit-tested and reused.
+
+    Parameters
+    ----------
+    t : float
+        Normalised value in [0, 1].
+    colormap : str
+        One of 'heat', 'cool', 'diverging', 'grayscale'.
+
+    Returns
+    -------
+    str
+        CSS ``rgb(r,g,b)`` color string.
+    """
+    t = max(0.0, min(1.0, t))
+    if colormap == "heat":
+        r = int(255 * min(1.0, t * 2))
+        g = int(255 * min(1.0, t * 3 - 1)) if t > 0.33 else 0
+        b = 0
+    elif colormap == "cool":
+        r = 0
+        g = int(255 * t)
+        b = int(255 * (1.0 - t))
+    elif colormap == "diverging":
+        if t < 0.5:
+            s = t * 2
+            r = int(255 * s)
+            g = int(255 * s)
+            b = 255
+        else:
+            s = (t - 0.5) * 2
+            r = 255
+            g = int(255 * (1.0 - s))
+            b = int(255 * (1.0 - s))
+    else:  # grayscale
+        c = int(255 * t)
+        r = g = b = c
+    return "rgb(%d,%d,%d)" % (r, g, b)
+
+
 def export_svg(result, regions, output_path, *, width=800, height=600,
                colormap="heat", show_original=False):
     """Export a smoothed heatmap as SVG.
 
     Colors cells by their smoothed (or original) attribute value.
+
+    Uses ``xml.etree.ElementTree`` for safe SVG construction (consistent
+    with the rest of the codebase) and ``SVGCoordinateTransform`` from
+    ``vormap_geometry`` to avoid duplicating coordinate mapping logic.
 
     Parameters
     ----------
@@ -524,6 +571,9 @@ def export_svg(result, regions, output_path, *, width=800, height=600,
     show_original : bool
         If True, color by original values instead of smoothed.
     """
+    import xml.etree.ElementTree as ET
+    from vormap_geometry import SVGCoordinateTransform
+
     validated = vormap.validate_output_path(output_path)
 
     values = result.original if show_original else result.smoothed
@@ -534,88 +584,55 @@ def export_svg(result, regions, output_path, *, width=800, height=600,
     vmax = max(values.values())
     vrange = vmax - vmin if vmax > vmin else 1.0
 
-    # Compute bounding box from regions
-    all_x = []
-    all_y = []
+    # Collect all vertex coordinates for the coordinate transform
+    all_pts = []
     for verts in regions.values():
-        for vx, vy in verts:
-            all_x.append(vx)
-            all_y.append(vy)
-
-    if not all_x:
+        all_pts.extend(verts)
+    if not all_pts:
         return
 
-    data_xmin, data_xmax = min(all_x), max(all_x)
-    data_ymin, data_ymax = min(all_y), max(all_y)
-    data_w = data_xmax - data_xmin or 1.0
-    data_h = data_ymax - data_ymin or 1.0
+    ct = SVGCoordinateTransform.from_points(all_pts, width, height, margin=20)
+    tx = ct.tx
+    ty = ct.ty
 
-    margin = 20
-    scale_x = (width - 2 * margin) / data_w
-    scale_y = (height - 2 * margin) / data_h
-    scale = min(scale_x, scale_y)
+    # Build SVG using ElementTree (safe against injection)
+    svg = ET.Element("svg", {
+        "xmlns": "http://www.w3.org/2000/svg",
+        "width": str(width),
+        "height": str(height),
+        "viewBox": "0 0 %d %d" % (width, height),
+    })
 
-    def tx(x):
-        return margin + (x - data_xmin) * scale
-
-    def ty(y):
-        return margin + (data_ymax - y) * scale  # flip y
-
-    def value_color(v):
-        t = (v - vmin) / vrange
-        t = max(0.0, min(1.0, t))
-        if colormap == "heat":
-            r = int(255 * min(1.0, t * 2))
-            g = int(255 * min(1.0, t * 3 - 1)) if t > 0.33 else 0
-            b = 0
-            return "rgb(%d,%d,%d)" % (r, g, b)
-        elif colormap == "cool":
-            r = 0
-            g = int(255 * t)
-            b = int(255 * (1.0 - t))
-            return "rgb(%d,%d,%d)" % (r, g, b)
-        elif colormap == "diverging":
-            if t < 0.5:
-                s = t * 2
-                r = int(255 * s)
-                g = int(255 * s)
-                b = 255
-            else:
-                s = (t - 0.5) * 2
-                r = 255
-                g = int(255 * (1.0 - s))
-                b = int(255 * (1.0 - s))
-            return "rgb(%d,%d,%d)" % (r, g, b)
-        else:  # grayscale
-            c = int(255 * t)
-            return "rgb(%d,%d,%d)" % (c, c, c)
-
-    lines = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d"'
-        ' viewBox="0 0 %d %d">' % (width, height, width, height),
-        '<rect width="100%%" height="100%%" fill="white"/>',
-    ]
+    # Background
+    ET.SubElement(svg, "rect", {
+        "width": "100%", "height": "100%", "fill": "white",
+    })
 
     # Draw cells
-    for seed, verts in sorted(regions.items()):
-        if seed not in values:
+    for seed in sorted(regions.keys()):
+        verts = regions[seed]
+        if seed not in values or not verts:
             continue
-        val = values[seed]
-        color = value_color(val)
+        t = (values[seed] - vmin) / vrange
+        color = _value_color(t, colormap)
         pts = " ".join("%.1f,%.1f" % (tx(vx), ty(vy)) for vx, vy in verts)
-        lines.append(
-            '<polygon points="%s" fill="%s" stroke="#333" stroke-width="0.5"'
-            ' opacity="0.85"/>' % (pts, color)
-        )
+        ET.SubElement(svg, "polygon", {
+            "points": pts,
+            "fill": color,
+            "stroke": "#333",
+            "stroke-width": "0.5",
+            "opacity": "0.85",
+        })
 
     # Draw seed points
     for seed in sorted(values.keys()):
-        sx, sy = tx(seed[0]), ty(seed[1])
-        lines.append(
-            '<circle cx="%.1f" cy="%.1f" r="2" fill="black" opacity="0.5"/>'
-            % (sx, sy)
-        )
+        ET.SubElement(svg, "circle", {
+            "cx": "%.1f" % tx(seed[0]),
+            "cy": "%.1f" % ty(seed[1]),
+            "r": "2",
+            "fill": "black",
+            "opacity": "0.5",
+        })
 
     # Legend
     legend_x = width - 120
@@ -623,28 +640,30 @@ def export_svg(result, regions, output_path, *, width=800, height=600,
     for i in range(10):
         t = i / 9.0
         v = vmin + t * vrange
-        color = value_color(v)
-        y = legend_y + i * 15
-        lines.append(
-            '<rect x="%d" y="%d" width="15" height="13" fill="%s" '
-            'stroke="#666" stroke-width="0.5"/>' % (legend_x, y, color)
-        )
-        lines.append(
-            '<text x="%d" y="%d" font-size="9" fill="#333">%.1f</text>'
-            % (legend_x + 20, y + 10, v)
-        )
+        color = _value_color(t, colormap)
+        y_pos = legend_y + i * 15
+        ET.SubElement(svg, "rect", {
+            "x": str(legend_x), "y": str(y_pos),
+            "width": "15", "height": "13",
+            "fill": color, "stroke": "#666", "stroke-width": "0.5",
+        })
+        lbl = ET.SubElement(svg, "text", {
+            "x": str(legend_x + 20), "y": str(y_pos + 10),
+            "font-size": "9", "fill": "#333",
+        })
+        lbl.text = "%.1f" % v
 
-    title = "Smoothed" if not show_original else "Original"
-    lines.append(
-        '<text x="%d" y="%d" font-size="11" font-weight="bold" fill="#333">'
-        '%s (%s, iter=%d)</text>'
-        % (10, 15, title, result.config.method, result.config.iterations)
-    )
+    # Title
+    title_text = "Smoothed" if not show_original else "Original"
+    title_el = ET.SubElement(svg, "text", {
+        "x": "10", "y": "15",
+        "font-size": "11", "font-weight": "bold", "fill": "#333",
+    })
+    title_el.text = "%s (%s, iter=%d)" % (
+        title_text, result.config.method, result.config.iterations)
 
-    lines.append("</svg>")
-
-    with open(validated, "w") as f:
-        f.write("\n".join(lines))
+    tree = ET.ElementTree(svg)
+    tree.write(validated, xml_declaration=True, encoding="unicode")
 
 
 # ── CLI ──────────────────────────────────────────────────────────────
