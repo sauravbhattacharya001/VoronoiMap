@@ -241,19 +241,29 @@ def experimental_variogram(
     if len(values) != n:
         raise ValueError(f"points ({n}) and values ({len(values)}) length mismatch")
 
-    # Compute all pairwise distances
+    # Compute all pairwise distances and squared value differences.
+    # The pairs are sorted by distance so that lag binning can use
+    # bisect instead of scanning all pairs per bin — reducing
+    # binning from O(n_pairs × n_lags) to O(n_pairs log n_pairs + n_lags log n_pairs).
+    import bisect
+
     max_dist = 0.0
     pairs = []
     for i in range(n):
+        xi, yi = points[i]
+        vi = values[i]
         for j in range(i + 1, n):
-            d = _dist(points[i], points[j])
+            xj, yj = points[j]
+            dx = xi - xj
+            dy = yi - yj
+            d = math.sqrt(dx * dx + dy * dy)
             if direction is not None:
                 angle = _angle_deg(points[i], points[j])
                 if not _angle_in_tolerance(angle, direction, tolerance):
                     # Also check the reverse direction (variograms are symmetric)
                     if not _angle_in_tolerance(angle, (direction + 180) % 360, tolerance):
                         continue
-            sq_diff = (values[i] - values[j]) ** 2
+            sq_diff = (vi - values[j]) ** 2
             pairs.append((d, sq_diff))
             if d > max_dist:
                 max_dist = d
@@ -264,6 +274,14 @@ def experimental_variogram(
     if max_lag is None:
         max_lag = max_dist / 2.0  # Standard: use half max distance
 
+    # Sort pairs by distance for efficient bin assignment via bisect.
+    pairs.sort(key=lambda p: p[0])
+
+    # Build a sorted distance array and a parallel sq_diff array for
+    # O(log n) bin boundary lookups.
+    pair_dists = [p[0] for p in pairs]
+    pair_sqdiffs = [p[1] for p in pairs]
+
     lag_width = max_lag / n_lags
     bins: List[LagBin] = []
 
@@ -272,15 +290,18 @@ def experimental_variogram(
         lag_high = (k + 1) * lag_width
         lag_center = (lag_low + lag_high) / 2.0
 
-        # Collect pairs in this bin
-        bin_pairs = [sq for d, sq in pairs if lag_low <= d < lag_high]
+        # Binary search for the slice of pairs within [lag_low, lag_high)
+        lo_idx = bisect.bisect_left(pair_dists, lag_low)
+        hi_idx = bisect.bisect_left(pair_dists, lag_high)
+        count = hi_idx - lo_idx
 
-        if len(bin_pairs) >= 1:
-            semivariance = sum(bin_pairs) / (2.0 * len(bin_pairs))
+        if count >= 1:
+            total_sq = sum(pair_sqdiffs[lo_idx:hi_idx])
+            semivariance = total_sq / (2.0 * count)
             bins.append(LagBin(
                 lag_center=lag_center,
                 semivariance=semivariance,
-                pair_count=len(bin_pairs),
+                pair_count=count,
                 lag_low=lag_low,
                 lag_high=lag_high,
             ))
