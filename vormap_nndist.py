@@ -83,6 +83,10 @@ def _knn_brute(points, k):
     distances.  This reduces per-point work from O(n log n) to
     O(n log k), which is significant when k ≪ n.
 
+    Internally uses squared distances throughout the heap comparisons
+    to avoid computing sqrt on every pair.  The sqrt is only computed
+    once per retained neighbour at extraction time.
+
     Returns a list of ``(distances, indices)`` tuples, one per point.
     Each distances/indices pair is sorted by ascending distance.
     """
@@ -90,20 +94,24 @@ def _knn_brute(points, k):
 
     n = len(points)
     k_actual = min(k, n - 1)
+    _sqrt = math.sqrt
     result = []
     for i in range(n):
-        # Max-heap of size k: store (-dist, j) so largest dist pops first
+        pix, piy = points[i]
+        # Max-heap of size k: store (-dist_sq, j) so largest pops first
         heap = []
         for j in range(n):
             if i == j:
                 continue
-            d = _euclidean(points[i], points[j])
+            dx = points[j][0] - pix
+            dy = points[j][1] - piy
+            d_sq = dx * dx + dy * dy
             if len(heap) < k_actual:
-                heapq.heappush(heap, (-d, j))
-            elif d < -heap[0][0]:
-                heapq.heapreplace(heap, (-d, j))
-        # Extract and sort ascending
-        top_k = sorted((-d, j) for d, j in heap)
+                heapq.heappush(heap, (-d_sq, j))
+            elif d_sq < -heap[0][0]:
+                heapq.heapreplace(heap, (-d_sq, j))
+        # Extract, convert squared distances to actual distances, sort ascending
+        top_k = sorted((_sqrt(-d_sq), j) for d_sq, j in heap)
         result.append(([d for d, _ in top_k], [j for _, j in top_k]))
     return result
 
@@ -115,18 +123,27 @@ def _nn1_brute(points):
     point.  Specialised single-purpose helper used by ``clark_evans()``
     and ``g_function()`` to avoid the overhead of full kNN when only
     the 1-NN distance is needed.
+
+    Uses squared distances internally and only computes sqrt once per
+    point (for the final minimum), eliminating n-1 sqrt calls per point.
+    Also inlines the distance computation to avoid per-pair function call
+    overhead.
     """
     n = len(points)
+    _sqrt = math.sqrt
     result = []
     for i in range(n):
-        min_d = float("inf")
+        pix, piy = points[i]
+        min_d_sq = float("inf")
         for j in range(n):
             if i == j:
                 continue
-            d = _euclidean(points[i], points[j])
-            if d < min_d:
-                min_d = d
-        result.append(min_d)
+            dx = points[j][0] - pix
+            dy = points[j][1] - piy
+            d_sq = dx * dx + dy * dy
+            if d_sq < min_d_sq:
+                min_d_sq = d_sq
+        result.append(_sqrt(min_d_sq))
     return result
 
 
