@@ -54,6 +54,7 @@ import math
 import os
 from vormap_utils import euclidean as _edge_length
 import statistics
+import vormap
 
 from vormap_utils import euclidean as _edge_length
 
@@ -704,6 +705,7 @@ def export_json(result, path):
     path : str
         Output file path.
     """
+    vormap.validate_output_path(path)
     # Build a JSON-safe copy (omit large vertex arrays per-triangle)
     export = {
         "num_points": result["num_points"],

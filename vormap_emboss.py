@@ -42,6 +42,8 @@ import zlib
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
+import vormap
+
 # ---------------------------------------------------------------------------
 # Material palettes — base colour + highlight/shadow tints
 # ---------------------------------------------------------------------------
@@ -303,7 +305,7 @@ def _make_png(width: int, height: int, pixels: List[List[Tuple[int, int, int]]])
 
 def save_png(result: EmbossResult, filepath: str) -> None:
     """Save an EmbossResult to a PNG file."""
-    # Basic path safety
+    vormap.validate_output_path(filepath)
     resolved = os.path.realpath(filepath)
     data = _make_png(result.width, result.height, result.pixels)
     with open(resolved, "wb") as f:

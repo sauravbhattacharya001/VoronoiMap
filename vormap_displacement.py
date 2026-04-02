@@ -51,6 +51,8 @@ import zlib
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
+import vormap
+
 
 # ---------------------------------------------------------------------------
 # Minimal PNG writer (no external deps)
@@ -308,6 +310,7 @@ def save_png(result: DisplacementResult, path: str) -> None:
     For ``map_type="both"`` the displacement and normal maps are placed
     side-by-side in a single image.
     """
+    vormap.validate_output_path(path)
     w, h = result.width, result.height
 
     if result.map_type == "displacement" and result.displacement is not None:

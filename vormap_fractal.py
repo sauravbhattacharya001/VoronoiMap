@@ -54,6 +54,7 @@ CLI::
 
 import json
 import math
+import vormap
 
 
 # ── Box-Counting Dimension ───────────────────────────────────
@@ -648,6 +649,7 @@ def export_json(result, path):
     path : str
         Output file path.
     """
+    vormap.validate_output_path(path)
     # Strip raw data that's too verbose for export
     export = {}
     for key, value in result.items():

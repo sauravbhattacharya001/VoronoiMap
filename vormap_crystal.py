@@ -36,6 +36,8 @@ import sys
 import zlib
 from typing import List, Optional, Tuple
 
+import vormap
+
 # ---------------------------------------------------------------------------
 # NumPy fast-path / pure-Python fallback
 # ---------------------------------------------------------------------------
@@ -317,6 +319,7 @@ def save_image(path: str, grid: List[List[int]], crystals: List[Crystal],
                config: CrystalConfig | None = None,
                show_borders: bool = True) -> None:
     """Render and save as PNG."""
+    vormap.validate_output_path(path)
     cfg = config or CrystalConfig()
     img = render(grid, crystals, cfg, show_borders)
     h = len(img)
@@ -330,6 +333,7 @@ def save_animation(path: str, frames: List[List[List[int]]],
                    show_borders: bool = True,
                    every: int = 1) -> None:
     """Save growth animation as animated GIF (requires Pillow) or PNG sequence."""
+    vormap.validate_output_path(path)
     cfg = config or CrystalConfig()
     try:
         from PIL import Image as PILImage
