@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-04-01T05:41:00.000Z",
-  "lastRepo": "BioBots",
-  "lastFeature": "Bioink Material Database — searchable reference of 18 bioprinting materials",
-  "runsCompleted": 64,
+  "lastRun": "2026-04-02T05:49:00.000Z",
+  "lastRepo": "Vidly",
+  "lastFeature": "Movie Connections — NYT Connections-style puzzle game with 5 puzzles, 4 difficulty tiers",
+  "runsCompleted": 76,
   "repoFeatures": {
     "WinSentinel": [
       "Peer Benchmark CLI command (--peers)",
@@ -15,7 +15,8 @@
       "Light/dark theme toggle for dashboard",
       "Command Center dashboard — unified activity feed aggregating alerts, budgets, and health signals",
       "Session Replay Debugger — step-through playback with transport controls, timeline markers, detail inspector",
-      "Interactive Dependency Graph dashboard — force-directed Canvas visualization with pan/zoom/drag, health color-coding, co-occurrence edges, detail inspector"
+      "Interactive Dependency Graph dashboard — force-directed Canvas visualization with pan/zoom/drag, health color-coding, co-occurrence edges, detail inspector",
+      "Agent Health Heatmap — GitHub-style calendar view with daily health scores, hourly drill-down"
     ],
     "sauravcode": [
       "Terminal cheat sheet command (sauravcheat.py)",
@@ -34,13 +35,15 @@
       "Smart auto-rename sessions after first assistant reply",
       "Incognito Mode - private sessions that skip localStorage persistence",
       "Message Reply/Quote — reply to specific messages with context preview bar",
-      "Conversation Timer — per-session active time tracking with auto-pause and time log dashboard (Alt+T)"
+      "Conversation Timer — per-session active time tracking with auto-pause and time log dashboard (Alt+T)",
+      "API Inspector — debug panel for API request/response logging with timing, tokens, cost"
     ],
     "gif-captcha": [
       "Personal stats tracker page (my-stats.html)",
       "Threat Intelligence Feed dashboard (threat-feed.html) — live simulated bot attack patterns, filtering, CSV export, trend chart",
       "Cost Calculator (cost-calculator.html) — estimate deployment costs with presets, breakdown, competitor comparison, CSV/JSON export",
-      "Bot or Human? interactive quiz (bot-or-human.html) — 15-round behavioral signal analysis game with Canvas trails, scoring, explanations"
+      "Bot or Human? interactive quiz (bot-or-human.html) — 15-round behavioral signal analysis game with Canvas trails, scoring, explanations",
+      "Integration Wizard (integration-wizard.html) — code generator for 6 backends (Express, Flask, Django, PHP, Rails, Go) + 4 frontends (Vanilla JS, React, Vue, Svelte) with configurable settings"
     ],
     "getagentbox": [
       "Visual sitemap page with search and categorized navigation",
@@ -53,50 +56,59 @@
       "Global command palette (Ctrl+K) for quick tool navigation",
       "Lab Unit Converter (9 categories: Volume, Mass, Length, Temperature, Pressure, Flow Rate, Time, Print Speed, Force)",
       "Bioprinting Glossary — searchable knowledge base with 39 terms, category filters, alphabetical nav, cross-references, and custom terms",
-      "Bioink Material Database — searchable reference of 18 bioprinting materials with filtering, comparison, and detail views"
+      "Bioink Material Database — searchable reference of 18 bioprinting materials with filtering, comparison, and detail views",
+      "Workflow Builder — visual multi-step protocol designer with drag-and-drop, 14 step types, 3 presets, dependencies, undo/redo, JSON/Markdown export"
     ],
     "everything": [
       "Sleep Calculator for optimal bedtime/wake-up times based on 90-minute cycles",
       "Text Statistics tool with word/char/sentence counts, reading time, and frequency analysis",
       "Sort Visualizer — interactive animated visualization of 5 sorting algorithms",
       "Daily Standup check-in — morning planning with yesterday/today/blockers, energy tracking, streaks",
-      "JSON Formatter tool with validation, tree view, and stats"
+      "JSON Formatter tool with validation, tree view, and stats",
+      "FIRE Calculator — financial independence planning tool with projections, milestones, and growth chart",
+      "Gradient Generator — interactive gradient builder with live preview, presets, CSS/Flutter code export"
     ],
     "ai": [
       "Quick-scan consolidated safety assessment command (preflight + scorecard + compliance + policy-lint)",
       "MITRE ATT&CK-style Threat Matrix — interactive HTML with 26 techniques across 7 tactics, severity filtering, coverage stats",
       "War Room Dashboard — interactive incident command center with fleet grid, event feed, kill switch, resource gauges, timeline",
-      "Contract Configuration Wizard — interactive HTML builder with 4-step wizard, live safety scoring, 5 presets, risk badges, compliance hints"
+      "Contract Configuration Wizard — interactive HTML builder with 4-step wizard, live safety scoring, 5 presets, risk badges, compliance hints",
+      "Interactive Incident Response Simulator — choose-your-own-adventure HTML game with 3 scenarios, 48 decision nodes"
     ],
     "GraphVisual": [
       "Interactive Random Walk Simulator with visit heatmap, cover time, and preset graphs",
       "Interactive Graph Isomorphism Checker with draw/text input, backtracking solver, color-coded mapping, presets",
       "Interactive Bipartite Graph Checker with BFS 2-coloring, odd cycle detection, animated layout, 7 presets",
-      "Euler Path & Circuit Finder with Hierholzer's algorithm animation, 6 presets, directed/undirected"
+      "Euler Path & Circuit Finder with Hierholzer's algorithm animation, 6 presets, directed/undirected",
+      "Interactive SCC Finder — Tarjan's algorithm with step-by-step animation, stack visualization, 6 presets"
     ],
     "Vidly": [
       "Movie Showdown head-to-head voting game with leaderboard",
       "Interactive Movie Timeline with genre color-coding and filtering",
       "Watch Party Planner — themed movie night plans with snack pairings and share codes",
-      "Movie Roulette — interactive spin-the-wheel random movie picker with Canvas animation, genre/rating filters"
+      "Movie Roulette — interactive spin-the-wheel random movie picker with Canvas animation, genre/rating filters",
+      "Movie Connections — NYT Connections-style puzzle with 5 puzzles, difficulty tiers, one-away hints"
     ],
     "prompt": [
       "PromptShareFormatter for multi-format prompt sharing (PlainText, Markdown, HTML, JSON, YAML)",
       "PromptPersonaBuilder — fluent builder for AI persona/system prompts with 4 presets, merge, compact render",
       "PromptRecipe — portable prompt bundles with builder, serialization, validation, and few-shot examples",
-      "PromptConversationSimulator — scripted multi-turn conversation testing with branching, conditions, validation, and multi-format export"
+      "PromptConversationSimulator — scripted multi-turn conversation testing with branching, conditions, validation, and multi-format export",
+      "PromptTournament — bracket-style prompt comparison engine with round-robin/elimination, weighted criteria, custom scorers"
     ],
     "Ocaml-sample-code": [
       "Maze generator & solver with BFS/DFS/A* and ASCII visualization",
       "Turing Machine simulator with tape visualization, 4 example machines (binary increment, unary addition, palindrome checker, 3-state busy beaver)",
       "Mini Prolog interpreter with unification, backtracking, arithmetic, list syntax, and interactive REPL",
-      "Forth interpreter — stack-based language with full control flow, definitions, variables, loops, decompiler"
+      "Forth interpreter — stack-based language with full control flow, definitions, variables, loops, decompiler",
+      "Petri Net simulator & analyzer — concurrent system modeling with deadlock detection, boundedness, liveness analysis"
     ],
     "FeedReader": [
       "Feed Weather Reporter - weather metaphor for feed activity analytics",
       "RSVP Speed Reading Mode (ArticleSpeedReadPresenter) - rapid serial visual presentation engine",
       "ArticleSummarizer & ArticleSummaryGenerator — TF-IDF extractive text summarization with title/position boosting",
-      "ReadingPaceCalculator — queue completion forecasting, pace trends, daily targets, weekly summaries"
+      "ReadingPaceCalculator — queue completion forecasting, pace trends, daily targets, weekly summaries",
+      "ReadingBingoManager — gamified 5x5 bingo card with 40+ challenges, line/blackout detection, card history"
     ]
   }
 }

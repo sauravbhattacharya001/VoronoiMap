@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-04-01T05:55:32.416Z",
-  "totalRuns": 2079,
+  "lastUpdated": "2026-04-02T05:05:00.000Z",
+  "totalRuns": 2095,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -14,20 +14,20 @@
     },
     "security_fix": {
       "weight": 18.1,
-      "runs": 206,
-      "successes": 206,
+      "runs": 207,
+      "successes": 207,
       "description": "Fix security vulnerability",
       "totalDone": 10
     },
     "perf_improvement": {
       "weight": 17.1,
-      "runs": 256,
-      "successes": 255
+      "runs": 259,
+      "successes": 258
     },
     "refactor": {
       "weight": 18.1,
-      "runs": 268,
-      "successes": 271
+      "runs": 270,
+      "successes": 273
     },
     "readme_overhaul": {
       "weight": 20,
@@ -51,8 +51,8 @@
     },
     "open_issue": {
       "weight": 15.1,
-      "runs": 123,
-      "successes": 126,
+      "runs": 124,
+      "successes": 127,
       "description": "Open a thoughtful issue",
       "totalDone": 2,
       "attempts": 4
@@ -95,8 +95,8 @@
     },
     "create_release": {
       "weight": 20,
-      "runs": 176,
-      "successes": 176,
+      "runs": 181,
+      "successes": 181,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
@@ -119,8 +119,8 @@
     },
     "add_badges": {
       "weight": 10,
-      "runs": 17,
-      "successes": 17,
+      "runs": 18,
+      "successes": 18,
       "description": "Add badges to README"
     },
     "add_license": {
@@ -155,8 +155,8 @@
     },
     "code_coverage": {
       "weight": 20,
-      "runs": 38,
-      "successes": 37,
+      "runs": 39,
+      "successes": 38,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
@@ -177,8 +177,8 @@
     },
     "add_tests": {
       "weight": 18.1,
-      "runs": 20,
-      "successes": 20,
+      "runs": 22,
+      "successes": 22,
       "description": "Add test suites for untested modules"
     }
   },
@@ -200,20 +200,20 @@
     "everything": [],
     "prompt": []
   },
-  "notes": "Run 2171-2172: create_release agentlens (v1.21.0 - Analytics Performance & Lazy Statements), refactor BioBots (deduplicate scriptUtils via canonical shared modules)",
-  "lastRepo": "BioBots",
-  "lastRun": "2026-03-31",
-  "runCount": 747,
+  "notes": "Run 2187-2188: code_coverage gif-captcha (Codecov CI integration + badge), open_issue prompt (#175 - ApiKey serialization leak)",
+  "lastRepo": "prompt",
+  "lastRun": "2026-04-01",
+  "runCount": 756,
   "lastTasks": [
-    "create_release",
-    "refactor"
+    "code_coverage",
+    "open_issue"
   ],
   "lastRepos": [
-    "agentlens",
-    "BioBots"
+    "gif-captcha",
+    "prompt"
   ],
-  "lastRunTimestamp": "2026-04-01T05:55:32.418Z",
-  "runCounter": 2172,
+  "lastRunTimestamp": "2026-04-02T05:05:00.000Z",
+  "runCounter": 2188,
   "lastWeightAdjustment": 1191,
   "adjustmentHistory": [
     {
