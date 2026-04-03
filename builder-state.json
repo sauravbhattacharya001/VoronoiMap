@@ -1,63 +1,82 @@
 {
-  "lastRun": "2026-04-02T05:49:00.000Z",
-  "lastRepo": "Vidly",
-  "lastFeature": "Movie Connections — NYT Connections-style puzzle game with 5 puzzles, 4 difficulty tiers",
-  "runsCompleted": 76,
+  "lastRun": "2026-04-03T05:53:00.000Z",
+  "lastRepo": "FeedReader",
+  "lastFeature": "ArticleFactChecker — heuristic claim extraction and verifiability analysis",
+  "runsCompleted": 124,
   "repoFeatures": {
     "WinSentinel": [
       "Peer Benchmark CLI command (--peers)",
       "Doctor command for self-diagnostics (--doctor)",
       "Security Forecast CLI command (--forecast) — linear regression predictions for score/findings/critical",
       "Report Card CLI command (--reportcard) — per-module letter grades, trend arrows, priority actions",
-      "Burndown CLI command (--burndown) — ASCII burndown chart with severity filter, burn rate, zero-date projection"
+      "Burndown CLI command (--burndown) — ASCII burndown chart with severity filter, burn rate, zero-date projection",
+      "Changelog CLI command (--changelog) — security posture drift tracking with weekly/monthly/daily grouping, module impact table",
+      "Security Pulse CLI command (--pulse) — ASCII EKG heartbeat visualization with scores, streaks, alerts, findings"
     ],
     "agentlens": [
       "Light/dark theme toggle for dashboard",
       "Command Center dashboard — unified activity feed aggregating alerts, budgets, and health signals",
       "Session Replay Debugger — step-through playback with transport controls, timeline markers, detail inspector",
       "Interactive Dependency Graph dashboard — force-directed Canvas visualization with pan/zoom/drag, health color-coding, co-occurrence edges, detail inspector",
-      "Agent Health Heatmap — GitHub-style calendar view with daily health scores, hourly drill-down"
+      "Agent Health Heatmap — GitHub-style calendar view with daily health scores, hourly drill-down",
+      "Anomaly Detection Dashboard — statistical outlier detection with timeline, 3 algorithms, threshold config",
+      "Alert Rules Builder — interactive alert rule management with visual builder, 13 metrics, conditions, notification channels, import/export"
     ],
     "sauravcode": [
       "Terminal cheat sheet command (sauravcheat.py)",
       "sauravshare.py — export .srv files as shareable HTML pages",
       "Interactive tutorial (sauravtutorial.py) — 17-lesson guided terminal tutorial",
       "sauravcanvas — turtle graphics for SVG/HTML output",
-      "sauravgolf.py — code golf challenges with 15 puzzles, par scoring, personal bests, leaderboard"
+      "sauravgolf.py — code golf challenges with 15 puzzles, par scoring, personal bests, leaderboard",
+      "sauravkata.py — coding kata exercise system with 12 challenges, 4 tiers, hints, streaks, daily kata",
+      "sauravregex — interactive regex tester & debugger with REPL, quiz, pattern analyzer, backtracking detection",
+      "sauravcipher - interactive cipher workbench with 7 ciphers, REPL, frequency analysis, Caesar cracker, cipher chaining",
+      "sauravmatrix — interactive matrix calculator & linear algebra toolkit with REPL, decompositions, eigenvalues, solver"
     ],
     "VoronoiMap": [
       "Dataset summary CLI (--summary, --summary-json)",
       "Interactive HTML Voronoi Playground (--playground flag)",
       "vormap_label — automatic label placement using Pole of Inaccessibility with SVG/HTML/JSON/CSV export",
-      "vormap_gallery.py — interactive Voronoi style gallery with 14 art styles, comparison mode, PNG export"
+      "vormap_gallery.py — interactive Voronoi style gallery with 14 art styles, comparison mode, PNG export",
+      "vormap_tile — seamless tileable Voronoi pattern generator with 5 styles, 6 palettes, Lloyd relaxation, tile preview",
+      "vormap_transform — geometric transformations with chainable pipeline, SVG visualization",
+      "vormap_text — Voronoi Typography: text as Voronoi cell mosaics with bitmap font, 7 colormaps, SVG/HTML export"
     ],
     "agenticchat": [
       "Smart auto-rename sessions after first assistant reply",
       "Incognito Mode - private sessions that skip localStorage persistence",
       "Message Reply/Quote — reply to specific messages with context preview bar",
       "Conversation Timer — per-session active time tracking with auto-pause and time log dashboard (Alt+T)",
-      "API Inspector — debug panel for API request/response logging with timing, tokens, cost"
+      "API Inspector — debug panel for API request/response logging with timing, tokens, cost",
+      "Ambient Sound Player — procedural soundscapes (rain, café, fire, wind, stream, white noise) with mixer panel, presets, persistence",
+      "Sticky Notes Board — visual draggable brainstorming canvas per session with color cycling, resize, persistence (Alt+N)",
+      "Conversation Stash — git-stash-style save/restore for conversations with stash stack, pop, apply, slash commands (Ctrl+Shift+Z)"
     ],
     "gif-captcha": [
       "Personal stats tracker page (my-stats.html)",
       "Threat Intelligence Feed dashboard (threat-feed.html) — live simulated bot attack patterns, filtering, CSV export, trend chart",
       "Cost Calculator (cost-calculator.html) — estimate deployment costs with presets, breakdown, competitor comparison, CSV/JSON export",
       "Bot or Human? interactive quiz (bot-or-human.html) — 15-round behavioral signal analysis game with Canvas trails, scoring, explanations",
-      "Integration Wizard (integration-wizard.html) — code generator for 6 backends (Express, Flask, Django, PHP, Rails, Go) + 4 frontends (Vanilla JS, React, Vue, Svelte) with configurable settings"
+      "Integration Wizard (integration-wizard.html) — code generator for 6 backends (Express, Flask, Django, PHP, Rails, Go) + 4 frontends (Vanilla JS, React, Vue, Svelte) with configurable settings",
+      "Research Paper Generator (research-paper.html) — wizard-guided academic report builder with 5 steps, 3 presets, Canvas charts, LaTeX/HTML/text export"
     ],
     "getagentbox": [
       "Visual sitemap page with search and categorized navigation",
       "Interactive Agent Simulator page (simulator.html) — chat with simulated AgentBox showing 7 capability categories",
       "Badge Generator (badges.html) — embeddable SVG badge builder with presets, styles, colors, and copy-to-clipboard",
       "Agent Persona Creator (persona-creator.html) — interactive personality designer with live chat preview, presets, export",
-      "Interactive CLI Playground — simulated terminal emulator with 12 AgentBox commands, animated output, command history"
+      "Interactive CLI Playground — simulated terminal emulator with 12 AgentBox commands, animated output, command history",
+      "Readiness Assessment (readiness.html) — interactive 10-question quiz with animated score ring, 5-dimension breakdown, personalized action plan",
+      "Agent Marketplace (marketplace.html) — browsable catalog of 18 community agent templates with search, categories, sorting, detail modal, deploy simulation"
     ],
     "BioBots": [
       "Global command palette (Ctrl+K) for quick tool navigation",
       "Lab Unit Converter (9 categories: Volume, Mass, Length, Temperature, Pressure, Flow Rate, Time, Print Speed, Force)",
       "Bioprinting Glossary — searchable knowledge base with 39 terms, category filters, alphabetical nav, cross-references, and custom terms",
       "Bioink Material Database — searchable reference of 18 bioprinting materials with filtering, comparison, and detail views",
-      "Workflow Builder — visual multi-step protocol designer with drag-and-drop, 14 step types, 3 presets, dependencies, undo/redo, JSON/Markdown export"
+      "Workflow Builder — visual multi-step protocol designer with drag-and-drop, 14 step types, 3 presets, dependencies, undo/redo, JSON/Markdown export",
+      "Cell Passage Tracker dashboard — interactive cell line passage monitoring with viability trends, senescence risk, fleet overview, Canvas charts, export",
+      "Plate Layout Designer — interactive visual well plate experiment planner with drag-to-paint, custom conditions, edge blanks, undo/redo, CSV/TSV/JSON export"
     ],
     "everything": [
       "Sleep Calculator for optimal bedtime/wake-up times based on 90-minute cycles",
@@ -66,49 +85,78 @@
       "Daily Standup check-in — morning planning with yesterday/today/blockers, energy tracking, streaks",
       "JSON Formatter tool with validation, tree view, and stats",
       "FIRE Calculator — financial independence planning tool with projections, milestones, and growth chart",
-      "Gradient Generator — interactive gradient builder with live preview, presets, CSS/Flutter code export"
+      "Gradient Generator — interactive gradient builder with live preview, presets, CSS/Flutter code export",
+      "Subnet Calculator — IPv4 CIDR calculator with network details, binary mask, subdivision, copy-to-clipboard",
+      "Text Diff Checker — compare two texts with line/word/character diff modes, LCS algorithm, similarity stats",
+      "Markdown Preview — live editor with split-pane rendered output, inline formatting, stats bar",
+      "Color Contrast Checker — WCAG 2.1 accessibility tool with contrast ratio, AA/AAA badges, auto-suggest, presets",
+      "Electricity Cost Calculator — appliance cost estimator with 29 presets, rate slider, daily/monthly/yearly summaries, cost breakdown",
+      "Date Calculator — date difference and add/subtract durations with business days, presets",
+      "Readability Analyzer — 6 readability indices (Flesch, Gunning Fog, Coleman-Liau, ARI, SMOG) with gauges and audience guidance",
+      "Hash Generator — compute MD5/SHA-1/SHA-224/SHA-256/SHA-384/SHA-512 digests with algorithm picker and show-all mode",
+      "Wordle word game — guess the 5-letter word in 6 tries with keyboard tracking, streaks, 500+ words"
     ],
     "ai": [
       "Quick-scan consolidated safety assessment command (preflight + scorecard + compliance + policy-lint)",
       "MITRE ATT&CK-style Threat Matrix — interactive HTML with 26 techniques across 7 tactics, severity filtering, coverage stats",
       "War Room Dashboard — interactive incident command center with fleet grid, event feed, kill switch, resource gauges, timeline",
       "Contract Configuration Wizard — interactive HTML builder with 4-step wizard, live safety scoring, 5 presets, risk badges, compliance hints",
-      "Interactive Incident Response Simulator — choose-your-own-adventure HTML game with 3 scenarios, 48 decision nodes"
+      "Interactive Incident Response Simulator — choose-your-own-adventure HTML game with 3 scenarios, 48 decision nodes",
+      "Fleet Simulator — interactive animated HTML visualization with Canvas agents, kill switch, budget, lineage tree, anomaly detection, 4 presets",
+      "Risk Register — formal risk tracking & lifecycle management with structured entries, state transitions, audit trail, inherent/residual scoring, HTML/CSV/JSON export",
+      "Safety Diff — structured snapshot comparison with scorecard dimension deltas, compliance finding diffs, risk register changes, HTML export"
     ],
     "GraphVisual": [
       "Interactive Random Walk Simulator with visit heatmap, cover time, and preset graphs",
       "Interactive Graph Isomorphism Checker with draw/text input, backtracking solver, color-coded mapping, presets",
       "Interactive Bipartite Graph Checker with BFS 2-coloring, odd cycle detection, animated layout, 7 presets",
       "Euler Path & Circuit Finder with Hierholzer's algorithm animation, 6 presets, directed/undirected",
-      "Interactive SCC Finder — Tarjan's algorithm with step-by-step animation, stack visualization, 6 presets"
+      "Interactive SCC Finder — Tarjan's algorithm with step-by-step animation, stack visualization, 6 presets",
+      "Articulation Points & Bridges Finder — interactive Tarjan's DFS with step animation, 6 presets, disc/low table",
+      "Network Resilience Analyzer — interactive attack simulation with 4 strategies (degree, betweenness, random, cascading), 6 presets, robustness curves, R-index, strategy comparison",
+      "Interactive Planarity Tester — canvas editor with K5/K3,3 detection, edge bounds, Euler formula, 8 presets"
     ],
     "Vidly": [
       "Movie Showdown head-to-head voting game with leaderboard",
       "Interactive Movie Timeline with genre color-coding and filtering",
       "Watch Party Planner — themed movie night plans with snack pairings and share codes",
       "Movie Roulette — interactive spin-the-wheel random movie picker with Canvas animation, genre/rating filters",
-      "Movie Connections — NYT Connections-style puzzle with 5 puzzles, difficulty tiers, one-away hints"
+      "Movie Connections — NYT Connections-style puzzle with 5 puzzles, difficulty tiers, one-away hints",
+      "Movie Emoji Story — guess movies from emoji plot summaries with 30 puzzles, 3 difficulties, hints, streak scoring",
+      "Movie Crossword Puzzle — interactive crossword game with 5 themed puzzles, timer, hints, stats",
+      "Movie Mad Libs — fill-in-the-blank movie plot remix game with 10 classic movie templates, random picker, original plot reveal"
     ],
     "prompt": [
       "PromptShareFormatter for multi-format prompt sharing (PlainText, Markdown, HTML, JSON, YAML)",
       "PromptPersonaBuilder — fluent builder for AI persona/system prompts with 4 presets, merge, compact render",
       "PromptRecipe — portable prompt bundles with builder, serialization, validation, and few-shot examples",
       "PromptConversationSimulator — scripted multi-turn conversation testing with branching, conditions, validation, and multi-format export",
-      "PromptTournament — bracket-style prompt comparison engine with round-robin/elimination, weighted criteria, custom scorers"
+      "PromptTournament — bracket-style prompt comparison engine with round-robin/elimination, weighted criteria, custom scorers",
+      "PromptChecklist — pre-flight best-practices validator with 16 checks, scoring, presets, comparison",
+      "PromptFlowChart — Mermaid diagram generator for prompt chains/workflows with fluent API, 7 node shapes, subgraphs, validation, HTML/Markdown/raw output",
+      "PromptDialect — convert prompts between AI model formats (ChatGPT, Claude, Gemini, Llama, Mistral) with API JSON generation, parsing, and comparison",
+      "PromptCoEvolver — genetic algorithm-inspired prompt breeding with 5 crossover strategies, 8 mutations, 4 fitness criteria, multi-generation evolution, lineage tracking"
     ],
     "Ocaml-sample-code": [
       "Maze generator & solver with BFS/DFS/A* and ASCII visualization",
       "Turing Machine simulator with tape visualization, 4 example machines (binary increment, unary addition, palindrome checker, 3-state busy beaver)",
       "Mini Prolog interpreter with unification, backtracking, arithmetic, list syntax, and interactive REPL",
       "Forth interpreter — stack-based language with full control flow, definitions, variables, loops, decompiler",
-      "Petri Net simulator & analyzer — concurrent system modeling with deadlock detection, boundedness, liveness analysis"
+      "Petri Net simulator & analyzer — concurrent system modeling with deadlock detection, boundedness, liveness analysis",
+      "Logic Circuit Simulator — digital gate simulation with truth tables, depth analysis, 6 built-in circuits",
+      "Algorithmic Music Composer — scales, chords, progressions, random walk/Markov/L-system melody generators, Euclidean rhythms, ABC export",
+      "Binary Decision Diagram (BDD) — ROBDD with hash-consing, Apply algorithm, SAT/TAUT, quantification, DOT export, interactive REPL"
     ],
     "FeedReader": [
       "Feed Weather Reporter - weather metaphor for feed activity analytics",
       "RSVP Speed Reading Mode (ArticleSpeedReadPresenter) - rapid serial visual presentation engine",
       "ArticleSummarizer & ArticleSummaryGenerator — TF-IDF extractive text summarization with title/position boosting",
       "ReadingPaceCalculator — queue completion forecasting, pace trends, daily targets, weekly summaries",
-      "ReadingBingoManager — gamified 5x5 bingo card with 40+ challenges, line/blackout detection, card history"
+      "ReadingBingoManager — gamified 5x5 bingo card with 40+ challenges, line/blackout detection, card history",
+      "ArticleTimeCapsule — bury articles for future resurfacing with presets, reflections, tags, stats",
+      "ArticleReadingListSharer — curate and share reading lists as HTML/Markdown/JSON/OPML with curator notes, search, stats",
+      "ArticleQuizGenerator — comprehension quiz engine with fill-in-the-blank, vocabulary, title-based questions, cross-article mode, scoring",
+      "ArticleFactChecker — heuristic claim extraction & verifiability analysis with credibility scoring"
     ]
   }
 }

@@ -53,6 +53,8 @@ Read C:\Users\onlin\.openclaw\workspace\gardener-weights.json at the start of ea
 
 Clone to C:\Users\onlin\.openclaw\workspace\temp-garden, work there, push, clean up.
 
+⛔ **REMINDER: `git push origin HEAD:main` (or HEAD:master). NEVER `gh pr create`. NEVER create branches. Commit on default branch, push directly. This applies to EVERY task above.**
+
 ## ALWAYS PUSH DIRECTLY — NEVER OPEN PRs
 
 **Push directly to the default branch (main/master). Do NOT open pull requests.** Branch protection is configured to allow direct pushes. Use:
