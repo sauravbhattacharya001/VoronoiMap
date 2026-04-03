@@ -12,6 +12,12 @@ continue to work.
 import math
 from typing import List, Tuple
 
+try:
+    import numpy as np
+    _HAS_NUMPY = True
+except ImportError:
+    _HAS_NUMPY = False
+
 # polygon_area is defined in vormap_geometry with full precision.
 # Re-export it here for backward compatibility.
 # NOTE: Lazy import to avoid circular dependency (vormap_geometry imports
@@ -40,6 +46,23 @@ def polygon_centroid(vertices):
         return (0.0, 0.0)
     if n <= 2:
         return polygon_centroid_mean(vertices)
+
+    # For large polygons (> 64 vertices), numpy vectorization wins.
+    # For the typical Voronoi polygon (5-20 vertices), array construction
+    # overhead makes numpy slower than a plain Python loop.
+    if _HAS_NUMPY and n > 64:
+        pts = np.asarray(vertices)
+        x = pts[:, 0]
+        y = pts[:, 1]
+        x_next = np.roll(x, -1)
+        y_next = np.roll(y, -1)
+        cross = x * y_next - x_next * y
+        signed_area = cross.sum() * 0.5
+        if abs(signed_area) < 1e-12:
+            return polygon_centroid_mean(vertices)
+        cx = ((x + x_next) * cross).sum() / (6.0 * signed_area)
+        cy = ((y + y_next) * cross).sum() / (6.0 * signed_area)
+        return (float(cx), float(cy))
 
     cx = 0.0
     cy = 0.0
@@ -223,21 +246,27 @@ def compute_nn_distances(points):
         from scipy.spatial import KDTree
         tree = KDTree(points)
         dists, _ = tree.query(points, k=2)  # k=2: self + nearest
-        return [dists[i][1] for i in range(n)]
+        # Return column slice directly — avoids O(n) Python list
+        # comprehension; dists[:, 1] is a numpy array that behaves
+        # like a list for all downstream uses.
+        return dists[:, 1].tolist()
     except ImportError:
         pass
 
-    # Brute force fallback — use math.hypot for C-level speed
-    _hypot = math.hypot
+    # Brute force fallback — use squared distances to avoid sqrt in the
+    # inner loop (sqrt is monotonic so ordering is preserved), then take
+    # a single sqrt per point for the final result.
     nn_dists = []
     for i in range(n):
         xi, yi = points[i]
-        best = float("inf")
+        best_sq = float("inf")
         for j in range(n):
             if i == j:
                 continue
-            d = _hypot(xi - points[j][0], yi - points[j][1])
-            if d < best:
-                best = d
-        nn_dists.append(best)
+            dx = xi - points[j][0]
+            dy = yi - points[j][1]
+            dsq = dx * dx + dy * dy
+            if dsq < best_sq:
+                best_sq = dsq
+        nn_dists.append(math.sqrt(best_sq))
     return nn_dists
