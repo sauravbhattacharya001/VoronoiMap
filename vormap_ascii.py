@@ -20,8 +20,10 @@ Usage (CLI):
     voronoimap datauni5.txt 5 --ascii --ascii-mono
 """
 
-import math
 import sys
+from itertools import chain
+
+from vormap_utils import bounding_box
 
 
 # ── ANSI color palettes ──────────────────────────────────────────────
@@ -53,6 +55,31 @@ def _point_in_polygon(px, py, polygon):
     return inside
 
 
+def _build_owner_grid(height, width, min_x, min_y, range_x, range_y, poly_list):
+    """Build a 2D grid mapping each cell to its owning region index (-1 = none)."""
+    grid = []
+    max_h = max(height - 1, 1)
+    max_w = max(width - 1, 1)
+    for row in range(height):
+        py = min_y + (row / max_h) * range_y
+        grid_row = []
+        for col in range(width):
+            px = min_x + (col / max_w) * range_x
+            owner = -1
+            for i, poly in enumerate(poly_list):
+                if _point_in_polygon(px, py, poly):
+                    owner = i
+                    break
+            grid_row.append(owner)
+        grid.append(grid_row)
+    return grid
+
+
+def _grid_coord(val, min_val, range_val, max_idx):
+    """Map a world coordinate to an integer grid coordinate."""
+    return int((val - min_val) / range_val * max_idx)
+
+
 def render(regions, data, *, width=80, height=24, mono=False,
            show_seeds=True, file=None):
     """Render a Voronoi diagram to the terminal.
@@ -82,11 +109,9 @@ def render(regions, data, *, width=80, height=24, mono=False,
         return
 
     # Compute bounding box from all polygon vertices
-    all_verts = [v for poly in regions.values() for v in poly]
-    xs = [v[0] for v in all_verts]
-    ys = [v[1] for v in all_verts]
-    min_x, max_x = min(xs), max(xs)
-    min_y, max_y = min(ys), max(ys)
+    min_x, min_y, max_x, max_y = bounding_box(
+        chain.from_iterable(regions.values())
+    )
 
     # Add small padding
     pad_x = (max_x - min_x) * 0.02 or 1.0
@@ -108,8 +133,8 @@ def render(regions, data, *, width=80, height=24, mono=False,
     seed_grid = {}
     if show_seeds:
         for sx, sy in seed_list:
-            gx = int((sx - min_x) / range_x * (width - 1))
-            gy = int((sy - min_y) / range_y * (height - 1))
+            gx = _grid_coord(sx, min_x, range_x, width - 1)
+            gy = _grid_coord(sy, min_y, range_y, height - 1)
             seed_grid[(gx, gy)] = True
 
     # Monochrome boundary chars
@@ -118,27 +143,15 @@ def render(regions, data, *, width=80, height=24, mono=False,
     _EMPTY = ' '
 
     # ── Build owner grid ───────────────────────────────────────────
-    grid = []
-    for row in range(height):
-        grid_row = []
-        py = min_y + (row / max(height - 1, 1)) * range_y
-        for col in range(width):
-            px = min_x + (col / max(width - 1, 1)) * range_x
-            owner = -1
-            for i, poly in enumerate(poly_list):
-                if _point_in_polygon(px, py, poly):
-                    owner = i
-                    break
-            grid_row.append(owner)
-        grid.append(grid_row)
+    grid = _build_owner_grid(height, width, min_x, min_y, range_x, range_y, poly_list)
 
     # ── Compute region center positions for labels (mono mode) ─────
     label_grid = {}
     if mono:
         for i, seed in enumerate(seed_list):
             sx, sy = seed
-            gx = int((sx - min_x) / range_x * (width - 1))
-            gy = int((sy - min_y) / range_y * (height - 1))
+            gx = _grid_coord(sx, min_x, range_x, width - 1)
+            gy = _grid_coord(sy, min_y, range_y, height - 1)
             label_grid[(gx, gy)] = str(i % 10)  # single digit label
 
     # Per-region fill characters for mono mode
