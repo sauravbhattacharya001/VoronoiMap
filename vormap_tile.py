@@ -47,6 +47,8 @@ import random
 import struct
 import sys
 
+from vormap_geometry import polygon_area as _polygon_area, polygon_centroid as _polygon_centroid
+
 # Optional dependencies — graceful degradation
 try:
     import numpy as np
@@ -179,41 +181,6 @@ def _clip_polygon_to_rect(poly, x0, y0, x1, y1):
                 output.append(_intersect_line(curr, nxt, edge_px, edge_py, edge_nx, edge_ny))
         poly = output
     return poly
-
-
-def _polygon_area(poly):
-    """Shoelace formula for polygon area."""
-    n = len(poly)
-    if n < 3:
-        return 0
-    area = 0
-    for i in range(n):
-        j = (i + 1) % n
-        area += poly[i][0] * poly[j][1]
-        area -= poly[j][0] * poly[i][1]
-    return abs(area) / 2
-
-
-def _polygon_centroid(poly):
-    """Centroid of a simple polygon."""
-    n = len(poly)
-    if n == 0:
-        return (0, 0)
-    if n < 3:
-        return (sum(p[0] for p in poly) / n, sum(p[1] for p in poly) / n)
-    cx, cy, a = 0, 0, 0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = poly[i][0] * poly[j][1] - poly[j][0] * poly[i][1]
-        cx += (poly[i][0] + poly[j][0]) * cross
-        cy += (poly[i][1] + poly[j][1]) * cross
-        a += cross
-    a /= 2
-    if abs(a) < 1e-12:
-        return (sum(p[0] for p in poly) / n, sum(p[1] for p in poly) / n)
-    cx /= (6 * a)
-    cy /= (6 * a)
-    return (cx, cy)
 
 
 def _points_to_svg_str(poly):

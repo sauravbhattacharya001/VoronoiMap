@@ -57,6 +57,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 from vormap import validate_output_path
+from vormap_geometry import polygon_area as _polygon_area, polygon_centroid as _polygon_centroid
 
 
 # ---------------------------------------------------------------------------
@@ -132,46 +133,6 @@ class PlacedLabel:
 
 
 # ---------------------------------------------------------------------------
-# Geometry helpers
-# ---------------------------------------------------------------------------
-
-def _polygon_area(vertices: List[Tuple[float, float]]) -> float:
-    """Shoelace formula for polygon area."""
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
-
-
-def _polygon_centroid(vertices: List[Tuple[float, float]]) -> Tuple[float, float]:
-    """Centroid of a simple polygon."""
-    n = len(vertices)
-    if n == 0:
-        return (0.0, 0.0)
-    if n <= 2:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    cx, cy, a6 = 0.0, 0.0, 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        cross = vertices[i][0] * vertices[j][1] - vertices[j][0] * vertices[i][1]
-        cx += (vertices[i][0] + vertices[j][0]) * cross
-        cy += (vertices[i][1] + vertices[j][1]) * cross
-        a6 += cross
-    if abs(a6) < 1e-12:
-        cx = sum(v[0] for v in vertices) / n
-        cy = sum(v[1] for v in vertices) / n
-        return (cx, cy)
-    a6 *= 3.0
-    return (cx / a6, cy / a6)
-
-
 def _point_to_segment_dist(
     px: float, py: float,
     ax: float, ay: float,
