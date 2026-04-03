@@ -30,33 +30,8 @@ Example::
 import math
 import random as _random
 from vormap_geometry import polygon_area, polygon_centroid
+from vormap_utils import point_in_polygon as _point_in_polygon
 
-
-def _point_in_polygon(x, y, vertices):
-    """Ray-casting point-in-polygon test.
-
-    Parameters
-    ----------
-    x, y : float
-        Test point coordinates.
-    vertices : list[tuple[float, float]]
-        Ordered polygon vertices.
-
-    Returns
-    -------
-    bool
-        True if (x, y) is inside the polygon.
-    """
-    n = len(vertices)
-    inside = False
-    j = n - 1
-    for i in range(n):
-        xi, yi = vertices[i]
-        xj, yj = vertices[j]
-        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / (yj - yi) + xi):
-            inside = not inside
-        j = i
-    return inside
 
 
 def _polygon_bbox(vertices):

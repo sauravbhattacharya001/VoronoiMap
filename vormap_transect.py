@@ -47,6 +47,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 
 from vormap import eudist_pts, validate_output_path
+from vormap_utils import point_in_polygon as _point_in_polygon
 
 
 # ── Data structures ──────────────────────────────────────────────────
@@ -165,21 +166,6 @@ def _segments_intersect(p1, p2, p3, p4):
         return (ix, iy, t)
     return None
 
-
-def _point_in_polygon(px, py, polygon):
-    """Ray-casting point-in-polygon test."""
-    n = len(polygon)
-    inside = False
-    j = n - 1
-    for i in range(n):
-        xi, yi = polygon[i]
-        xj, yj = polygon[j]
-        if ((yi > py) != (yj > py)) and (
-            px < (xj - xi) * (py - yi) / (yj - yi) + xi
-        ):
-            inside = not inside
-        j = i
-    return inside
 
 
 def _find_region_for_point(px, py, regions):

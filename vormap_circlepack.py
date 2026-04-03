@@ -44,7 +44,7 @@ except ImportError:
 
 # ── Geometry helpers ─────────────────────────────────────────────────
 
-from vormap_utils import polygon_area as _polygon_area
+from vormap_utils import polygon_area as _polygon_area, point_in_polygon as _point_in_polygon
 from vormap_utils import polygon_centroid as _polygon_centroid
 
 
@@ -58,19 +58,6 @@ def _point_to_segment_dist(px, py, ax, ay, bx, by):
     proj_y = ay + t * dy
     return math.hypot(px - proj_x, py - proj_y)
 
-
-def _point_in_polygon(px, py, vertices):
-    """Ray-casting point-in-polygon test."""
-    n = len(vertices)
-    inside = False
-    j = n - 1
-    for i in range(n):
-        xi, yi = vertices[i]
-        xj, yj = vertices[j]
-        if ((yi > py) != (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi):
-            inside = not inside
-        j = i
-    return inside
 
 
 def _dist_to_polygon_boundary(px, py, vertices):

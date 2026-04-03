@@ -37,7 +37,7 @@ import random as _random
 from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
-from vormap_utils import polygon_centroid_mean as _polygon_centroid
+from vormap_utils import polygon_centroid_mean as _polygon_centroid, point_in_polygon as _point_in_polygon
 
 # ── Core Voronoi computation (pure-Python fallback) ──
 
@@ -104,19 +104,6 @@ def _polygon_bbox(poly):
     from vormap_utils import bounding_box
     return bounding_box(poly)
 
-
-def _point_in_polygon(px, py, poly):
-    """Ray-casting point-in-polygon test."""
-    n = len(poly)
-    inside = False
-    j = n - 1
-    for i in range(n):
-        xi, yi = poly[i]
-        xj, yj = poly[j]
-        if ((yi > py) != (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi):
-            inside = not inside
-        j = i
-    return inside
 
 
 def _ensure_ccw(poly):

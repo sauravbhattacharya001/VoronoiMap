@@ -270,3 +270,32 @@ def compute_nn_distances(points):
                 best_sq = dsq
         nn_dists.append(math.sqrt(best_sq))
     return nn_dists
+
+
+def point_in_polygon(px: float, py: float, vertices) -> bool:
+    """Ray-casting point-in-polygon test.
+
+    Parameters
+    ----------
+    px, py : float
+        Test point coordinates.
+    vertices : list[tuple[float, float]]
+        Ordered polygon vertices (open or closed).
+
+    Returns
+    -------
+    bool
+        ``True`` if the point lies inside the polygon.
+    """
+    n = len(vertices)
+    inside = False
+    j = n - 1
+    for i in range(n):
+        yi, yj = vertices[i][1], vertices[j][1]
+        xi, xj = vertices[i][0], vertices[j][0]
+        if ((yi > py) != (yj > py)) and (
+            px < (xj - xi) * (py - yi) / (yj - yi + 1e-30) + xi
+        ):
+            inside = not inside
+        j = i
+    return inside

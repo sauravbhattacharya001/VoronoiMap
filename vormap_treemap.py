@@ -69,7 +69,7 @@ class TreemapCell:
 
 # ── Geometry Helpers ──────────────────────────────────────────────────
 
-from vormap_utils import polygon_area as _polygon_area
+from vormap_utils import polygon_area as _polygon_area, point_in_polygon as _point_in_polygon
 from vormap_utils import polygon_centroid as _polygon_centroid
 
 
@@ -113,21 +113,6 @@ def _bbox_polygon(xmin, ymin, xmax, ymax):
     return [(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)]
 
 
-def _point_in_polygon(px, py, poly):
-    """Ray-casting point-in-polygon test."""
-    n = len(poly)
-    inside = False
-    j = n - 1
-    for i in range(n):
-        yi, yj = poly[i][1], poly[j][1]
-        xi, xj = poly[i][0], poly[j][0]
-        if ((yi > py) != (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi):
-            inside = not inside
-        j = i
-    return inside
-
-
-# ── Voronoi Subdivision ──────────────────────────────────────────────
 
 def _compute_bounded_voronoi(seeds, bbox):
     """Compute Voronoi regions clipped to a bounding box.

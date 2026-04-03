@@ -78,6 +78,14 @@ def make_regular_polygon(center: Point, radius: float, sides: int, rotation: flo
 # ---------------------------------------------------------------------------
 
 from vormap_geometry import polygon_area as _polygon_area
+from vormap_utils import point_in_polygon as _pip_util
+
+
+def point_in_polygon(point: Point, polygon: Polygon) -> bool:
+    """Ray-casting point-in-polygon test (delegates to vormap_utils)."""
+    return _pip_util(point[0], point[1], polygon)
+
+
 
 
 def _line_intersection(p1: Point, p2: Point, p3: Point, p4: Point) -> Point:
@@ -99,24 +107,6 @@ def _is_inside(point: Point, edge_start: Point, edge_end: Point) -> bool:
             (edge_end[1] - edge_start[1]) * (point[0] - edge_start[0])) >= 0
 
 
-def point_in_polygon(point: Point, polygon: Polygon) -> bool:
-    """Ray-casting point-in-polygon test."""
-    x, y = point
-    n = len(polygon)
-    inside = False
-    j = n - 1
-    for i in range(n):
-        xi, yi = polygon[i]
-        xj, yj = polygon[j]
-        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / (yj - yi) + xi):
-            inside = not inside
-        j = i
-    return inside
-
-
-# ---------------------------------------------------------------------------
-# Sutherland-Hodgman clipper
-# ---------------------------------------------------------------------------
 
 def clip_polygon(subject: Polygon, clip: Polygon) -> Polygon:
     """Clip a subject polygon against a convex clip polygon.

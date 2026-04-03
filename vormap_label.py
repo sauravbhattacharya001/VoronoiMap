@@ -58,6 +58,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from vormap import validate_output_path
 from vormap_geometry import polygon_area as _polygon_area, polygon_centroid as _polygon_centroid
+from vormap_utils import point_in_polygon as _point_in_polygon
 
 
 # ---------------------------------------------------------------------------
@@ -171,27 +172,6 @@ def _dist_to_polygon_edge(
     return min_d
 
 
-def _point_in_polygon(
-    px: float, py: float, vertices: List[Tuple[float, float]]
-) -> bool:
-    """Ray casting point-in-polygon test."""
-    n = len(vertices)
-    inside = False
-    j = n - 1
-    for i in range(n):
-        yi, yj = vertices[i][1], vertices[j][1]
-        xi, xj = vertices[i][0], vertices[j][0]
-        if ((yi > py) != (yj > py)) and (
-            px < (xj - xi) * (py - yi) / (yj - yi + 1e-30) + xi
-        ):
-            inside = not inside
-        j = i
-    return inside
-
-
-# ---------------------------------------------------------------------------
-# Pole of Inaccessibility (iterative grid refinement)
-# ---------------------------------------------------------------------------
 
 def _pole_of_inaccessibility(
     vertices: List[Tuple[float, float]],
