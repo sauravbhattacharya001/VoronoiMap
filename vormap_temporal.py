@@ -231,7 +231,10 @@ def _euclidean(a, b):
 def _match_seeds(seeds_a, seeds_b, radius):
     """Match seeds between two snapshots using nearest-neighbor within radius.
 
-    Uses a greedy closest-first matching strategy to avoid ambiguity.
+    Uses a grid-based spatial index on *seeds_b* so that only seeds
+    within ``radius`` are considered, reducing average complexity from
+    O(n_a * n_b) to O(n_a * k) where k is the number of nearby seeds.
+    Ties are resolved with a greedy closest-first matching strategy.
 
     Returns
     -------
@@ -245,21 +248,47 @@ def _match_seeds(seeds_a, seeds_b, radius):
     n_a = len(seeds_a)
     n_b = len(seeds_b)
 
-    # Compute all pairwise distances within radius
-    candidates = []
-    for i in range(n_a):
-        for j in range(n_b):
-            d = _euclidean(seeds_a[i], seeds_b[j])
-            if d <= radius:
-                candidates.append((d, i, j))
+    # Build grid index on seeds_b with cell size = radius
+    cell_size = max(radius, 1e-9)
+    inv_cell = 1.0 / cell_size
+    grid: Dict[Tuple[int, int], List[int]] = {}
+    for j in range(n_b):
+        cx = int(seeds_b[j][0] * inv_cell)
+        cy = int(seeds_b[j][1] * inv_cell)
+        key = (cx, cy)
+        if key in grid:
+            grid[key].append(j)
+        else:
+            grid[key] = [j]
 
-    # Greedy closest-first matching
+    # Find candidate pairs within radius using the grid
+    candidates = []
+    _offsets = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0),
+                (0, 1), (1, -1), (1, 0), (1, 1))
+    radius_sq = radius * radius
+    for i in range(n_a):
+        ax, ay = seeds_a[i]
+        cx = int(ax * inv_cell)
+        cy = int(ay * inv_cell)
+        for dx, dy in _offsets:
+            bucket = grid.get((cx + dx, cy + dy))
+            if bucket is None:
+                continue
+            for j in bucket:
+                ddx = ax - seeds_b[j][0]
+                ddy = ay - seeds_b[j][1]
+                d_sq = ddx * ddx + ddy * ddy
+                if d_sq <= radius_sq:
+                    candidates.append((d_sq, i, j))
+
+    # Greedy closest-first matching (sort by squared distance;
+    # ordering is the same as Euclidean distance)
     candidates.sort()
     matched_a = set()
     matched_b = set()
     matches = {}
 
-    for d, i, j in candidates:
+    for d_sq, i, j in candidates:
         if i in matched_a or j in matched_b:
             continue
         matches[i] = j
