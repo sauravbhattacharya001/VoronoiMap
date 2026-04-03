@@ -164,10 +164,29 @@ def _clip_infinite_voronoi(vor, bounds):
 
     Returns a dict mapping point index → list of (x, y) vertices.
     Infinite regions are clipped to the bounding box edges.
+
+    Performance: pre-builds a lookup index from point index to its
+    infinite ridges, avoiding an O(n × r) nested scan that dominated
+    runtime for large diagrams (thousands of points).
     """
     s, n, w, e = bounds
     center = np.array(vor.points.mean(axis=0))
+    far_scale = max(e - w, n - s) * 2
     regions = {}
+
+    # Pre-build index: point_idx → list of (ridge_points, ridge_vertices)
+    # for infinite ridges only.  This turns the inner O(r) scan into O(1)
+    # amortised lookups — critical when there are thousands of ridges.
+    from collections import defaultdict
+    infinite_ridges_by_point = defaultdict(list)
+    for ridge_idx in range(len(vor.ridge_vertices)):
+        rv = vor.ridge_vertices[ridge_idx]
+        if -1 not in rv:
+            continue
+        p1, p2 = vor.ridge_points[ridge_idx]
+        entry = (p1, p2, rv)
+        infinite_ridges_by_point[p1].append(entry)
+        infinite_ridges_by_point[p2].append(entry)
 
     for point_idx, region_idx in enumerate(vor.point_region):
         region = vor.regions[region_idx]
@@ -186,19 +205,8 @@ def _clip_infinite_voronoi(vor, bounds):
             if v_idx >= 0:
                 finite_verts.append(tuple(vor.vertices[v_idx]))
             else:
-                # Find the two ridges that bound this infinite edge
-                # and project them to the boundary
-                prev_idx = region[i - 1]
-                next_idx = region[(i + 1) % len(region)]
-
-                # Project from the finite vertex toward infinity
-                for ridge_idx, (p1, p2) in enumerate(vor.ridge_points):
-                    if point_idx not in (p1, p2):
-                        continue
-                    ridge_verts = vor.ridge_vertices[ridge_idx]
-                    if -1 not in ridge_verts:
-                        continue
-
+                # Look up only the infinite ridges for this point
+                for p1, p2, ridge_verts in infinite_ridges_by_point.get(point_idx, ()):
                     finite_v = [v for v in ridge_verts if v >= 0]
                     if not finite_v:
                         continue
@@ -215,7 +223,7 @@ def _clip_infinite_voronoi(vor, bounds):
                         normal = -normal
 
                     # Project far enough to hit the boundary
-                    far_point = fv + normal * max(e - w, n - s) * 2
+                    far_point = fv + normal * far_scale
                     # Clip to bounds
                     far_point[0] = max(w, min(e, far_point[0]))
                     far_point[1] = max(s, min(n, far_point[1]))
