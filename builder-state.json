@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-04-03T05:53:00.000Z",
-  "lastRepo": "FeedReader",
-  "lastFeature": "ArticleFactChecker — heuristic claim extraction and verifiability analysis",
-  "runsCompleted": 124,
+  "lastRun": "2026-04-04T19:47:00.000Z",
+  "lastRepo": "WinSentinel",
+  "lastFeature": "Security Debt Calculator CLI command (--debt) — effort estimation, ROI ranking, repayment plan",
+  "runsCompleted": 171,
   "repoFeatures": {
     "WinSentinel": [
       "Peer Benchmark CLI command (--peers)",
@@ -11,7 +11,9 @@
       "Report Card CLI command (--reportcard) — per-module letter grades, trend arrows, priority actions",
       "Burndown CLI command (--burndown) — ASCII burndown chart with severity filter, burn rate, zero-date projection",
       "Changelog CLI command (--changelog) — security posture drift tracking with weekly/monthly/daily grouping, module impact table",
-      "Security Pulse CLI command (--pulse) — ASCII EKG heartbeat visualization with scores, streaks, alerts, findings"
+      "Security Pulse CLI command (--pulse) — ASCII EKG heartbeat visualization with scores, streaks, alerts, findings",
+      "Security Calendar CLI command (--calendar) — iCal export, audit cadence analysis, SLA deadlines, review events",
+      "Security Debt Calculator CLI command (--debt) — effort estimation, ROI ranking, repayment plan"
     ],
     "agentlens": [
       "Light/dark theme toggle for dashboard",
@@ -20,7 +22,8 @@
       "Interactive Dependency Graph dashboard — force-directed Canvas visualization with pan/zoom/drag, health color-coding, co-occurrence edges, detail inspector",
       "Agent Health Heatmap — GitHub-style calendar view with daily health scores, hourly drill-down",
       "Anomaly Detection Dashboard — statistical outlier detection with timeline, 3 algorithms, threshold config",
-      "Alert Rules Builder — interactive alert rule management with visual builder, 13 metrics, conditions, notification channels, import/export"
+      "Alert Rules Builder — interactive alert rule management with visual builder, 13 metrics, conditions, notification channels, import/export",
+      "Session Timeline — interactive Gantt chart with concurrency analysis, time range filtering, grouping, zoom, tooltips, Canvas concurrency chart, JSON/SVG export"
     ],
     "sauravcode": [
       "Terminal cheat sheet command (sauravcheat.py)",
@@ -31,7 +34,8 @@
       "sauravkata.py — coding kata exercise system with 12 challenges, 4 tiers, hints, streaks, daily kata",
       "sauravregex — interactive regex tester & debugger with REPL, quiz, pattern analyzer, backtracking detection",
       "sauravcipher - interactive cipher workbench with 7 ciphers, REPL, frequency analysis, Caesar cracker, cipher chaining",
-      "sauravmatrix — interactive matrix calculator & linear algebra toolkit with REPL, decompositions, eigenvalues, solver"
+      "sauravmatrix — interactive matrix calculator & linear algebra toolkit with REPL, decompositions, eigenvalues, solver",
+      "sauravplot — ASCII plotting (bar, line, scatter, histogram, sparkline, pie) with CLI + .srv builtins"
     ],
     "VoronoiMap": [
       "Dataset summary CLI (--summary, --summary-json)",
@@ -40,7 +44,8 @@
       "vormap_gallery.py — interactive Voronoi style gallery with 14 art styles, comparison mode, PNG export",
       "vormap_tile — seamless tileable Voronoi pattern generator with 5 styles, 6 palettes, Lloyd relaxation, tile preview",
       "vormap_transform — geometric transformations with chainable pipeline, SVG visualization",
-      "vormap_text — Voronoi Typography: text as Voronoi cell mosaics with bitmap font, 7 colormaps, SVG/HTML export"
+      "vormap_text — Voronoi Typography: text as Voronoi cell mosaics with bitmap font, 7 colormaps, SVG/HTML export",
+      "vormap_cvd — Color Vision Deficiency simulator with Brettel/Viénot matrices, palette checker, CVD-safe palette suggestions"
     ],
     "agenticchat": [
       "Smart auto-rename sessions after first assistant reply",
@@ -50,7 +55,9 @@
       "API Inspector — debug panel for API request/response logging with timing, tokens, cost",
       "Ambient Sound Player — procedural soundscapes (rain, café, fire, wind, stream, white noise) with mixer panel, presets, persistence",
       "Sticky Notes Board — visual draggable brainstorming canvas per session with color cycling, resize, persistence (Alt+N)",
-      "Conversation Stash — git-stash-style save/restore for conversations with stash stack, pop, apply, slash commands (Ctrl+Shift+Z)"
+      "Conversation Stash — git-stash-style save/restore for conversations with stash stack, pop, apply, slash commands (Ctrl+Shift+Z)",
+      "Conversation Screenshot — export chat as shareable PNG image via Canvas API with 3 themes, download/clipboard",
+      "Voice Chat Mode — hands-free conversational loop with Alt+V toggle"
     ],
     "gif-captcha": [
       "Personal stats tracker page (my-stats.html)",
@@ -58,7 +65,9 @@
       "Cost Calculator (cost-calculator.html) — estimate deployment costs with presets, breakdown, competitor comparison, CSV/JSON export",
       "Bot or Human? interactive quiz (bot-or-human.html) — 15-round behavioral signal analysis game with Canvas trails, scoring, explanations",
       "Integration Wizard (integration-wizard.html) — code generator for 6 backends (Express, Flask, Django, PHP, Rails, Go) + 4 frontends (Vanilla JS, React, Vue, Svelte) with configurable settings",
-      "Research Paper Generator (research-paper.html) — wizard-guided academic report builder with 5 steps, 3 presets, Canvas charts, LaTeX/HTML/text export"
+      "Research Paper Generator (research-paper.html) — wizard-guided academic report builder with 5 steps, 3 presets, Canvas charts, LaTeX/HTML/text export",
+      "Speed Challenge Arena (speed-arena.html) — timed speed-solving game with 4 modes, difficulty scaling, combos, ranks",
+      "CAPTCHA Escape Room (escape-room.html) — 5 themed rooms with 10 puzzle types, key collection, hints, scoring, star rating"
     ],
     "getagentbox": [
       "Visual sitemap page with search and categorized navigation",
@@ -67,7 +76,9 @@
       "Agent Persona Creator (persona-creator.html) — interactive personality designer with live chat preview, presets, export",
       "Interactive CLI Playground — simulated terminal emulator with 12 AgentBox commands, animated output, command history",
       "Readiness Assessment (readiness.html) — interactive 10-question quiz with animated score ring, 5-dimension breakdown, personalized action plan",
-      "Agent Marketplace (marketplace.html) — browsable catalog of 18 community agent templates with search, categories, sorting, detail modal, deploy simulation"
+      "Agent Marketplace (marketplace.html) — browsable catalog of 18 community agent templates with search, categories, sorting, detail modal, deploy simulation",
+      "Agent Name Generator — interactive naming tool with 8 purposes, 6 personalities, 6 styles, 720+ names, favorites, copy",
+      "Flow Builder — visual drag-and-drop agent pipeline designer with 10 node types, Canvas rendering, 4 presets, auto-layout, JSON export/import"
     ],
     "BioBots": [
       "Global command palette (Ctrl+K) for quick tool navigation",
@@ -76,7 +87,10 @@
       "Bioink Material Database — searchable reference of 18 bioprinting materials with filtering, comparison, and detail views",
       "Workflow Builder — visual multi-step protocol designer with drag-and-drop, 14 step types, 3 presets, dependencies, undo/redo, JSON/Markdown export",
       "Cell Passage Tracker dashboard — interactive cell line passage monitoring with viability trends, senescence risk, fleet overview, Canvas charts, export",
-      "Plate Layout Designer — interactive visual well plate experiment planner with drag-to-paint, custom conditions, edge blanks, undo/redo, CSV/TSV/JSON export"
+      "Plate Layout Designer — interactive visual well plate experiment planner with drag-to-paint, custom conditions, edge blanks, undo/redo, CSV/TSV/JSON export",
+      "QR Label Generator — printable QR code labels for lab samples with built-in QR engine, 6 presets, 3 formats, CSV export",
+      "Growth Curve Analyzer — phase detection, doubling time, logistic fit, comparison, CSV export",
+      "Chain of Custody — sample transfer tracking, condition logging, disposal workflow, audit trail, JSON/CSV/print export"
     ],
     "everything": [
       "Sleep Calculator for optimal bedtime/wake-up times based on 90-minute cycles",
@@ -94,7 +108,12 @@
       "Date Calculator — date difference and add/subtract durations with business days, presets",
       "Readability Analyzer — 6 readability indices (Flesch, Gunning Fog, Coleman-Liau, ARI, SMOG) with gauges and audience guidance",
       "Hash Generator — compute MD5/SHA-1/SHA-224/SHA-256/SHA-384/SHA-512 digests with algorithm picker and show-all mode",
-      "Wordle word game — guess the 5-letter word in 6 tries with keyboard tracking, streaks, 500+ words"
+      "Wordle word game — guess the 5-letter word in 6 tries with keyboard tracking, streaks, 500+ words",
+      "NATO Phonetic Alphabet Converter — encode/decode text to NATO phonetic words with reference table",
+      "Cron Expression Builder — interactive visual cron editor with field selectors, presets, descriptions, next-run preview",
+      "Minesweeper — classic game with 3 difficulties, first-click safety, flood-fill reveal, chord reveal, timer, flagging",
+      "Snake game — classic arcade with swipe/arrow key controls, speed scaling, high score tracking",
+      "Hangman game — classic word guessing with 40 words, hints, ASCII art, shake animation, streak tracking"
     ],
     "ai": [
       "Quick-scan consolidated safety assessment command (preflight + scorecard + compliance + policy-lint)",
@@ -104,7 +123,9 @@
       "Interactive Incident Response Simulator — choose-your-own-adventure HTML game with 3 scenarios, 48 decision nodes",
       "Fleet Simulator — interactive animated HTML visualization with Canvas agents, kill switch, budget, lineage tree, anomaly detection, 4 presets",
       "Risk Register — formal risk tracking & lifecycle management with structured entries, state transitions, audit trail, inherent/residual scoring, HTML/CSV/JSON export",
-      "Safety Diff — structured snapshot comparison with scorecard dimension deltas, compliance finding diffs, risk register changes, HTML export"
+      "Root Cause Analyzer — 5 Whys, Fishbone/Ishikawa, Fault Tree with cut-set analysis",
+      "Safety Diff — structured snapshot comparison with scorecard dimension deltas, compliance finding diffs, risk register changes, HTML export",
+      "Safety Nutrition Label — FDA-style safety fact sheets with risk calories, safety vitamins, allergens, 4 presets, comparison mode, ASCII/JSON/HTML output"
     ],
     "GraphVisual": [
       "Interactive Random Walk Simulator with visit heatmap, cover time, and preset graphs",
@@ -114,7 +135,11 @@
       "Interactive SCC Finder — Tarjan's algorithm with step-by-step animation, stack visualization, 6 presets",
       "Articulation Points & Bridges Finder — interactive Tarjan's DFS with step animation, 6 presets, disc/low table",
       "Network Resilience Analyzer — interactive attack simulation with 4 strategies (degree, betweenness, random, cascading), 6 presets, robustness curves, R-index, strategy comparison",
-      "Interactive Planarity Tester — canvas editor with K5/K3,3 detection, edge bounds, Euler formula, 8 presets"
+      "Interactive Planarity Tester — canvas editor with K5/K3,3 detection, edge bounds, Euler formula, 8 presets",
+      "Topological Sort Visualizer — interactive Kahn's/DFS animation with cycle detection, 7 presets, text input",
+      "Crossing Number Game — interactive edge crossing minimization puzzle with 8 presets, scoring, auto-solve",
+      "Maximum Clique Finder — interactive Bron-Kerbosch visualizer with step animation, 7 presets",
+      "Hamiltonian Path & Circuit Finder — interactive backtracking visualizer with 8 presets, Warnsdorff heuristic, animation controls"
     ],
     "Vidly": [
       "Movie Showdown head-to-head voting game with leaderboard",
@@ -124,7 +149,11 @@
       "Movie Connections — NYT Connections-style puzzle with 5 puzzles, difficulty tiers, one-away hints",
       "Movie Emoji Story — guess movies from emoji plot summaries with 30 puzzles, 3 difficulties, hints, streak scoring",
       "Movie Crossword Puzzle — interactive crossword game with 5 themed puzzles, timer, hints, stats",
-      "Movie Mad Libs — fill-in-the-blank movie plot remix game with 10 classic movie templates, random picker, original plot reveal"
+      "Movie Mad Libs — fill-in-the-blank movie plot remix game with 10 classic movie templates, random picker, original plot reveal",
+      "Movie Poster Creator — Canvas-based poster designer with 6 layouts, 8 quick themes, genre icons, star ratings, auto-fill from catalog, PNG download",
+      "Alphabet Challenge — gamified A-Z movie collection tracker with progress ring, clickable grid, achievements",
+      "Movie Drinking Game Generator — genre-based watching rules with 3 difficulties, rule categories, estimated sips",
+      "Movie Soundtrack Discovery — genre-to-soundtrack profiles, mood playlists (8 moods), per-movie suggestions, mixtape generator, trivia quiz"
     ],
     "prompt": [
       "PromptShareFormatter for multi-format prompt sharing (PlainText, Markdown, HTML, JSON, YAML)",
@@ -135,7 +164,11 @@
       "PromptChecklist — pre-flight best-practices validator with 16 checks, scoring, presets, comparison",
       "PromptFlowChart — Mermaid diagram generator for prompt chains/workflows with fluent API, 7 node shapes, subgraphs, validation, HTML/Markdown/raw output",
       "PromptDialect — convert prompts between AI model formats (ChatGPT, Claude, Gemini, Llama, Mistral) with API JSON generation, parsing, and comparison",
-      "PromptCoEvolver — genetic algorithm-inspired prompt breeding with 5 crossover strategies, 8 mutations, 4 fitness criteria, multi-generation evolution, lineage tracking"
+      "PromptCoEvolver — genetic algorithm-inspired prompt breeding with 5 crossover strategies, 8 mutations, 4 fitness criteria, multi-generation evolution, lineage tracking",
+      "PromptBiasDetector — cognitive & demographic bias detection with 10 categories, 20+ rules, severity levels, debiased output, batch support",
+      "PromptMaturityModel — 5-level capability maturity assessment across 8 dimensions with portfolio analysis, progress comparison, custom weights",
+      "PromptDiffEngine — line/word-level diff engine with LCS, three-way merge, unified/side-by-side output, similarity scoring",
+      "PromptHeatmap — visual prompt analysis with 5 scoring dimensions (instruction, variables, complexity, structure, emphasis), HTML/text output"
     ],
     "Ocaml-sample-code": [
       "Maze generator & solver with BFS/DFS/A* and ASCII visualization",
@@ -145,7 +178,9 @@
       "Petri Net simulator & analyzer — concurrent system modeling with deadlock detection, boundedness, liveness analysis",
       "Logic Circuit Simulator — digital gate simulation with truth tables, depth analysis, 6 built-in circuits",
       "Algorithmic Music Composer — scales, chords, progressions, random walk/Markov/L-system melody generators, Euclidean rhythms, ABC export",
-      "Binary Decision Diagram (BDD) — ROBDD with hash-consing, Apply algorithm, SAT/TAUT, quantification, DOT export, interactive REPL"
+      "Binary Decision Diagram (BDD) — ROBDD with hash-consing, Apply algorithm, SAT/TAUT, quantification, DOT export, interactive REPL",
+      "Minimal HTTP/1.1 Server — zero-dependency web server with routing, static files, JSON APIs, fork() concurrency",
+      "Mini SQL Query Engine — in-memory SQL with REPL, JOINs, GROUP BY, aggregates, WHERE/ORDER BY/LIMIT/DISTINCT"
     ],
     "FeedReader": [
       "Feed Weather Reporter - weather metaphor for feed activity analytics",
@@ -156,7 +191,10 @@
       "ArticleTimeCapsule — bury articles for future resurfacing with presets, reflections, tags, stats",
       "ArticleReadingListSharer — curate and share reading lists as HTML/Markdown/JSON/OPML with curator notes, search, stats",
       "ArticleQuizGenerator — comprehension quiz engine with fill-in-the-blank, vocabulary, title-based questions, cross-article mode, scoring",
-      "ArticleFactChecker — heuristic claim extraction & verifiability analysis with credibility scoring"
+      "ArticleFactChecker — heuristic claim extraction & verifiability analysis with credibility scoring",
+      "ArticleFlashcardGenerator — SM-2 spaced repetition flashcard system with pattern-based extraction, decks, review sessions, streaks",
+      "ArticleDigestComposer — newsletter digest generator with daily/weekly/monthly periods, feed grouping, HTML/Markdown/text export",
+      "FeedHealthDashboardViewController — interactive feed monitoring UI with summary cards, status breakdown, sortable feed table, recommendations"
     ]
   }
 }

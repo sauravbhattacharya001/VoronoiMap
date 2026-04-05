@@ -65,7 +65,7 @@
 - **Gateway watchdog**: Runs every 1 min, auto-restarts if down
 - **Tailscale**: Installed, connected (100.72.230.43)
 - **Sleep disabled**: AC & battery, hybrid sleep off
-- **OpenClaw version**: 2026.3.13 (updated from 2026.2.26 on Mar 17)
+- **OpenClaw version**: 2026.4.2 (updated from 2026.3.13 on Apr 3)
 - **Gardener/Builder scheduling**: OpenClaw cron jobs (every 30 min, isolated sessions). Task files always push directly — never open PRs.
 - **Branch protection**: Re-enabled on all 16 repos (no review required, force push blocked, direct pushes allowed)
 - **Gardener/Builder stats**: Gardener ~2166 runs, Builder ~700 runs (as of Mar 31)
