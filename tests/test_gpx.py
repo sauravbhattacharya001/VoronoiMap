@@ -197,9 +197,9 @@ def test_xxe_rejection_padded():
     <gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
       <wpt lat="0" lon="0"><name>&xxe;</name></wpt>
     </gpx>"""
-    path = tempfile.mktemp(suffix=".gpx")
+    fd, path = tempfile.mkstemp(suffix=".gpx")
     try:
-        with open(path, "wb") as f:
+        with os.fdopen(fd, "wb") as f:
             f.write(malicious)
         try:
             load_gpx(path)

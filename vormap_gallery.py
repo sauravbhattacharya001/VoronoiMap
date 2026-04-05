@@ -40,6 +40,7 @@ Programmatic usage
 """
 
 import argparse
+import html as _html_mod
 import os
 import sys
 
@@ -311,8 +312,8 @@ buildGrid();
 
 
 def _esc(s):
-    """Escape HTML special characters."""
-    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+    """Escape HTML special characters including single quotes."""
+    return _html_mod.escape(s, quote=True)
 
 
 def save(html, path):
