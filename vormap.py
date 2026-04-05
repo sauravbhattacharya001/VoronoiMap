@@ -572,7 +572,6 @@ def _parse_points_json(filepath):
         if not (_isfinite(lng_val) and _isfinite(lat_val)):
             continue
         _append((lng_val, lat_val))
-        points.append((lng_val, lat_val))
 
     return points
 
