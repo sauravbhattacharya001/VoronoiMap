@@ -272,6 +272,72 @@ def compute_nn_distances(points):
     return nn_dists
 
 
+def point_to_segment_distance(px: float, py: float,
+                              ax: float, ay: float,
+                              bx: float, by: float) -> float:
+    """Minimum distance from point (px, py) to line segment (ax, ay)-(bx, by).
+
+    Computes the perpendicular distance when the projection falls on the
+    segment, otherwise returns the distance to the nearest endpoint.
+
+    Parameters
+    ----------
+    px, py : float
+        Query point coordinates.
+    ax, ay : float
+        Segment start coordinates.
+    bx, by : float
+        Segment end coordinates.
+
+    Returns
+    -------
+    float
+        Minimum distance from the point to the segment.
+    """
+    dx, dy = bx - ax, by - ay
+    len_sq = dx * dx + dy * dy
+    if len_sq < 1e-12:
+        return math.hypot(px - ax, py - ay)
+    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / len_sq))
+    proj_x = ax + t * dx
+    proj_y = ay + t * dy
+    return math.hypot(px - proj_x, py - proj_y)
+
+
+def dist_to_polygon_boundary(px: float, py: float, vertices) -> float:
+    """Minimum distance from a point to any edge of a polygon.
+
+    Iterates over all edges of *vertices* (treated as a closed polygon)
+    and returns the smallest point-to-segment distance.
+
+    Parameters
+    ----------
+    px, py : float
+        Query point coordinates.
+    vertices : list of (float, float)
+        Ordered polygon vertices.
+
+    Returns
+    -------
+    float
+        Minimum distance to the polygon boundary.  Returns ``inf`` if
+        the polygon has fewer than 2 vertices.
+    """
+    n = len(vertices)
+    if n < 2:
+        if n == 1:
+            return math.hypot(px - vertices[0][0], py - vertices[0][1])
+        return float("inf")
+    min_d = float("inf")
+    for i in range(n):
+        ax, ay = vertices[i]
+        bx, by = vertices[(i + 1) % n]
+        d = point_to_segment_distance(px, py, ax, ay, bx, by)
+        if d < min_d:
+            min_d = d
+    return min_d
+
+
 def point_in_polygon(px: float, py: float, vertices) -> bool:
     """Ray-casting point-in-polygon test.
 

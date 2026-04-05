@@ -97,17 +97,7 @@ def _brute_radius(seeds: List[Point], point: Point, radius: float):
 # Geometry helpers
 # ---------------------------------------------------------------------------
 
-def _point_to_segment_distance(px: float, py: float,
-                               ax: float, ay: float,
-                               bx: float, by: float) -> float:
-    """Minimum distance from point (px, py) to segment (ax, ay)-(bx, by)."""
-    dx, dy = bx - ax, by - ay
-    if dx == 0 and dy == 0:
-        return math.hypot(px - ax, py - ay)
-    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
-    proj_x = ax + t * dx
-    proj_y = ay + t * dy
-    return math.hypot(px - proj_x, py - proj_y)
+from vormap_utils import point_to_segment_distance as _point_to_segment_distance
 
 
 # ---------------------------------------------------------------------------

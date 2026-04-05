@@ -59,6 +59,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from vormap import validate_output_path
 from vormap_geometry import polygon_area as _polygon_area, polygon_centroid as _polygon_centroid
 from vormap_utils import point_in_polygon as _point_in_polygon
+from vormap_utils import dist_to_polygon_boundary as _dist_to_polygon_edge
 
 
 # ---------------------------------------------------------------------------
@@ -134,42 +135,8 @@ class PlacedLabel:
 
 
 # ---------------------------------------------------------------------------
-def _point_to_segment_dist(
-    px: float, py: float,
-    ax: float, ay: float,
-    bx: float, by: float,
-) -> float:
-    """Distance from point (px, py) to segment (ax, ay)-(bx, by)."""
-    dx, dy = bx - ax, by - ay
-    len_sq = dx * dx + dy * dy
-    if len_sq < 1e-12:
-        return math.hypot(px - ax, py - ay)
-    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / len_sq))
-    proj_x = ax + t * dx
-    proj_y = ay + t * dy
-    return math.hypot(px - proj_x, py - proj_y)
-
-
-def _dist_to_polygon_edge(
-    px: float, py: float, vertices: List[Tuple[float, float]]
-) -> float:
-    """Minimum distance from a point to any edge of a polygon."""
-    n = len(vertices)
-    if n < 2:
-        if n == 1:
-            return math.hypot(px - vertices[0][0], py - vertices[0][1])
-        return float("inf")
-    min_d = float("inf")
-    for i in range(n):
-        j = (i + 1) % n
-        d = _point_to_segment_dist(
-            px, py,
-            vertices[i][0], vertices[i][1],
-            vertices[j][0], vertices[j][1],
-        )
-        if d < min_d:
-            min_d = d
-    return min_d
+# _point_to_segment_dist and _dist_to_polygon_edge consolidated into
+# vormap_utils.point_to_segment_distance / dist_to_polygon_boundary.
 
 
 

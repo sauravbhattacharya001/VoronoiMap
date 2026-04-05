@@ -46,31 +46,7 @@ except ImportError:
 
 from vormap_utils import polygon_area as _polygon_area, point_in_polygon as _point_in_polygon
 from vormap_utils import polygon_centroid as _polygon_centroid
-
-
-def _point_to_segment_dist(px, py, ax, ay, bx, by):
-    """Distance from point (px,py) to line segment (ax,ay)-(bx,by)."""
-    dx, dy = bx - ax, by - ay
-    if dx == 0 and dy == 0:
-        return math.hypot(px - ax, py - ay)
-    t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
-    proj_x = ax + t * dx
-    proj_y = ay + t * dy
-    return math.hypot(px - proj_x, py - proj_y)
-
-
-
-def _dist_to_polygon_boundary(px, py, vertices):
-    """Minimum distance from a point to the polygon boundary."""
-    n = len(vertices)
-    min_d = float('inf')
-    for i in range(n):
-        ax, ay = vertices[i]
-        bx, by = vertices[(i + 1) % n]
-        d = _point_to_segment_dist(px, py, ax, ay, bx, by)
-        if d < min_d:
-            min_d = d
-    return min_d
+from vormap_utils import dist_to_polygon_boundary as _dist_to_polygon_boundary
 
 
 def _largest_inscribed_circle(vertices, iterations=16):
