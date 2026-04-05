@@ -42,6 +42,33 @@ Add small/medium features to repos that make sense based on what the repo does. 
 
 **Size guide:** Each feature should be a single, self-contained PR-sized change. Think "1-2 hour dev work" not "2-week project".
 
+## CREATIVE DIRECTION: BUILD AGENCY
+
+Slowly introduce agentic capabilities into these apps. Not every feature needs this, but trend toward it over time. Think: apps that act, not just apps that respond.
+
+**What "agency" means here:**
+- **Proactive behavior** — features that monitor, detect, and alert without being asked (anomaly detection, threshold watchers, smart notifications)
+- **Autonomous decision-making** — features that analyze situations and recommend or auto-take actions (auto-categorization, smart defaults, adaptive thresholds)
+- **Learning & adaptation** — features that improve over time based on usage patterns (personalized recommendations, habit learning, preference inference)
+- **Goal-oriented workflows** — features where the user sets a goal and the app figures out steps (optimization planners, smart schedulers, strategy generators)
+- **Inter-system awareness** — features that correlate data across modules to surface insights no single module could find
+- **Self-monitoring** — features where the app monitors its own health, performance, or data quality
+
+**Examples per repo:**
+- **agentlens**: Auto-triage alerts, anomaly forecasting, self-healing suggestions
+- **everything**: Smart reminders that learn timing, cross-tracker health insights, adaptive goals
+- **FeedReader**: Auto-curated digests based on reading patterns, smart feed discovery
+- **sauravcode**: Auto-optimization hints, runtime profiling with fix suggestions
+- **BioBots**: Experiment outcome prediction, contamination early warning
+- **GraphVisual**: Auto-detect interesting substructures, suggest analysis paths
+- **agenticchat**: Context-aware response suggestions, conversation health monitoring
+- **VoronoiMap**: Automated spatial pattern detection, data-driven layout optimization
+- **Vidly**: Personalized recommendation engine, viewing pattern insights
+- **ai**: Autonomous safety monitoring, drift detection
+- **prompt**: Auto-prompt improvement suggestions, A/B test recommendation
+
+**Gradual progression:** Start with simple awareness (monitoring, detection, alerts) → move toward recommendation → then toward autonomous action with user oversight. Don't jump to full autonomy — build trust incrementally, just like real AI agents should.
+
 ## REPO CONTEXT
 
 Understand these repos:
@@ -79,6 +106,17 @@ After each run, update builder-state.json:
 
 Clone to C:\Users\onlin\.openclaw\workspace\temp-builder, work there, push, clean up.
 
+**Step-by-step:**
+1. Clone the repo
+2. Write your feature
+3. **Run build verification** (see below) — DO NOT SKIP
+4. **Run existing tests** if they exist
+5. Fix any failures
+6. Commit with clear message
+7. `git push origin HEAD:main` (or HEAD:master)
+8. **Verify push exit code** — report failure if it didn't land
+9. Clean up temp directory
+
 ## ALWAYS PUSH DIRECTLY — NEVER OPEN PRs
 
 **Push directly to the default branch (main/master). Do NOT open pull requests.** Branch protection is configured to allow direct pushes. Use:
@@ -95,6 +133,48 @@ Never use `gh pr create`. Never create feature branches and leave them as PRs. J
 - Feature should work out of the box — no broken builds
 - Include a brief usage note in the commit message
 - Would a real user appreciate this feature?
+
+## ⚠️ MANDATORY: BUILD VERIFICATION BEFORE PUSHING
+
+**You MUST verify your code compiles/parses before pushing. No exceptions.**
+
+After writing your feature and before `git push`, run the appropriate build check:
+
+| Language | Verification Command |
+|----------|---------------------|
+| Python | `python -m py_compile <your_file.py>` (for each new .py file) |
+| Dart/Flutter | `flutter analyze --no-fatal-infos` (in repo root) |
+| Java | `mvn compile -q` (in repo root) |
+| C# / .NET | `dotnet build --no-restore -q` (in repo root) |
+| Swift/iOS | `swiftc -typecheck <your_file.swift>` or `xcodebuild -scheme FeedReader build` |
+| Node/JS | `node -c <your_file.js>` (syntax check each new file) |
+| OCaml | `ocamlfind ocamlopt -package <deps> -c <your_file.ml>` or just `make` |
+| HTML | Open in browser or validate structure is complete |
+
+**If the build fails:**
+1. Fix the error
+2. Re-run the build check
+3. Only push when it passes
+
+**If you can't fix it**, revert your changes (`git checkout -- .`) and report the failure. Do NOT push broken code.
+
+**Also run existing tests if they exist:**
+- Python: `python -m pytest` (if pytest is set up)
+- Dart: `flutter test` (if tests exist)
+- .NET: `dotnet test --no-build -q`
+- Java: `mvn test -q`
+- Node: `npm test` (if package.json has test script)
+
+Test failures in your NEW code = must fix. Test failures in EXISTING code = note in your report but still okay to push your feature.
+
+## ⚠️ VERIFY PUSH SUCCEEDED
+
+After `git push`, check the exit code. If push fails:
+1. Try `git pull --rebase origin main` (or master) then push again
+2. If still failing, report the error — do NOT silently skip
+3. Your summary MUST say whether the push succeeded or failed
+
+**If your summary says "pushed to master" but the push actually failed, that's a lie. Don't do it.**
 
 ## REPORTING
 

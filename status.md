@@ -1,5 +1,4 @@
-# Repo Gardener - Run 2325-2326
-**Started:** 2026-04-04 6:08 PM PST
-**Task 1:** perf_improvement on `everything` (Dart)
-**Task 2:** perf_improvement on `BioBots` (JavaScript)
-**Status:** Cloning everything...
+# Builder Status
+**Run:** 173 | **Started:** 2026-04-04 10:41 PM PST
+**Status:** Building vormap_advisor.py — Spatial Analysis Advisor for VoronoiMap
+**Feature:** Auto-analyzes dataset properties and recommends optimal vormap tools with reasoning

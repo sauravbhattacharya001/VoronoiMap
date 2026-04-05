@@ -68,6 +68,28 @@ Never use `gh pr create`. Never create feature branches and leave them as PRs. J
 ## QUALITY STANDARDS
 Senior engineer quality. Read and understand code before changing it. No cosmetic-only changes. Think before you code. Would you approve this PR?
 
+## ⚠️ MANDATORY: BUILD VERIFICATION BEFORE PUSHING
+
+**You MUST verify your changes compile/parse before pushing. No exceptions.**
+
+After making changes and before `git push`, run the appropriate build check:
+
+| Language | Verification Command |
+|----------|---------------------|
+| Python | `python -m py_compile <changed_file.py>` |
+| Dart/Flutter | `flutter analyze --no-fatal-infos` |
+| Java | `mvn compile -q` |
+| C# / .NET | `dotnet build --no-restore -q` |
+| Swift/iOS | `swiftc -typecheck <changed_file.swift>` or `xcodebuild build` |
+| Node/JS | `node -c <changed_file.js>` |
+| OCaml | `make` or `ocamlfind ocamlopt -c <file.ml>` |
+
+**If build fails:** Fix it or revert. Do NOT push broken code.
+
+**Run existing tests if they exist** (pytest, flutter test, dotnet test, mvn test, npm test). Test failures in YOUR changes = must fix. Pre-existing test failures = note but okay to push.
+
+**Verify push succeeded:** Check `git push` exit code. If it failed, report it honestly. Don't claim "pushed to master" if it didn't land.
+
 ## REPORTING
 
 Update status.md during each task. After completion:
