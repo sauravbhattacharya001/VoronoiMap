@@ -77,6 +77,48 @@ def _bbox(pts: List[Point]) -> Tuple[float, float, float, float]:
     return (min(xs), min(ys), max(xs), max(ys))
 
 
+# ── Affine matrix helpers ──────────────────────────────────────────
+# A 2D affine transform is a 3×3 matrix stored as a flat 6-tuple:
+#   (a, b, tx, c, d, ty)  representing:
+#   | a  b  tx |     x' = a*x + b*y + tx
+#   | c  d  ty |     y' = c*x + d*y + ty
+#   | 0  0  1  |
+
+Affine = Tuple[float, float, float, float, float, float]
+
+_IDENTITY: Affine = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+
+
+def _affine_compose(m1: Affine, m2: Affine) -> Affine:
+    """Compose two affine transforms: result = m1 · m2."""
+    a1, b1, tx1, c1, d1, ty1 = m1
+    a2, b2, tx2, c2, d2, ty2 = m2
+    return (
+        a1 * a2 + b1 * c2,
+        a1 * b2 + b1 * d2,
+        a1 * tx2 + b1 * ty2 + tx1,
+        c1 * a2 + d1 * c2,
+        c1 * b2 + d1 * d2,
+        c1 * tx2 + d1 * ty2 + ty1,
+    )
+
+
+def _affine_apply(m: Affine, pts: List[Point]) -> List[Point]:
+    """Apply an affine matrix to a list of points."""
+    a, b, tx, c, d, ty = m
+    return [(a * x + b * y + tx, c * x + d * y + ty) for x, y in pts]
+
+
+def _affine_around(pivot: Point, a: float, b: float, c: float, d: float) -> Affine:
+    """Build an affine that applies the 2×2 matrix [[a,b],[c,d]] around *pivot*.
+
+    Equivalent to translate(-pivot) → linear → translate(+pivot), but
+    computed in one step to avoid three matrix multiplications."""
+    px, py = pivot
+    return (a, b, px - a * px - b * py,
+            c, d, py - c * px - d * py)
+
+
 # ── Individual transforms ──────────────────────────────────────────
 
 def rotate(pts: List[Point], angle_deg: float, pivot: Optional[Point] = None) -> List[Point]:
@@ -85,12 +127,7 @@ def rotate(pts: List[Point], angle_deg: float, pivot: Optional[Point] = None) ->
         pivot = _centroid(pts)
     rad = math.radians(angle_deg)
     cos_a, sin_a = math.cos(rad), math.sin(rad)
-    out = []
-    for x, y in pts:
-        dx, dy = x - pivot[0], y - pivot[1]
-        out.append((pivot[0] + dx * cos_a - dy * sin_a,
-                     pivot[1] + dx * sin_a + dy * cos_a))
-    return out
+    return _affine_apply(_affine_around(pivot, cos_a, -sin_a, sin_a, cos_a), pts)
 
 
 def scale(pts: List[Point], sx: float = 1.0, sy: Optional[float] = None,
@@ -100,11 +137,7 @@ def scale(pts: List[Point], sx: float = 1.0, sy: Optional[float] = None,
         sy = sx
     if center is None:
         center = _centroid(pts)
-    out = []
-    for x, y in pts:
-        out.append((center[0] + (x - center[0]) * sx,
-                     center[1] + (y - center[1]) * sy))
-    return out
+    return _affine_apply(_affine_around(center, sx, 0.0, 0.0, sy), pts)
 
 
 def mirror(pts: List[Point], axis: str = "y", angle_deg: Optional[float] = None,
@@ -113,19 +146,14 @@ def mirror(pts: List[Point], axis: str = "y", angle_deg: Optional[float] = None,
     if center is None:
         center = _centroid(pts)
     if axis == "x":
-        return [(x, 2 * center[1] - y) for x, y in pts]
+        return _affine_apply(_affine_around(center, 1.0, 0.0, 0.0, -1.0), pts)
     elif axis == "y":
-        return [(2 * center[0] - x, y) for x, y in pts]
+        return _affine_apply(_affine_around(center, -1.0, 0.0, 0.0, 1.0), pts)
     elif axis == "angle" and angle_deg is not None:
         rad = math.radians(angle_deg)
         cos2 = math.cos(2 * rad)
         sin2 = math.sin(2 * rad)
-        out = []
-        for x, y in pts:
-            dx, dy = x - center[0], y - center[1]
-            out.append((center[0] + dx * cos2 + dy * sin2,
-                         center[1] + dx * sin2 - dy * cos2))
-        return out
+        return _affine_apply(_affine_around(center, cos2, sin2, sin2, -cos2), pts)
     else:
         raise ValueError(f"Unknown mirror axis: {axis!r}")
 
@@ -135,17 +163,12 @@ def shear(pts: List[Point], shx: float = 0.0, shy: float = 0.0,
     """Apply shear transformation."""
     if center is None:
         center = _centroid(pts)
-    out = []
-    for x, y in pts:
-        dx, dy = x - center[0], y - center[1]
-        out.append((center[0] + dx + shx * dy,
-                     center[1] + shy * dx + dy))
-    return out
+    return _affine_apply(_affine_around(center, 1.0, shx, shy, 1.0), pts)
 
 
 def translate(pts: List[Point], dx: float = 0.0, dy: float = 0.0) -> List[Point]:
     """Shift all points by (dx, dy)."""
-    return [(x + dx, y + dy) for x, y in pts]
+    return _affine_apply((1.0, 0.0, dx, 0.0, 1.0, dy), pts)
 
 
 def jitter(pts: List[Point], radius: float = 1.0, seed: Optional[int] = None) -> List[Point]:
@@ -157,6 +180,48 @@ def jitter(pts: List[Point], radius: float = 1.0, seed: Optional[int] = None) ->
         r = rng.uniform(0, radius)
         out.append((x + r * math.cos(angle), y + r * math.sin(angle)))
     return out
+
+
+def to_affine_matrix(name: str, **kwargs) -> Affine:
+    """Return the affine matrix for a named transform without applying it.
+
+    Useful for pre-composing multiple transforms into a single matrix
+    before applying to large point sets::
+
+        m1 = to_affine_matrix("rotate", angle_deg=45, pivot=(0, 0))
+        m2 = to_affine_matrix("scale", sx=2.0, center=(0, 0))
+        composed = _affine_compose(m1, m2)
+        result = _affine_apply(composed, points)
+
+    Raises ValueError for non-affine transforms (jitter).
+    """
+    if name == "jitter":
+        raise ValueError("jitter is stochastic and cannot be expressed as an affine matrix")
+    pivot = kwargs.get("pivot") or kwargs.get("center") or (0.0, 0.0)
+    if name == "rotate":
+        rad = math.radians(kwargs["angle_deg"])
+        c, s = math.cos(rad), math.sin(rad)
+        return _affine_around(pivot, c, -s, s, c)
+    elif name == "scale":
+        sx = kwargs.get("sx", 1.0)
+        sy = kwargs.get("sy", sx)
+        return _affine_around(pivot, sx, 0.0, 0.0, sy)
+    elif name == "mirror":
+        axis = kwargs.get("axis", "y")
+        if axis == "x":
+            return _affine_around(pivot, 1.0, 0.0, 0.0, -1.0)
+        elif axis == "y":
+            return _affine_around(pivot, -1.0, 0.0, 0.0, 1.0)
+        else:
+            rad = math.radians(kwargs["angle_deg"])
+            cos2, sin2 = math.cos(2 * rad), math.sin(2 * rad)
+            return _affine_around(pivot, cos2, sin2, sin2, -cos2)
+    elif name == "shear":
+        return _affine_around(pivot, 1.0, kwargs.get("shx", 0.0),
+                              kwargs.get("shy", 0.0), 1.0)
+    elif name == "translate":
+        return (1.0, 0.0, kwargs.get("dx", 0.0), 0.0, 1.0, kwargs.get("dy", 0.0))
+    raise ValueError(f"Unknown transform: {name!r}")
 
 
 # ── Pipeline ────────────────────────────────────────────────────────
@@ -173,16 +238,58 @@ _REGISTRY = {
 
 def chain_transforms(pts: List[Point],
                      steps: Sequence[Tuple[str, Dict]]) -> TransformResult:
-    """Apply a sequence of named transforms and return a *TransformResult*."""
+    """Apply a sequence of named transforms and return a *TransformResult*.
+
+    When all steps are affine (everything except jitter), the matrices
+    are composed into a single transform and applied in one pass over
+    the points — O(n) regardless of how many transforms are chained.
+    """
     original = list(pts)
-    current = list(pts)
     names = []
+
+    # Partition steps into contiguous affine runs and non-affine (jitter)
+    # so we can batch affine segments into a single matrix application.
+    current = list(pts)
+    pending_affine: Affine = _IDENTITY
+    centroid = _centroid(current)
+
+    def _flush_affine():
+        nonlocal current, pending_affine, centroid
+        if pending_affine != _IDENTITY:
+            current = _affine_apply(pending_affine, current)
+            pending_affine = _IDENTITY
+            centroid = _centroid(current)
+
     for name, kwargs in steps:
         fn = _REGISTRY.get(name)
         if fn is None:
             raise ValueError(f"Unknown transform: {name!r}")
-        current = fn(current, **kwargs)
         names.append(name)
+
+        if name == "jitter":
+            # Flush any pending affine, then apply jitter (non-affine)
+            _flush_affine()
+            current = fn(current, **kwargs)
+            centroid = _centroid(current)
+        else:
+            # Build affine matrix for this step using current centroid
+            # as the default pivot/center
+            kw = dict(kwargs)
+            if name in ("rotate",) and "pivot" not in kw:
+                kw["pivot"] = centroid
+            elif name in ("scale", "mirror", "shear") and "center" not in kw:
+                kw["center"] = centroid
+            try:
+                mat = to_affine_matrix(name, **kw)
+                pending_affine = _affine_compose(mat, pending_affine)
+            except ValueError:
+                # Fallback: apply directly
+                _flush_affine()
+                current = fn(current, **kwargs)
+                centroid = _centroid(current)
+
+    _flush_affine()
+
     return TransformResult(
         original=original,
         transformed=current,
