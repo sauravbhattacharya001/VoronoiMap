@@ -23,3 +23,7 @@ visualization:
   - '(plot|render|display|color|animate|heatmap|contour|viz|visual|draw|map output)'
 spatial:
   - '(voronoi|delaunay|polygon|geometry|coordinate|CRS|projection|GeoJSON|KML|shapefile|spatial)'
+infrastructure:
+  - '(refactor|cleanup|dead code|unused|deprecat|migrate|restructur|reorganiz)'
+good first issue:
+  - '(beginner|easy|starter|straightforward|simple fix|low.hanging|good first)'

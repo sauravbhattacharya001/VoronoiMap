@@ -83,5 +83,67 @@ security:
       - any-glob-to-any-file:
           - 'vormap_geojson.py'
           - 'vormap_kml.py'
+          - 'vormap_gpx.py'
           - 'vormap_report.py'
           - 'vormap_pipeline.py'
+          - 'vormap_gallery.py'
+
+# Visualization and rendering modules
+visualization:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'vormap_viz.py'
+          - 'vormap_animate.py'
+          - 'vormap_heatmap.py'
+          - 'vormap_contour.py'
+          - 'vormap_color.py'
+          - 'vormap_coloring.py'
+          - 'vormap_gradient.py'
+          - 'vormap_ascii.py'
+          - 'vormap_stainedglass.py'
+          - 'vormap_watercolor.py'
+          - 'vormap_lowpoly.py'
+          - 'vormap_pixelart.py'
+          - 'vormap_stipple.py'
+          - 'vormap_halftone.py'
+          - 'vormap_mosaic.py'
+          - 'vormap_photomosaic.py'
+          - 'vormap_kaleidoscope.py'
+          - 'vormap_emboss.py'
+          - 'vormap_hatch.py'
+          - 'vormap_crossstitch.py'
+          - 'vormap_stringart.py'
+
+# Spatial analysis modules
+spatial-analysis:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'vormap_cluster.py'
+          - 'vormap_hotspot.py'
+          - 'vormap_kde.py'
+          - 'vormap_interp.py'
+          - 'vormap_autocorr.py'
+          - 'vormap_nndist.py'
+          - 'vormap_variogram.py'
+          - 'vormap_zonal.py'
+          - 'vormap_regress.py'
+          - 'vormap_outlier.py'
+          - 'vormap_crossval.py'
+          - 'vormap_montecarlo.py'
+          - 'vormap_mapalgebra.py'
+
+# Core geometry and generation
+core:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'vormap.py'
+          - 'vormap_generate.py'
+          - 'vormap_seeds.py'
+          - 'vormap_delaunay.py'
+          - 'vormap_geometry.py'
+          - 'vormap_utils.py'
+          - 'vormap_clip.py'
+          - 'vormap_merge.py'
+          - 'vormap_query.py'
+          - 'vormap_relax.py'
+          - 'vormap_hull.py'
