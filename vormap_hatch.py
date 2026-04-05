@@ -37,6 +37,7 @@ import random as _random
 from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
+import vormap
 from vormap_utils import polygon_centroid_mean as _polygon_centroid, point_in_polygon as _point_in_polygon
 
 # ── Core Voronoi computation (pure-Python fallback) ──
@@ -615,7 +616,7 @@ def to_json(hatch_data):
 def _load_points(filepath):
     """Load points from text file (x y per line or x,y)."""
     pts = []
-    with open(filepath, "r") as f:
+    with open(vormap.validate_input_path(filepath, allow_absolute=True), "r") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):
@@ -629,7 +630,7 @@ def _load_points(filepath):
 def _load_values(filepath):
     """Load per-cell values from text file (one float per line)."""
     vals = []
-    with open(filepath, "r") as f:
+    with open(vormap.validate_input_path(filepath, allow_absolute=True), "r") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):
@@ -705,7 +706,7 @@ def main():
     else:
         content = to_svg(hatch, args.width, args.height)
 
-    with open(args.output, "w") as f:
+    with open(vormap.validate_output_path(args.output, allow_absolute=True), "w") as f:
         f.write(content)
 
     n_cells = len(hatch["cells"])

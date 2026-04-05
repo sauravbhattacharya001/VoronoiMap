@@ -37,6 +37,8 @@ import os
 import random as _rand
 import sys
 
+import vormap
+
 # ---------------------------------------------------------------------------
 # Voronoi computation (same KD-free approach used elsewhere in VoronoiMap)
 # ---------------------------------------------------------------------------
@@ -363,15 +365,17 @@ def main(argv=None):
 
     if args.output:
         svg = render_svg(seeds, cells, boundary, field_fn, slines, w, h)
-        with open(args.output, "w", encoding="utf-8") as f:
+        safe_out = vormap.validate_output_path(args.output, allow_absolute=True)
+        with open(safe_out, "w", encoding="utf-8") as f:
             f.write(svg)
-        print(f"SVG written -> {args.output}")
+        print(f"SVG written -> {safe_out}")
 
     if args.json:
         data = export_json(seeds, cells, field_fn, w, h)
-        with open(args.json, "w", encoding="utf-8") as f:
+        safe_json = vormap.validate_output_path(args.json, allow_absolute=True)
+        with open(safe_json, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
-        print(f"JSON written -> {args.json}")
+        print(f"JSON written -> {safe_json}")
 
     if not args.output and not args.json:
         # Preview stats

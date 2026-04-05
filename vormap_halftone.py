@@ -51,6 +51,8 @@ import zlib
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
+import vormap
+
 
 # ---------------------------------------------------------------------------
 # PNG reader (minimal, supports 8-bit RGB/RGBA non-interlaced)
@@ -59,7 +61,7 @@ from typing import Dict, List, Optional, Tuple
 def _read_png(path: str) -> Tuple[int, int, List[Tuple[int, int, int]]]:
     """Read a PNG file and return (width, height, pixels) where pixels is a
     flat list of (R, G, B) tuples in row-major order."""
-    with open(path, "rb") as f:
+    with open(vormap.validate_input_path(path, allow_absolute=True), "rb") as f:
         sig = f.read(8)
         if sig != b"\x89PNG\r\n\x1a\n":
             raise ValueError("Not a valid PNG file")
@@ -171,7 +173,7 @@ def _write_png(path: str, width: int, height: int,
     ihdr = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
     compressed = zlib.compress(bytes(raw_rows), 9)
 
-    with open(path, "wb") as f:
+    with open(vormap.validate_output_path(path, allow_absolute=True), "wb") as f:
         f.write(b"\x89PNG\r\n\x1a\n")
         f.write(_chunk(b"IHDR", ihdr))
         f.write(_chunk(b"IDAT", compressed))

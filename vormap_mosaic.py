@@ -31,6 +31,8 @@ import zlib
 from collections import defaultdict
 from typing import List, Tuple, Optional, Dict
 
+import vormap
+
 # ── Optional dependency detection ──
 
 try:
@@ -75,7 +77,7 @@ def _read_png(filepath: str) -> Tuple[int, int, list]:
     * Individual chunk lengths are validated against remaining file size.
     * CRC of every chunk is verified; mismatches raise ``ValueError``.
     """
-    with open(filepath, "rb") as f:
+    with open(vormap.validate_input_path(filepath, allow_absolute=True), "rb") as f:
         sig = f.read(8)
         if sig != b"\x89PNG\r\n\x1a\n":
             raise ValueError("Not a valid PNG file")
@@ -226,7 +228,7 @@ def _write_png(filepath: str, width: int, height: int, pixels: list) -> None:
     ihdr = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
     compressed = zlib.compress(bytes(raw_rows), 9)
 
-    with open(filepath, "wb") as f:
+    with open(vormap.validate_output_path(filepath, allow_absolute=True), "wb") as f:
         f.write(b"\x89PNG\r\n\x1a\n")
         f.write(_chunk(b"IHDR", ihdr))
         f.write(_chunk(b"IDAT", compressed))
