@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-04-05T04:11:00.000Z",
-  "lastRepo": "agenticchat",
-  "lastFeature": "Word Cloud Generator — interactive word frequency cloud with 5 color schemes, spiral layout, PNG download (Alt+W)",
-  "runsCompleted": 172,
+  "lastRun": "2026-04-05T23:20:00.000Z",
+  "lastRepo": "VoronoiMap",
+  "lastFeature": "Spatial Analysis Recommender — Hopkins statistic, Clark-Evans R, proactive tool suggestions",
+  "runsCompleted": 176,
   "repoFeatures": {
     "WinSentinel": [
       "Peer Benchmark CLI command (--peers)",
@@ -13,7 +13,8 @@
       "Changelog CLI command (--changelog) — security posture drift tracking with weekly/monthly/daily grouping, module impact table",
       "Security Pulse CLI command (--pulse) — ASCII EKG heartbeat visualization with scores, streaks, alerts, findings",
       "Security Calendar CLI command (--calendar) — iCal export, audit cadence analysis, SLA deadlines, review events",
-      "Security Debt Calculator CLI command (--debt) — effort estimation, ROI ranking, repayment plan"
+      "Security Debt Calculator CLI command (--debt) — effort estimation, ROI ranking, repayment plan",
+      "Security Anomaly Watchdog CLI command (--watchdog) — z-score anomaly detection for score drops, finding spikes, module regressions"
     ],
     "agentlens": [
       "Light/dark theme toggle for dashboard",
@@ -45,7 +46,8 @@
       "vormap_tile — seamless tileable Voronoi pattern generator with 5 styles, 6 palettes, Lloyd relaxation, tile preview",
       "vormap_transform — geometric transformations with chainable pipeline, SVG visualization",
       "vormap_text — Voronoi Typography: text as Voronoi cell mosaics with bitmap font, 7 colormaps, SVG/HTML export",
-      "vormap_cvd — Color Vision Deficiency simulator with Brettel/Viénot matrices, palette checker, CVD-safe palette suggestions"
+      "vormap_cvd — Color Vision Deficiency simulator with Brettel/Viénot matrices, palette checker, CVD-safe palette suggestions",
+      "vormap_recommend — Spatial Analysis Recommender with Hopkins statistic, Clark-Evans R, proactive tool suggestions, HTML report"
     ],
     "agenticchat": [
       "Smart auto-rename sessions after first assistant reply",
@@ -58,7 +60,8 @@
       "Conversation Stash — git-stash-style save/restore for conversations with stash stack, pop, apply, slash commands (Ctrl+Shift+Z)",
       "Conversation Screenshot — export chat as shareable PNG image via Canvas API with 3 themes, download/clipboard",
       "Voice Chat Mode — hands-free conversational loop with Alt+V toggle",
-      "Word Cloud Generator — interactive word frequency cloud with 5 color schemes, spiral layout, PNG download (Alt+W)"
+      "Word Cloud Generator — interactive word frequency cloud with 5 color schemes, spiral layout, PNG download (Alt+W)",
+      "Prompt Enhancer — AI-powered prompt improvement with 5 modes (clarity, detail, concise, expert, creative) via Alt+E"
     ],
     "gif-captcha": [
       "Personal stats tracker page (my-stats.html)",
@@ -154,7 +157,8 @@
       "Movie Poster Creator — Canvas-based poster designer with 6 layouts, 8 quick themes, genre icons, star ratings, auto-fill from catalog, PNG download",
       "Alphabet Challenge — gamified A-Z movie collection tracker with progress ring, clickable grid, achievements",
       "Movie Drinking Game Generator — genre-based watching rules with 3 difficulties, rule categories, estimated sips",
-      "Movie Soundtrack Discovery — genre-to-soundtrack profiles, mood playlists (8 moods), per-movie suggestions, mixtape generator, trivia quiz"
+      "Movie Soundtrack Discovery — genre-to-soundtrack profiles, mood playlists (8 moods), per-movie suggestions, mixtape generator, trivia quiz",
+      "Taste Evolution Tracker — genre drift detection, momentum-based predictions, proactive suggestions, taste personas"
     ],
     "prompt": [
       "PromptShareFormatter for multi-format prompt sharing (PlainText, Markdown, HTML, JSON, YAML)",

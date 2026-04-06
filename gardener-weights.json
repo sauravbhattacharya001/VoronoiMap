@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-04-05T04:35:00.000Z",
-  "totalRuns": 2222,
+  "lastUpdated": "2026-04-06T05:10:00.000Z",
+  "totalRuns": 2304,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -9,50 +9,50 @@
     },
     "bug_fix": {
       "weight": 17.1,
-      "runs": 141,
-      "successes": 142
+      "runs": 144,
+      "successes": 145
     },
     "security_fix": {
       "weight": 18.1,
-      "runs": 221,
-      "successes": 221,
+      "runs": 229,
+      "successes": 229,
       "description": "Fix security vulnerability",
       "totalDone": 10
     },
     "perf_improvement": {
       "weight": 17.1,
-      "runs": 288,
-      "successes": 286
+      "runs": 304,
+      "successes": 302
     },
     "refactor": {
       "weight": 18.1,
-      "runs": 308,
-      "successes": 311
+      "runs": 324,
+      "successes": 327
     },
     "readme_overhaul": {
       "weight": 20,
-      "runs": 37,
-      "successes": 36
+      "runs": 39,
+      "successes": 38
     },
     "doc_update": {
       "weight": 16.1,
-      "runs": 84,
-      "successes": 86,
+      "runs": 88,
+      "successes": 90,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
       "weight": 18.1,
-      "runs": 69,
-      "successes": 69,
+      "runs": 71,
+      "successes": 71,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 15.1,
-      "runs": 126,
-      "successes": 129,
+      "runs": 130,
+      "successes": 133,
       "description": "Open a thoughtful issue",
       "totalDone": 2,
       "attempts": 4
@@ -65,8 +65,8 @@
     },
     "merge_dependabot": {
       "weight": 25,
-      "runs": 56,
-      "successes": 42,
+      "runs": 61,
+      "successes": 43,
       "description": "Review and merge open Dependabot PRs"
     },
     "add_ci_cd": {
@@ -83,8 +83,8 @@
     },
     "add_dependabot": {
       "weight": 20,
-      "runs": 23,
-      "successes": 23,
+      "runs": 24,
+      "successes": 24,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
@@ -95,8 +95,8 @@
     },
     "create_release": {
       "weight": 20,
-      "runs": 217,
-      "successes": 217,
+      "runs": 231,
+      "successes": 230,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
@@ -107,8 +107,8 @@
     },
     "docker_workflow": {
       "weight": 20,
-      "runs": 29,
-      "successes": 29,
+      "runs": 32,
+      "successes": 32,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
@@ -125,14 +125,14 @@
     },
     "add_license": {
       "weight": 10,
-      "runs": 9,
-      "successes": 8,
+      "runs": 10,
+      "successes": 9,
       "description": "Add/update LICENSE file"
     },
     "issue_templates": {
       "weight": 20,
-      "runs": 26,
-      "successes": 26,
+      "runs": 28,
+      "successes": 28,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
@@ -143,20 +143,20 @@
     },
     "repo_topics": {
       "weight": 10,
-      "runs": 21,
-      "successes": 21,
+      "runs": 22,
+      "successes": 22,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
       "weight": 10,
-      "runs": 24,
-      "successes": 24,
+      "runs": 25,
+      "successes": 25,
       "description": "Configure branch protection"
     },
     "code_coverage": {
       "weight": 20,
-      "runs": 39,
-      "successes": 38,
+      "runs": 40,
+      "successes": 39,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
@@ -166,19 +166,19 @@
     },
     "auto_labeler": {
       "weight": 10,
-      "runs": 24,
-      "successes": 24,
+      "runs": 26,
+      "successes": 26,
       "description": "Add auto-labeler or stale bot"
     },
     "add_docstrings": {
       "weight": 12,
-      "runs": 33,
-      "successes": 33
+      "runs": 35,
+      "successes": 35
     },
     "add_tests": {
       "weight": 18.1,
-      "runs": 26,
-      "successes": 26,
+      "runs": 27,
+      "successes": 27,
       "description": "Add test suites for untested modules"
     }
   },
@@ -200,20 +200,20 @@
     "everything": [],
     "prompt": []
   },
-  "notes": "Run 2337: auto_labeler Vidly PR size labeler. Run 2338: docs_site WinSentinel security hardening guide.",
-  "lastRepo": "WinSentinel",
-  "lastRun": "2026-04-04",
-  "runCount": 834,
+  "notes": "Run 2423: docker_workflow prompt (added SBOM, provenance attestation, supply chain security). Run 2424: docker_workflow ai (added SBOM, provenance, Trivy scanning, QEMU).",
+  "lastRepo": "ai",
+  "lastRun": "2026-04-05",
+  "runCount": 857,
   "lastTasks": [
-    "auto_labeler",
-    "docs_site"
+    "docker_workflow",
+    "docker_workflow"
   ],
   "lastRepos": [
-    "Vidly",
-    "WinSentinel"
+    "prompt",
+    "ai"
   ],
-  "lastRunTimestamp": "2026-04-05T05:35:00.000Z",
-  "runCounter": 2338,
+  "lastRunTimestamp": "2026-04-06T05:10:00.000Z",
+  "runCounter": 2424,
   "lastWeightAdjustment": 1191,
   "adjustmentHistory": [
     {
