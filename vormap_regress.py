@@ -838,23 +838,40 @@ def fit_gwr(stats, *, y, x, bandwidth=None, kernel="gaussian"):
     if n < k + 1:
         raise ValueError("Need at least %d observations" % (k + 1))
 
-    # Compute all pairwise distances
-    dists = [[0.0] * n for _ in range(n)]
-    for i in range(n):
-        for j in range(i + 1, n):
-            d = math.sqrt((coords[i][0] - coords[j][0]) ** 2 +
-                          (coords[i][1] - coords[j][1]) ** 2)
-            dists[i][j] = d
-            dists[j][i] = d
+    # Compute all pairwise distances — numpy vectorised when available
+    try:
+        import numpy as _np
+        _pts = _np.asarray(coords, dtype=float)            # (n, 2)
+        _diff = _pts[:, None, :] - _pts[None, :, :]        # (n, n, 2)
+        dists_arr = _np.sqrt((_diff * _diff).sum(axis=2))  # (n, n)
+        dists = dists_arr  # keep as ndarray for fast indexing below
+        _use_numpy_gwr = True
+    except ImportError:
+        _use_numpy_gwr = False
+        dists = [[0.0] * n for _ in range(n)]
+        for i in range(n):
+            for j in range(i + 1, n):
+                d = math.sqrt((coords[i][0] - coords[j][0]) ** 2 +
+                              (coords[i][1] - coords[j][1]) ** 2)
+                dists[i][j] = d
+                dists[j][i] = d
 
     # Auto bandwidth: median pairwise distance
     if bandwidth is None:
-        all_dists = []
-        for i in range(n):
-            for j in range(i + 1, n):
-                all_dists.append(dists[i][j])
-        all_dists.sort()
-        bandwidth = all_dists[len(all_dists) // 2] if all_dists else 1.0
+        if _use_numpy_gwr:
+            # Extract upper triangle and compute median — avoids
+            # materialising an n*(n-1)/2 Python list.
+            import numpy as _np
+            upper_idx = _np.triu_indices(n, k=1)
+            upper_dists = dists_arr[upper_idx]
+            bandwidth = float(_np.median(upper_dists)) if len(upper_dists) else 1.0
+        else:
+            all_dists = []
+            for i in range(n):
+                for j in range(i + 1, n):
+                    all_dists.append(dists[i][j])
+            all_dists.sort()
+            bandwidth = all_dists[len(all_dists) // 2] if all_dists else 1.0
 
     # Fit local regressions
     local_coeffs = []
@@ -866,63 +883,121 @@ def fit_gwr(stats, *, y, x, bandwidth=None, kernel="gaussian"):
     y_mean = _mean(y_vals)
     sst_global = sum((yi - y_mean) ** 2 for yi in y_vals)
 
-    for i in range(n):
-        # Compute weights for observation i
-        weights = []
-        for j in range(n):
-            d = dists[i][j]
+    # ── NumPy-accelerated GWR fitting ────────────────────────────────
+    # When numpy is available, vectorise the weight computation and
+    # weighted least-squares solve across all observations.  The inner
+    # loop becomes numpy linear-algebra calls instead of O(nk²) Python.
+    if _use_numpy_gwr:
+        import numpy as _np
+        X_arr = _np.asarray(X, dtype=float)           # (n, k)
+        y_arr = _np.asarray(y_vals, dtype=float)      # (n,)
+        y_dev = y_arr - y_mean                         # (n,) deviations
+
+        for i in range(n):
+            d_row = dists_arr[i]                        # (n,)
             if kernel == "gaussian":
-                w = math.exp(-0.5 * (d / bandwidth) ** 2)
+                w = _np.exp(-0.5 * (d_row / bandwidth) ** 2)
             else:  # bisquare
-                if d <= bandwidth:
-                    w = (1.0 - (d / bandwidth) ** 2) ** 2
-                else:
-                    w = 0.0
-            weights.append(w)
+                w = _np.where(d_row <= bandwidth,
+                              (1.0 - (d_row / bandwidth) ** 2) ** 2,
+                              0.0)
 
-        # Weighted X and y
-        # X'WX and X'Wy
-        XtWX = [[0.0] * k for _ in range(k)]
-        XtWy = [0.0] * k
-        for j in range(n):
-            wj = weights[j]
-            if wj < 1e-14:
-                continue
-            for a in range(k):
-                XtWy[a] += wj * X[j][a] * y_vals[j]
-                for b in range(k):
-                    XtWX[a][b] += wj * X[j][a] * X[j][b]
+            # Weighted design matrix: sqrt(w) * X
+            sw = _np.sqrt(w)                            # (n,)
+            Xw = X_arr * sw[:, None]                    # (n, k)
+            yw = y_arr * sw                             # (n,)
 
-        try:
-            beta_i = _solve(XtWX, XtWy)
-        except Exception:
-            beta_i = [0.0] * k
+            try:
+                beta_i, _, _, _ = _np.linalg.lstsq(Xw, yw, rcond=None)
+                beta_i = beta_i.tolist()
+            except Exception:
+                beta_i = [0.0] * k
 
-        local_coeffs.append(beta_i)
+            local_coeffs.append(beta_i)
 
-        # Fitted value at i
-        y_hat_i = _dot(X[i], beta_i)
-        fitted.append(y_hat_i)
-        residuals.append(y_vals[i] - y_hat_i)
+            y_hat_i = float(X_arr[i] @ _np.asarray(beta_i))
+            fitted.append(y_hat_i)
+            residuals.append(y_vals[i] - y_hat_i)
 
-        # Local R² (weighted)
-        w_ss_tot = sum(weights[j] * (y_vals[j] - y_mean) ** 2 for j in range(n))
-        w_ss_res = sum(weights[j] * (y_vals[j] - _dot(X[j], beta_i)) ** 2
-                       for j in range(n))
-        lr2 = 1.0 - w_ss_res / w_ss_tot if w_ss_tot > 0 else 0.0
-        local_r2.append(max(0.0, min(1.0, lr2)))
+            # Local R² (weighted)
+            fitted_all = X_arr @ _np.asarray(beta_i)   # (n,)
+            w_ss_tot = float((w * y_dev ** 2).sum())
+            w_ss_res = float((w * (y_arr - fitted_all) ** 2).sum())
+            lr2_val = 1.0 - w_ss_res / w_ss_tot if w_ss_tot > 0 else 0.0
+            local_r2.append(max(0.0, min(1.0, lr2_val)))
 
-        # Local t-values (approximate)
-        w_mse = w_ss_res / max(sum(1 for w in weights if w > 1e-14) - k, 1)
-        try:
-            XtWX_inv = _invert(XtWX)
-            t_vals_i = []
-            for a in range(k):
-                se = math.sqrt(abs(w_mse * XtWX_inv[a][a]))
-                t_vals_i.append(beta_i[a] / se if se > 1e-14 else 0.0)
-        except Exception:
-            t_vals_i = [0.0] * k
-        local_t_vals.append(t_vals_i)
+            # Local t-values
+            n_eff = max(int((w > 1e-14).sum()) - k, 1)
+            w_mse = w_ss_res / n_eff
+            try:
+                XtWX = Xw.T @ Xw                       # (k, k)
+                XtWX_inv = _np.linalg.inv(XtWX)
+                se = _np.sqrt(_np.abs(w_mse * _np.diag(XtWX_inv)))
+                t_vals_i = [float(beta_i[a] / se[a]) if se[a] > 1e-14
+                            else 0.0 for a in range(k)]
+            except Exception:
+                t_vals_i = [0.0] * k
+            local_t_vals.append(t_vals_i)
+
+    else:
+        # ── Pure-Python fallback ─────────────────────────────────────
+        for i in range(n):
+            # Compute weights for observation i
+            weights = []
+            for j in range(n):
+                d = dists[i][j]
+                if kernel == "gaussian":
+                    w = math.exp(-0.5 * (d / bandwidth) ** 2)
+                else:  # bisquare
+                    if d <= bandwidth:
+                        w = (1.0 - (d / bandwidth) ** 2) ** 2
+                    else:
+                        w = 0.0
+                weights.append(w)
+
+            # Weighted X and y
+            # X'WX and X'Wy
+            XtWX = [[0.0] * k for _ in range(k)]
+            XtWy = [0.0] * k
+            for j in range(n):
+                wj = weights[j]
+                if wj < 1e-14:
+                    continue
+                for a in range(k):
+                    XtWy[a] += wj * X[j][a] * y_vals[j]
+                    for b in range(k):
+                        XtWX[a][b] += wj * X[j][a] * X[j][b]
+
+            try:
+                beta_i = _solve(XtWX, XtWy)
+            except Exception:
+                beta_i = [0.0] * k
+
+            local_coeffs.append(beta_i)
+
+            # Fitted value at i
+            y_hat_i = _dot(X[i], beta_i)
+            fitted.append(y_hat_i)
+            residuals.append(y_vals[i] - y_hat_i)
+
+            # Local R² (weighted)
+            w_ss_tot = sum(weights[j] * (y_vals[j] - y_mean) ** 2 for j in range(n))
+            w_ss_res = sum(weights[j] * (y_vals[j] - _dot(X[j], beta_i)) ** 2
+                           for j in range(n))
+            lr2_val = 1.0 - w_ss_res / w_ss_tot if w_ss_tot > 0 else 0.0
+            local_r2.append(max(0.0, min(1.0, lr2_val)))
+
+            # Local t-values (approximate)
+            w_mse = w_ss_res / max(sum(1 for w in weights if w > 1e-14) - k, 1)
+            try:
+                XtWX_inv = _invert(XtWX)
+                t_vals_i = []
+                for a in range(k):
+                    se = math.sqrt(abs(w_mse * XtWX_inv[a][a]))
+                    t_vals_i.append(beta_i[a] / se if se > 1e-14 else 0.0)
+            except Exception:
+                t_vals_i = [0.0] * k
+            local_t_vals.append(t_vals_i)
 
     # Global R² and AIC
     sse = sum(r ** 2 for r in residuals)
