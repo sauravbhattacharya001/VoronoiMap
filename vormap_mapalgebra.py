@@ -110,7 +110,8 @@ class CellLayer:
             }
         """
         safe = vormap.validate_input_path(path, allow_absolute=True)
-        with open(safe) as f:
+        with open(safe, encoding="utf-8") as f:
+            data = json.load(f)
         values = {int(k): float(v) for k, v in data["values"].items()}
         adjacency = {int(k): [int(n) for n in v] for k, v in data["adjacency"].items()}
         return cls(
@@ -843,7 +844,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     elif args.command == "zonal-stats":
         layer = CellLayer.from_json(args.input)
         safe_zones = vormap.validate_input_path(args.zones, allow_absolute=True)
-        with open(safe_zones) as f:
+        with open(safe_zones, encoding="utf-8") as f:
             zone_data = json.load(f)
         zones = {int(k): v for k, v in zone_data.items()}
         stats = zonal_stats(layer, zones)

@@ -400,7 +400,7 @@ def _cli_import(args):
         os.makedirs(os.path.dirname(os.path.abspath(safe_out)) or ".",
                     exist_ok=True)
         if ext == ".csv":
-            with open(safe_out, "w") as f:
+            with open(safe_out, "w", encoding="utf-8") as f:
                 f.write("longitude,latitude,name,elevation\n")
                 for (lon, lat), meta in zip(points, metadata):
                     name = _sanitize_csv_field(meta.get("name", ""))
@@ -413,10 +413,10 @@ def _cli_import(args):
                 entry = {"lon": lon, "lat": lat}
                 entry.update(meta)
                 data.append(entry)
-            with open(safe_out, "w") as f:
+            with open(safe_out, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
         else:
-            with open(safe_out, "w") as f:
+            with open(safe_out, "w", encoding="utf-8") as f:
                 for lon, lat in points:
                     f.write("%.8f %.8f\n" % (lon, lat))
         print("Exported %d points to %s" % (len(points), safe_out))
@@ -447,7 +447,7 @@ def _cli_export(args):
     names = []
 
     if ext == ".csv":
-        with open(safe_in) as f:
+        with open(safe_in, encoding="utf-8") as f:
             header = f.readline().strip().lower()
             for line in f:
                 parts = line.strip().split(",")
@@ -463,7 +463,7 @@ def _cli_export(args):
                         continue
     elif ext == ".json":
         import json
-        with open(safe_in) as f:
+        with open(safe_in, encoding="utf-8") as f:
             data = json.load(f)
         for entry in data:
             if isinstance(entry, dict):
@@ -476,7 +476,7 @@ def _cli_export(args):
                 points.append((float(entry[0]), float(entry[1])))
                 names.append(None)
     else:
-        with open(safe_in) as f:
+        with open(safe_in, encoding="utf-8") as f:
             for line in f:
                 parts = line.strip().split()
                 if len(parts) >= 2:

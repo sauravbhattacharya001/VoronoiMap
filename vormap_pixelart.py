@@ -327,7 +327,7 @@ def main() -> None:
     if args.points:
         vormap.validate_input_path(args.points, allow_absolute=True)
         points = []
-        with open(args.points) as f:
+        with open(args.points, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith("#"):

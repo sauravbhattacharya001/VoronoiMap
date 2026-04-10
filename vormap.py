@@ -374,7 +374,7 @@ def _detect_format(filepath):
     if ext == '.json':
         # Peek at content to distinguish JSON array from GeoJSON
         try:
-            with open(filepath, 'r') as f:
+            with open(filepath, 'r', encoding="utf-8") as f:
                 # Read first non-whitespace chars to detect GeoJSON
                 content = f.read(2048)
                 content_stripped = content.lstrip()
@@ -407,7 +407,7 @@ def _parse_points_txt(filepath):
     _float = float
     _isfinite = math.isfinite
     _append = points.append
-    with open(filepath, 'r') as objf:
+    with open(filepath, 'r', encoding="utf-8") as objf:
         for line in objf:
             coord = line.split(None, 2)
             if len(coord) < 2:
@@ -442,7 +442,7 @@ def _parse_points_csv(filepath):
     ]
 
     points = []
-    with open(filepath, 'r', newline='') as f:
+    with open(filepath, 'r', newline='', encoding="utf-8") as f:
         # Sniff the dialect once from a sample, then rewind
         sample = f.read(4096)
         f.seek(0)
@@ -513,7 +513,7 @@ def _parse_points_json(filepath):
     """
     import json
 
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding="utf-8") as f:
         data = json.load(f)
 
     if not isinstance(data, list):
@@ -580,7 +580,7 @@ def _parse_points_geojson(filepath):
     """Parse GeoJSON FeatureCollection or array of Features with Point geometry."""
     import json
 
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding="utf-8") as f:
         data = json.load(f)
 
     if not isinstance(data, dict):
@@ -1985,7 +1985,7 @@ def _cmd_pattern(args, data):
         import json
         validate_output_path(args.pattern_json, allow_absolute=True)
         result = vp.generate_pattern_json(summary)
-        with open(args.pattern_json, 'w') as f:
+        with open(args.pattern_json, 'w', encoding="utf-8") as f:
             json.dump(result, f, indent=2)
         print('Pattern analysis JSON saved to %s' % args.pattern_json)
 

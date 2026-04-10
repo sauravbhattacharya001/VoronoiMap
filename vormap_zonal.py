@@ -220,7 +220,7 @@ def export_csv(results, filepath):
         lines.append(','.join(vals))
 
     safe = vormap.validate_output_path(filepath, allow_absolute=True)
-    with open(safe, 'w', newline='') as f:
+    with open(safe, 'w', newline='', encoding="utf-8") as f:
         f.write('\n'.join(lines) + '\n')
 
 
@@ -235,7 +235,7 @@ def export_json(results, filepath, indent=2):
         Path to write the JSON file.
     """
     safe = vormap.validate_output_path(filepath, allow_absolute=True)
-    with open(safe, 'w') as f:
+    with open(safe, 'w', encoding="utf-8") as f:
         json.dump(results, f, indent=indent)
 
 
@@ -354,7 +354,7 @@ def export_svg(results, seeds, filepath, stat_key='mean',
     lines.append('</svg>')
 
     safe = vormap.validate_output_path(filepath, allow_absolute=True)
-    with open(safe, 'w') as f:
+    with open(safe, 'w', encoding="utf-8") as f:
         f.write('\n'.join(lines))
 
 
@@ -414,13 +414,13 @@ def _load_points_file(filepath):
     safe = vormap.validate_input_path(filepath, allow_absolute=True)
     ext = os.path.splitext(safe)[1].lower()
     if ext == '.json':
-        with open(safe) as f:
+        with open(safe, encoding="utf-8") as f:
             data = json.load(f)
         return [(float(p[0]), float(p[1])) for p in data]
     else:
         # CSV
         points = []
-        with open(safe) as f:
+        with open(safe, encoding="utf-8") as f:
             for lineno, line in enumerate(f):
                 line = line.strip()
                 if not line or (lineno == 0 and not line[0].isdigit()):
@@ -434,7 +434,7 @@ def _load_observations_file(filepath, value_columns):
     """Load observations (x, y, v1, ...) from CSV."""
     safe = vormap.validate_input_path(filepath, allow_absolute=True)
     observations = []
-    with open(safe) as f:
+    with open(safe, encoding="utf-8") as f:
         for lineno, line in enumerate(f):
             line = line.strip()
             if not line or (lineno == 0 and not line[0].isdigit()):

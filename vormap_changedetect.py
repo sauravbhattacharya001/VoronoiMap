@@ -159,7 +159,7 @@ class ChangeReport:
         """Export report to JSON file."""
         validate_output_path(path)
         data = self.to_dict()
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
         return path
 
@@ -196,7 +196,7 @@ class ChangeReport:
                     f"{c.change},{c.change_pct:.2f}"
                 )
 
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
         return path
 

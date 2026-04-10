@@ -258,7 +258,7 @@ def export_svg(result, output_path, width=800, height=600,
     target_areas = result["target_areas"]
 
     if not regions:
-        with open(output_path, "w") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write('<svg xmlns="http://www.w3.org/2000/svg"/>')
         return
 
@@ -338,7 +338,7 @@ def export_svg(result, output_path, width=800, height=600,
 
     lines.append('</svg>')
 
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding="utf-8") as f:
         f.write('\n'.join(lines))
 
 
@@ -347,7 +347,7 @@ def export_svg(result, output_path, width=800, height=600,
 def export_json(result, output_path):
     """Export cartogram result to JSON."""
     output_path = validate_output_path(output_path, allow_absolute=True)
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding="utf-8") as f:
         json.dump(result, f, indent=2, default=str)
 
 
@@ -432,7 +432,7 @@ def _cli():
         vals = [float(v.strip()) for v in args.values.split(",")]
     elif args.values_file:
         validated_path = validate_input_path(args.values_file, allow_absolute=True)
-        with open(validated_path) as f:
+        with open(validated_path, encoding="utf-8") as f:
             vals = [float(line.strip()) for line in f if line.strip()]
 
     if vals is None:

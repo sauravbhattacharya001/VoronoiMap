@@ -616,7 +616,7 @@ def to_json(hatch_data):
 def _load_points(filepath):
     """Load points from text file (x y per line or x,y)."""
     pts = []
-    with open(vormap.validate_input_path(filepath, allow_absolute=True), "r") as f:
+    with open(vormap.validate_input_path(filepath, allow_absolute=True), "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):
@@ -630,7 +630,7 @@ def _load_points(filepath):
 def _load_values(filepath):
     """Load per-cell values from text file (one float per line)."""
     vals = []
-    with open(vormap.validate_input_path(filepath, allow_absolute=True), "r") as f:
+    with open(vormap.validate_input_path(filepath, allow_absolute=True), "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):
@@ -706,7 +706,7 @@ def main():
     else:
         content = to_svg(hatch, args.width, args.height)
 
-    with open(vormap.validate_output_path(args.output, allow_absolute=True), "w") as f:
+    with open(vormap.validate_output_path(args.output, allow_absolute=True), "w", encoding="utf-8") as f:
         f.write(content)
 
     n_cells = len(hatch["cells"])

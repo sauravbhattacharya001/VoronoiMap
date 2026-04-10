@@ -1026,14 +1026,14 @@ def fit_gwr(stats, *, y, x, bandwidth=None, kernel="gaussian"):
 def export_regress_json(result, path):
     """Export regression results as JSON."""
     path = validate_output_path(path, allow_absolute=True)
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding="utf-8") as f:
         json.dump(result.to_dict(), f, indent=2)
 
 
 def export_regress_csv(result, path):
     """Export per-observation regression data as CSV."""
     path = validate_output_path(path, allow_absolute=True)
-    with open(path, 'w', newline='') as f:
+    with open(path, 'w', newline='', encoding="utf-8") as f:
         writer = csv.writer(f)
 
         if isinstance(result, OLSResult):

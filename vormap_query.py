@@ -430,12 +430,12 @@ def _load_batch_file(path: str) -> List[Point]:
     resolved = validate_input_path(path, allow_absolute=True)
 
     if path.endswith('.json'):
-        with open(resolved) as f:
+        with open(resolved, encoding="utf-8") as f:
             data = json.load(f)
         return [(p[0], p[1]) for p in data]
     # CSV: each line is X,Y
     points = []
-    with open(resolved) as f:
+    with open(resolved, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith('#'):

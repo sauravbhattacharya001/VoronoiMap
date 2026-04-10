@@ -43,7 +43,7 @@ Recommendation = namedtuple("Recommendation", ["priority", "tool", "command", "r
 def _load_points(path):
     """Load 2D points from a whitespace-delimited text file."""
     points = []
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):
@@ -393,7 +393,7 @@ def main():
     if args.html:
         vormap.validate_output_path(args.html, allow_absolute=True)
         html = _format_html(recs, args.datafile)
-        with open(args.html, "w") as f:
+        with open(args.html, "w", encoding="utf-8") as f:
             f.write(html)
         print(f"HTML report written to {args.html}")
 

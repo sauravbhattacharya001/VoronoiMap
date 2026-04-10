@@ -374,7 +374,7 @@ def main():
             frame_svg = points_to_svg(points, width, height,
                                       args.dot_size, args.bg_color, args.dot_color)
             frame_path = os.path.join(frames_dir, f"frame_{i+1:04d}.svg")
-            with open(frame_path, "w") as f:
+            with open(frame_path, "w", encoding="utf-8") as f:
                 f.write(frame_svg)
 
         if disp < args.tolerance:
@@ -390,7 +390,7 @@ def main():
         svg = points_to_svg(points, width, height, args.dot_size,
                             args.bg_color, args.dot_color)
         safe_svg = vormap.validate_output_path(args.svg, allow_absolute=True)
-        with open(safe_svg, "w") as f:
+        with open(safe_svg, "w", encoding="utf-8") as f:
             f.write(svg)
         print(f"SVG written to {args.svg}")
 
@@ -400,13 +400,13 @@ def main():
             "final_displacement": round(disp, 4),
         })
         safe_json = vormap.validate_output_path(args.json, allow_absolute=True)
-        with open(safe_json, "w") as f:
+        with open(safe_json, "w", encoding="utf-8") as f:
             f.write(js)
         print(f"JSON written to {args.json}")
 
     if args.output:
         safe_out = vormap.validate_output_path(args.output, allow_absolute=True)
-        with open(safe_out, "w") as f:
+        with open(safe_out, "w", encoding="utf-8") as f:
             for x, y in points:
                 f.write(f"{x:.4f} {y:.4f}\n")
         print(f"Coordinates written to {args.output}")

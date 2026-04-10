@@ -727,7 +727,7 @@ def export_json(result, path):
         ],
     }
 
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(export, f, indent=2, default=str)
 
 
@@ -751,7 +751,7 @@ if __name__ == "__main__":
             json_out = sys.argv[idx + 1]
 
     pts = []
-    with open(points_path) as f:
+    with open(points_path, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):

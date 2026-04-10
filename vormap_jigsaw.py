@@ -422,7 +422,7 @@ def generate_jigsaw(
     import json
     manifest_path = os.path.join(output_dir, "manifest.json")
     manifest_path = vormap.validate_output_path(manifest_path, allow_absolute=True)
-    with open(manifest_path, "w") as f:
+    with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
 
     # Write overlay if requested

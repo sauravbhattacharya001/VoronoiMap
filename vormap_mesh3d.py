@@ -203,7 +203,7 @@ def export_obj(cells, heights, filepath):
         vertex_offset += 2 * n
         lines.append("")
 
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
     return filepath
@@ -303,7 +303,7 @@ def export_summary_json(cells, heights, filepath):
         },
     }
 
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
     return filepath
 

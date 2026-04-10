@@ -606,7 +606,7 @@ def export_automata_json(result: AutomatonResult, output_path: str) -> str:
             final_states[f"{seed[0]},{seed[1]}"] = state
     data["final_states"] = final_states
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
     return output_path
@@ -635,7 +635,7 @@ def export_automata_csv(result: AutomatonResult, output_path: str) -> str:
             row.append(str(snap.state_counts.get(s, 0)))
         lines.append(",".join(row))
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
     return output_path

@@ -235,14 +235,14 @@ def export_erosion_json(frames: list[dict], path: str) -> None:
     serializable = []
     for frame in frames:
         serializable.append({str(k): round(v, 4) for k, v in frame.items()})
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump({"steps": len(frames), "frames": serializable}, f, indent=1)
 
 
 def export_erosion_csv(frames: list[dict], path: str) -> None:
     """Export erosion frames to CSV (step, seed, elevation)."""
     path = vormap.validate_output_path(path, allow_absolute=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("step,seed,elevation\n")
         for i, frame in enumerate(frames):
             for seed, elev in sorted(frame.items(), key=lambda x: str(x[0])):
@@ -314,7 +314,7 @@ def export_erosion_svg(
     lines.append("</svg>")
 
     path = vormap.validate_output_path(path, allow_absolute=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
 

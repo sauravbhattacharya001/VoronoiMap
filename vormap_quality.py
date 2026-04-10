@@ -231,7 +231,7 @@ class QualityReport:
     def to_json(self, path, *, allow_absolute=False):
         """Export report as JSON."""
         safe = validate_output_path(path, allow_absolute=allow_absolute)
-        with open(safe, "w") as f:
+        with open(safe, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=2)
         return safe
 
@@ -255,7 +255,7 @@ class QualityReport:
             ["density_cv", str(round(self.density.cv, 4))],
             ["isolated_points", str(self.isolation.isolated_count)],
         ]
-        with open(safe, "w") as f:
+        with open(safe, "w", encoding="utf-8") as f:
             for row in rows:
                 f.write(",".join(row) + "\n")
         return safe

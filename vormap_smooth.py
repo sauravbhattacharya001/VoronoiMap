@@ -438,7 +438,7 @@ def smooth_from_file(filename, value_file=None, config=None, value_column=0):
             value_file, base_dir="data", allow_absolute=True
         )
         values = {}
-        with open(resolved, "r") as f:
+        with open(resolved, "r", encoding="utf-8") as f:
             reader = csv.reader(f)
             header = next(reader, None)
             for row in reader:
@@ -501,7 +501,7 @@ def export_json(result, output_path):
         "data": records,
     }
 
-    with open(validated, "w") as f:
+    with open(validated, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2)
 
 

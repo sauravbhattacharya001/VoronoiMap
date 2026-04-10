@@ -402,7 +402,7 @@ def load_boundary(filepath: str) -> Polygon:
         raise FileNotFoundError(f"Boundary file not found: {filepath}")
 
     points: Polygon = []
-    with open(resolved) as f:
+    with open(resolved, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith('#'):

@@ -156,7 +156,7 @@ def _bench_estimate_sum(data, bounds, trials, tmpdir):
     """Benchmark the EstimateSUM algorithm."""
     # Write data to a temp file for get_sum()
     data_file = os.path.join(tmpdir, "_bench_data.txt")
-    with open(data_file, "w") as f:
+    with open(data_file, "w", encoding="utf-8") as f:
         for x, y in data:
             f.write("%.6f %.6f\n" % (x, y))
 
@@ -347,7 +347,7 @@ def format_report(report):
 def export_json(report, filepath):
     """Export benchmark report to JSON."""
     path = vormap.validate_output_path(filepath, allow_absolute=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(report.to_dict(), f, indent=2)
     return path
 
@@ -355,7 +355,7 @@ def export_json(report, filepath):
 def export_csv(report, filepath):
     """Export benchmark report to CSV."""
     path = vormap.validate_output_path(filepath, allow_absolute=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("operation,point_count,trials,mean_ms,median_ms,std_dev_ms,min_ms,max_ms\n")
         for t in report.timings:
             d = t.to_dict()

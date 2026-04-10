@@ -517,7 +517,7 @@ def export_shape_json(
         Output file path.
     """
     os.makedirs(os.path.dirname(os.path.abspath(path)) if os.path.dirname(path) else ".", exist_ok=True)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(analysis, f, indent=2)
 
 

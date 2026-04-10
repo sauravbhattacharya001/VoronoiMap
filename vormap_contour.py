@@ -643,7 +643,7 @@ def generate_contours(
     if geojson_path:
         gj = contour_to_geojson(contours)
         gj_out = vormap.validate_output_path(geojson_path, allow_absolute=True)
-        with open(gj_out, "w") as f:
+        with open(gj_out, "w", encoding="utf-8") as f:
             json.dump(gj, f, indent=2)
 
     total_paths = sum(len(c["paths"]) for c in contours)
@@ -690,7 +690,7 @@ def _cli():
     # Load seeds
     seeds_path = vormap.validate_input_path(args.seeds, allow_absolute=True)
     seeds: list[tuple[float, float]] = []
-    with open(seeds_path) as f:
+    with open(seeds_path, encoding="utf-8") as f:
         for line in f:
             parts = line.strip().split()
             if len(parts) >= 2:
@@ -699,7 +699,7 @@ def _cli():
     # Load values
     vals_path = vormap.validate_input_path(args.values, allow_absolute=True)
     values: list[float] = []
-    with open(vals_path) as f:
+    with open(vals_path, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:

@@ -418,7 +418,7 @@ def main(argv=None):
 
     if args.json:
         out_path = vormap.validate_input_path(args.json, allow_absolute=True)
-        with open(out_path, "w") as f:
+        with open(out_path, "w", encoding="utf-8") as f:
             json.dump(to_dict(result), f, indent=2)
         print(f"\nJSON written to {out_path}")
 

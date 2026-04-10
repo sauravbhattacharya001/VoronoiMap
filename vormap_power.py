@@ -952,7 +952,7 @@ def main():
         from vormap import validate_input_path
         resolved_input = validate_input_path(args.input, allow_absolute=True)
         seeds = []
-        with open(resolved_input) as f:
+        with open(resolved_input, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith('#'):

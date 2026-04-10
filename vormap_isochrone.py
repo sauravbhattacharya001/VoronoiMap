@@ -182,7 +182,7 @@ def export_isochrone_json(costs, bands, path):
             for cid in sorted(costs)
         ]
     }
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     return path
 

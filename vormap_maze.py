@@ -600,7 +600,7 @@ def generate_maze(n_points=100, algorithm="dfs", start=None, goal=None,
 def _safe_write(filepath, content):
     """Write content to file with basic path validation."""
     filepath = vormap._validate_path(filepath, allow_absolute=True, label="Output file")
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(content)
 
 
