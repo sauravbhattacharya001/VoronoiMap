@@ -69,7 +69,8 @@
 - **Gardener/Builder scheduling**: OpenClaw cron jobs (every 30 min, isolated sessions). Task files always push directly — never open PRs.
 - **Branch protection**: Re-enabled on all 16 repos (no review required, force push blocked, direct pushes allowed)
 - **Gardener/Builder stats**: Gardener ~2166 runs, Builder ~700 runs (as of Mar 31)
-- **4 cron jobs active**: Gardener (30min), Builder (30min), Memory Backup (11 PM daily), Profile Refresh (10 AM daily)
+- **5 cron jobs active**: Gardener (30min), Builder (30min), Memory Backup (11 PM daily), Profile Refresh (10 AM daily), Daily Bot Digest (9 PM daily)
+- **Lesson**: `every`-type cron jobs can get dropped during OpenClaw updates — always verify cron jobs after restarts
 - **WinSentinel NuGet**: Workflow fixed (action versions), needs NUGET_API_KEY secret to publish
 - **Memory backup**: Private GitHub repo `sauravbhattacharya001/zalenix-memory`, nightly commits confirmed working
 
