@@ -352,11 +352,13 @@ def main(argv=None):
     else:
         content = export_svg(tiles, meta, args.colormap, args.labels)
 
+    vormap.validate_output_path(args.output, allow_absolute=True)
     with open(args.output, "w", encoding="utf-8") as f:
         f.write(content)
     print("  Written: %s" % args.output)
 
     if args.seeds_out:
+        vormap.validate_output_path(args.seeds_out, allow_absolute=True)
         csv_content = export_seeds_csv(tiles)
         with open(args.seeds_out, "w", encoding="utf-8") as f:
             f.write(csv_content)

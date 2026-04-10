@@ -314,12 +314,14 @@ def main(argv=None):
         content = to_svg(points, args.size, args.colormap,
                          voronoi=args.voronoi, title=args.title)
 
+    vormap.validate_output_path(args.output, allow_absolute=True)
     with open(args.output, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"✓ {args.spiral} spiral ({args.seeds} seeds) → {args.output}")
 
     # Optional CSV seed export
     if args.seeds_out:
+        vormap.validate_output_path(args.seeds_out, allow_absolute=True)
         with open(args.seeds_out, "w", encoding="utf-8") as f:
             f.write("x,y\n")
             for x, y in points:

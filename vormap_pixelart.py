@@ -42,6 +42,8 @@ import os
 import random
 import struct
 import zlib
+
+import vormap
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
@@ -323,6 +325,7 @@ def main() -> None:
 
     points = None
     if args.points:
+        vormap.validate_input_path(args.points, allow_absolute=True)
         points = []
         with open(args.points) as f:
             for line in f:

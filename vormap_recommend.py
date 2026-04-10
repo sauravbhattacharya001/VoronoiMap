@@ -35,6 +35,8 @@ import random
 import sys
 from collections import namedtuple
 
+import vormap
+
 Recommendation = namedtuple("Recommendation", ["priority", "tool", "command", "reason"])
 
 
@@ -389,6 +391,7 @@ def main():
     recs = recommend(args.datafile, top=args.top)
 
     if args.html:
+        vormap.validate_output_path(args.html, allow_absolute=True)
         html = _format_html(recs, args.datafile)
         with open(args.html, "w") as f:
             f.write(html)

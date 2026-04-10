@@ -39,6 +39,8 @@ import os
 import random
 import sys
 
+import vormap
+
 # ── Colour palettes ─────────────────────────────────────────────────────
 
 PALETTES = {
@@ -386,6 +388,7 @@ def main(argv=None):
             seed=args.seed,
         )
 
+    vormap.validate_output_path(args.output, allow_absolute=True)
     with open(args.output, "w", encoding="utf-8") as fh:
         fh.write(content)
 

@@ -1983,6 +1983,7 @@ def _cmd_pattern(args, data):
         print(vp.format_pattern_report(summary))
     if args.pattern_json:
         import json
+        validate_output_path(args.pattern_json, allow_absolute=True)
         result = vp.generate_pattern_json(summary)
         with open(args.pattern_json, 'w') as f:
             json.dump(result, f, indent=2)

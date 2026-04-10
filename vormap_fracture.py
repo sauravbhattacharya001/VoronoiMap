@@ -32,6 +32,8 @@ import json
 import math
 import os
 import random
+
+import vormap
 from typing import List, Tuple, Optional, Dict, Any
 
 from vormap_utils import polygon_area as _polygon_area, polygon_centroid_mean as _polygon_centroid_raw
@@ -575,12 +577,14 @@ def main():
           f"({meta['mode']} mode, {meta['material']} material)")
 
     if args.output:
+        vormap.validate_output_path(args.output, allow_absolute=True)
         svg = fracture_to_svg(result)
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(svg)
         print(f"SVG written to {args.output}")
 
     if args.json_output:
+        vormap.validate_output_path(args.json_output, allow_absolute=True)
         js = fracture_to_json(result)
         with open(args.json_output, "w", encoding="utf-8") as f:
             f.write(js)
