@@ -107,18 +107,82 @@ def _build_stats_lookup(region_stats):
     return lookup
 
 
+def _build_cluster_summary(cluster_id, members, stats_lookup):
+    """Build a summary dict for a single cluster.
+
+    Parameters
+    ----------
+    cluster_id : int
+        Numeric cluster label.
+    members : list of (float, float)
+        Seed points belonging to this cluster.
+    stats_lookup : dict
+        seed -> region stats dict.
+
+    Returns
+    -------
+    dict
+        Cluster summary with id, size, seed list, area/compactness
+        statistics (mean, total, min, max, std), and centroid.
+    """
+    n = len(members)
+    if n == 0:
+        return {
+            "cluster_id": cluster_id, "size": 0, "seeds": [],
+            "mean_area": 0.0, "total_area": 0.0,
+            "min_area": 0.0, "max_area": 0.0, "std_area": 0.0,
+            "mean_compactness": 0.0, "std_compactness": 0.0,
+            "centroid_x": 0.0, "centroid_y": 0.0,
+        }
+
+    areas = []
+    compactnesses = []
+    cx_sum = 0.0
+    cy_sum = 0.0
+    for seed in members:
+        stat = stats_lookup.get(seed, {})
+        areas.append(stat.get("area", 0.0))
+        compactnesses.append(stat.get("compactness", 0.0))
+        cx_sum += stat.get("centroid_x", seed[0])
+        cy_sum += stat.get("centroid_y", seed[1])
+
+    mean_area = sum(areas) / n
+    mean_comp = sum(compactnesses) / n
+    total_area = sum(areas)
+
+    std_area = math.sqrt(sum((a - mean_area) ** 2 for a in areas) / n)
+    std_comp = math.sqrt(
+        sum((c - mean_comp) ** 2 for c in compactnesses) / n)
+
+    return {
+        "cluster_id": cluster_id,
+        "size": n,
+        "seeds": [(s[0], s[1]) for s in members],
+        "mean_area": mean_area,
+        "total_area": total_area,
+        "min_area": min(areas),
+        "max_area": max(areas),
+        "std_area": round(std_area, 4),
+        "mean_compactness": mean_comp,
+        "std_compactness": round(std_comp, 6),
+        "centroid_x": round(cx_sum / n, 4),
+        "centroid_y": round(cy_sum / n, 4),
+    }
+
+
+_METRIC_EXTRACTORS = {
+    "area": lambda s: s["area"],
+    "density": lambda s: 1.0 / s["area"] if s["area"] > 0 else float("inf"),
+    "compactness": lambda s: s["compactness"],
+    "vertices": lambda s: s["vertex_count"],
+}
+
+
 def _metric_value(stat, metric):
     """Extract a metric value from a region stats dict."""
-    if metric == "area":
-        return stat["area"]
-    elif metric == "density":
-        area = stat["area"]
-        return 1.0 / area if area > 0 else float("inf")
-    elif metric == "compactness":
-        return stat["compactness"]
-    elif metric == "vertices":
-        return stat["vertex_count"]
-    else:
+    try:
+        return _METRIC_EXTRACTORS[metric](stat)
+    except KeyError:
         raise ValueError("Unknown metric: %s" % metric)
 
 
@@ -487,36 +551,8 @@ def cluster_regions(region_stats, regions, data, *,
             continue
         cluster_groups.setdefault(label, []).append(seed)
 
-    clusters = []
-    for cid in sorted(cluster_groups.keys()):
-        members = cluster_groups[cid]
-        areas = []
-        compactnesses = []
-        cx_sum = 0.0
-        cy_sum = 0.0
-        total_area = 0.0
-        for seed in members:
-            stat = stats_lookup.get(seed, {})
-            a = stat.get("area", 0.0)
-            areas.append(a)
-            total_area += a
-            compactnesses.append(stat.get("compactness", 0.0))
-            cx_sum += stat.get("centroid_x", seed[0])
-            cy_sum += stat.get("centroid_y", seed[1])
-
-        n = len(members)
-        clusters.append({
-            "cluster_id": cid,
-            "size": n,
-            "seeds": [(s[0], s[1]) for s in members],
-            "mean_area": sum(areas) / n if n else 0.0,
-            "total_area": total_area,
-            "min_area": min(areas) if areas else 0.0,
-            "max_area": max(areas) if areas else 0.0,
-            "mean_compactness": (sum(compactnesses) / n if n else 0.0),
-            "centroid_x": round(cx_sum / n, 4) if n else 0.0,
-            "centroid_y": round(cy_sum / n, 4) if n else 0.0,
-        })
+    clusters = [_build_cluster_summary(cid, cluster_groups[cid], stats_lookup)
+                for cid in sorted(cluster_groups.keys())]
 
     params = {"method": method, "metric": metric}
     if method == "threshold":
