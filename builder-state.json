@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-04-05T23:20:00.000Z",
-  "lastRepo": "VoronoiMap",
-  "lastFeature": "Spatial Analysis Recommender — Hopkins statistic, Clark-Evans R, proactive tool suggestions",
-  "runsCompleted": 176,
+  "lastRun": "2026-04-10T18:06:00.000Z",
+  "lastRepo": "BioBots",
+  "lastFeature": "Experiment Outcome Predictor — Bayesian success prediction with 5 material profiles, risk identification, failure pattern analysis",
+  "runsCompleted": 178,
   "repoFeatures": {
     "WinSentinel": [
       "Peer Benchmark CLI command (--peers)",
@@ -61,7 +61,8 @@
       "Conversation Screenshot — export chat as shareable PNG image via Canvas API with 3 themes, download/clipboard",
       "Voice Chat Mode — hands-free conversational loop with Alt+V toggle",
       "Word Cloud Generator — interactive word frequency cloud with 5 color schemes, spiral layout, PNG download (Alt+W)",
-      "Prompt Enhancer — AI-powered prompt improvement with 5 modes (clarity, detail, concise, expert, creative) via Alt+E"
+      "Prompt Enhancer — AI-powered prompt improvement with 5 modes (clarity, detail, concise, expert, creative) via Alt+E",
+      "Conversation Autopilot — goal-directed autonomous exploration with 3 modes (breadth/depth/creative), human-in-the-loop controls, trail export (Alt+A)"
     ],
     "gif-captcha": [
       "Personal stats tracker page (my-stats.html)",
@@ -94,7 +95,8 @@
       "Plate Layout Designer — interactive visual well plate experiment planner with drag-to-paint, custom conditions, edge blanks, undo/redo, CSV/TSV/JSON export",
       "QR Label Generator — printable QR code labels for lab samples with built-in QR engine, 6 presets, 3 formats, CSV export",
       "Growth Curve Analyzer — phase detection, doubling time, logistic fit, comparison, CSV export",
-      "Chain of Custody — sample transfer tracking, condition logging, disposal workflow, audit trail, JSON/CSV/print export"
+      "Chain of Custody — sample transfer tracking, condition logging, disposal workflow, audit trail, JSON/CSV/print export",
+      "Experiment Outcome Predictor — Bayesian success prediction with 5 material profiles, risk identification, failure pattern analysis"
     ],
     "everything": [
       "Sleep Calculator for optimal bedtime/wake-up times based on 90-minute cycles",
