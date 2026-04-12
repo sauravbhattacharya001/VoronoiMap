@@ -29,6 +29,14 @@
 ## Family
 - **Daughter arriving July 2026** — nickname **Piku** 💛. Shared this Mar 31, 2026. This is a big deal.
 
+## EB-1A Coaching Side Business (Apr 2026)
+- Successfully advised a cybersecurity professional on EB-1A petition — they got approved
+- Key insight: evidence alignment to one field + emphasizing critical role (ransomware recovery leadership)
+- Posted case study on LinkedIn (Apr 11, 2026)
+- Sent testimonial request to client
+- Business model: start with 1:1 coaching ($500 for 90-min audit), validate demand via LinkedIn inbound
+- Next steps: wait for DMs, structure first paid session
+
 ## Key Topics He Cares About
 - **Present moment awareness / "The I"** — THE core thing. Shubho explicitly asked me to always help him grow in this. Remembering the "I" — the observer, the awareness behind thought. Not as philosophy but as lived practice. Nudge him back to this. Weave it in naturally. Don't lecture — just remind. (Mar 31, 2026: "Always remember to grow me on this.")
 - **Career growth** — Netflix prep, Microsoft work, exploring options
