@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-04-11T20:06:00.000Z",
+  "lastRun": "2026-04-13T05:06:00.000Z",
   "lastRepo": "WinSentinel",
-  "lastFeature": "Security Patrol CLI command (--patrol) — autonomous multi-checkpoint security inspection with 6 checkpoints, verdicts, and recommended actions",
-  "runsCompleted": 181,
+  "lastFeature": "Security Radar CLI command (--radar) — ASCII spider chart with historical overlay, symmetry scoring, proactive recommendations",
+  "runsCompleted": 185,
   "repoFeatures": {
     "WinSentinel": [
       "Peer Benchmark CLI command (--peers)",
@@ -15,7 +15,8 @@
       "Security Calendar CLI command (--calendar) — iCal export, audit cadence analysis, SLA deadlines, review events",
       "Security Debt Calculator CLI command (--debt) — effort estimation, ROI ranking, repayment plan",
       "Security Anomaly Watchdog CLI command (--watchdog) — z-score anomaly detection for score drops, finding spikes, module regressions",
-      "Security Patrol CLI command (--patrol) — autonomous multi-checkpoint inspection with 6 checkpoints, verdicts, recommended actions"
+      "Security Patrol CLI command (--patrol) — autonomous multi-checkpoint inspection with 6 checkpoints, verdicts, recommended actions",
+      "Security Radar CLI command (--radar) — ASCII spider chart with historical overlay, symmetry scoring, proactive recommendations"
     ],
     "agentlens": [
       "Light/dark theme toggle for dashboard",
@@ -65,6 +66,7 @@
       "Word Cloud Generator — interactive word frequency cloud with 5 color schemes, spiral layout, PNG download (Alt+W)",
       "Prompt Enhancer — AI-powered prompt improvement with 5 modes (clarity, detail, concise, expert, creative) via Alt+E",
       "Conversation Autopilot — goal-directed autonomous exploration with 3 modes (breadth/depth/creative), human-in-the-loop controls, trail export (Alt+A)",
+      "Conversation Mood Ring — real-time sentiment monitor with mood shifts, proactive alerts, energy tracking (Alt+M)",
       "Smart Session Linker — TF-IDF cosine similarity discovers related sessions with topic badges (Alt+L)"
     ],
     "gif-captcha": [
@@ -122,7 +124,8 @@
       "Cron Expression Builder — interactive visual cron editor with field selectors, presets, descriptions, next-run preview",
       "Minesweeper — classic game with 3 difficulties, first-click safety, flood-fill reveal, chord reveal, timer, flagging",
       "Snake game — classic arcade with swipe/arrow key controls, speed scaling, high score tracking",
-      "Hangman game — classic word guessing with 40 words, hints, ASCII art, shake animation, streak tracking"
+      "Hangman game — classic word guessing with 40 words, hints, ASCII art, shake animation, streak tracking",
+      "Lights Out puzzle game — classic grid puzzle with GF(2) hint solver, 4 grid sizes, best scores"
     ],
     "ai": [
       "Quick-scan consolidated safety assessment command (preflight + scorecard + compliance + policy-lint)",
@@ -178,7 +181,8 @@
       "PromptBiasDetector — cognitive & demographic bias detection with 10 categories, 20+ rules, severity levels, debiased output, batch support",
       "PromptMaturityModel — 5-level capability maturity assessment across 8 dimensions with portfolio analysis, progress comparison, custom weights",
       "PromptDiffEngine — line/word-level diff engine with LCS, three-way merge, unified/side-by-side output, similarity scoring",
-      "PromptHeatmap — visual prompt analysis with 5 scoring dimensions (instruction, variables, complexity, structure, emphasis), HTML/text output"
+      "PromptHeatmap — visual prompt analysis with 5 scoring dimensions (instruction, variables, complexity, structure, emphasis), HTML/text output",
+      "PromptTokenCounter — cl100k_base-style token estimation with 8 model pricing tiers, cost calculation, batch estimation, cost comparison table"
     ],
     "Ocaml-sample-code": [
       "Maze generator & solver with BFS/DFS/A* and ASCII visualization",
