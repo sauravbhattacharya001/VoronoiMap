@@ -39,13 +39,13 @@ keywords = [
 [project.optional-dependencies]
 fast = [
     "numpy>=2.0.2",
-    "scipy>=1.7",
+    "scipy>=1.13.1",
 ]
 dev = [
     "pytest>=8.4.2",
-    "pytest-cov>=4.0",
+    "pytest-cov>=7.1.0",
     "numpy>=2.0.2",
-    "scipy>=1.7",
+    "scipy>=1.13.1",
 ]
 
 [project.scripts]
