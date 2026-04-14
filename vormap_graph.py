@@ -18,6 +18,8 @@ compatibility.
 """
 
 import math
+
+from vormap_geometry import SVGCoordinateTransform
 from collections import deque
 import xml.etree.ElementTree as ET
 
@@ -651,32 +653,18 @@ def export_graph_svg(
 
     color_fn = _COLOR_SCHEMES[color_scheme]
 
-    # Coordinate transform
-    all_xs = [pt[0] for pt in data]
-    all_ys = [pt[1] for pt in data]
+    # Coordinate transform — use centralised SVGCoordinateTransform
+    all_pts = list(data)
     for verts in regions.values():
-        for vx, vy in verts:
-            all_xs.append(vx)
-            all_ys.append(vy)
+        all_pts.extend(verts)
 
-    if not all_xs or not all_ys:
+    if not all_pts:
         raise ValueError("No data to visualize")
 
-    min_x, max_x = min(all_xs), max(all_xs)
-    min_y, max_y = min(all_ys), max(all_ys)
-    range_x = max(max_x - min_x, 1e-6)
-    range_y = max(max_y - min_y, 1e-6)
-    draw_w = width - 2 * margin
-    draw_h = height - 2 * margin
-    scale = min(draw_w / range_x, draw_h / range_y)
-    offset_x = margin + (draw_w - range_x * scale) / 2
-    offset_y = margin + (draw_h - range_y * scale) / 2
-
-    def tx(x):
-        return offset_x + (x - min_x) * scale
-
-    def ty(y):
-        return offset_y + (max_y - y) * scale
+    ct = SVGCoordinateTransform.from_points(all_pts, width, height, margin=margin)
+    tx = ct.tx
+    ty = ct.ty
+    scale = ct.scale
 
     # Build SVG
     svg = ET.Element("svg", {

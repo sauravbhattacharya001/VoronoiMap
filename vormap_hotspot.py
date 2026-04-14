@@ -52,6 +52,7 @@ from vormap_geometry import (
     polygon_centroid,
     polygon_area,
     edge_length as _distance,
+    SVGCoordinateTransform,
 )
 
 try:
@@ -606,23 +607,13 @@ def export_hotspot_svg(result, regions, data, output_path, *,
     if not data:
         return output_path
 
-    # Compute bounds
-    all_x = [p[0] for p in data]
-    all_y = [p[1] for p in data]
-    min_x, max_x = min(all_x), max(all_x)
-    min_y, max_y = min(all_y), max(all_y)
+    # Use centralised coordinate transform from vormap_geometry
     margin = 40
-    range_x = max_x - min_x or 1
-    range_y = max_y - min_y or 1
-    draw_w = width - 2 * margin
-    draw_h = height - 2 * margin - (80 if show_legend else 0)
-    scale = min(draw_w / range_x, draw_h / range_y)
-
-    def tx(x):
-        return margin + (x - min_x) * scale
-
-    def ty(y):
-        return margin + (max_y - y) * scale  # flip y
+    legend_height = 80 if show_legend else 0
+    ct = SVGCoordinateTransform.from_points(
+        data, width, height - legend_height, margin=margin)
+    tx = ct.tx
+    ty = ct.ty
 
     # Build lookup from region_index to classification
     classification_map = {}

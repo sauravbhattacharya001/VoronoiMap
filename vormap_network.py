@@ -44,7 +44,7 @@ import xml.etree.ElementTree as ET
 from collections import deque
 from dataclasses import dataclass, field
 
-from vormap_geometry import edge_length
+from vormap_geometry import edge_length, SVGCoordinateTransform
 
 # Alias for backward compatibility (used by tests)
 _euclidean = edge_length
@@ -507,20 +507,13 @@ def export_network_svg(
     if not nodes:
         return
 
-    # Compute coordinate bounds for scaling
-    xs = [n["centroid"][0] for n in nodes]
-    ys = [n["centroid"][1] for n in nodes]
-    x_min, x_max = min(xs), max(xs)
-    y_min, y_max = min(ys), max(ys)
-    x_range = x_max - x_min or 1
-    y_range = y_max - y_min or 1
-    padding = 40
-
-    def tx(x):
-        return padding + (x - x_min) / x_range * (width - 2 * padding)
-
-    def ty(y):
-        return padding + (y_max - y) / y_range * (height - 2 * padding)
+    # Use centralised coordinate transform (stretch mode matches
+    # the original independent x/y scaling behaviour)
+    centroids = [n["centroid"] for n in nodes]
+    ct = SVGCoordinateTransform.from_points(
+        centroids, width, height, margin=40, mode="stretch")
+    tx = ct.tx
+    ty = ct.ty
 
     svg = ET.Element(
         "svg",
