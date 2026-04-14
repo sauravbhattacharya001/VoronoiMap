@@ -329,6 +329,65 @@ def _gi_star(values, weights, i, x_bar, s):
     return z, p
 
 
+def _gi_star_batch(values, weights, x_bar, s):
+    """Compute Getis-Ord Gi* for all regions in a single vectorized pass.
+
+    When numpy is available, builds a binary weight matrix W (including
+    self-weights for the Gi* variant) and computes all z-scores and
+    p-values via matrix–vector multiplication — O(n²) total work but
+    executed in optimized C/Fortran rather than n separate Python loops.
+
+    Falls back to a scalar loop when numpy is not installed.
+
+    Returns
+    -------
+    tuple of (z_scores, p_values, neighbor_counts)
+        Each is a list of length n.
+    """
+    n = len(values)
+    if n < 2 or s < 1e-15:
+        return [0.0] * n, [1.0] * n, [0] * n
+
+    try:
+        import numpy as np
+
+        # Build binary weight matrix (Gi* includes self)
+        W = np.eye(n, dtype=np.float64)  # self-weight = 1
+        for i in range(n):
+            for j in weights.get(i, set()):
+                W[i, j] = 1.0
+
+        x = np.asarray(values, dtype=np.float64)
+        sum_w = W.sum(axis=1)          # (n,) — number of neighbors+self
+        sum_w2 = sum_w                  # binary weights: w²=w
+        sum_wx = W @ x                  # (n,) — weighted sum of values
+
+        numerator = sum_wx - x_bar * sum_w
+        denom = s * np.sqrt((n * sum_w2 - sum_w ** 2) / (n - 1))
+
+        # Avoid division by zero
+        safe = np.abs(denom) > 1e-15
+        z_arr = np.where(safe, numerator / np.where(safe, denom, 1.0), 0.0)
+        p_arr = 2.0 * (1.0 - np.vectorize(_normal_cdf)(np.abs(z_arr)))
+
+        neighbor_counts = (sum_w.astype(int) - 1).tolist()  # exclude self
+        return z_arr.tolist(), p_arr.tolist(), neighbor_counts
+
+    except ImportError:
+        pass
+
+    # Scalar fallback
+    z_scores = []
+    p_values = []
+    neighbor_counts = []
+    for i in range(n):
+        z, p = _gi_star(values, weights, i, x_bar, s)
+        z_scores.append(z)
+        p_values.append(p)
+        neighbor_counts.append(len(weights.get(i, set())))
+    return z_scores, p_values, neighbor_counts
+
+
 def _classify_spot(z, p, confidence):
     """Classify a region based on z-score and p-value.
 
@@ -541,8 +600,14 @@ def detect_hotspots(
         global_std=global_std,
     )
 
+    n = len(values)
+    z_scores, p_values, neighbor_counts = _gi_star_batch(
+        values, weights, global_mean, global_std
+    )
+
     for i, s in enumerate(stats):
-        z, p = _gi_star(values, weights, i, global_mean, global_std)
+        z = z_scores[i]
+        p = p_values[i]
         classification = _classify_spot(z, p, confidence)
 
         entry = {
@@ -553,7 +618,7 @@ def detect_hotspots(
             "z_score": round(z, 4),
             "p_value": round(p, 6),
             "classification": classification,
-            "neighbors": len(weights.get(i, set())),
+            "neighbors": neighbor_counts[i],
         }
 
         result.all_regions.append(entry)
