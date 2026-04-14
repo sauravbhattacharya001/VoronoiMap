@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-04-13T05:06:00.000Z",
-  "lastRepo": "WinSentinel",
-  "lastFeature": "Security Radar CLI command (--radar) — ASCII spider chart with historical overlay, symmetry scoring, proactive recommendations",
-  "runsCompleted": 185,
+  "lastRun": "2026-04-14T04:36:00.000Z",
+  "lastRepo": "ai",
+  "lastFeature": "Adaptive Safety Thresholds — self-tuning limits with EMA tracking, breach forecasting, risk-aware multipliers",
+  "runsCompleted": 190,
   "repoFeatures": {
     "WinSentinel": [
       "Peer Benchmark CLI command (--peers)",
@@ -67,7 +67,8 @@
       "Prompt Enhancer — AI-powered prompt improvement with 5 modes (clarity, detail, concise, expert, creative) via Alt+E",
       "Conversation Autopilot — goal-directed autonomous exploration with 3 modes (breadth/depth/creative), human-in-the-loop controls, trail export (Alt+A)",
       "Conversation Mood Ring — real-time sentiment monitor with mood shifts, proactive alerts, energy tracking (Alt+M)",
-      "Smart Session Linker — TF-IDF cosine similarity discovers related sessions with topic badges (Alt+L)"
+      "Smart Session Linker — TF-IDF cosine similarity discovers related sessions with topic badges (Alt+L)",
+      "Conversation Drift Detector — proactive topic coherence monitoring with TF-IDF cosine similarity, auto-alerts, refocus suggestions (Alt+Shift+D)"
     ],
     "gif-captcha": [
       "Personal stats tracker page (my-stats.html)",
@@ -125,7 +126,10 @@
       "Minesweeper — classic game with 3 difficulties, first-click safety, flood-fill reveal, chord reveal, timer, flagging",
       "Snake game — classic arcade with swipe/arrow key controls, speed scaling, high score tracking",
       "Hangman game — classic word guessing with 40 words, hints, ASCII art, shake animation, streak tracking",
-      "Lights Out puzzle game — classic grid puzzle with GF(2) hint solver, 4 grid sizes, best scores"
+      "Lights Out puzzle game — classic grid puzzle with GF(2) hint solver, 4 grid sizes, best scores",
+      "Password Strength Analyzer — real-time entropy, crack time estimation, pattern detection, improvement suggestions",
+      "Quick Math Drill — adaptive timed arithmetic practice with 5 difficulty levels, streak tracking, session results",
+      "Life Score Dashboard — radar chart self-assessment across 8 life dimensions with imbalance detection and focus recommendations"
     ],
     "ai": [
       "Quick-scan consolidated safety assessment command (preflight + scorecard + compliance + policy-lint)",
@@ -137,7 +141,8 @@
       "Risk Register — formal risk tracking & lifecycle management with structured entries, state transitions, audit trail, inherent/residual scoring, HTML/CSV/JSON export",
       "Root Cause Analyzer — 5 Whys, Fishbone/Ishikawa, Fault Tree with cut-set analysis",
       "Safety Diff — structured snapshot comparison with scorecard dimension deltas, compliance finding diffs, risk register changes, HTML export",
-      "Safety Nutrition Label — FDA-style safety fact sheets with risk calories, safety vitamins, allergens, 4 presets, comparison mode, ASCII/JSON/HTML output"
+      "Safety Nutrition Label — FDA-style safety fact sheets with risk calories, safety vitamins, allergens, 4 presets, comparison mode, ASCII/JSON/HTML output",
+      "Adaptive Safety Thresholds — self-tuning limits with EMA tracking, breach forecasting, risk-aware multipliers, 3 preset profiles"
     ],
     "GraphVisual": [
       "Interactive Random Walk Simulator with visit heatmap, cover time, and preset graphs",
