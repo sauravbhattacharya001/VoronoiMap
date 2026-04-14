@@ -33,6 +33,13 @@ except ImportError:
     # Allow standalone testing
     load_data = None
 
+try:
+    import numpy as np
+    from scipy.spatial import KDTree
+    _HAS_SCIPY = True
+except ImportError:
+    _HAS_SCIPY = False
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -141,7 +148,14 @@ def profile_points(points):
 
     # --- Nearest-neighbor distances ---
     nn_dists = []
-    if n <= 10000:
+    if _HAS_SCIPY:
+        # O(n log n) using KDTree — vastly faster than brute-force
+        arr = np.array(points)
+        tree = KDTree(arr)
+        # k=2: first neighbour is the point itself at distance 0
+        dists, _ = tree.query(arr, k=2)
+        nn_dists = dists[:, 1].tolist()
+    elif n <= 10000:
         for i, p in enumerate(points):
             best = float('inf')
             for j, q in enumerate(points):
@@ -151,7 +165,7 @@ def profile_points(points):
                         best = d
             nn_dists.append(best)
     else:
-        # Sample 2000 random points for NN
+        # Sample 2000 random points for NN (brute-force fallback)
         import random as _rnd
         sample_idx = _rnd.sample(range(n), min(2000, n))
         for i in sample_idx:
@@ -174,7 +188,7 @@ def profile_points(points):
         "nn_median": round(_percentile(nn_sorted, 50), 6) if nn_sorted else 0,
         "nn_std": round(nn_sd, 6),
         "nn_cv": round(nn_sd / nn_mean, 4) if nn_mean > 0 else 0,
-        "sampled": n > 10000,
+        "sampled": not _HAS_SCIPY and n > 10000,
     }
 
     # --- Quadrant breakdown ---
