@@ -1,7 +1,7 @@
 # HEARTBEAT.md
 
 ## Cron Health Check
-- Verify both Repo Gardener and Feature Builder cron jobs exist and have run in the last 2 hours
-- If either is missing, recreate it and notify Shubho
-- Gardener job name: "Repo Gardener", Builder job name: "Feature Builder"
-- Both should be: every 30min, isolated, delivery none, timeout 1800s
+- Verify Feature Builder cron job exists and has run in the last 2 hours
+- If missing, recreate it
+- **Repo Gardener**: KNOWN BUG — `every`-type cron jobs silently drop. Do NOT recreate on every heartbeat (wastes tokens). The gardener will be re-added once the OpenClaw cron bug is fixed or a workaround is found. Filed as a known issue.
+- Next step: try merging gardener into builder task file so one cron runs both, OR wait for OpenClaw fix
