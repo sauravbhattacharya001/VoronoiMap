@@ -558,7 +558,11 @@ class MonteCarloTest:
                         d_sq = ddx * ddx + ddy * ddy
                         if d_sq < min_d_sq:
                             min_d_sq = d_sq
-            if min_d_sq == _inf:
+            # Fall back to brute force when the 3×3 grid search found
+            # no neighbours at all, OR when the best distance found
+            # exceeds cell_size — in that case a closer point could
+            # exist in a grid cell beyond the immediate 3×3 ring.
+            if min_d_sq == _inf or min_d_sq > cell_size * cell_size:
                 for j in range(n):
                     if j == i:
                         continue
