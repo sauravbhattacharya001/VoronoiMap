@@ -39,77 +39,63 @@ import random
 import sys
 from copy import deepcopy
 
+from vormap_utils import compute_nn_distances, euclidean
+from vormap_hull import convex_hull
+from vormap_geometry import polygon_area as _polygon_area
+
+try:
+    import numpy as np
+    from scipy.spatial import KDTree
+    _HAS_SCIPY = True
+except ImportError:
+    _HAS_SCIPY = False
+
 # ---------------------------------------------------------------------------
-# Geometry helpers (self-contained, no heavy deps)
+# Geometry helpers — delegates to shared modules where possible
 # ---------------------------------------------------------------------------
-
-def _dist(a, b):
-    return math.hypot(a[0] - b[0], a[1] - b[1])
-
-
-def _nearest_neighbour_dists(pts):
-    """Return list of nearest-neighbour distances (O(n^2) — fine for GA sizes)."""
-    dists = []
-    for i, p in enumerate(pts):
-        best = float("inf")
-        for j, q in enumerate(pts):
-            if i != j:
-                d = _dist(p, q)
-                if d < best:
-                    best = d
-        dists.append(best)
-    return dists
 
 
 def _convex_hull_area(pts):
-    """Graham scan → shoelace area."""
+    """Convex hull area via shared vormap_hull module."""
     if len(pts) < 3:
         return 0.0
-    pts_sorted = sorted(pts, key=lambda p: (p[0], p[1]))
-    lower = []
-    for p in pts_sorted:
-        while len(lower) >= 2 and _cross(lower[-2], lower[-1], p) <= 0:
-            lower.pop()
-        lower.append(p)
-    upper = []
-    for p in reversed(pts_sorted):
-        while len(upper) >= 2 and _cross(upper[-2], upper[-1], p) <= 0:
-            upper.pop()
-        upper.append(p)
-    hull = lower[:-1] + upper[:-1]
-    return abs(_shoelace(hull))
-
-
-def _cross(o, a, b):
-    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
-
-
-def _shoelace(poly):
-    n = len(poly)
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += poly[i][0] * poly[j][1]
-        area -= poly[j][0] * poly[i][1]
-    return area / 2.0
+    result = convex_hull(pts)
+    return _polygon_area(result.vertices) if result.vertices else 0.0
 
 
 def _voronoi_cell_areas(pts, width, height):
-    """Approximate cell areas via nearest-seed assignment on a coarse grid."""
+    """Approximate cell areas via nearest-seed assignment.
+
+    Uses scipy KDTree for O(n log n) grid queries when available,
+    falling back to brute-force O(n × grid) otherwise.
+    """
     step = max(2, int(min(width, height) / 80))
-    counts = [0] * len(pts)
-    total = 0
-    for gy in range(0, height, step):
-        for gx in range(0, width, step):
-            best_i = 0
-            best_d = float("inf")
-            for i, (px, py) in enumerate(pts):
-                d = (gx - px) ** 2 + (gy - py) ** 2
-                if d < best_d:
-                    best_d = d
-                    best_i = i
-            counts[best_i] += 1
-            total += 1
+
+    if _HAS_SCIPY and len(pts) > 4:
+        # Build grid coordinates and query KDTree for nearest seed
+        gy_vals = list(range(0, height, step))
+        gx_vals = list(range(0, width, step))
+        grid = np.array([(gx, gy) for gy in gy_vals for gx in gx_vals], dtype=float)
+        tree = KDTree(pts)
+        _, indices = tree.query(grid)
+        counts = [0] * len(pts)
+        for idx in indices:
+            counts[idx] += 1
+        total = len(grid)
+    else:
+        counts = [0] * len(pts)
+        total = 0
+        for gy in range(0, height, step):
+            for gx in range(0, width, step):
+                best_i = 0
+                best_d = float("inf")
+                for i, (px, py) in enumerate(pts):
+                    d = (gx - px) ** 2 + (gy - py) ** 2
+                    if d < best_d:
+                        best_d = d
+                        best_i = i
+                counts[best_i] += 1
+                total += 1
     cell_area = (width * height) / total if total else 1
     return [c * cell_area for c in counts]
 
@@ -127,7 +113,7 @@ def _fitness_uniform(pts, w, h):
 
 
 def _fitness_clustered(pts, _w, _h):
-    nn = _nearest_neighbour_dists(pts)
+    nn = compute_nn_distances(pts)
     mean_d = sum(nn) / len(nn) if nn else 1
     var_d = sum((d - mean_d) ** 2 for d in nn) / len(nn) if nn else 0
     return var_d / (mean_d ** 2 + 1e-9)
@@ -140,7 +126,7 @@ def _fitness_coverage(pts, w, h):
 
 
 def _fitness_spread(pts, _w, _h):
-    nn = _nearest_neighbour_dists(pts)
+    nn = compute_nn_distances(pts)
     return min(nn) if nn else 0
 
 
