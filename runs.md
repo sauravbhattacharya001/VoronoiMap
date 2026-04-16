@@ -1,4 +1,37 @@
+## 2026-04-15
+
+### Repo Gardener Run 2521-2522 (10:16 PM PST)
+- **Task 1:** `create_release` on **GraphVisual** → v2.41.0. Perf improvement: `GraphAnomalyDetector.getResult()` now O(1) via HashMap index (was O(n) linear scan), `countAnomalies()` counts in-place without allocating intermediate list. Pushed ✅, released ✅.
+- **Task 2:** `refactor` on **BioBots** → Made cell-type-specific recommendations in `mediaOptimizer.nutrientGap()` data-driven via `extras` array on `CELL_REQUIREMENTS` entries, replacing hardcoded if-chain for stem/mcf7/cho. All 11 tests pass ✅. Pushed ✅.
+
+### Repo Gardener Run 2519-2520 (9:46 PM PST)
+- **Task 1:** `create_release` on **agentlens** → v1.31.0 (LRU cache for extractServiceName, optimized isFailure regex, charCodeAt micro-opt)
+- **Task 2:** `perf_improvement` on **WinSentinel** → Batch XML extraction in EventLogMonitorModule: added `GetEventDataValues()` to extract all fields from single `ToXml()` call (~5x fewer allocations). Hoisted `SuspiciousNetworkProcesses` HashSet to static field (eliminated per-call alloc). Build verified ✅.
+
+### Repo Gardener Run 2517-2518 (9:16 PM PST)
+- **Task 1:** `create_release` on **GraphVisual** → v2.40.0 (distance report single-pass optimization + LocationResolver batch transactions)
+- **Task 2:** `refactor` on **sauravcode** → Decomposed monolithic `_check_structure` in sauravlint.py into 12 focused single-responsibility methods with explicit `_StructState` dataclass. 933 tests pass.
+
+### Repo Gardener Run 2515-2516 (8:46 PM PST)
+- **Task 1:** `create_release` on **agentlens** → v1.30.0 with 30+ commits (security fixes, perf optimizations, new features, dependency bumps)
+- **Task 2:** `perf_improvement` on **everything** → Uint16List for Levenshtein DP (eliminates heap allocation per element) + pre-computed caches in findDuplicatesOf
+
+### Repo Gardener Run 2513-2514 (8:16 PM PST)
+- **Task 1:** refactor on sauravcode — Fixed 3 issues in sauravpipe.py: replaced deprecated `tempfile.mktemp` with `NamedTemporaryFile`, protected stage status mutations with lock to fix race conditions, replaced busy-wait `sleep(0.1)` polling with `threading.Event`. Pushed to main.
+- **Task 2:** create_release on VoronoiMap — Created v1.28.0 with 2 commits: NNI fallback nearest-neighbor fix and geometry helper deduplication with KDTree optimization.
+
+### Repo Gardener Run 2511-2512 (7:46 PM PST)
+- **Task 1:** create_release on agentlens — Created v1.29.0 with 19 commits since v1.28.1: performance caching (extractServiceName, leaderboard CTE), security fix (SQLite overflow), 6 dependency bumps, refactoring (statement cache, CLI signatures).
+- **Task 2:** perf_improvement on GraphVisual — Consolidated `GraphDistanceDistribution.generateReport()` from 8+ separate O(V²) passes over the distance matrix into a single pass. Also eliminated 3 redundant sort operations for percentile queries and replaced `Collections.nCopies` bar rendering with direct StringBuilder. Pushed to master.
+
+### Repo Gardener Run 2509-2510 (7:16 PM PST)
+- **Task 1:** add_tests on gif-captcha — Added 36 comprehensive tests for `captcha-rate-limiter.js` covering all 3 algorithms (sliding-window, token-bucket, leaky-bucket), banning, whitelist, consume(), peek(), reset, serialization, and prototype pollution prevention. All tests pass. Pushed to main.
+- **Task 2:** issue_templates on WinSentinel — Added documentation issue template (`documentation_issue.yml`) for reporting doc errors, outdated content, missing docs, broken links. Updated config.yml. Pushed to main.
+
 ## 2026-04-14
+
+### Daily Memory Backup (11:00 PM PST)
+- Committed and pushed 7 changed files (incl. new `memory/2026-04-14.md`, `memory/reminders.md`, HEARTBEAT, runs, status, builder/gardener state). Commit `16afcd1`.
 
 ### Run 2508 (10:46 PM PST)
 - **Task 1:** refactor on **GraphVisual** — Refactored `LocationResolver.main()` to batch UPDATE statements (500 per batch) with explicit transaction control instead of per-meeting `executeUpdate()`. Reduces JDBC round-trip overhead and fsync cost. Added rollback-on-failure, reduced log verbosity, and added final summary. Pushed to master.
