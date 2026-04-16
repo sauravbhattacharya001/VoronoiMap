@@ -41,7 +41,6 @@ CLI::
 """
 
 import argparse
-import hashlib
 import math
 import random
 import sys

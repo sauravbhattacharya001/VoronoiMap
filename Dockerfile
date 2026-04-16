@@ -7,8 +7,9 @@ WORKDIR /app
 COPY pyproject.toml MANIFEST.in requirements.txt ./
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-# Copy source
-COPY vormap.py README.md LICENSE ./
+# Copy all source files (main module + all vormap_* modules)
+COPY vormap*.py ./
+COPY README.md LICENSE ./
 COPY tests/ tests/
 
 # Build wheel
@@ -26,7 +27,7 @@ WORKDIR /app
 # Install the built wheel + fast dependencies
 COPY --from=builder /dist/*.whl /tmp/
 RUN pip install --no-cache-dir /tmp/*.whl \
-    && pip install --no-cache-dir numpy scipy \
+    && pip install --no-cache-dir "numpy>=2.0.2,<3" "scipy>=1.13.1,<2" \
     && rm -f /tmp/*.whl
 
 # Non-root user for security

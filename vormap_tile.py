@@ -365,7 +365,7 @@ class TileGenerator:
                 )
             elif self.style == "mosaic":
                 # Slight color variation
-                h = int(hashlib.md5(str(idx).encode()).hexdigest()[:2], 16)
+                h = int(hashlib.md5(str(idx).encode(), usedforsecurity=False).hexdigest()[:2], 16)
                 variation = (h - 128) / 512  # ±0.25 brightness
                 parts.append(
                     '<polygon points="%s" fill="%s" fill-opacity="%.2f" '
