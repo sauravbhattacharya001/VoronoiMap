@@ -66,24 +66,30 @@ def _convex_hull_area(pts):
 def _voronoi_cell_areas(pts, width, height):
     """Approximate cell areas via nearest-seed assignment.
 
-    Uses scipy KDTree for O(n log n) grid queries when available,
+    Uses scipy KDTree with vectorised numpy grid construction and
+    ``np.bincount`` for O(n log n) grid queries when available,
     falling back to brute-force O(n × grid) otherwise.
     """
+    n_pts = len(pts)
     step = max(2, int(min(width, height) / 80))
 
-    if _HAS_SCIPY and len(pts) > 4:
-        # Build grid coordinates and query KDTree for nearest seed
-        gy_vals = list(range(0, height, step))
-        gx_vals = list(range(0, width, step))
-        grid = np.array([(gx, gy) for gy in gy_vals for gx in gx_vals], dtype=float)
+    if _HAS_SCIPY and n_pts > 4:
+        # Vectorised grid via np.meshgrid — avoids slow Python list-of-tuples
+        gx = np.arange(0, width, step, dtype=float)
+        gy = np.arange(0, height, step, dtype=float)
+        mx, my = np.meshgrid(gx, gy)
+        grid = np.column_stack((mx.ravel(), my.ravel()))
+
         tree = KDTree(pts)
         _, indices = tree.query(grid)
-        counts = [0] * len(pts)
-        for idx in indices:
-            counts[idx] += 1
+
+        # bincount is O(total) with no Python loop overhead
+        counts = np.bincount(indices, minlength=n_pts)
         total = len(grid)
+        cell_area = (width * height) / total if total else 1
+        return (counts * cell_area).tolist()
     else:
-        counts = [0] * len(pts)
+        counts = [0] * n_pts
         total = 0
         for gy in range(0, height, step):
             for gx in range(0, width, step):
