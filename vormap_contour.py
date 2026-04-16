@@ -395,20 +395,126 @@ def _idw_grid(
     dx: float, dy: float,
     cols: int, rows: int,
     power: float = 2.0,
+    k_nearest: int = 0,
 ) -> list[list[float]]:
-    """Inverse-distance-weighted interpolation onto a regular grid."""
+    """Inverse-distance-weighted interpolation onto a regular grid.
+
+    When *k_nearest* > 0 (or auto-selected), only the closest seeds
+    contribute to each grid point — giving the same visual quality
+    with O(rows*cols*K) work instead of O(rows*cols*N) where N is the
+    total seed count.  A cell-based spatial index avoids scanning all
+    seeds for each grid point.
+    """
+    n_seeds = len(seeds)
+
+    # Auto-select k: use all seeds when few, cap at 12 for large sets
+    if k_nearest <= 0:
+        k_nearest = min(n_seeds, 12) if n_seeds > 20 else n_seeds
+
+    # Pre-extract coordinates into flat lists (avoids per-iteration
+    # tuple unpacking overhead)
+    sx_arr = [s[0] for s in seeds]
+    sy_arr = [s[1] for s in seeds]
+
+    # Fast path: when using all seeds, skip the spatial index
+    if k_nearest >= n_seeds:
+        return _idw_grid_brute(sx_arr, sy_arr, values, x0, y0,
+                               dx, dy, cols, rows, power)
+
+    # Build a cell-based spatial index for fast neighbor lookup.
+    # Cell size chosen so each cell holds ~2-4 seeds on average.
+    from collections import defaultdict
+    extent_x = dx * (cols - 1)
+    extent_y = dy * (rows - 1)
+    area = max(extent_x, 1.0) * max(extent_y, 1.0)
+    cell_size = max(dx, dy, math.sqrt(area / max(n_seeds, 1)) * 1.5)
+    inv_cell = 1.0 / cell_size
+
+    bucket: dict[tuple[int, int], list[int]] = defaultdict(list)
+    for i in range(n_seeds):
+        cx_i = int(sx_arr[i] * inv_cell)
+        cy_i = int(sy_arr[i] * inv_cell)
+        bucket[(cx_i, cy_i)].append(i)
+
+    grid: list[list[float]] = []
+    _sqrt = math.sqrt
+
+    for r in range(rows):
+        row: list[float] = []
+        y = y0 + r * dy
+        for c in range(cols):
+            x = x0 + c * dx
+
+            # Expand search radius until we have k_nearest candidates
+            gcx = int(x * inv_cell)
+            gcy = int(y * inv_cell)
+            candidates: list[tuple[float, int]] = []  # (dist², idx)
+            radius = 1
+            while len(candidates) < k_nearest and radius < 200:
+                for bx in range(gcx - radius, gcx + radius + 1):
+                    for by in range(gcy - radius, gcy + radius + 1):
+                        # Only scan the outer ring on expansions
+                        if radius > 1 and (
+                            gcx - radius < bx < gcx + radius - 1 and
+                            gcy - radius < by < gcy + radius - 1
+                        ):
+                            continue
+                        for idx in bucket.get((bx, by), ()):
+                            ddx = x - sx_arr[idx]
+                            ddy = y - sy_arr[idx]
+                            candidates.append((ddx * ddx + ddy * ddy, idx))
+                if len(candidates) >= k_nearest:
+                    break
+                radius += 1
+
+            # Sort and take k-nearest
+            candidates.sort()
+            total_w = 0.0
+            total_v = 0.0
+            exact = None
+            for dist_sq, idx in candidates[:k_nearest]:
+                if dist_sq < 1e-20:
+                    exact = values[idx]
+                    break
+                d = _sqrt(dist_sq)
+                w = 1.0 / (d ** power)
+                total_w += w
+                total_v += w * values[idx]
+
+            if exact is not None:
+                row.append(exact)
+            elif total_w > 0:
+                row.append(total_v / total_w)
+            else:
+                row.append(0.0)
+        grid.append(row)
+    return grid
+
+
+def _idw_grid_brute(
+    sx_arr: list[float], sy_arr: list[float],
+    values: list[float],
+    x0: float, y0: float,
+    dx: float, dy: float,
+    cols: int, rows: int,
+    power: float,
+) -> list[list[float]]:
+    """Brute-force IDW for small seed counts (all seeds per grid point)."""
+    n = len(values)
+    _sqrt = math.sqrt
     grid: list[list[float]] = []
     for r in range(rows):
         row: list[float] = []
         y = y0 + r * dy
         for c in range(cols):
             x = x0 + c * dx
-            # Check for coincident seed
             total_w = 0.0
             total_v = 0.0
             exact = None
-            for k, (sx, sy) in enumerate(seeds):
-                d = math.sqrt((x - sx) ** 2 + (y - sy) ** 2)
+            for k in range(n):
+                ddx = x - sx_arr[k]
+                ddy = y - sy_arr[k]
+                d = _sqrt(ddx * ddx + ddy * ddy)
                 if d < 1e-10:
                     exact = values[k]
                     break
