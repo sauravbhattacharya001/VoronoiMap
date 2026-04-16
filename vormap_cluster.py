@@ -135,33 +135,50 @@ def _build_cluster_summary(cluster_id, members, stats_lookup):
             "centroid_x": 0.0, "centroid_y": 0.0,
         }
 
-    areas = []
-    compactnesses = []
+    # Single-pass computation: accumulate sums, sum-of-squares,
+    # min/max in one iteration instead of building intermediate
+    # lists and doing 5+ separate passes (append, sum, sum, min,
+    # max, two generator comprehensions for std dev).
+    area_sum = 0.0
+    area_sq_sum = 0.0
+    area_min = float("inf")
+    area_max = float("-inf")
+    comp_sum = 0.0
+    comp_sq_sum = 0.0
     cx_sum = 0.0
     cy_sum = 0.0
     for seed in members:
         stat = stats_lookup.get(seed, {})
-        areas.append(stat.get("area", 0.0))
-        compactnesses.append(stat.get("compactness", 0.0))
+        a = stat.get("area", 0.0)
+        c = stat.get("compactness", 0.0)
+        area_sum += a
+        area_sq_sum += a * a
+        if a < area_min:
+            area_min = a
+        if a > area_max:
+            area_max = a
+        comp_sum += c
+        comp_sq_sum += c * c
         cx_sum += stat.get("centroid_x", seed[0])
         cy_sum += stat.get("centroid_y", seed[1])
 
-    mean_area = sum(areas) / n
-    mean_comp = sum(compactnesses) / n
-    total_area = sum(areas)
+    mean_area = area_sum / n
+    mean_comp = comp_sum / n
 
-    std_area = math.sqrt(sum((a - mean_area) ** 2 for a in areas) / n)
-    std_comp = math.sqrt(
-        sum((c - mean_comp) ** 2 for c in compactnesses) / n)
+    # Var = E[X^2] - E[X]^2  (population variance, single-pass)
+    area_var = area_sq_sum / n - mean_area * mean_area
+    comp_var = comp_sq_sum / n - mean_comp * mean_comp
+    std_area = math.sqrt(max(area_var, 0.0))
+    std_comp = math.sqrt(max(comp_var, 0.0))
 
     return {
         "cluster_id": cluster_id,
         "size": n,
         "seeds": [(s[0], s[1]) for s in members],
         "mean_area": mean_area,
-        "total_area": total_area,
-        "min_area": min(areas),
-        "max_area": max(areas),
+        "total_area": area_sum,
+        "min_area": area_min,
+        "max_area": area_max,
         "std_area": round(std_area, 4),
         "mean_compactness": mean_comp,
         "std_compactness": round(std_comp, 6),
@@ -372,9 +389,16 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
     # iterated it again to populate cluster_adj — O(2E) with extra
     # memory.  Building cluster_adj in one pass halves the work and
     # avoids allocating the edge list entirely.
+    # Build cluster adjacency and seed the initial merge-cost heap.
+    # The previous implementation maintained a `pushed` set of size
+    # O(E) to deduplicate initial heap entries.  Since the merge
+    # loop already uses generation-based staleness checks (O(1) per
+    # pop), duplicate heap entries are harmless and the set can be
+    # removed — saving both memory and per-edge hash overhead.
+    # Instead, we push from each cluster to its higher-id neighbors
+    # only, which naturally avoids most duplicates.
     heap = []
     cluster_adj = {}  # cluster_id -> set of adjacent cluster_ids
-    pushed = set()    # deduplicate initial heap entries
     for seed in seeds:
         c1 = seed_to_cluster.get(seed)
         if c1 is None:
@@ -386,14 +410,15 @@ def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
                 continue
             cluster_adj.setdefault(c1, set()).add(c2)
             cluster_adj.setdefault(c2, set()).add(c1)
-            # Push heap entry once per cluster pair
-            pair = (min(c1, c2), max(c1, c2))
-            if pair not in pushed:
-                pushed.add(pair)
+
+    # Push one heap entry per adjacent pair (lower-id -> higher-id)
+    for c1, neighbors in cluster_adj.items():
+        for c2 in neighbors:
+            if c2 > c1 and c2 in cluster_members:
                 cost = _merge_cost(c1, c2)
-                heapq.heappush(heap, (cost, pair[0], pair[1],
-                                      cluster_gen[pair[0]],
-                                      cluster_gen[pair[1]]))
+                heapq.heappush(heap, (cost, c1, c2,
+                                      cluster_gen[c1],
+                                      cluster_gen[c2]))
 
     while n_clusters > num_clusters and heap:
         cost, c1, c2, g1, g2 = heapq.heappop(heap)
