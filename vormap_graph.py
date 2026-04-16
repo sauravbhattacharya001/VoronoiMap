@@ -223,20 +223,50 @@ def _compute_degree_stats(adjacency):
 
 
 def _compute_clustering(adjacency):
-    """Compute global clustering coefficient (closed/total triplets)."""
+    """Compute global clustering coefficient (closed/total triplets).
+
+    Uses edge-based triangle counting: for each edge (u, v), the number
+    of triangles containing that edge equals ``|N(u) ∩ N(v)|``.  Summing
+    over all edges and dividing by 3 (each triangle has 3 edges) gives
+    the total closed triplets.  Python's built-in ``set.intersection``
+    replaces the previous nested-loop approach, reducing per-edge work
+    from O(k) element-wise lookups to a single C-level set operation.
+    """
     neighbor_set = {seed: set(neigh) for seed, neigh in adjacency.items()}
+
+    # Total triplets: sum of C(k, 2) over all nodes.
     total_triplets = 0
-    closed_triplets = 0
-    for seed, neighbors in adjacency.items():
+    for neighbors in adjacency.values():
         k = len(neighbors)
-        if k < 2:
-            continue
-        total_triplets += k * (k - 1) // 2
-        for i in range(len(neighbors)):
-            for j in range(i + 1, len(neighbors)):
-                if neighbors[j] in neighbor_set[neighbors[i]]:
-                    closed_triplets += 1
-    return closed_triplets / total_triplets if total_triplets > 0 else 0.0
+        if k >= 2:
+            total_triplets += k * (k - 1) // 2
+
+    if total_triplets == 0:
+        return 0.0
+
+    # Count triangles via edge-based set intersection.  Each triangle
+    # is discovered once per edge (3 times total), so we process each
+    # undirected edge once (u < v by sort order) and sum intersections.
+    triangle_edge_sum = 0
+    seen = set()
+    for u, neighbors_u in adjacency.items():
+        ns_u = neighbor_set[u]
+        for v in neighbors_u:
+            if v in seen:
+                continue  # already counted edge (v, u)
+            triangle_edge_sum += len(ns_u & neighbor_set[v])
+        seen.add(u)
+
+    # Each triangle contributes 1 to the intersection count of each of
+    # its 3 edges, but a closed triplet centred on a node counts each
+    # triangle once per vertex.  Since we sum over edges (3 per
+    # triangle), dividing by 3 gives the triangle count, and each
+    # triangle produces exactly 3 closed triplets (one per vertex).
+    closed_triplets = triangle_edge_sum  # == 3 * num_triangles / 3 * 3
+    # Correction: triangle_edge_sum = 3 * num_triangles (each triangle
+    # found once per edge).  closed_triplets = 3 * num_triangles (one
+    # per vertex).  So closed_triplets == triangle_edge_sum.
+    return closed_triplets / total_triplets
 
 
 def _find_components(adjacency):
