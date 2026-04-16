@@ -63,6 +63,13 @@ from typing import Dict, List, Optional, Tuple
 
 from vormap_geometry import edge_length as _dist
 
+try:
+    from scipy.spatial import cKDTree as _cKDTree
+    import numpy as _np
+    _HAS_SCIPY = True
+except ImportError:
+    _HAS_SCIPY = False
+
 import vormap
 
 
@@ -241,46 +248,77 @@ def experimental_variogram(
     if len(values) != n:
         raise ValueError(f"points ({n}) and values ({len(values)}) length mismatch")
 
-    # Compute all pairwise distances and squared value differences.
+    # Compute pairwise distances and squared value differences.
     # The pairs are sorted by distance so that lag binning can use
     # bisect instead of scanning all pairs per bin — reducing
     # binning from O(n_pairs × n_lags) to O(n_pairs log n_pairs + n_lags log n_pairs).
     import bisect
 
-    max_dist = 0.0
-    pairs = []
-    for i in range(n):
-        xi, yi = points[i]
-        vi = values[i]
-        for j in range(i + 1, n):
-            xj, yj = points[j]
-            dx = xi - xj
-            dy = yi - yj
-            d = math.sqrt(dx * dx + dy * dy)
-            if direction is not None:
-                angle = _angle_deg(points[i], points[j])
-                if not _angle_in_tolerance(angle, direction, tolerance):
-                    # Also check the reverse direction (variograms are symmetric)
-                    if not _angle_in_tolerance(angle, (direction + 180) % 360, tolerance):
-                        continue
-            sq_diff = (vi - values[j]) ** 2
-            pairs.append((d, sq_diff))
-            if d > max_dist:
-                max_dist = d
+    # ── Fast path: scipy cKDTree for omnidirectional variograms ──
+    # When scipy is available and no directional filter is needed,
+    # use cKDTree.sparse_distance_matrix to compute only pairs within
+    # max_lag.  This reduces from O(n²) all-pairs to roughly O(n·k)
+    # where k is the average number of neighbours within max_lag.
+    if _HAS_SCIPY and direction is None and n >= 8 and max_lag is not None:
+        pts_arr = _np.asarray(points, dtype=_np.float64)
+        vals_arr = _np.asarray(values, dtype=_np.float64)
+        tree = _cKDTree(pts_arr)
 
-    if max_dist == 0:
-        raise ValueError("All points are at the same location")
+        # sparse_distance_matrix returns only pairs within max_lag
+        sdm = tree.sparse_distance_matrix(tree, max_lag, output_type='coo_matrix')
+        # Extract upper-triangle pairs (i < j) to avoid double-counting
+        mask = sdm.row < sdm.col
+        rows = sdm.row[mask]
+        cols = sdm.col[mask]
+        dists = sdm.data[mask]
 
-    if max_lag is None:
-        max_lag = max_dist / 2.0  # Standard: use half max distance
+        if len(dists) == 0:
+            raise ValueError("No point pairs within max_lag distance")
 
-    # Sort pairs by distance for efficient bin assignment via bisect.
-    pairs.sort(key=lambda p: p[0])
+        sq_diffs = (vals_arr[rows] - vals_arr[cols]) ** 2
 
-    # Build a sorted distance array and a parallel sq_diff array for
-    # O(log n) bin boundary lookups.
-    pair_dists = [p[0] for p in pairs]
-    pair_sqdiffs = [p[1] for p in pairs]
+        # Sort by distance for bisect-based binning
+        sort_idx = _np.argsort(dists)
+        pair_dists = dists[sort_idx].tolist()
+        pair_sqdiffs = sq_diffs[sort_idx].tolist()
+        max_dist = pair_dists[-1] if pair_dists else 0.0
+
+    else:
+        # ── Fallback: brute-force O(n²) pairwise computation ─────
+        max_dist = 0.0
+        pairs = []
+        for i in range(n):
+            xi, yi = points[i]
+            vi = values[i]
+            for j in range(i + 1, n):
+                xj, yj = points[j]
+                dx = xi - xj
+                dy = yi - yj
+                d = math.sqrt(dx * dx + dy * dy)
+                if direction is not None:
+                    angle = _angle_deg(points[i], points[j])
+                    if not _angle_in_tolerance(angle, direction, tolerance):
+                        # Also check the reverse direction (variograms are symmetric)
+                        if not _angle_in_tolerance(angle, (direction + 180) % 360, tolerance):
+                            continue
+                sq_diff = (vi - values[j]) ** 2
+                pairs.append((d, sq_diff))
+                if d > max_dist:
+                    max_dist = d
+
+        if max_dist == 0:
+            raise ValueError("All points are at the same location")
+
+        if max_lag is None:
+            max_lag = max_dist / 2.0  # Standard: use half max distance
+
+        # Sort pairs by distance for efficient bin assignment via bisect.
+        pairs.sort(key=lambda p: p[0])
+
+        # Build a sorted distance array and a parallel sq_diff array for
+        # O(log n) bin boundary lookups.
+        pair_dists = [p[0] for p in pairs]
+        pair_sqdiffs = [p[1] for p in pairs]
 
     lag_width = max_lag / n_lags
     bins: List[LagBin] = []
@@ -309,7 +347,7 @@ def experimental_variogram(
     return ExperimentalVariogram(
         bins=bins,
         n_points=n,
-        n_pairs=len(pairs),
+        n_pairs=len(pair_dists),
         max_distance=max_dist,
         lag_width=lag_width,
         direction=direction,
