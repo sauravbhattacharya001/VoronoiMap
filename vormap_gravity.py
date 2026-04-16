@@ -396,23 +396,25 @@ def _doubly_constrained_model(
     for iteration in range(config.max_iterations):
         iterations = iteration + 1
 
-        # Row balancing — vectorised: row_sums = (a * (cost @ b))
-        row_sums = a_factors * (cost @ b_factors)
-        # Update a_factors where row_targets > 0 and row_sums > 0
-        safe_rows = row_positive & (row_sums > 0)
-        a_factors = np.where(safe_rows, row_targets / row_sums, 0.0)
+        # Row balancing (standard Furness IPF):
+        # a_i = O_i / sum_j(cost_ij * b_j)
+        row_denom = cost @ b_factors
+        safe_rows = row_positive & (row_denom > 0)
+        a_factors = np.where(safe_rows, row_targets / row_denom, 0.0)
 
-        # Column balancing — vectorised: col_sums = b * (cost.T @ a)
-        col_sums = b_factors * (cost.T @ a_factors)
+        # Column balancing:
+        # b_j = D_j / sum_i(cost_ij * a_i)
+        col_denom = cost.T @ a_factors
+        safe_cols = col_positive & (col_denom > 0)
         # Track max relative error for convergence check.
-        safe_cols = col_positive & (col_sums > 0)
-        # Compute relative errors only for valid columns.
-        rel_errors = np.where(safe_cols,
-                              np.abs(col_sums - col_targets) / col_targets,
+        # Actual col sums of T_ij = a_i * cost_ij * b_j
+        actual_col_sums = b_factors * col_denom
+        rel_errors = np.where(col_positive & (col_targets > 0),
+                              np.abs(actual_col_sums - col_targets) / col_targets,
                               0.0)
         max_err = float(rel_errors.max()) if rel_errors.size > 0 else 0.0
 
-        b_factors = np.where(safe_cols, col_targets / col_sums, 0.0)
+        b_factors = np.where(safe_cols, col_targets / col_denom, 0.0)
 
         if max_err < config.convergence_threshold:
             break
