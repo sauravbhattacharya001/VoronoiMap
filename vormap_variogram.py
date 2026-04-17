@@ -259,6 +259,27 @@ def experimental_variogram(
     # use cKDTree.sparse_distance_matrix to compute only pairs within
     # max_lag.  This reduces from O(n²) all-pairs to roughly O(n·k)
     # where k is the average number of neighbours within max_lag.
+    #
+    # When max_lag is None (the default), we first estimate it as
+    # half the maximum pairwise distance using cKDTree, which is
+    # O(n log n) instead of the O(n²) brute-force fallback that was
+    # previously triggered.  This keeps the entire function on the
+    # fast O(n·k) path for the common omnidirectional case.
+    if _HAS_SCIPY and direction is None and n >= 8:
+        if max_lag is None:
+            pts_arr = _np.asarray(points, dtype=_np.float64)
+            tree = _cKDTree(pts_arr)
+            # Approximate max pairwise distance via double-BFS on the
+            # KDTree: query farthest point from an arbitrary start,
+            # then farthest from that.  O(n log n) vs O(n²).
+            _, far_idx = tree.query(pts_arr[0], k=n)
+            farthest_pt = pts_arr[far_idx[-1]]
+            d_max, _ = tree.query(farthest_pt, k=n)
+            estimated_max = float(d_max[-1])
+            if estimated_max == 0:
+                raise ValueError("All points are at the same location")
+            max_lag = estimated_max / 2.0
+
     if _HAS_SCIPY and direction is None and n >= 8 and max_lag is not None:
         pts_arr = _np.asarray(points, dtype=_np.float64)
         vals_arr = _np.asarray(values, dtype=_np.float64)
