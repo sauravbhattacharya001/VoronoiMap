@@ -60,61 +60,12 @@ from vormap_geometry import (
     polygon_centroid,
     polygon_area,
 )
-
-
-# ── Matrix helpers (pure Python OLS) ────────────────────────────────
-
-def _transpose(matrix):
-    """Transpose a list-of-lists matrix."""
-    rows = len(matrix)
-    cols = len(matrix[0])
-    return [[matrix[r][c] for r in range(rows)] for c in range(cols)]
-
-
-def _mat_mul(a, b):
-    """Multiply two matrices (list-of-lists)."""
-    rows_a, cols_a = len(a), len(a[0])
-    cols_b = len(b[0])
-    result = [[0.0] * cols_b for _ in range(rows_a)]
-    for i in range(rows_a):
-        for j in range(cols_b):
-            s = 0.0
-            for k in range(cols_a):
-                s += a[i][k] * b[k][j]
-            result[i][j] = s
-    return result
-
-
-def _mat_vec(a, v):
-    """Multiply matrix by column vector, return list."""
-    return [sum(a[i][j] * v[j] for j in range(len(v))) for i in range(len(a))]
-
-
-def _invert(matrix):
-    """Invert a square matrix using Gauss-Jordan elimination."""
-    n = len(matrix)
-    # Augment with identity
-    aug = [row[:] + [1.0 if i == j else 0.0 for j in range(n)]
-           for i, row in enumerate(matrix)]
-    for col in range(n):
-        # Partial pivoting
-        max_row = col
-        for row in range(col + 1, n):
-            if abs(aug[row][col]) > abs(aug[max_row][col]):
-                max_row = row
-        aug[col], aug[max_row] = aug[max_row], aug[col]
-        pivot = aug[col][col]
-        if abs(pivot) < 1e-15:
-            raise ValueError("Singular matrix — cannot solve OLS")
-        for j in range(2 * n):
-            aug[col][j] /= pivot
-        for row in range(n):
-            if row == col:
-                continue
-            factor = aug[row][col]
-            for j in range(2 * n):
-                aug[row][j] -= factor * aug[col][j]
-    return [row[n:] for row in aug]
+from vormap_utils import (
+    mat_transpose as _transpose,
+    mat_mul as _mat_mul,
+    mat_vec as _mat_vec,
+    mat_invert as _invert,
+)
 
 
 # ── Design matrix construction ──────────────────────────────────────

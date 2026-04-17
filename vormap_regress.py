@@ -52,116 +52,16 @@ import math
 import xml.etree.ElementTree as ET
 
 from vormap import validate_output_path
-
-
-# ── Matrix helpers (pure Python, no numpy) ──────────────────────────
-
-
-def _transpose(m):
-    """Transpose a list-of-lists matrix."""
-    if not m:
-        return []
-    return [[m[r][c] for r in range(len(m))] for c in range(len(m[0]))]
-
-
-def _mat_mul(a, b):
-    """Multiply two matrices (list-of-lists)."""
-    rows_a, cols_a = len(a), len(a[0])
-    cols_b = len(b[0])
-    result = [[0.0] * cols_b for _ in range(rows_a)]
-    for i in range(rows_a):
-        for k in range(cols_a):
-            aik = a[i][k]
-            for j in range(cols_b):
-                result[i][j] += aik * b[k][j]
-    return result
-
-
-def _mat_vec(m, v):
-    """Multiply matrix by column vector, return vector."""
-    return [sum(m[i][j] * v[j] for j in range(len(v))) for i in range(len(m))]
-
-
-def _identity(n):
-    """Return n×n identity matrix."""
-    return [[1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
-
-
-def _lu_decompose(matrix):
-    """LU decomposition with partial pivoting.
-
-    Returns (L, U, perm) where perm is the row permutation vector.
-    """
-    n = len(matrix)
-    # Copy
-    U = [row[:] for row in matrix]
-    L = _identity(n)
-    perm = list(range(n))
-
-    for col in range(n):
-        # Partial pivot
-        max_val = abs(U[col][col])
-        max_row = col
-        for row in range(col + 1, n):
-            if abs(U[row][col]) > max_val:
-                max_val = abs(U[row][col])
-                max_row = row
-        if max_row != col:
-            U[col], U[max_row] = U[max_row], U[col]
-            perm[col], perm[max_row] = perm[max_row], perm[col]
-            for k in range(col):
-                L[col][k], L[max_row][k] = L[max_row][k], L[col][k]
-
-        if abs(U[col][col]) < 1e-14:
-            continue
-
-        for row in range(col + 1, n):
-            factor = U[row][col] / U[col][col]
-            L[row][col] = factor
-            for k in range(col, n):
-                U[row][k] -= factor * U[col][k]
-
-    return L, U, perm
-
-
-def _lu_solve(L, U, perm, b):
-    """Solve Ax = b given LU decomposition."""
-    n = len(b)
-    # Permute b
-    pb = [b[perm[i]] for i in range(n)]
-
-    # Forward substitution: Ly = pb
-    y = [0.0] * n
-    for i in range(n):
-        y[i] = pb[i] - sum(L[i][j] * y[j] for j in range(i))
-
-    # Back substitution: Ux = y
-    x = [0.0] * n
-    for i in range(n - 1, -1, -1):
-        if abs(U[i][i]) < 1e-14:
-            x[i] = 0.0
-        else:
-            x[i] = (y[i] - sum(U[i][j] * x[j] for j in range(i + 1, n))) / U[i][i]
-
-    return x
-
-
-def _solve(A, b):
-    """Solve Ax = b via LU decomposition."""
-    L, U, perm = _lu_decompose(A)
-    return _lu_solve(L, U, perm, b)
-
-
-def _invert(A):
-    """Invert a square matrix via LU decomposition."""
-    n = len(A)
-    L, U, perm = _lu_decompose(A)
-    inv = []
-    for col in range(n):
-        e = [1.0 if i == col else 0.0 for i in range(n)]
-        inv.append(_lu_solve(L, U, perm, e))
-    # inv is list of column vectors; transpose to get matrix
-    return _transpose(inv)
+from vormap_utils import (
+    mat_transpose as _transpose,
+    mat_mul as _mat_mul,
+    mat_vec as _mat_vec,
+    mat_identity as _identity,
+    lu_decompose as _lu_decompose,
+    lu_solve as _lu_solve,
+    mat_solve as _solve,
+    mat_invert as _invert,
+)
 
 
 # ── Statistics helpers ───────────────────────────────────────────────
