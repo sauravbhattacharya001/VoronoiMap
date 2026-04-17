@@ -191,13 +191,17 @@ def _tournament_select(pop, fits, k=3):
 
 def evolve(n_points=30, width=500, height=500, objective="uniform",
            pop_size=40, generations=150, elitism=2, seed=None,
-           on_generation=None):
+           on_generation=None, stale_limit=20):
     """Run the GA and return the best individual with metadata.
 
     Parameters
     ----------
     on_generation : callable, optional
         ``fn(gen, best_fitness)`` called every generation for progress.
+    stale_limit : int
+        Generations without improvement before adaptive mutation kicks
+        in (doubles the mutation rate and sigma).  Resets when a new
+        best is found.  Default 20.
 
     Returns
     -------
@@ -210,27 +214,67 @@ def evolve(n_points=30, width=500, height=500, objective="uniform",
         raise ValueError(f"Unknown objective '{objective}'. Choose from: {list(_OBJECTIVES)}")
 
     pop = [_random_individual(n_points, width, height) for _ in range(pop_size)]
+    # Track fitness alongside individuals so elites are not re-evaluated.
+    # None means "needs evaluation"; a float means "cached".
+    fits: list = [None] * pop_size
     history = []
+    best_ever = -float("inf")
+    stale_gens = 0  # generations since last improvement
 
     for gen in range(generations):
-        fits = [fit_fn(ind, width, height) for ind in pop]
+        # Evaluate only individuals whose fitness is not cached.
+        for i in range(len(pop)):
+            if fits[i] is None:
+                fits[i] = fit_fn(pop[i], width, height)
+
         ranked = sorted(zip(pop, fits), key=lambda x: x[1], reverse=True)
         best_fit = ranked[0][1]
         history.append(best_fit)
+
+        # Adaptive mutation: track stagnation
+        if best_fit > best_ever + 1e-12:
+            best_ever = best_fit
+            stale_gens = 0
+        else:
+            stale_gens += 1
+
         if on_generation:
             on_generation(gen, best_fit)
 
-        # next generation
-        new_pop = [deepcopy(ranked[i][0]) for i in range(elitism)]
-        while len(new_pop) < pop_size:
-            p1 = _tournament_select(pop, fits)
-            p2 = _tournament_select(pop, fits)
-            child = _crossover(p1, p2)
-            child = _mutate(child, width, height)
-            new_pop.append(child)
-        pop = new_pop
+        # Adaptive mutation parameters: boost when stuck in local optimum
+        if stale_gens >= stale_limit:
+            mut_rate = min(0.40, 0.15 * (1 + stale_gens / stale_limit))
+            mut_sigma = min(0.15, 0.05 * (1 + stale_gens / stale_limit))
+        else:
+            mut_rate = 0.15
+            mut_sigma = 0.05
 
-    fits = [fit_fn(ind, width, height) for ind in pop]
+        # Build next generation: elites carry over with cached fitness.
+        new_pop = []
+        new_fits: list = []
+        for i in range(min(elitism, len(ranked))):
+            new_pop.append(deepcopy(ranked[i][0]))
+            new_fits.append(ranked[i][1])  # fitness is unchanged
+
+        # Fill the rest with offspring (fitness unknown → None).
+        all_pop = [r[0] for r in ranked]
+        all_fits = [r[1] for r in ranked]
+        while len(new_pop) < pop_size:
+            p1 = _tournament_select(all_pop, all_fits)
+            p2 = _tournament_select(all_pop, all_fits)
+            child = _crossover(p1, p2)
+            child = _mutate(child, width, height, rate=mut_rate,
+                            sigma_frac=mut_sigma)
+            new_pop.append(child)
+            new_fits.append(None)  # needs evaluation next generation
+        pop = new_pop
+        fits = new_fits
+
+    # Final evaluation for any unevaluated individuals.
+    for i in range(len(pop)):
+        if fits[i] is None:
+            fits[i] = fit_fn(pop[i], width, height)
+
     best_idx = max(range(len(fits)), key=lambda i: fits[i])
     return {
         "points": pop[best_idx],
