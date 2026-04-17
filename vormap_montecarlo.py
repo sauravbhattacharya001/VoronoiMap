@@ -241,6 +241,42 @@ class MonteCarloResult:
         return d
 
 
+# ── Envelope helpers ────────────────────────────────────────────────
+
+def _two_sided_rank(simulated, observed, pivot=1.0):
+    """Count how many simulated values deviate from *pivot* at least as
+    much as *observed* does.  Used for two-sided Monte Carlo p-values."""
+    obs_dev = abs(observed - pivot)
+    return sum(1 for v in simulated if abs(v - pivot) >= obs_dev)
+
+
+def _one_sided_rank(simulated, observed):
+    """Count how many simulated values are >= *observed* (one-sided)."""
+    return sum(1 for v in simulated if v >= observed)
+
+
+def _envelope_stats(simulated, n_sims):
+    """Return (mean, std, lower_2.5, upper_97.5) for a simulated distribution."""
+    mn = _mean(simulated)
+    sd = _std(simulated)
+    lo = _safe_percentile(simulated, 2.5)
+    hi = _safe_percentile(simulated, 97.5)
+    return mn, sd, lo, hi
+
+
+def _interpret_envelope(observed, lo, hi, labels):
+    """Return an interpretation string given envelope bounds.
+
+    *labels* is a 3-tuple ``(below, within, above)`` describing
+    the meaning of falling below the CI, within, or above.
+    """
+    if observed < lo:
+        return labels[0]
+    elif observed > hi:
+        return labels[2]
+    return labels[1]
+
+
 # ── Monte Carlo Test Engine ─────────────────────────────────────────
 
 class MonteCarloTest:
@@ -328,21 +364,13 @@ class MonteCarloTest:
         result._sim_area_cvs = sim_area_cvs
 
         # ── NNI envelope ────────────────────────────────────────
-        nni_rank = sum(1 for v in sim_nnis
-                       if abs(v - 1.0) >= abs(obs_nni - 1.0))
+        nni_rank = _two_sided_rank(sim_nnis, obs_nni, pivot=1.0)
         nni_p = (nni_rank + 1) / (simulations + 1)
-        nni_mean = _mean(sim_nnis)
-        nni_std = _std(sim_nnis)
-
-        nni_lo = _safe_percentile(sim_nnis, 2.5)
-        nni_hi = _safe_percentile(sim_nnis, 97.5)
-
-        if obs_nni < nni_lo:
-            nni_interp = "clustered"
-        elif obs_nni > nni_hi:
-            nni_interp = "dispersed"
-        else:
-            nni_interp = "random"
+        nni_mean, nni_std, nni_lo, nni_hi = _envelope_stats(
+            sim_nnis, simulations)
+        nni_interp = _interpret_envelope(
+            obs_nni, nni_lo, nni_hi,
+            ("clustered", "random", "dispersed"))
 
         result.nni = NNIEnvelope(
             observed=round(obs_nni, 6),
@@ -357,21 +385,14 @@ class MonteCarloTest:
         )
 
         # ── VMR envelope ────────────────────────────────────────
-        vmr_rank = sum(1 for v in sim_vmrs
-                       if abs(v - 1.0) >= abs(obs_vmr - 1.0))
+        vmr_rank = _two_sided_rank(sim_vmrs, obs_vmr, pivot=1.0)
         vmr_p = (vmr_rank + 1) / (simulations + 1)
-        vmr_mean = _mean(sim_vmrs)
-        vmr_std = _std(sim_vmrs)
-
-        vmr_lo = _safe_percentile(sim_vmrs, 2.5)
-        vmr_hi = _safe_percentile(sim_vmrs, 97.5)
-
-        if obs_vmr > vmr_hi:
-            vmr_interp = "clustered"
-        elif obs_vmr < vmr_lo:
-            vmr_interp = "dispersed"
-        else:
-            vmr_interp = "random"
+        vmr_mean, vmr_std, vmr_lo, vmr_hi = _envelope_stats(
+            sim_vmrs, simulations)
+        # VMR labels are inverted: high VMR = clustered
+        vmr_interp = _interpret_envelope(
+            obs_vmr, vmr_lo, vmr_hi,
+            ("dispersed", "random", "clustered"))
 
         result.vmr = VMREnvelope(
             observed=round(obs_vmr, 6),
@@ -386,19 +407,15 @@ class MonteCarloTest:
         )
 
         # ── Area CV envelope ────────────────────────────────────
-        cv_rank = sum(1 for v in sim_area_cvs if v >= obs_area_cv)
+        cv_rank = _one_sided_rank(sim_area_cvs, obs_area_cv)
         cv_p = (cv_rank + 1) / (simulations + 1)
-        cv_mean = _mean(sim_area_cvs)
-
-        cv_lo = _safe_percentile(sim_area_cvs, 2.5)
-        cv_hi = _safe_percentile(sim_area_cvs, 97.5)
-
-        if obs_area_cv > cv_hi:
-            area_interp = "more variable than CSR (clustered/irregular)"
-        elif obs_area_cv < cv_lo:
-            area_interp = "more uniform than CSR (regular/dispersed)"
-        else:
-            area_interp = "consistent with CSR"
+        cv_mean, _, cv_lo, cv_hi = _envelope_stats(
+            sim_area_cvs, simulations)
+        area_interp = _interpret_envelope(
+            obs_area_cv, cv_lo, cv_hi,
+            ("more uniform than CSR (regular/dispersed)",
+             "consistent with CSR",
+             "more variable than CSR (clustered/irregular)"))
 
         result.area = AreaEnvelope(
             observed_mean=round(obs_area_mean, 4),
