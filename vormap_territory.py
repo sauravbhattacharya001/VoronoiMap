@@ -74,70 +74,41 @@ def _find_shared_borders(
 ]:
     """Find shared border lengths between adjacent regions.
 
-    Two regions share a border if they have two or more vertices that
-    are very close (within tolerance).  The shared border length is
-    the sum of edge lengths along the shared vertices.
+    Uses an edge-ownership approach: each polygon edge (normalised to a
+    canonical vertex order) is mapped to the set of region seeds whose
+    polygon contains it.  Edges owned by exactly two regions are shared
+    borders.  The total shared length per region pair is the sum of
+    those edge lengths.
 
-    Returns a dict mapping (seed_a, seed_b) → shared_length where
-    seed_a < seed_b lexicographically.
+    Returns a dict mapping ``(seed_a, seed_b)`` → ``shared_length``
+    where ``seed_a < seed_b`` lexicographically.
     """
-    tol = 1e-6
-
-    # Build a mapping: rounded vertex → list of seeds that contain it
-    vertex_to_seeds: Dict[Tuple[float, float], List[Tuple[float, float]]] = {}
-    for seed, verts in regions.items():
-        for v in verts:
-            key = (round(v[0], 4), round(v[1], 4))
-            if key not in vertex_to_seeds:
-                vertex_to_seeds[key] = []
-            vertex_to_seeds[key].append(seed)
-
-    # For each pair of regions, find shared vertices
-    pair_shared_verts: Dict[
+    # Map each canonical edge → list of owning seeds.
+    edge_owners: Dict[
         Tuple[Tuple[float, float], Tuple[float, float]],
         List[Tuple[float, float]],
     ] = {}
-    for key, seeds in vertex_to_seeds.items():
-        unique_seeds = list(set(seeds))
-        for i in range(len(unique_seeds)):
-            for j in range(i + 1, len(unique_seeds)):
-                pair = tuple(sorted([unique_seeds[i], unique_seeds[j]]))
-                if pair not in pair_shared_verts:
-                    pair_shared_verts[pair] = []
-                pair_shared_verts[pair].append(key)
-
-    # Build a set of actual polygon edges (from both regions in each pair)
-    # so we can chain shared vertices along real edges, not angular sort.
-    region_edges: Dict[Tuple[float, float], set] = {}
     for seed, verts in regions.items():
-        edge_set: set = set()
         n = len(verts)
         for k in range(n):
             v1 = (round(verts[k][0], 4), round(verts[k][1], 4))
             v2 = (round(verts[(k + 1) % n][0], 4), round(verts[(k + 1) % n][1], 4))
-            edge_set.add((min(v1, v2), max(v1, v2)))
-        region_edges[seed] = edge_set
+            canon = (min(v1, v2), max(v1, v2))
+            if canon not in edge_owners:
+                edge_owners[canon] = []
+            edge_owners[canon].append(seed)
 
-    # Compute shared border length for each pair by summing actual
-    # shared polygon edges (not phantom diagonals from angular sort)
+    # Accumulate shared border lengths per region pair.
     shared_borders: Dict[
         Tuple[Tuple[float, float], Tuple[float, float]],
         float,
     ] = {}
-    for pair, verts in pair_shared_verts.items():
-        if len(verts) < 2:
+    for (v1, v2), owners in edge_owners.items():
+        if len(owners) != 2:
             continue
-        shared_set = frozenset(verts)
-        # Collect edges from both regions where both endpoints are shared
-        edges_a = region_edges.get(pair[0], set())
-        edges_b = region_edges.get(pair[1], set())
-        all_edges = edges_a | edges_b
-        total = 0.0
-        for v1, v2 in all_edges:
-            if v1 in shared_set and v2 in shared_set:
-                total += _edge_length(v1, v2)
-        if total > tol:
-            shared_borders[pair] = total
+        pair = (min(owners[0], owners[1]), max(owners[0], owners[1]))
+        length = _edge_length(v1, v2)
+        shared_borders[pair] = shared_borders.get(pair, 0.0) + length
 
     return shared_borders
 
