@@ -46,6 +46,15 @@ from vormap_geometry import (
     polygon_area,
 )
 
+try:
+    import numpy as np
+    from scipy.spatial import KDTree as _KDTree
+    _HAS_SCIPY = True
+except ImportError:
+    np = None
+    _KDTree = None
+    _HAS_SCIPY = False
+
 Point = Tuple[float, float]
 
 
@@ -321,8 +330,9 @@ class MonteCarloTest:
 
         result = MonteCarloResult(self.n, self.bounds, simulations, seed)
 
-        # Compute observed statistics
-        obs_nni = self._compute_nni(self.points)
+        # Compute observed statistics — build one KDTree and share it
+        obs_tree = _KDTree(self.points) if _HAS_SCIPY else None
+        obs_nni = self._compute_nni(self.points, tree=obs_tree)
         obs_vmr = self._compute_vmr(self.points, quadrat_nx, quadrat_ny)
         obs_areas = self._compute_voronoi_areas(self.points)
         obs_area_mean = _mean(obs_areas) if obs_areas else 0.0
@@ -334,7 +344,7 @@ class MonteCarloTest:
         max_dist = min(n_b - s, e - w) / 2.0
         radii = [max_dist * (i + 1) / (radii_count + 1)
                  for i in range(radii_count)]
-        obs_l = self._compute_ripleys_l(self.points, radii)
+        obs_l = self._compute_ripleys_l(self.points, radii, tree=obs_tree)
 
         # Run simulations
         sim_nnis = []
@@ -345,7 +355,14 @@ class MonteCarloTest:
 
         for _ in range(simulations):
             sim_pts = self._generate_csr(self.n)
-            sim_nnis.append(self._compute_nni(sim_pts))
+
+            # Build KDTree once per simulation and reuse for both NNI
+            # and Ripley's L — avoids building 2 trees per sim.
+            sim_tree = None
+            if _HAS_SCIPY:
+                sim_tree = _KDTree(sim_pts)
+
+            sim_nnis.append(self._compute_nni(sim_pts, tree=sim_tree))
             sim_vmrs.append(self._compute_vmr(sim_pts, quadrat_nx, quadrat_ny))
 
             sim_areas = self._compute_voronoi_areas(sim_pts)
@@ -355,7 +372,7 @@ class MonteCarloTest:
                        if sim_areas and sim_am > 0 else 0.0)
             sim_area_cvs.append(sim_acv)
 
-            sim_l = self._compute_ripleys_l(sim_pts, radii)
+            sim_l = self._compute_ripleys_l(sim_pts, radii, tree=sim_tree)
             for j in range(len(radii)):
                 sim_l_values[j].append(sim_l[j])
 
@@ -498,7 +515,7 @@ class MonteCarloTest:
         return [(_uniform(w, e), _uniform(s, north))
                 for _ in range(n)]
 
-    def _compute_nni(self, points):
+    def _compute_nni(self, points, tree=None):
         """Compute Clark-Evans Nearest-Neighbor Index.
 
         When scipy is available, uses KDTree for vectorized batch
@@ -506,6 +523,15 @@ class MonteCarloTest:
         executed entirely in C/Fortran with no Python per-point overhead.
         This is 10-50x faster than the grid fallback for typical point
         counts (100–100k).
+
+        Parameters
+        ----------
+        points : list of (x, y)
+            Point coordinates.
+        tree : scipy.spatial.KDTree or None
+            Pre-built KDTree to reuse.  When provided, skips the O(n log n)
+            tree construction — significant when called thousands of times
+            in Monte Carlo simulations.
 
         Falls back to a grid-based spatial index for O(n) expected time
         when scipy is not installed.
@@ -520,19 +546,15 @@ class MonteCarloTest:
         expected = 0.5 / math.sqrt(density) if density > 0 else 0
 
         # ── Fast path: scipy KDTree vectorized query ──
-        try:
-            import numpy as np
-            from scipy.spatial import KDTree
-
+        if _HAS_SCIPY:
             pts_arr = np.asarray(points)
-            tree = KDTree(pts_arr)
+            if tree is None:
+                tree = _KDTree(pts_arr)
             # k=2 because the closest point is always the point itself
             dists, _ = tree.query(pts_arr, k=2)
             # dists[:, 1] is the distance to the true nearest neighbor
             obs_mean = float(np.mean(dists[:, 1]))
             return obs_mean / expected if expected > 0 else 1.0
-        except ImportError:
-            pass
 
         # ── Fallback: grid-based spatial index ──
         cell_size = max(expected * 2.0, 1e-9)
@@ -643,12 +665,22 @@ class MonteCarloTest:
             total = (north - s) * (e - w)
             return [total / len(points)] * len(points)
 
-    def _compute_ripleys_l(self, points, radii):
+    def _compute_ripleys_l(self, points, radii, tree=None):
         """Compute Besag's L(r) = sqrt(K(r)/pi) - r.
 
         Uses scipy KDTree when available for O(n log n) per radius,
         falling back to a sort-once O(n²) approach that avoids
         recomputing distances for every radius.
+
+        Parameters
+        ----------
+        points : list of (x, y)
+            Point coordinates.
+        radii : list of float
+            Distance thresholds for K/L computation.
+        tree : scipy.spatial.KDTree or None
+            Pre-built KDTree to reuse.  Avoids redundant O(n log n)
+            tree builds in Monte Carlo loops.
 
         The denominator uses n*(n-1) per Ripley (1976) eq. 2.1 since
         self-pairs are excluded from the count.
@@ -661,9 +693,9 @@ class MonteCarloTest:
         area = (north - s) * (e - w)
         denom = n * (n - 1) if n > 1 else 1
 
-        try:
-            from scipy.spatial import KDTree
-            tree = KDTree(points)
+        if _HAS_SCIPY:
+            if tree is None:
+                tree = _KDTree(points)
             l_values = []
             for r in radii:
                 # count_neighbors counts all pairs (i,j) with i<j within r
@@ -673,8 +705,6 @@ class MonteCarloTest:
                 l_r = math.sqrt(k_r / math.pi) - r if k_r >= 0 else -r
                 l_values.append(l_r)
             return l_values
-        except ImportError:
-            pass
 
         # Fallback: compute all pairwise distances once, sort, then
         # use binary search across radii (O(n² + n² log(n²) + R·log(n²))
