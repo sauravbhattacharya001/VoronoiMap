@@ -1,4 +1,199 @@
+## 2026-04-16
+
+### Run 2609-2610 — Repo Gardener (10:46 PM PST)
+- **Task 1:** `auto_labeler` on **Vidly** — Added issue triage workflow (auto-adds `needs-triage` label on new issues, removes it when triaged) and PR auto-assign workflow (assigns author, skips dependabot). Created `needs-triage` label.
+- **Task 2:** `code_coverage` on **WinSentinel** — Added 12 unit tests for `SecurityCoverageService` (previously untested). Tests cover empty reports, module/category matching, coverage calculation, case-insensitive matching, gap detection, recommendations. All 12 pass.
+
+### Run 2607-2608 — Repo Gardener (10:16 PM PST)
+- **Task 1:** `create_release` on **WinSentinel** — Created v1.4.3 covering 4 commits since v1.4.2: remediation strategy chain refactor, 35 new tests (NoiseAnalyzer + CalendarHeatmap), README stats update.
+- **Task 2:** `refactor` on **GraphVisual** — Refactored `GraphSampler.java`: extracted `copyEdge()`, `endpoints()`, `induceEdges()`, and `resolveSeed()` helpers to eliminate duplicated edge-copy logic (repeated 3×) and seed-resolution code. Compiles clean. -76/+79 lines.
+
+### Run 2605-2606 — Repo Gardener (9:16 PM PST)
+- **Task 1:** `repo_topics` on **VoronoiMap** — Added `numpy` and `python3` topics (now at max 20). Repo already had 18 well-chosen topics.
+- **Task 2:** `bug_fix` on **Ocaml-sample-code** — Fixed O(n²) performance bug in `compression.ml` `decompress`. The inner loop called `Buffer.contents buf` on every character, creating a full string copy each time. Replaced with `Buffer.sub` to snapshot the source pattern once per token and cycle through it for overlapping matches.
+
+### Run 2603-2604 — Repo Gardener (8:46 PM PST)
+- **Task 1:** `security_fix` on **GraphVisual** — Fixed path traversal vulnerability (CWE-22), resource leak, and missing UTF-8 encoding in ResiliencePanelController's CSV export. Added ExportUtils.validateOutputPath(), try-with-resources, and SecurityException handling. This was the only exporter in the codebase missing these protections.
+- **Task 2:** `docker_workflow` on **getagentbox** — Fixed broken branch references: docker.yml and codeql.yml both targeted `main` but the default branch is `master`, so neither workflow ever triggered. Corrected push/PR branch filters and Docker edge tag.
+
+### Run 2601-2602 — Repo Gardener (7:46 PM PST)
+- **Task 1:** `repo_topics` on **Ocaml-sample-code** — Added 10 new topics (computer-science, type-inference, theorem-prover, neural-network, sat-solver, compiler, interpreters, concurrent-programming, distributed-systems, machine-learning) and set repo description
+- **Task 2:** `code_coverage` on **WinSentinel** — Added 20 comprehensive tests for NoiseAnalyzer service covering empty input, perennial detection, noise level ratings, SuggestedAction logic, module noise ranking, top-N limiting, DaysSpan, suppressible estimation, and edge cases. All 36 tests passing.
+
+### Run 2599-2600 — Repo Gardener (7:16 PM PST)
+- **Task 1:** `add_tests` on **VoronoiMap** — Added 36-test suite for `vormap_evolve` module covering geometry helpers, all 5 fitness functions, genetic operators, main evolve() function, and output helpers
+- **Task 2:** `bug_fix` on **agentlens** — Fixed backend silently dropping span events: SDK emits `span_start`/`span_end`/`decision` event types but `VALID_EVENT_TYPES` whitelist in validation.js didn't include them, breaking timeline visualization
+
+### Run 2597-2598 — Repo Gardener (6:47 PM PST)
+- **Task 1:** `perf_improvement` on **VoronoiMap** — Vectorized power diagram grid assignment in `compute_power_regions()` (O(res²×S) pure-Python → numpy meshgrid+broadcast, ~20-50x speedup) and `batch_weighted_nn()` (vectorized P×S distance matrix)
+- **Task 2:** `create_release` on **prompt** — Created v5.5.0 release (PromptTokenCounter feature, XSS fix in flowchart, perf optimizations in similarity/search/dedup, refactoring in Conversation & PromptRouter)
+
+### Run 2595-2596 — Repo Gardener (6:16 PM PST)
+- **Task 1:** `create_release` on **agentlens** — Created v1.34.0 release (CLI modularization: extracted dashboard/replay modules, fixed mojibake encoding)
+- **Task 2:** `perf_improvement` on **GraphVisual** — Rewrote `predictEnsemble()` from O(V²) memory materialization to streaming top-K min-heap (O(K) memory); replaced Jaccard HashSet union with arithmetic `|A|+|B|-|common|` eliminating O(V²) allocations
+
+### Run 2593-2594 — Repo Gardener (5:46 PM PST)
+- **Task 1:** `setup_copilot_agent` on **BioBots** — Added NuGet package caching to copilot-setup-steps.yml, expanded docs/shared module listing from 11 to 65+ in copilot-instructions.md, fixed jest version refs
+- **Task 2:** `add_tests` on **WinSentinel** — Added 15 unit tests for CalendarHeatmapService: empty runs, aggregation, streak tracking, gap detection, chronological ordering, week params, score extremes
+
+### Run 2591-2592 — Repo Gardener (5:16 PM PST)
+- **Task 1:** `add_docstrings` on **ai** — Added comprehensive docstrings to `risk_heatmap.py`: 3 enums, 2 dataclasses, 9 methods, and CLI entry-point (18 previously undocumented items)
+- **Task 2:** `bug_fix` on **BioBots** — Fixed division-by-zero in `cellViability.js` IC50 interpolation (adjacent points at 50% caused NaN) + validated non-null params positive in `molarity.js` dilution calculator (zero denominator produced Infinity)
+
+### Run 2589-2590 — Repo Gardener (4:46 PM PST)
+- **Task 1:** `create_release` on **VoronoiMap** — Created v1.30.0 release (4 commits since v1.29.0: clustering coefficient perf, Gi* vectorization, gravity model bugfix, FIPS hashlib security)
+- **Task 2:** `security_fix` on **agenticchat** — Hardened ConversationAutopilot: replaced raw DOM API key access with ApiKeyManager (respects validation/incognito), added 5s rate limiter between API calls, capped unlimited mode to 50 steps max
+
+### Run 2587-2588 — Repo Gardener (4:16 PM PST)
+- **Task 1:** `readme_overhaul` on **BioBots** — Added SDK & Packages section with npm package usage examples (createMaterialCalculator, createRheologyModeler, createViabilityEstimator), lazy-loading note, listFactories/factoryCount API. Updated TOC.
+- **Task 2:** `refactor` on **sauravbhattacharya001** — Extracted Project Comparison into a revealing-module IIFE (`Compare` namespace), consistent with Spotlight/TechRadar/Timeline patterns. Encapsulates state and all compare functions. Legacy aliases preserved. 589/590 tests pass (1 pre-existing failure).
+
+### Run 2585-2586 — Repo Gardener (3:46 PM PST)
+- **Task 1:** `refactor` on **agentlens** — Extracted `cmd_dashboard` (258 lines) to `cli_dashboard.py` and `cmd_replay` + `build_session_from_api` (207 lines) to `cli_replay.py`. Fixed 257 mojibake characters caused by cp1252 double-encoding of UTF-8 emoji throughout `cli.py` (pre-existing encoding corruption that caused SyntaxError). All 3 files compile-verified.
+- **Task 2:** `create_release` on **BioBots** — Created v1.25.1 release covering 1 commit since v1.25.0: pre-index diagnostic rules by symptom for O(1) lookup, fix duplicate use-strict.
+
+### Run 2583-2584 — Repo Gardener (3:16 PM PST)
+- **Task 1:** `create_release` on **sauravcode** — Created v6.1.0 release covering 3 commits since v6.0.0: split list comprehensions into filtered/unfiltered loops (perf), generic ASTNode.children() walker (refactor), parse-once benchmark optimization (perf).
+- **Task 2:** `refactor` on **WinSentinel** — Extracted the if/else remediation dispatch chain in AgentBrain.ExecuteAutoFix into an IRemediationStrategy chain-of-responsibility pattern. 6 strategy classes (Defender, HostsFile, ProcessKill, FileQuarantine, IpBlock, FixCommand) now live in RemediationStrategies.cs. Build passes, 98/98 tests pass.
+
+### Run 2581-2582 — Repo Gardener (2:46 PM PST)
+- **Task 1:** `create_release` on **agentlens** — Created v1.33.0 release covering 2 commits since v1.32.0: single-pass linearRegression optimization in forecast module, and event buffer/alert history capping to prevent memory leaks in alert_rules.
+- **Task 2:** `perf_improvement` on **GraphVisual** — Replaced O(V²) linear scan in `simulateDegreeAttack()` (GraphResilienceAnalyzer.java) with a bucket-queue indexed by degree. Removals update only neighbors' bucket positions, giving O(V+E) total for the degree-attack ordering. Pushed to master.
+
+### Run 2579-2580 — Repo Gardener (2:16 PM PST)
+- **Task 1:** `perf_improvement` on **VoronoiMap** — Replaced O(k²) nested-loop triangle counting in `_compute_clustering()` (vormap_graph.py) with edge-based set intersection. For each edge (u,v), computes |N(u) ∩ N(v)| via Python's C-level `set.__and__`, eliminating per-pair hash lookups. Total triplets computed in separate single pass. All 112 graph tests pass. Pushed to master.
+- **Task 2:** `refactor` on **BioBots** — Pre-indexed `DIAGNOSTIC_RULES` by symptom in `failureDiagnostic.js` via `RULES_BY_SYMPTOM` lookup table built at module load, so `diagnose()` iterates only matching rules instead of scanning all 44. Exported the index for downstream consumers. Fixed duplicate `'use strict'` directive in `mlDiagnostic.js`. All 117 diagnostic tests pass. Pushed to master.
+
+### Run 2577-2578 — Repo Gardener (1:46 PM PST)
+- **Task 1:** `perf_improvement` on **agentlens** — Optimized `linearRegression()` in `forecast.js`: compute Σ(x-xMean)² analytically via closed-form `n(n²-1)/12` (eliminates a full pass), combined ssTot+ssRes into single loop. Coerced tokenValues/sessionValues to Number[] once at route-handler top instead of 3 redundant `.map(Number)` calls. Added optional pre-computed regression param to `detectTrend()`. Pushed to master.
+- **Task 2:** `add_tests` on **GraphVisual** — Added `GraphPowerCalculatorTest.java` (20 tests) and `PerfectGraphAnalyzerTest.java` (15 tests). Covers k-th power computation, diameter, density, BFS distances, odd hole/antihole detection, bipartite/chordal/perfect class checks, report generation, edge cases. Pushed to master.
+
+### Run 2575-2576 — Repo Gardener (1:16 PM PST)
+- **Task 1:** `bug_fix` on **VoronoiMap** — Fixed incorrect Furness IPF balancing in `_doubly_constrained_model()` in `vormap_gravity.py`. Row/column balancing was premultiplying by stale factors (`a * (cost @ b)` and `b * (cost.T @ a)`) instead of using standard IPF form (`O_i / sum_j(cost_ij * b_j)`). Fixed convergence error check too. Pushed to master.
+- **Task 2:** `refactor` on **prompt** — Extracted `PrepareRequest()` and `AppendAssistantMessage()` helpers in `Conversation.cs` to eliminate duplicated setup/teardown between `SendAsync` and `SendStreamAsync`. Also fixed `SendStreamAsync` calling `accumulated.ToString()` twice per streaming chunk (once for FullText, once for EstimateTokens) — now caches in local var, halving per-chunk allocations. Build verified clean. Pushed to main.
+
+### Run 2573-2574 — Repo Gardener (12:46 PM PST)
+- **Task 1:** `bug_fix` on **agentlens** — Capped unbounded `_events` and `_history` buffers in `AlertRulesEngine` (default 10K events, 5K history) to prevent memory leaks in long-running processes using `evaluate_incremental()`. Added `event_count`/`history_count` properties and `clear_events()`. Pushed to master.
+- **Task 2:** `perf_improvement` on **GraphVisual** — Replaced O(V²) linear-scan Maximum Cardinality Search in `ChordalGraphAnalyzer` with O(V+E) bucket-based priority queue. Also fixed a syntax bug (stray closing brace) in `computeFillIn`. Pushed to master.
+
+### Run 2571-2572 — Repo Gardener (12:16 PM PST)
+- **Task 1:** `add_badges` on **gif-captcha** — Added GitHub stars, npm monthly downloads, Node.js version requirement, and PRs Welcome badges to README.
+- **Task 2:** `open_issue` on **Vidly** — Filed [#144](https://github.com/sauravbhattacharya001/Vidly/issues/144): 12 bare `catch (Exception ex)` blocks across controllers mask bugs and leak exception details. Documented affected files, impact, and fix pattern.
+
+### Run 2569-2570 — Repo Gardener (11:46 AM PST)
+- **Task 1:** `readme_overhaul` on **WinSentinel** — Updated all outdated stats: tests 1,172→4,173, test files 49→128, source LOC 27k→72k+, test LOC 11k→50k+, commits 59→370+. Added missing releases (v1.2.0–v1.4.2) to releases table. Updated footer.
+- **Task 2:** `bug_fix` on **Vidly** — Fixed broken constructor chain in CouponService. Parameterless constructor chained to `this(InMemoryCouponRepository)` but only a 2-arg constructor (ICouponRepository, IClock) existed — compile error. Added SystemClock as second argument.
+
+### Run 2567-2568 — Repo Gardener (11:16 AM PST)
+- **Task 1:** `create_release` on **agentlens** — Created v1.32.0 release covering 6 commits since v1.31.0: security hardening (FIPS-safe md5, config file permissions), performance (step_baselines caching, single-pass anomaly computation, skip JSON parsing in /summary), and profiler SQL column fix.
+- **Task 2:** `perf_improvement` on **GraphVisual** — Shared pre-computed neighbor HashSets across all motif detectors in `GraphMotifFinder`. Previously, `findTriangles()` and `findSquares()` each built their own O(V+E) HashMaps independently. Now built once in `analyze()` and shared. Also fixed `findOpenPaths()` which called `graph.isNeighbor(a,b)` (O(degree) per call in JUNG) — replaced with O(1) HashSet lookups, reducing per-vertex cost from O(k³) to O(k²).
+
+### Run 2565-2566 — Repo Gardener (10:46 AM PST)
+- **Task 1:** `perf_improvement` on **VoronoiMap** — Vectorized normal CDF computation in `_gi_star_batch` (replaced `np.vectorize(_normal_cdf)` with `scipy.special.erf` / `math.erf`), and replaced element-by-element weight matrix construction with COO-style batch numpy indexing. ~5-10x speedup on p-value computation for hotspot analysis.
+- **Task 2:** `refactor` on **prompt** — Pre-compiled and cached regex patterns in `PromptRouter.AddRoute()` instead of re-parsing on every `ScoreAll`/`Route` call. Added parallel `_compiledPatterns` dictionary, updated `RemoveRoute`/`Clear` for cache consistency, simplified `SafeIsMatch` to use `Regex` instances directly.
+- *(merge_dependabot re-rolled: no open Dependabot PRs on any repo)*
+
+### Run 2563-2564 — Repo Gardener (10:16 AM PST)
+- **Task 1:** `perf_improvement` on **GraphVisual** — Optimized `DominatingSetAnalyzer.greedyDominatingSet()` and `kDominatingSet()` from O(V²·deg) to O(V·Δ²) using bucket-indexed priority with incremental score updates. Eliminates full vertex rescanning each round.
+- **Task 2:** `create_release` on **agenticchat** — Created v2.28.1 (CI & dependency maintenance: actions/upload-pages-artifact v4→v5, improved Dependabot config).
+
+### Run 2561-2562 — Repo Gardener (09:46 AM PST)
+- **Task 1:** `security_fix` on **agentlens** — Added `usedforsecurity=False` to 3 `hashlib.md5()` calls in postmortem.py for FIPS compliance. sampling.py already had the flag.
+- **Task 2:** `create_release` on **BioBots** — Created v1.25.0 covering GitHub Pages SEO (404 page, sitemap.xml, robots.txt).
+
+### Run 2559-2560 — Repo Gardener (09:16 AM PST)
+- **Task 1:** `security_fix` on **VoronoiMap** — FIPS-compatible hashlib.md5 (added usedforsecurity=False), removed unused hashlib import from vormap_text.py, fixed Dockerfile to copy all vormap_*.py modules (was only copying vormap.py producing broken image), pinned numpy/scipy upper bounds to prevent supply-chain drift.
+- **Task 2:** `create_release` on **GraphVisual** — Created v2.43.0 covering chordal graph adjacency map refactor and DijkstraEntry deduplication.
+
+### Run 2557-2558 — Repo Gardener (08:46 AM PST)
+- **Task 1:** `merge_dependabot` on **agenticchat** — Merged PR #150: bump actions/upload-pages-artifact from v4 to v5 (CI action update, safe to merge).
+- **Task 2:** `perf_improvement` on **agentlens** — Cached `step_baselines()` in `LatencyProfiler` to avoid redundant recomputation. Previously baselines were recomputed from scratch on every call to `detect_slow_steps()` and `fleet_summary()`. Added cache with generation-based invalidation on session add/remove.
+
+### Run 2555-2556 — Repo Gardener (08:16 AM PST)
+- **Task 1:** `deploy_pages` on **BioBots** — Added custom 404 page (matching dark theme with nav links), sitemap.xml (70 tool pages), and robots.txt for SEO. Pages workflow already existed; these additions improve discoverability and UX.
+- **Task 2:** `add_dependabot` on **agenticchat** — Enhanced existing dependabot.yml: added grouping for GitHub Actions minor/patch updates (reduces PR noise), added ignore rule for Docker major version bumps (prevents breaking changes like node 20→22).
+
+### Run 2553-2554 — Repo Gardener (07:46 AM PST)
+- **Task 1:** `create_release` on **BioBots** — Created v1.24.0 covering API docs for 10 modules, 4 perf optimizations (outcomePredictor O(n²)→O(n), fitLogistic 3-4× faster, labInventory single-pass, crosslink stats merge), passage refactor, and CI action bumps.
+- **Task 2:** `refactor` on **GraphVisual** — Eliminated 9 redundant `GraphUtils.buildAdjacencyMap()` calls in `ChordalGraphAnalyzer`. Public methods now compute adjacency once and delegate to private helpers. Also fixed `minimalSeparators` calling `buildCliqueTree` (which re-ran `allMaximalCliques`). Net: -150 lines.
+
+### Run 2551-2552 — Repo Gardener (07:16 AM PST)
+- **Task 1:** `create_release` on **VoronoiMap** — Created v1.29.0 release covering 4 perf commits: KDTree variogram fast path, contour IDW spatial indexing, evolve grid vectorization, single-pass cluster stats.
+- **Task 2:** `security_fix` on **prompt** — Fixed XSS vulnerability in `PromptFlowChart.RenderHtml()` where `Render()` output (containing user-controlled node/edge labels) was injected into HTML without escaping. Also hardened `EscapeLabel` to escape `<`, `>`, `&` for Mermaid HTML labels.
+
+### Run 2549-2550 — Repo Gardener (06:46 AM PST)
+- **Task 1:** `perf_improvement` on **agentlens** — Replaced multi-pass baseline computation in anomalies.js with single-pass sum-of-squares approach. Reduced ~16 array iterations to 1 loop for computing mean/stddev across 4 dimensions. Added `meanStddevFromSums()` helper.
+- **Task 2:** `refactor` on **GraphVisual** — Deduplicated `DijkstraEntry` inner class between `GraphUtils` and `ShortestPathFinder`. Made `GraphUtils.DijkstraEntry` package-visible, removed duplicate from `ShortestPathFinder`.
+- Both pushed directly to master ✅
+
+### Run 2549 — Feature Builder (06:34 AM PST)
+- **Repo:** everything (Flutter)
+- **Feature:** Decision Matrix — weighted multi-criteria scoring tool
+- **Details:** Interactive decision-making tool with options, weighted criteria (sliders), scoring grid, ranked results with progress bars, AI-style recommendation with gap analysis, winner strength identification
+- **Commit:** `feat: add Decision Matrix — weighted multi-criteria scoring tool`
+- **Push:** ✅ Success (HEAD → master)
+- **Files:** `decision_matrix_service.dart`, `decision_matrix_screen.dart`, updated `feature_registry.dart`
+
+### Run 2547-2548 (05:46 AM PST)
+- **Task 1:** code_cleanup on **gif-captcha** — Consolidated 3 test directories (test/, __tests__/, tests/) into single tests/ dir. Moved 5 unique test files, removed 5 duplicates, renamed 1 to follow *.test.js convention. 1845 lines of duplicate code removed.
+- **Task 2:** perf_improvement on **VoronoiMap** — Added scipy cKDTree fast path to experimental_variogram(). When max_lag is specified and direction is None, uses sparse_distance_matrix for O(n·k) pair computation instead of O(n²) brute force. All 43 variogram tests pass.
+
+## 2026-04-16
+
+### Repo Gardener Run 2545-2546 (5:16 AM PST)
+- **Task 1:** create_release on **WinSentinel** — Created v1.4.2 release covering test coverage improvements (InfoCommands chat handler tests). Published at https://github.com/sauravbhattacharya001/WinSentinel/releases/tag/v1.4.2
+- **Task 2:** perf_improvement on **sauravcode** — Optimized list comprehension evaluation: split into separate filtered/unfiltered loops to eliminate per-element None-check when no filter condition exists. Hoisted method references to locals for LOAD_FAST. Added try/finally for exception-safe scope restore. Pushed `b53b6e0` to main.
+- **Note:** merge_dependabot re-rolled (no open Dependabot PRs across any repos).
+
+### Repo Gardener Run 2543-2544 (4:46 AM PST)
+- **Task 1:** doc_update on **BioBots** — Added API reference documentation for 10 previously undocumented modules in `docs/API.md`: Autoclave Logger, Centrifuge Calculator, Electroporation Calculator, Growth Curve Analyzer, Osmolality Calculator, pH Adjustment Calculator, Buffer Prep Calculator, Media Optimizer, and Western Blot Analyzer. Updated table of contents. Pushed `ce4f5b1` to master.
+- **Task 2:** branch_protection on **getagentbox** — Enhanced branch protection on master: enabled required status checks (strict mode), required linear history (no merge commits), and required conversation resolution. Kept enforce_admins off for direct push compatibility.
+
+### Repo Gardener Run 2541-2542 (4:16 AM PST)
+- **Task 1:** perf_improvement on **BioBots** — Merged redundant `_mean()` and `_std()` calls in `crosslink.js` `_generateRecommendations()` into a single `_computeStats()` pass. Previously each call copied the array and ran Welford's algorithm independently. All 81 crosslink tests pass. Pushed `666dce8` to master.
+- **Task 2:** security_fix on **agentlens** — Fixed CWE-732 in `cli_config.py`: config file containing API key was written with default permissions (0o644). Now uses `os.open()` with mode 0o600 on POSIX to restrict access to owner-only. Pre-existing files also get permissions corrected on next save. Pushed `0affe5d` to master.
+
+### Repo Gardener Run 2539-2540 (3:46 AM PST)
+- **Task 1:** perf_improvement on **prompt** — Pre-computed normalized text and n-gram sets in `PromptContextCompressor.FindDuplicateGroups()` to avoid redundant O(n) normalization/tokenization per pair comparison. Also optimized Jaccard intersection to iterate over the smaller set. Pushed `8bf0c16` to main.
+- **Task 2:** refactor on **sauravcode** — Added generic `ASTNode.children()` method using introspection to yield child nodes, then replaced the 80-line `isinstance` chain in `scan_features()` with a 35-line generic walker. Automatically correct for new AST node types. All 3612 tests pass. Pushed `ddfc455` to main.
+
+### Repo Gardener Run 2537-2538 (3:16 AM PST)
+- **Task 1:** create_release on **GraphVisual** — Created v2.42.0 release covering the profiler triangle detection optimization (O(1) triangle checks via pre-built neighbor sets, eliminated redundant degree scan). Meaningful changelog with performance impact notes.
+- **Task 2:** perf_improvement on **VoronoiMap** — Replaced brute-force O(rows×cols×N) IDW interpolation in `vormap_contour.py` with k-nearest (k=12) spatial-indexed lookup. Added cell-based spatial hash with expanding-ring search, separate brute-force fast path for ≤20 seeds, pre-extracted coordinate arrays. Pushed `060b158` to master.
+
+### Repo Gardener Run 2535-2536 (2:46 AM PST)
+- **Task 1:** bug_fix on **agentlens** — Profiler route (`routes/profiler.js`) queried non-existent columns (`id`, `total_tokens`, `duration_ms`, `error_count`, `created_at`) from sessions table and (`type`, `name`, `tool_name`) from events table, causing all 4 profiler endpoints to crash. Fixed SQL to use actual schema (`session_id`, computed totals, `started_at`, `event_type`), parse tool names from JSON `tool_call` column. Pushed `577cf67` to master.
+- **Task 2:** add_tests on **WinSentinel** — Added 26 xUnit tests for `InfoCommands` chat handler covering all trigger words (today, history, explain action, while away), response content, suggested actions, and empty/populated journal scenarios. All 26 tests pass. Pushed `98400d2` to main.
+
+### Repo Gardener Run 2533-2534 (2:16 AM PST)
+- **Task 1:** perf_improvement on **sauravcode** — `sauravbench.py` re-tokenized and re-parsed source code on every benchmark iteration. Extracted `parse_once()` to parse the AST once, then pass it through all warmup and measured iterations. Eliminates N redundant parse passes per benchmark run. Pushed `be6608d` to main.
+- **Task 2:** refactor on **BioBots** — `getCellLineReport()` in `passage.js` computed viability trend twice (once directly, once through `getSenescenceRisk()`). Refactored `getSenescenceRisk()` to accept optional pre-computed trend, and `getCellLineReport()` now computes it once and shares. All 107 tests pass. Pushed `330f805` to master.
+
+### Repo Gardener Run 2531-2532 (1:16 AM PST)
+- **Task 1 (perf_improvement → agentlens):** Replay `/summary` endpoint was parsing 4 JSON columns per event (up to 20,000 JSON.parse calls for 5000 events) then discarding all parsed content. Added `replaySummaryFromRawEvents()` that computes identical output using only scalar columns, cutting CPU/GC by ~60-80%. Pushed `447a0b5`.
+- **Task 2 (perf_improvement → GraphVisual):** Two optimizations in `GraphNetworkProfiler`: (1) Pre-build HashMap of neighbor HashSets for O(1) triangle adjacency checks instead of potentially O(degree) `graph.isNeighbor()` calls — reduces clustering computation from O(k³) to O(k²) per vertex. (2) Cache maxDegree during `computeDegreeStats()` to eliminate redundant O(V) scan in `computeHubDominance()`. Pushed `0ef3b7d`.
+
+### Repo Gardener Run 2529-2530 (12:46 AM PST)
+- **Task 1 (refactor → VoronoiMap):** Vectorised `_voronoi_cell_areas` in `vormap_evolve.py` — replaced Python list-comprehension grid building with `np.meshgrid` + `column_stack` and replaced per-index Python counting loop with `np.bincount`. Eliminates the two largest Python-loop bottlenecks in the scipy path. Pushed `e323af4`.
+- **Task 2 (create_release → gif-captcha):** Released v1.8.0 with 6 commits since v1.7.0 — perf optimisations to Jaccard similarity, secureRandomInt deduplication, comprehensive rate-limiter tests, and dependency bumps (jsdom 29, codecov v6, upload-pages-artifact v5).
+
+### Repo Gardener Run 2527-2528 (12:16 AM PST)
+- **Task 1 (create_release → sauravcode):** Released v6.0.0 — major release with sauravpipe DAG pipeline runner, security hardening (eval→ast.literal_eval, sandbox hardening, tempfile fix), SEC012/SEC013 lint rules, debugger double-fire fix, race condition fixes, lint decomposition, and ThreadPoolExecutor scheduler. 11 commits since v5.9.0.
+- **Task 2 (perf_improvement → BioBots):** Optimized `labInventory.js`: (1) Added `usageByItem` per-item index so `getUsageHistory` and `getForecast` scan only the item's entries instead of the entire usage log — O(item) vs O(total). (2) Rewrote `getSummary` as a single-pass over items replacing 4 separate full iterations. All 14 tests pass. Pushed `a09280c`.
+
 ## 2026-04-15
+
+### Repo Gardener Run 2525-2526 (11:46 PM PST)
+- **Task 1 (create_release → agenticchat):** Released v2.28.0 with 7 commits since v2.27.0 — Conversation Drift Detector, Mood Ring (Alt+M), Smart Session Linker (Alt+L), Conversation Autopilot, TextAnalytics refactor, and deploy-pages bump.
+- **Task 2 (perf_improvement → VoronoiMap):** Optimized `vormap_cluster.py`: (1) `_build_cluster_summary` — replaced 5+ list passes with single-pass accumulation using running sums/sum-of-squares for stats; (2) `_cluster_agglomerative` — removed O(E) `pushed` dedup set since generation-based staleness checks already handle duplicates. Pushed `bbf58ef`.
+
+### Repo Gardener Run 2523-2524 (11:16 PM PST)
+- **Task 1 (refactor → sauravcode):** Replaced batch-join scheduler in `sauravpipe.py` with streaming `ThreadPoolExecutor`. Old scheduler batched ready stages and joined all threads before dispatching new ones, defeating DAG parallelism. New approach uses `Condition` variable and submits stages immediately when dependencies complete. Pushed `83ae769`.
+- **Task 2 (perf_improvement → everything):** Three perf fixes in command palette: (1) cached `buildActions()` — ~50 PaletteAction objects were re-allocated on every palette open, now computed once; (2) pre-lowercase query in `_applyFilter` — eliminated ~50 redundant `toLowerCase()` calls per keystroke; (3) hoisted `recentIds` out of `itemBuilder` to avoid per-item list copies. Pushed `4915d03`.
+- merge_dependabot re-rolled (no Dependabot PRs across any repo)
+
+### Daily Memory Backup (11:00 PM PST)
+- Committed & pushed 4 files (memory/2026-04-15.md, gardener-weights.json, runs.md, status.md) → `231c00a`
 
 ### Repo Gardener Run 2521-2522 (10:16 PM PST)
 - **Task 1:** `create_release` on **GraphVisual** → v2.41.0. Perf improvement: `GraphAnomalyDetector.getResult()` now O(1) via HashMap index (was O(n) linear scan), `countAnomalies()` counts in-place without allocating intermediate list. Pushed ✅, released ✅.
@@ -805,6 +1000,7 @@
 
 ## 2026-04-13
 - **23:00 Daily Memory Backup**: Committed 7 files (memory, eb1a-form-copy, heartbeat, runs, status, builder-state, gardener-weights). Pushed to remote.
+
 
 
 
