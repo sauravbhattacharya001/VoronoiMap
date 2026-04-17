@@ -165,6 +165,13 @@ def build_roadmap(data, *, clip_to_bounds=True):
     roadmap.bounds = bounds
     roadmap.obstacle_points = obstacle_pts
 
+    # Build a KDTree for O(log n) nearest-obstacle queries instead
+    # of the previous O(n) brute-force distance computation per vertex.
+    # For V vertices and N obstacle points this reduces clearance
+    # computation from O(V*N) to O(V*log N).
+    from scipy.spatial import cKDTree
+    obstacle_tree = cKDTree(pts_array)
+
     # Build nodes from Voronoi vertices
     vertex_to_node = {}  # vor vertex index → roadmap node index
     for vi, (vx, vy) in enumerate(vor.vertices):
@@ -173,9 +180,9 @@ def build_roadmap(data, *, clip_to_bounds=True):
             if vx < west or vx > east or vy < south or vy > north:
                 continue
 
-        # Clearance = distance to nearest obstacle point
-        dists = np.sqrt(np.sum((pts_array - [vx, vy]) ** 2, axis=1))
-        clearance = float(np.min(dists))
+        # Clearance = distance to nearest obstacle point (O(log n) via KDTree)
+        clearance, _ = obstacle_tree.query([vx, vy])
+        clearance = float(clearance)
 
         node = RoadmapNode(vx, vy, clearance, len(roadmap.nodes))
         roadmap.nodes.append(node)
@@ -208,8 +215,31 @@ def build_roadmap(data, *, clip_to_bounds=True):
 
 # ── Pathfinding ──────────────────────────────────────────────────
 
-def _nearest_node(roadmap, x, y):
-    """Find the roadmap node closest to (x, y)."""
+def _build_node_tree(roadmap):
+    """Build a KDTree from roadmap nodes for O(log n) nearest lookups.
+
+    Returns (cKDTree, index_map) where index_map[i] is the roadmap
+    node index for tree point i.  Returns (None, None) if scipy is
+    unavailable or the roadmap has no nodes.
+    """
+    if not _HAS_SCIPY or not roadmap.nodes:
+        return None, None
+    from scipy.spatial import cKDTree
+    coords = np.array([(n.x, n.y) for n in roadmap.nodes])
+    idx_map = [n.index for n in roadmap.nodes]
+    return cKDTree(coords), idx_map
+
+
+def _nearest_node(roadmap, x, y, _tree=None, _idx_map=None):
+    """Find the roadmap node closest to (x, y).
+
+    When *_tree* (a cKDTree built from node coordinates) and *_idx_map*
+    are provided, uses an O(log n) query instead of the O(n) linear
+    scan.  This matters for large roadmaps and repeated queries.
+    """
+    if _tree is not None:
+        dist, ti = _tree.query([x, y])
+        return _idx_map[ti], float(dist)
     best_idx = -1
     best_dist = float('inf')
     for node in roadmap.nodes:
@@ -249,9 +279,14 @@ def find_path(roadmap, start, goal, *, mode='shortest'):
     if not roadmap.nodes:
         return result
 
+    # Build a KDTree once for O(log n) node snapping instead of 2×O(n)
+    node_tree, idx_map = _build_node_tree(roadmap)
+
     # Snap start and goal to nearest roadmap nodes
-    start_idx, start_dist = _nearest_node(roadmap, start[0], start[1])
-    goal_idx, goal_dist = _nearest_node(roadmap, goal[0], goal[1])
+    start_idx, start_dist = _nearest_node(roadmap, start[0], start[1],
+                                          _tree=node_tree, _idx_map=idx_map)
+    goal_idx, goal_dist = _nearest_node(roadmap, goal[0], goal[1],
+                                        _tree=node_tree, _idx_map=idx_map)
 
     result.start_node = start_idx
     result.goal_node = goal_idx
