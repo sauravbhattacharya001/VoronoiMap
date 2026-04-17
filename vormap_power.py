@@ -39,6 +39,12 @@ import math
 import json
 import random as _random
 
+try:
+    import numpy as np
+    _HAS_NUMPY = True
+except ImportError:
+    _HAS_NUMPY = False
+
 
 # ---------------------------------------------------------------------------
 # Weight assignment helpers
@@ -254,11 +260,42 @@ def batch_weighted_nn(points, seeds, weights, mode='power'):
     """Assign each point in *points* to its nearest weighted seed.
 
     Returns list of ``(index, seed, weighted_dist)`` tuples.
+
+    Uses numpy vectorization when available for O(P×S) with low constant
+    factor instead of per-point Python loops.
     """
     if not seeds:
         raise ValueError("seeds must not be empty")
     if len(seeds) != len(weights):
         raise ValueError("seeds and weights must have the same length")
+
+    # Vectorized path: compute all distances in one shot
+    if _HAS_NUMPY and len(points) >= 8:
+        pts = np.asarray(points, dtype=np.float64)      # (P, 2)
+        ss = np.asarray(seeds, dtype=np.float64)         # (S, 2)
+        ws = np.asarray(weights, dtype=np.float64)       # (S,)
+
+        # dx[i,j] = pts[i,0] - ss[j,0], etc.
+        dx = pts[:, 0:1] - ss[:, 0]  # (P, S)
+        dy = pts[:, 1:2] - ss[:, 1]  # (P, S)
+        dsq = dx * dx + dy * dy       # (P, S)
+
+        if mode == 'power':
+            wd = dsq - ws              # broadcast (S,) over (P, S)
+        elif mode == 'additive':
+            wd = np.sqrt(dsq) - ws
+        elif mode == 'multiplicative':
+            safe_ws = np.where(ws > 0, ws, np.inf)
+            wd = np.sqrt(dsq) / safe_ws
+        else:
+            raise ValueError(f"Unknown mode: {mode!r}")
+
+        best_idx = np.argmin(wd, axis=1)                 # (P,)
+        best_dist = wd[np.arange(len(pts)), best_idx]    # (P,)
+
+        return [(int(idx), tuple(ss[idx]), float(d))
+                for idx, d in zip(best_idx, best_dist)]
+
     return [compute_weighted_nn(p, seeds, weights, mode) for p in points]
 
 
@@ -332,22 +369,48 @@ def compute_power_regions(seeds, weights, mode='power', bounds=None,
     dx = (x_max - x_min) / resolution
     dy = (y_max - y_min) / resolution
 
-    # Assign each grid cell to nearest weighted seed
-    grid = []
-    for iy in range(resolution):
-        row = []
-        py = y_min + (iy + 0.5) * dy
-        for ix in range(resolution):
-            px = x_min + (ix + 0.5) * dx
-            best = 0
-            best_d = fn(px, py, seeds[0][0], seeds[0][1], weights[0])
-            for k in range(1, n):
-                d = fn(px, py, seeds[k][0], seeds[k][1], weights[k])
-                if d < best_d:
-                    best_d = d
-                    best = k
-            row.append(best)
-        grid.append(row)
+    # Assign each grid cell to nearest weighted seed — numpy vectorized
+    if _HAS_NUMPY:
+        gx = np.linspace(x_min + 0.5 * dx, x_max - 0.5 * dx, resolution)
+        gy = np.linspace(y_min + 0.5 * dy, y_max - 0.5 * dy, resolution)
+        gxx, gyy = np.meshgrid(gx, gy)                # (res, res)
+        flat_x = gxx.ravel()                           # (res²,)
+        flat_y = gyy.ravel()
+
+        ss = np.asarray(seeds, dtype=np.float64)       # (n, 2)
+        ws = np.asarray(weights, dtype=np.float64)     # (n,)
+
+        # dsq[i, k] = squared distance from grid point i to seed k
+        dxm = flat_x[:, None] - ss[:, 0]               # (res², n)
+        dym = flat_y[:, None] - ss[:, 1]
+        dsq = dxm * dxm + dym * dym
+
+        if mode == 'power':
+            wd = dsq - ws
+        elif mode == 'additive':
+            wd = np.sqrt(dsq) - ws
+        else:  # multiplicative
+            safe_ws = np.where(ws > 0, ws, np.inf)
+            wd = np.sqrt(dsq) / safe_ws
+
+        grid_flat = np.argmin(wd, axis=1)              # (res²,)
+        grid = grid_flat.reshape(resolution, resolution).tolist()
+    else:
+        grid = []
+        for iy in range(resolution):
+            row = []
+            py = y_min + (iy + 0.5) * dy
+            for ix in range(resolution):
+                px = x_min + (ix + 0.5) * dx
+                best = 0
+                best_d = fn(px, py, seeds[0][0], seeds[0][1], weights[0])
+                for k in range(1, n):
+                    d = fn(px, py, seeds[k][0], seeds[k][1], weights[k])
+                    if d < best_d:
+                        best_d = d
+                        best = k
+                row.append(best)
+            grid.append(row)
 
     # Extract region polygons via marching squares (convex hull of cells)
     regions = []
