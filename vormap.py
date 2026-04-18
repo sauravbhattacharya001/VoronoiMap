@@ -2909,6 +2909,10 @@ def _build_parser():
              'If a datafile is provided, points are pre-loaded.',
     )
 
+    # ── Spatial Sentinel ─────────────────────────────────────────
+    from vormap_sentinel import add_sentinel_args
+    add_sentinel_args(parser)
+
     return parser
 
 
@@ -3156,6 +3160,15 @@ def main():
         import vormap_playground
         out = vormap_playground.generate_playground(args.playground, data)
         print('Playground written to %s' % out)
+
+    # Spatial Sentinel
+    sentinel_requested = any([
+        getattr(args, 'sentinel_baseline', None),
+        getattr(args, 'sentinel_load_baseline', None),
+    ])
+    if sentinel_requested:
+        from vormap_sentinel import run_sentinel_cli
+        run_sentinel_cli(args, args.datafile)
 
 
 if __name__ == '__main__':
