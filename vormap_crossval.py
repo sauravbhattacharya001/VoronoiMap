@@ -115,6 +115,64 @@ def _get_interp_fn(method: str, points, values, power: float = 2.0):
     return fn
 
 
+def _idw_loo_fast(
+    points: List[Tuple[float, float]],
+    values: List[float],
+    power: float,
+) -> List[Tuple[float, float, float]]:
+    """Fast LOO cross-validation for IDW using analytical weight removal.
+
+    For each left-out point *i*, the IDW prediction from the remaining
+    n-1 points is:
+
+        pred_i = (sum_j!=i w_ij * v_j) / (sum_j!=i w_ij)
+
+    where w_ij = 1 / d(i,j)^p.  Instead of rebuilding the point list
+    each iteration, we precompute the full pairwise distance matrix and
+    derive each LOO prediction by subtracting point i's self-contribution
+    from the total weighted sums — O(n²) total with no list allocations.
+
+    Returns list of (observed, predicted, error) per point.
+    """
+    n = len(points)
+    results = []
+
+    # Precompute all pairwise inverse-distance weights: w[i][j] = 1/d^p
+    # For i==j the weight is 0 (self is excluded in LOO).
+    weights = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        xi, yi = points[i]
+        for j in range(i + 1, n):
+            dx = xi - points[j][0]
+            dy = yi - points[j][1]
+            d_sq = dx * dx + dy * dy
+            if d_sq < 1e-30:
+                # Coincident points: use very large weight
+                w = 1e15
+            else:
+                w = d_sq ** (-power / 2.0)
+            weights[i][j] = w
+            weights[j][i] = w
+
+    for i in range(n):
+        sum_w = 0.0
+        sum_wv = 0.0
+        for j in range(n):
+            if j == i:
+                continue
+            w = weights[i][j]
+            sum_w += w
+            sum_wv += w * values[j]
+
+        if sum_w < 1e-30:
+            continue
+        predicted = sum_wv / sum_w
+        observed = values[i]
+        results.append((observed, predicted, predicted - observed))
+
+    return results
+
+
 def cross_validate(
     points: List[Tuple[float, float]],
     values: List[float],
@@ -125,6 +183,9 @@ def cross_validate(
 
     Withholds each point in turn, interpolates its value from the
     remaining n-1 points, and computes prediction error metrics.
+
+    For IDW, uses an optimized O(n²) analytical weight-removal approach
+    that avoids n list copies and n interpolator reconstructions.
 
     Parameters
     ----------
@@ -163,31 +224,46 @@ def cross_validate(
     errors = []
     abs_errors = []
 
-    for i in range(n):
-        # Leave out point i
-        pts_loo = points[:i] + points[i + 1:]
-        vals_loo = values[:i] + values[i + 1:]
+    # Fast path for IDW: precompute pairwise weights, derive LOO
+    # predictions analytically without list slicing or re-instantiation.
+    if method == 'idw':
+        loo_results = _idw_loo_fast(points, values, power)
+        for idx, (observed, predicted, error) in enumerate(loo_results):
+            residuals.append({
+                'x': points[idx][0],
+                'y': points[idx][1],
+                'observed': observed,
+                'predicted': predicted,
+                'error': error,
+            })
+            errors.append(error)
+            abs_errors.append(abs(error))
+    else:
+        for i in range(n):
+            # Leave out point i
+            pts_loo = points[:i] + points[i + 1:]
+            vals_loo = values[:i] + values[i + 1:]
 
-        # Predict
-        interp_fn = _get_interp_fn(method, pts_loo, vals_loo, power=power)
-        try:
-            predicted = interp_fn(points[i])
-        except Exception:
-            # Skip points where interpolation fails (edge cases)
-            continue
+            # Predict
+            interp_fn = _get_interp_fn(method, pts_loo, vals_loo, power=power)
+            try:
+                predicted = interp_fn(points[i])
+            except Exception:
+                # Skip points where interpolation fails (edge cases)
+                continue
 
-        observed = values[i]
-        error = predicted - observed
+            observed = values[i]
+            error = predicted - observed
 
-        residuals.append({
-            'x': points[i][0],
-            'y': points[i][1],
-            'observed': observed,
-            'predicted': predicted,
-            'error': error,
-        })
-        errors.append(error)
-        abs_errors.append(abs(error))
+            residuals.append({
+                'x': points[i][0],
+                'y': points[i][1],
+                'observed': observed,
+                'predicted': predicted,
+                'error': error,
+            })
+            errors.append(error)
+            abs_errors.append(abs(error))
 
     elapsed = (time.perf_counter() - t0) * 1000
 
