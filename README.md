@@ -39,6 +39,10 @@ This repository contains personal context and workspace data. It is not intended
 - **Sub-agents**: Long-running tasks are delegated to sub-agents that report progress via `status.md` and log results to `runs.md`.
 - **Automated tasks**: Cron-triggered tasks (Repo Gardener, Builder, Sentinel) have their own task definition files with weights and instructions.
 
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
 ## Author
 
 [Saurav Bhattacharya](https://github.com/sauravbhattacharya001)
