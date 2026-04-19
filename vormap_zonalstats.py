@@ -168,7 +168,12 @@ def _std(values, mean):
 
 
 def _compute_zone_stats(values, percentiles=()):
-    """Compute aggregate statistics for a list of values."""
+    """Compute aggregate statistics for a list of values.
+
+    Sorts the values once and reuses the sorted list for median,
+    min, max, range, and all percentile computations — O(n log n)
+    total instead of O(k * n log n) where k = 1 + len(percentiles).
+    """
     if not values:
         result = {
             "count": 0,
@@ -184,20 +189,34 @@ def _compute_zone_stats(values, percentiles=()):
             result["p%d" % int(p)] = None
         return result
 
-    s = sum(values)
-    m = s / len(values)
+    sv = sorted(values)
+    n = len(sv)
+    s = sum(sv)
+    m = s / n
+
+    # Median from pre-sorted list
+    if n % 2 == 1:
+        med = sv[n // 2]
+    else:
+        med = (sv[n // 2 - 1] + sv[n // 2]) / 2.0
+
     result = {
-        "count": len(values),
+        "count": n,
         "sum": round(s, 6),
         "mean": round(m, 6),
-        "median": round(_median(values), 6),
-        "min": round(min(values), 6),
-        "max": round(max(values), 6),
+        "median": round(med, 6),
+        "min": round(sv[0], 6),
+        "max": round(sv[-1], 6),
         "std": round(_std(values, m), 6),
-        "range": round(max(values) - min(values), 6),
+        "range": round(sv[-1] - sv[0], 6),
     }
+    # Compute percentiles from the already-sorted list
     for p in percentiles:
-        result["p%d" % int(p)] = round(_percentile(values, p), 6)
+        k = (p / 100.0) * (n - 1)
+        lo = int(math.floor(k))
+        hi = min(lo + 1, n - 1)
+        frac = k - lo
+        result["p%d" % int(p)] = round(sv[lo] + frac * (sv[hi] - sv[lo]), 6)
     return result
 
 
