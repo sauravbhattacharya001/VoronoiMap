@@ -45,6 +45,19 @@
 - [Trend (`vormap_trend`)](#vormap_trend)
 - [Variogram (`vormap_variogram`)](#vormap_variogram)
 - [Viz (`vormap_viz`)](#vormap-viz)
+- [Automata (`vormap_automata`)](#vormap-automata)
+- [Benchmark (`vormap_benchmark`)](#vormap-benchmark)
+- [Buffer (`vormap_buffer`)](#vormap-buffer)
+- [Cartogram (`vormap_cartogram`)](#vormap-cartogram)
+- [Classify (`vormap_classify`)](#vormap-classify)
+- [Contour (`vormap_contour`)](#vormap-contour)
+- [Crossval (`vormap_crossval`)](#vormap-crossval)
+- [Delaunay (`vormap_delaunay`)](#vormap-delaunay)
+- [Diffusion (`vormap_diffusion`)](#vormap-diffusion)
+- [Forecast (`vormap_forecast`)](#vormap-forecast)
+- [Fractal (`vormap_fractal`)](#vormap-fractal)
+- [Gravity (`vormap_gravity`)](#vormap-gravity)
+- [Montecarlo (`vormap_montecarlo`)](#vormap-montecarlo)
 
 ---
 
@@ -1215,4 +1228,205 @@ Export per-cell watershed data as CSV.
 #### `main(argv: list = None)`
 
 Command-line interface.
+
+---
+
+## vormap_automata
+
+> Cellular Automata on Voronoi Tessellations.
+
+| Symbol | Description |
+|--------|-------------|
+| `StepSnapshot (class)` | State of the automaton at a single time step. |
+| `AutomatonResult (class)` | Full result of an automaton run. |
+| `build_automaton` | Initialize cell states for an automaton. |
+| `step` | Advance the automaton by one step. |
+| `run` | Run the automaton for multiple steps. |
+| `export_automata_json` | Export automaton result to JSON. |
+| `export_automata_csv` | Export per-step statistics to CSV. |
+| `export_automata_svg` | Export the automaton state as an SVG diagram. |
+| `format_report` | Generate a human-readable text report. |
+
+---
+
+## vormap_benchmark
+
+> Performance benchmark for VoronoiMap operations.
+
+| Symbol | Description |
+|--------|-------------|
+| `OperationTiming (class)` | Timing result for a single operation at a given point count. |
+| `BenchmarkReport (class)` | Full benchmark report across multiple sizes and operations. |
+| `run_benchmark` | Run the full benchmark suite. |
+| `format_report` | Format a benchmark report as a human-readable table. |
+| `export_json` | Export benchmark report to JSON. |
+| `export_csv` | Export benchmark report to CSV. |
+
+---
+
+## vormap_buffer
+
+> Buffer Zone Analysis for Voronoi point datasets.
+
+| Symbol | Description |
+|--------|-------------|
+| `BufferOverlap (class)` | Overlap between two point buffers. |
+| `BufferContainment (class)` | A point contained within another point's buffer zone. |
+| `RingZone (class)` | A single ring in a multi-ring buffer. |
+| `BufferReport (class)` | Results of buffer zone analysis. |
+| `analyze_buffers` | Run buffer zone analysis on a set of 2-D points. |
+| `print_buffer_report` | Pretty-print buffer analysis to stdout. |
+
+---
+
+## vormap_cartogram
+
+> Voronoi Cartogram — area-proportional region distortion.
+
+| Symbol | Description |
+|--------|-------------|
+| `cartogram` | Compute a Voronoi cartogram. |
+| `export_svg` | Export cartogram result to SVG. |
+| `export_json` | Export cartogram result to JSON. |
+| `format_report` | Return a human-readable summary of the cartogram result. |
+
+---
+
+## vormap_classify
+
+> Spatial data classification for choropleth mapping.
+
+| Symbol | Description |
+|--------|-------------|
+| `ClassificationResult (class)` | Result of a classification operation. |
+| `classify` | Classify values into discrete classes. |
+| `compare_methods` | Run multiple classification methods and compare results. |
+| `export_csv` | Export classification results to CSV. |
+
+---
+
+## vormap_contour
+
+> Contour line extraction from Voronoi cell values.
+
+| Symbol | Description |
+|--------|-------------|
+| `auto_levels` | Compute *n* evenly-spaced contour levels spanning the data range. |
+| `contour_length` | Total Euclidean length of a contour polyline. |
+| `extract_contours` | Trace contour lines from seed-associated scalar values. |
+| `contour_to_geojson` | Convert contour results to a GeoJSON FeatureCollection. |
+| `export_contour_svg` | Render contour lines as an SVG file. |
+| `generate_contours` | One-call pipeline: extract contours and export SVG + optional GeoJSON. |
+
+---
+
+## vormap_crossval
+
+> Leave-one-out cross-validation for spatial interpolation methods.
+
+| Symbol | Description |
+|--------|-------------|
+| `CrossValResult (class)` | Results from leave-one-out cross-validation of one method. |
+| `cross_validate` | Leave-one-out cross-validation for a single interpolation method. |
+| `compare_methods` | Run LOO cross-validation for multiple methods and rank by RMSE. |
+| `export_crossval_csv` | Export cross-validation results to CSV. |
+| `export_crossval_svg` | Export a bar chart comparing interpolation methods as SVG. |
+
+---
+
+## vormap_delaunay
+
+> Delaunay triangulation quality analysis for Voronoi tessellations.
+
+| Symbol | Description |
+|--------|-------------|
+| `delaunay_triangulate` | Compute the Delaunay triangulation of a 2D point set. |
+| `classify_triangle` | Classify a triangle's quality. |
+| `triangle_quality` | Compute quality metrics for a single triangle. |
+| `mesh_statistics` | Compute mesh-level quality statistics. |
+| `angle_spectrum` | Analyse the distribution of all interior angles. |
+| `edge_analysis` | Analyse edge-length distribution of the Delaunay mesh. |
+| `delaunay_quality` | Run the complete Delaunay quality analysis pipeline. |
+| `format_report` | Format a human-readable quality report. |
+| `export_json` | Export quality analysis to a JSON file. |
+
+---
+
+## vormap_diffusion
+
+> Spatial Diffusion Simulation over Voronoi Networks.
+
+| Symbol | Description |
+|--------|-------------|
+| `DiffusionFrame (class)` | Snapshot of the simulation at a single time step. |
+| `DiffusionResult (class)` | Full result of a diffusion simulation. |
+| `heat_diffusion` | Simulate heat equation diffusion on the Voronoi graph. |
+| `sir_simulation` | Simulate SIR epidemic model on the Voronoi graph. |
+| `threshold_diffusion` | Simulate threshold adoption model on the Voronoi graph. |
+| `export_diffusion_json` | Export diffusion result as JSON. |
+| `export_diffusion_csv` | Export diffusion result as CSV. |
+| `export_diffusion_svg` | Export diffusion simulation as animated SVG. |
+| `format_report` | Format a human-readable report of the diffusion simulation. |
+
+---
+
+## vormap_forecast
+
+> Spatial Point Pattern Forecaster — predict future distributions from history.
+
+| Symbol | Description |
+|--------|-------------|
+| `ForecastResult (class)` | Container for forecast output. |
+| `ForecastModel (class)` | Time-series spatial forecaster. |
+
+---
+
+## vormap_fractal
+
+> Fractal dimension analysis for Voronoi seed point patterns.
+
+| Symbol | Description |
+|--------|-------------|
+| `box_count` | Compute box-counting data for a set of 2D points. |
+| `lacunarity` | Compute lacunarity Λ(ε) via the gliding-box method. |
+| `correlation_dimension` | Grassberger-Procaccia correlation dimension D₂. |
+| `multifractal_spectrum` | Compute generalised Rényi dimensions D_q. |
+| `boundary_dimension` | Box-counting dimension of Voronoi cell boundaries. |
+| `fractal_analysis` | Run all fractal analyses on a point dataset. |
+| `format_report` | Format fractal analysis results as a human-readable text report. |
+| `export_json` | Export fractal analysis results to JSON. |
+
+---
+
+## vormap_gravity
+
+> Spatial Interaction & Gravity Model for Voronoi diagrams.
+
+| Symbol | Description |
+|--------|-------------|
+| `GravityModel (class)` | Supported gravity model variants. |
+| `GravityConfig (class)` | Configuration for a gravity model run. |
+| `Location (class)` | A spatial location with mass (attractiveness). |
+| `Flow (class)` | A directed interaction flow between two locations. |
+| `MarketArea (class)` | Huff-model market area for a destination. |
+| `AccessibilityScore (class)` | Hansen accessibility score for an origin. |
+| `GravityResult (class)` | Full gravity model analysis result. |
+| `gravity_analysis` | Run gravity model analysis on a set of locations. |
+| `gravity_analysis_from_stats` | Run gravity analysis using Voronoi region stats. |
+| `export_gravity_svg` | Export gravity analysis as an SVG visualisation. |
+| `export_gravity_json` | Export gravity analysis result as JSON. |
+| `export_gravity_csv` | Export flow list as CSV. |
+
+---
+
+## vormap_montecarlo
+
+> Monte Carlo Spatial Simulation for VoronoiMap.
+
+| Symbol | Description |
+|--------|-------------|
+| `MonteCarloResult (class)` | Combined results from a Monte Carlo spatial hypothesis test. |
+| `MonteCarloTest (class)` | Run Monte Carlo simulations to test a point pattern against CSR. |
+| `export_envelope_svg` | Export Ripley's L envelope as an SVG chart. |
+| `export_json` | Export Monte Carlo results as JSON. |
 
