@@ -7,12 +7,15 @@ steps:
     uses: actions/setup-python@v5
     with:
       python-version: "3.12"
+      cache: "pip"
 
   - name: Install dependencies
-    run: pip install -r requirements.txt
+    run: |
+      pip install -r requirements.txt
+      pip install -e .
 
   - name: Install dev tools
-    run: pip install flake8 pytest
+    run: pip install flake8 pytest pytest-cov
 
   - name: Create test data directory
     run: mkdir -p data
@@ -27,8 +30,11 @@ steps:
       150.0 750.0
       EOF
 
-  - name: Verify module imports
+  - name: Verify package install
     run: python -c "import vormap; print('vormap imported successfully')"
+
+  - name: Verify extension modules
+    run: python -c "from vormap_utils import *; print('utils OK')"
 
   - name: Run tests
     run: python -m pytest tests/ -v --tb=short
