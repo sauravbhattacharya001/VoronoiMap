@@ -1,0 +1,81 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:claude:acp:e9a0b9b8-6872-4a43-8ced-353646096a4e:oneshot:b674495b-5776-4c11-8fc2-a579c5fe766a",
+  "acp_session_id": "88e81e98-ae76-4275-b000-f78708013da4",
+  "agent_command": "npx -y @agentclientprotocol/claude-agent-acp@^0.25.0",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace",
+  "name": "agent:claude:acp:e9a0b9b8-6872-4a43-8ced-353646096a4e",
+  "created_at": "2026-04-18T23:22:39.635Z",
+  "last_used_at": "2026-04-18T23:23:01.250Z",
+  "last_seq": 0,
+  "last_request_id": "ed7aaf4a-9db9-4835-a04b-1ac1b86ced32",
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Aclaude%3Aacp%3Ae9a0b9b8-6872-4a43-8ced-353646096a4e%3Aoneshot%3Ab674495b-5776-4c11-8fc2-a579c5fe766a.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": true,
+  "closed_at": "2026-04-18T23:23:01.530Z",
+  "pid": 2908,
+  "agent_started_at": "2026-04-18T23:22:44.128Z",
+  "last_prompt_at": "2026-04-18T23:22:59.682Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "_meta": {
+      "claudeCode": {
+        "promptQueueing": true
+      }
+    },
+    "promptCapabilities": {
+      "image": true,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": true
+    },
+    "loadSession": true,
+    "sessionCapabilities": {
+      "fork": {},
+      "list": {},
+      "resume": {},
+      "close": {}
+    }
+  },
+  "title": null,
+  "messages": [
+    {
+      "User": {
+        "id": "6103b515-fa8d-4213-81cb-2c0b07133cb4",
+        "content": [
+          {
+            "Text": "[Sat 2026-04-18 16:22 PDT] Say \"Hello from Claude Code!\" and tell me what directory you're in and what files you see."
+          }
+        ]
+      }
+    }
+  ],
+  "updated_at": "2026-04-18T23:23:01.244Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {
+    "available_commands": [
+      "update-config",
+      "debug",
+      "simplify",
+      "batch",
+      "loop",
+      "schedule",
+      "claude-api",
+      "compact",
+      "context",
+      "heapdump",
+      "init",
+      "review",
+      "security-review",
+      "insights"
+    ]
+  }
+}

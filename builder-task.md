@@ -106,6 +106,30 @@ After each run, update builder-state.json:
 
 Clone to C:\Users\onlin\.openclaw\workspace\temp-builder, work there, push, clean up.
 
+### Using Codex for Implementation
+
+For the coding phase (step 2-5), spawn Codex as a sub-agent to do the actual implementation:
+
+```
+sessions_spawn with:
+  runtime: acp
+  agentId: codex
+  cwd: <cloned repo directory>
+  mode: run
+  task: "<detailed implementation prompt>"
+```
+
+Write a detailed prompt for Codex including:
+- What feature to build (be specific)
+- Which files to modify/create
+- The repo's language and framework
+- Build verification command to run before finishing
+- Existing test commands if any
+
+After Codex finishes, verify the changes yourself (build check, test, git diff review) before pushing.
+
+If Codex/ACP is unavailable (spawn fails), fall back to implementing directly with read/write/edit/exec.
+
 **Step-by-step:**
 1. Clone the repo
 2. Write your feature

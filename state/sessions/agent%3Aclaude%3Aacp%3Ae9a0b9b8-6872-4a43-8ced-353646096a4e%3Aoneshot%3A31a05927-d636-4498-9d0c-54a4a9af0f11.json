@@ -1,0 +1,50 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:claude:acp:e9a0b9b8-6872-4a43-8ced-353646096a4e:oneshot:31a05927-d636-4498-9d0c-54a4a9af0f11",
+  "acp_session_id": "952a86e1-ad3b-4868-b57f-f61ef4df0a89",
+  "agent_command": "npx -y @agentclientprotocol/claude-agent-acp@^0.25.0",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace",
+  "name": "agent:claude:acp:e9a0b9b8-6872-4a43-8ced-353646096a4e",
+  "created_at": "2026-04-18T23:32:25.463Z",
+  "last_used_at": "2026-04-18T23:32:25.463Z",
+  "last_seq": 0,
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Aclaude%3Aacp%3Ae9a0b9b8-6872-4a43-8ced-353646096a4e%3Aoneshot%3A31a05927-d636-4498-9d0c-54a4a9af0f11.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": false,
+  "pid": 4884,
+  "agent_started_at": "2026-04-18T23:31:48.185Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "_meta": {
+      "claudeCode": {
+        "promptQueueing": true
+      }
+    },
+    "promptCapabilities": {
+      "image": true,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": true
+    },
+    "loadSession": true,
+    "sessionCapabilities": {
+      "fork": {},
+      "list": {},
+      "resume": {},
+      "close": {}
+    }
+  },
+  "title": null,
+  "messages": [],
+  "updated_at": "2026-04-18T23:32:25.463Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {}
+}

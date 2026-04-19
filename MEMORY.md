@@ -107,6 +107,17 @@
 - Research focus: AI agent identity, accountability, governance
 - Organization: The New World Foundation, Bothell
 
+## Sub-Agent Discipline
+- **ALWAYS spawn sub-agents for long-running tasks** — installs, config changes, testing, anything >5 seconds
+- Keep main session responsive for Shubho at all times
+- Shubho has asked for this multiple times — non-negotiable
+
+## Agent Organization
+- Formalized in `TEAM.md` — the org chart, roster, and details for all 7 agents
+- Hierarchy: Shubho → Zalenix → Gardener/Builder/Digest/Backup/Profile → Codex
+- This structure scales — add new agents as roles, not rewrites
+- Shubho wants this maintained as the team grows
+
 ## Lessons Learned
 - Gmail compose URL is more reliable than clicking Compose button when browser automation is flaky
 - Chrome extension tab connections can drop on page changes — user needs to re-attach
