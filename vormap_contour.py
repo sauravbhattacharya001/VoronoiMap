@@ -91,13 +91,29 @@ def _march_squares(grid: list[list[float]], level: float,
 
     segments: list[tuple[tuple[float, float], tuple[float, float]]] = []
 
+    # Pre-compute edge transition table: for each marching-squares index
+    # (0-15), which two edges contain the contour crossing.
+    _EDGE_TABLE: list[tuple[int, ...]] = [() for _ in range(16)]
+    for _idx in range(1, 15):
+        if _idx in (5, 10):
+            continue  # saddle points handled separately
+        _edges: list[int] = []
+        for _bit in range(4):
+            if bool(_idx & (1 << _bit)) != bool(_idx & (1 << ((_bit + 1) % 4))):
+                _edges.append(_bit)
+        _EDGE_TABLE[_idx] = tuple(_edges)
+
     for r in range(rows):
+        grid_r = grid[r]
+        grid_r1 = grid[r + 1]
+        cy = y0 + r * dy
+        cy_dy = cy + dy
         for c in range(cols):
             # Four corners: BL, BR, TR, TL
-            bl = grid[r][c]
-            br = grid[r][c + 1]
-            tr = grid[r + 1][c + 1]
-            tl = grid[r + 1][c]
+            bl = grid_r[c]
+            br = grid_r[c + 1]
+            tr = grid_r1[c + 1]
+            tl = grid_r1[c]
 
             # Cell index (binary: TL TR BR BL)
             idx = 0
@@ -113,51 +129,47 @@ def _march_squares(grid: list[list[float]], level: float,
             if idx == 0 or idx == 15:
                 continue
 
-            # Edge interpolation points
+            # Edge interpolation points — inline to avoid closure overhead
             cx = x0 + c * dx
-            cy = y0 + r * dy
+            cx_dx = cx + dx
 
-            def _edge_point(side: int) -> tuple[float, float]:
+            # Compute all 4 edge points only when needed
+            def _ep(side: int) -> tuple[float, float]:
                 if side == 0:  # bottom: BL → BR
-                    t = _lerp(cx, cx + dx, bl, br, level)
+                    t = _lerp(cx, cx_dx, bl, br, level)
                     return (cx + t * dx, cy)
                 elif side == 1:  # right: BR → TR
-                    t = _lerp(cy, cy + dy, br, tr, level)
-                    return (cx + dx, cy + t * dy)
+                    t = _lerp(cy, cy_dy, br, tr, level)
+                    return (cx_dx, cy + t * dy)
                 elif side == 2:  # top: TL → TR
-                    t = _lerp(cx, cx + dx, tl, tr, level)
-                    return (cx + t * dx, cy + dy)
+                    t = _lerp(cx, cx_dx, tl, tr, level)
+                    return (cx + t * dx, cy_dy)
                 else:  # left: BL → TL
-                    t = _lerp(cy, cy + dy, bl, tl, level)
+                    t = _lerp(cy, cy_dy, bl, tl, level)
                     return (cx, cy + t * dy)
 
             # Saddle-point disambiguation (cases 5 and 10)
             if idx == 5:
-                center = (bl + br + tr + tl) / 4.0
+                center = (bl + br + tr + tl) * 0.25
                 if center >= level:
-                    segments.append((_edge_point(3), _edge_point(2)))
-                    segments.append((_edge_point(0), _edge_point(1)))
+                    segments.append((_ep(3), _ep(2)))
+                    segments.append((_ep(0), _ep(1)))
                 else:
-                    segments.append((_edge_point(3), _edge_point(0)))
-                    segments.append((_edge_point(2), _edge_point(1)))
+                    segments.append((_ep(3), _ep(0)))
+                    segments.append((_ep(2), _ep(1)))
             elif idx == 10:
-                center = (bl + br + tr + tl) / 4.0
+                center = (bl + br + tr + tl) * 0.25
                 if center >= level:
-                    segments.append((_edge_point(0), _edge_point(1)))
-                    segments.append((_edge_point(2), _edge_point(3)))
+                    segments.append((_ep(0), _ep(1)))
+                    segments.append((_ep(2), _ep(3)))
                 else:
-                    segments.append((_edge_point(0), _edge_point(3)))
-                    segments.append((_edge_point(2), _edge_point(1)))
+                    segments.append((_ep(0), _ep(3)))
+                    segments.append((_ep(2), _ep(1)))
             else:
-                # Standard cases — one segment per cell
-                edges = []
-                for bit in range(4):
-                    a_in = bool(idx & (1 << bit))
-                    b_in = bool(idx & (1 << ((bit + 1) % 4)))
-                    if a_in != b_in:
-                        edges.append(bit)
-                if len(edges) == 2:
-                    segments.append((_edge_point(edges[0]), _edge_point(edges[1])))
+                # Standard cases — use pre-computed edge table
+                et = _EDGE_TABLE[idx]
+                if len(et) == 2:
+                    segments.append((_ep(et[0]), _ep(et[1])))
 
     # Chain segments into polylines
     return _chain_segments(segments)
@@ -449,17 +461,21 @@ def _idw_grid(
             gcx = int(x * inv_cell)
             gcy = int(y * inv_cell)
             candidates: list[tuple[float, int]] = []  # (dist², idx)
+            seen: set[int] = set()
             radius = 1
             while len(candidates) < k_nearest and radius < 200:
                 for bx in range(gcx - radius, gcx + radius + 1):
                     for by in range(gcy - radius, gcy + radius + 1):
                         # Only scan the outer ring on expansions
                         if radius > 1 and (
-                            gcx - radius < bx < gcx + radius - 1 and
-                            gcy - radius < by < gcy + radius - 1
+                            gcx - radius + 1 <= bx <= gcx + radius - 1 and
+                            gcy - radius + 1 <= by <= gcy + radius - 1
                         ):
                             continue
                         for idx in bucket.get((bx, by), ()):
+                            if idx in seen:
+                                continue
+                            seen.add(idx)
                             ddx = x - sx_arr[idx]
                             ddy = y - sy_arr[idx]
                             candidates.append((ddx * ddx + ddy * ddy, idx))
