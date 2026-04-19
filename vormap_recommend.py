@@ -36,6 +36,9 @@ import sys
 from collections import namedtuple
 
 import vormap
+from vormap_utils import bounding_box, compute_nn_distances
+from vormap_hull import convex_hull
+from vormap_geometry import polygon_area as _polygon_area
 
 Recommendation = namedtuple("Recommendation", ["priority", "tool", "command", "reason"])
 
@@ -58,25 +61,17 @@ def _load_points(path):
 
 
 def _bounding_box(pts):
-    xs = [p[0] for p in pts]
-    ys = [p[1] for p in pts]
-    return min(xs), min(ys), max(xs), max(ys)
+    """Bounding box — delegates to shared vormap_utils.bounding_box."""
+    return bounding_box(pts)
 
 
 def _distances_to_nearest(pts):
-    """Brute-force nearest-neighbor distances (fine for <10k points)."""
-    n = len(pts)
-    dists = []
-    for i in range(n):
-        best = float("inf")
-        for j in range(n):
-            if i == j:
-                continue
-            d = math.hypot(pts[i][0] - pts[j][0], pts[i][1] - pts[j][1])
-            if d < best:
-                best = d
-        dists.append(best)
-    return dists
+    """Nearest-neighbor distances — delegates to shared vormap_utils.
+
+    Uses scipy KDTree (O(n log n)) when available via the shared
+    implementation, falling back to brute force O(n²) otherwise.
+    """
+    return compute_nn_distances(pts)
 
 
 def _hopkins_statistic(pts, m=None, seed=42):
@@ -133,34 +128,11 @@ def _nearest_neighbor_ratio(pts):
 
 
 def _convex_hull_area(pts):
-    """Convex hull area via the shoelace formula on a Graham scan hull."""
-    def cross(o, a, b):
-        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
-
-    pts_sorted = sorted(set(pts))
-    if len(pts_sorted) < 3:
+    """Convex hull area — delegates to shared vormap_hull module."""
+    if len(pts) < 3:
         return 0.0
-
-    lower = []
-    for p in pts_sorted:
-        while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
-            lower.pop()
-        lower.append(p)
-    upper = []
-    for p in reversed(pts_sorted):
-        while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
-            upper.pop()
-        upper.append(p)
-    hull = lower[:-1] + upper[:-1]
-
-    # Shoelace
-    area = 0.0
-    nh = len(hull)
-    for i in range(nh):
-        j = (i + 1) % nh
-        area += hull[i][0] * hull[j][1]
-        area -= hull[j][0] * hull[i][1]
-    return abs(area) / 2.0
+    result = convex_hull(pts)
+    return _polygon_area(result.vertices) if result.vertices else 0.0
 
 
 def recommend(path, top=None):
