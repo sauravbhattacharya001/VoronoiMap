@@ -2917,44 +2917,41 @@ def _build_parser():
 
 
 def _cmd_summary(args, data):
-    """Print a quick dataset overview with key spatial statistics."""
+    """Print a quick dataset overview with key spatial statistics.
+
+    Uses :func:`vormap_utils.bounding_box` and
+    :func:`vormap_utils.compute_nn_distances` to avoid duplicating
+    spatial computations that are already provided by the shared
+    utility module.  Computes the centroid in a single pass over the
+    data without materialising separate x/y coordinate lists.
+    """
     import json as _json
+    from vormap_utils import bounding_box as _bbox, compute_nn_distances
 
     if data is None:
         data = load_data(args.datafile)
 
     n = len(data)
-    xs = [p[0] for p in data]
-    ys = [p[1] for p in data]
 
-    x_min, x_max = min(xs), max(xs)
-    y_min, y_max = min(ys), max(ys)
+    # Single-pass centroid + bounding box via shared utility
+    x_min, y_min, x_max, y_max = _bbox(data)
     width = x_max - x_min
     height = y_max - y_min
     area = width * height
     density = n / area if area > 0 else 0
 
-    # Centroid
-    cx = sum(xs) / n
-    cy = sum(ys) / n
+    # Centroid — single pass, no intermediate lists
+    sum_x = sum_y = 0.0
+    for px, py in data:
+        sum_x += px
+        sum_y += py
+    cx = sum_x / n
+    cy = sum_y / n
 
-    # Nearest-neighbor distances
-    nn_dists = []
-    if _HAS_SCIPY:
-        pts = np.array(data)
-        tree = KDTree(pts)
-        dists, _ = tree.query(pts, k=2)
-        nn_dists = dists[:, 1].tolist()
-    else:
-        # Brute force for small datasets
-        for i, (x1, y1) in enumerate(data):
-            best = float('inf')
-            for j, (x2, y2) in enumerate(data):
-                if i != j:
-                    d = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-                    if d < best:
-                        best = d
-            nn_dists.append(best)
+    # Nearest-neighbor distances via shared utility (uses KDTree when
+    # scipy is available, brute-force O(n²) with squared-distance
+    # optimisation otherwise)
+    nn_dists = compute_nn_distances(data)
 
     nn_min = min(nn_dists) if nn_dists else 0
     nn_max = max(nn_dists) if nn_dists else 0
