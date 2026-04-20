@@ -1,0 +1,47 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:codex:acp:15af7459-a2a4-48b3-a900-442efb1a3b95:oneshot:f79fc27f-7b36-45fc-b05b-531d5c65cc11",
+  "acp_session_id": "019da69b-75a6-7c03-be8c-aa6ebb9cdb93",
+  "agent_command": "npx @zed-industries/codex-acp@^0.11.1",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+  "name": "agent:codex:acp:15af7459-a2a4-48b3-a900-442efb1a3b95",
+  "created_at": "2026-04-19T16:38:19.437Z",
+  "last_used_at": "2026-04-19T16:38:19.437Z",
+  "last_seq": 0,
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Acodex%3Aacp%3A15af7459-a2a4-48b3-a900-442efb1a3b95%3Aoneshot%3Af79fc27f-7b36-45fc-b05b-531d5c65cc11.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": false,
+  "pid": 10648,
+  "agent_started_at": "2026-04-19T16:38:15.831Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "loadSession": true,
+    "promptCapabilities": {
+      "image": true,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": false
+    },
+    "sessionCapabilities": {
+      "list": {},
+      "close": {}
+    },
+    "auth": {
+      "logout": {}
+    }
+  },
+  "title": null,
+  "messages": [],
+  "updated_at": "2026-04-19T16:38:19.437Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {}
+}

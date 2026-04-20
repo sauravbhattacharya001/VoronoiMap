@@ -1,0 +1,71 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:codex:acp:88725932-0dbd-491f-8dda-fc5ed5d87eae:oneshot:a47b0696-4bd4-4eeb-a43e-7b8efd463766",
+  "acp_session_id": "019da70c-c5b1-70b3-9f6c-8abb0e9c3e55",
+  "agent_command": "npx @zed-industries/codex-acp@^0.11.1",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+  "name": "agent:codex:acp:88725932-0dbd-491f-8dda-fc5ed5d87eae",
+  "created_at": "2026-04-19T18:41:59.051Z",
+  "last_used_at": "2026-04-19T18:42:13.968Z",
+  "last_seq": 0,
+  "last_request_id": "8d0bb4e6-373e-4e87-8683-57aa0efad9a9",
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Acodex%3Aacp%3A88725932-0dbd-491f-8dda-fc5ed5d87eae%3Aoneshot%3Aa47b0696-4bd4-4eeb-a43e-7b8efd463766.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": true,
+  "closed_at": "2026-04-19T18:42:14.146Z",
+  "pid": 16344,
+  "agent_started_at": "2026-04-19T18:42:00.622Z",
+  "last_prompt_at": "2026-04-19T18:42:05.421Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "loadSession": true,
+    "promptCapabilities": {
+      "image": true,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": false
+    },
+    "sessionCapabilities": {
+      "list": {},
+      "close": {}
+    },
+    "auth": {
+      "logout": {}
+    }
+  },
+  "title": null,
+  "messages": [
+    {
+      "User": {
+        "id": "c07326e0-f819-4b8b-ba05-2254b8e1f704",
+        "content": [
+          {
+            "Text": "[Sun 2026-04-19 11:41 PDT] Add a Security Correlation Engine CLI command (`--correlate`) to this WinSentinel C# project. This feature cross-correlates findings across different audit modules to surface compound/multi-vector risks that no single module would catch alone.\n\n## What to build\n\n### 1. Add `Correlate` to `CliCommand` enum in `src/WinSentinel.Cli/CliParser.cs`\nAdd `Correlate` before `Help` in the enum (line ~278). Also add these options to `CliOptions`:\n```csharp\npublic int CorrelateMinModules { get; set; } = 2;\npublic string? CorrelateSeverityFilter { get; set; }\npublic int CorrelateTop { get; set; } = 15;\n```\n\n### 2. Add CLI parsing in `CliParser.cs`\nIn the `Parse` method's switch statement, add:\n```csharp\n\"--correlate\" => CliCommand.Correlate,\n```\nAnd parse `--correlate-min-modules`, `--correlate-severity`, `--correlate-top` options.\n\nFind where other similar commands are parsed (search for `--cluster` or `--genome` patterns) and follow the exact same style.\n\n### 3. Add `ConsoleFormatter.Correlate.cs`\nCreate `src/WinSentinel.Cli/ConsoleFormatter.Correlate.cs` as a partial class extension. Follow the EXACT style of `ConsoleFormatter.Cluster.cs` or `ConsoleFormatter.Genome.cs`.\n\nThe formatter should display:\n- A header box: \"🔗 Security Correlation Engine\"\n- Summary stats (total findings, modules analyzed, correlations found, compound risks)\n- For each correlation:\n  - Correlation name (e.g., \"Weak Auth + Open Ports\", \"Missing Updates + Disabled Firewall\")\n  - Modules involved (listed)\n  - Contributing findings from each module\n  - Compound risk level (Elevated/High/Critical) based on combined severity\n  - Risk narrative explaining WHY these findings together are worse than individually\n  - Recommended action\n\n### 4. Add handler in `src/WinSentinel.Cli/Program.cs`\n\nAdd to the switch expression (around line 81):\n```csharp\nCliCommand.Correlate => await HandleCorrelate(options),\n```\n\nAdd the `HandleCorrelate` method. Follow the pattern of `HandleCluster`:\n1. Run audit via `RunAuditAsync`\n2. Get all findings with their module names\n3. Apply severity/module filters\n4. Run correlation logic\n5. Output via ConsoleFormatter or JSON\n\n### 5. Correlation Logic (in HandleCorrelate or a helper)\n\nDefine ~12 correlation rules as a static list. Each rule has:\n- Name (string)\n- RequiredModulePatterns (list of module name substrings to match)\n- FindingPatterns (list of keyword patterns to match in finding titles)\n- CompoundRiskLevel (string)\n- Narrative (string template explaining the compound risk)\n- Action (recommended fix)\n\nExample rules:\n1. \"Weak Authentication + Network Exposure\" - auth findings + network/firewall findings → Critical\n2. \"Missing Updates + Disabled Antivirus\" - update findings + AV findings → Critical\n3. \"Excessive Permissions + Audit Gaps\" - permission findings + audit/logging findings → High\n4. \"Encryption Weakness + Data Exposure\" - encryption/TLS findings + share/data findings → Critical\n5. \"Service Misconfiguration + Missing Patches\" - service findings + update findings → High\n6. \"Weak Passwords + Remote Access\" - password findings + RDP/remote findings → Critical\n7. \"Firewall Gaps + Running Services\" - firewall findings + service findings → High\n8. \"Missing Backups + Ransomware Risk\" - backup findings + update/AV findings → High\n9. \"Privilege Escalation Path\" - UAC/admin findings + service permission findings → Critical\n10. \"Supply Chain Risk\" - unsigned/unverified findings + autorun findings → High\n11. \"Lateral Movement Enablers\" - share/SMB findings + weak auth findings → Critical\n12. \"Compliance Gap Cluster\" - multiple policy violation findings across 3+ modules → Elevated\n\nFor matching: check if findings from the required modules exist AND if any finding titles contain the keyword patterns. A correlation fires if at least 2 modules contribute matching findings.\n\nAlso add a \"Proactive Recommendations\" section at the bottom with prioritized actions based on which correlations fired.\n\n### 6. JSON output\nWhen `--json` is passed, output structured JSON with correlations array.\n\n### 7. Help text\nAdd `--correlate` to the help text in the help handler. Search for where `--genome` or `--cluster` help text is and add similar lines.\n\n## Build verification\nAfter all changes, run: `dotnet build --no-restore -q` from the repo root. Fix any errors.\n\n## Important\n- This is a C# .NET project\n- All formatters are partial classes of `ConsoleFormatter`\n- Use `Console.ForegroundColor` for colors (same as other formatters)\n- Follow the EXACT coding style of existing files\n- Do NOT create any new projects or add NuGet packages"
+          }
+        ]
+      }
+    }
+  ],
+  "updated_at": "2026-04-19T18:42:05.445Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {
+    "available_commands": [
+      "review",
+      "review-branch",
+      "review-commit",
+      "init",
+      "compact",
+      "undo",
+      "logout"
+    ]
+  }
+}

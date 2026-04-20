@@ -1,0 +1,71 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:codex:acp:40e30dd0-9488-4364-b2ca-00ab1d380d8c:oneshot:694be70d-4d22-41cb-a872-a93e156e9e1c",
+  "acp_session_id": "019da84d-125f-7092-af49-3e1c1a69dc3b",
+  "agent_command": "npx @zed-industries/codex-acp@^0.11.1",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+  "name": "agent:codex:acp:40e30dd0-9488-4364-b2ca-00ab1d380d8c",
+  "created_at": "2026-04-20T00:31:50.774Z",
+  "last_used_at": "2026-04-20T00:32:04.320Z",
+  "last_seq": 0,
+  "last_request_id": "d43740b3-77ef-4d11-971e-d12f52ca331c",
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Acodex%3Aacp%3A40e30dd0-9488-4364-b2ca-00ab1d380d8c%3Aoneshot%3A694be70d-4d22-41cb-a872-a93e156e9e1c.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": true,
+  "closed_at": "2026-04-20T00:32:04.480Z",
+  "pid": 14108,
+  "agent_started_at": "2026-04-20T00:31:52.743Z",
+  "last_prompt_at": "2026-04-20T00:31:56.717Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "loadSession": true,
+    "promptCapabilities": {
+      "image": true,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": false
+    },
+    "sessionCapabilities": {
+      "list": {},
+      "close": {}
+    },
+    "auth": {
+      "logout": {}
+    }
+  },
+  "title": null,
+  "messages": [
+    {
+      "User": {
+        "id": "bb72879a-f398-470e-bf63-95e255d2dd04",
+        "content": [
+          {
+            "Text": "[Sun 2026-04-19 17:31 PDT] Create a new BioBots SDK module: Lab Anomaly Correlator (`docs/shared/anomalyCorrelator.js`). This is an autonomous cross-module correlation engine that detects patterns across lab events to find root causes.\n\n## What it does\n\nThe module exports `createAnomalyCorrelator` factory. The correlator:\n\n1. **Ingests events** from different lab modules (contamination, viability, equipment, environment, print quality)\n2. **Detects temporal correlations** — events close in time across modules suggest shared root cause\n3. **Builds a correlation graph** — nodes are events, edges are correlations with strength scores\n4. **Identifies root cause candidates** — events with highest outgoing correlation (most likely upstream cause)\n5. **Generates recommendations** — proactive actions based on correlation patterns\n6. **Severity scoring** — compound severity when multiple anomalies correlate\n\n## API Design\n\n```js\nvar correlator = createAnomalyCorrelator(options);\n// options: { timeWindowMs: 3600000, minCorrelation: 0.3 }\n\n// Add events from different modules\ncorrelator.addEvent({\n  id: 'evt-1',\n  module: 'contamination',  // contamination|viability|equipment|environment|printQuality\n  type: 'bacterial_detected',\n  severity: 0.8,           // 0-1\n  timestamp: Date.now(),\n  metadata: { organism: 'E.coli', location: 'Bay 3' }\n});\n\n// Run correlation analysis\nvar report = correlator.analyze();\n// Returns:\n// {\n//   correlations: [{ eventA, eventB, strength, timeGap, pattern }],\n//   rootCauses: [{ event, confidence, affectedEvents, explanation }],\n//   clusters: [{ id, events, compoundSeverity, pattern }],\n//   recommendations: [{ priority, action, reasoning, relatedCluster }],\n//   summary: { totalEvents, totalCorrelations, clustersFound, highestSeverity }\n// }\n\n// Get events for a specific module\ncorrelator.getEvents(module);\n\n// Clear all events\ncorrelator.clear();\n\n// Get correlation between two specific events\ncorrelator.getCorrelation(eventIdA, eventIdB);\n```\n\n## Correlation Rules (implement these)\n\n1. **Temporal proximity** — events within timeWindowMs are candidates\n2. **Module cross-correlation** — known causal patterns:\n   - environment anomaly → contamination (humidity/temp changes cause contamination)\n   - equipment malfunction → printQuality drop\n   - contamination → viability drop\n   - environment anomaly → viability drop  \n   - equipment → environment (broken HVAC → temp change)\n3. **Cascade detection** — A→B→C chains where A is root cause\n4. **Severity amplification** — compound severity = 1 - product(1 - severity_i) for correlated cluster\n5. **Pattern matching** — repeated co-occurrences of same module pairs increase correlation strength\n\n## Recommendations engine\n\nBased on detected patterns, generate actionable recommendations:\n- If environment→contamination: \"Check HVAC filters and room pressurization\"\n- If equipment→printQuality: \"Schedule equipment maintenance and recalibration\"\n- If contamination→viability: \"Initiate decontamination protocol for affected area\"\n- If cascade detected: \"Address root cause [X] to prevent downstream effects\"\n- If recurring pattern: \"Implement preventive monitoring for [module] anomalies\"\n\n## Technical requirements\n\n- Pure JavaScript (Node.js), no external dependencies\n- CommonJS module (module.exports)\n- Follow same coding style as other BioBots modules in docs/shared/\n- Include JSDoc comments\n- Input validation with helpful error messages\n- The factory function should be exported as `createAnomalyCorrelator`\n\n## Also do these:\n\n1. **Register in index.js** — Add to the manifest array:\n   ```js\n   ['createAnomalyCorrelator', './docs/shared/anomalyCorrelator', 'createAnomalyCorrelator'],\n   ```\n\n2. **Add an interactive HTML page** at `Try/scripts/anomalyCorrelator.js` that creates a browser-based dashboard for the correlator. It should:\n   - Have a form to add events (module dropdown, type, severity slider, timestamp)\n   - Show a visual correlation graph (use Canvas API - nodes as circles, edges as lines with thickness = strength)\n   - Display root cause analysis results\n   - Show recommendations panel\n   - Have \"Generate Sample Data\" button that creates ~15 realistic events across modules\n   - Include cluster visualization\n   - Dark/light theme support\n\n3. **Link the page in Try/index.html** if it exists (or just make the JS self-contained)\n\n## Verification\n\nAfter writing all files, run: `node -c docs/shared/anomalyCorrelator.js && node -c index.js && node -c Try/scripts/anomalyCorrelator.js`\n\nAlso run: `node -e \"var m = require('./docs/shared/anomalyCorrelator'); var c = m.createAnomalyCorrelator(); c.addEvent({id:'t1',module:'environment',type:'temp_spike',severity:0.7,timestamp:Date.now()-1000,metadata:{}}); c.addEvent({id:'t2',module:'contamination',type:'bacterial',severity:0.8,timestamp:Date.now(),metadata:{}}); var r = c.analyze(); console.log('correlations:', r.correlations.length, 'rootCauses:', r.rootCauses.length, 'OK');\""
+          }
+        ]
+      }
+    }
+  ],
+  "updated_at": "2026-04-20T00:31:56.714Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {
+    "available_commands": [
+      "review",
+      "review-branch",
+      "review-commit",
+      "init",
+      "compact",
+      "undo",
+      "logout"
+    ]
+  }
+}

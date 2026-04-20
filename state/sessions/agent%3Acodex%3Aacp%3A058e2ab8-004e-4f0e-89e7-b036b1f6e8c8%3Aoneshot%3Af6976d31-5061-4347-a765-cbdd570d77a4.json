@@ -1,0 +1,71 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:codex:acp:058e2ab8-004e-4f0e-89e7-b036b1f6e8c8:oneshot:f6976d31-5061-4347-a765-cbdd570d77a4",
+  "acp_session_id": "019da8f4-53e6-75d2-87eb-55f6d7480fda",
+  "agent_command": "npx @zed-industries/codex-acp@^0.11.1",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+  "name": "agent:codex:acp:058e2ab8-004e-4f0e-89e7-b036b1f6e8c8",
+  "created_at": "2026-04-20T03:34:32.689Z",
+  "last_used_at": "2026-04-20T03:34:46.338Z",
+  "last_seq": 0,
+  "last_request_id": "19ec9df0-c2c3-4c97-85b9-e030bb5b9e7d",
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Acodex%3Aacp%3A058e2ab8-004e-4f0e-89e7-b036b1f6e8c8%3Aoneshot%3Af6976d31-5061-4347-a765-cbdd570d77a4.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": true,
+  "closed_at": "2026-04-20T03:34:46.516Z",
+  "pid": 12260,
+  "agent_started_at": "2026-04-20T03:34:34.412Z",
+  "last_prompt_at": "2026-04-20T03:34:37.869Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "loadSession": true,
+    "promptCapabilities": {
+      "image": true,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": false
+    },
+    "sessionCapabilities": {
+      "list": {},
+      "close": {}
+    },
+    "auth": {
+      "logout": {}
+    }
+  },
+  "title": null,
+  "messages": [
+    {
+      "User": {
+        "id": "48fc38c2-8aa8-4d2a-9be2-6d0ce616ff5a",
+        "content": [
+          {
+            "Text": "[Sun 2026-04-19 20:34 PDT] Add a new \"Security Mission Planner\" CLI command (--mission) to WinSentinel. This is a C# .NET project.\n\n## What it does\nAn autonomous goal-oriented security improvement planner that:\n1. Analyzes current security posture from audit history\n2. Identifies weakest modules and biggest improvement opportunities\n3. Generates a phased mission plan with specific, actionable objectives\n4. Estimates effort and impact for each objective\n5. Provides proactive recommendations and a mission briefing\n\n## Files to modify\n\n### 1. `src/WinSentinel.Cli/CliParser.cs`\n- Add `Mission` to the `CliCommand` enum (after `Drift`)\n- Add `MissionDays`, `MissionTarget`, `MissionPhases` properties to `CliOptions`:\n  - `public int MissionDays { get; set; } = 90;`\n  - `public int MissionTarget { get; set; } = 0; // 0 = auto-calculate`\n  - `public int MissionPhases { get; set; } = 3;`\n- Add parser cases in the switch statement (after the drift cases, before default):\n  ```\n  case \"--mission\":\n  case \"mission\":\n      options.Command = CliCommand.Mission;\n      break;\n  case \"--mission-days\":\n      // parse int, clamp 7-365\n  case \"--mission-target\":\n      // parse int, clamp 0-100\n  case \"--mission-phases\":\n      // parse int, clamp 1-5\n  ```\n\n### 2. `src/WinSentinel.Cli/Program.cs`\n- Add `CliCommand.Mission => await HandleMission(options),` to the switch (after Drift)\n- Add `HandleMission` method. Pattern follows other handlers like HandleRadar/HandleGenome.\n\nThe HandleMission method should:\n```csharp\nstatic async Task<int> HandleMission(CliOptions options)\n{\n    // 1. Get audit history\n    using var history = new AuditHistoryService();\n    history.EnsureDatabase();\n    var runs = history.GetHistory(options.MissionDays);\n    \n    if (runs.Count == 0) { warn and return 1; }\n    \n    // 2. Analyze current state\n    var latest = runs.OrderByDescending(r => r.Timestamp).First();\n    var earliest = runs.OrderBy(r => r.Timestamp).First();\n    \n    // 3. Calculate target score (auto = current + weighted improvement)\n    var currentScore = latest.OverallScore;\n    var targetScore = options.MissionTarget > 0 ? options.MissionTarget \n        : Math.Min(100, currentScore + Math.Max(10, (100 - currentScore) / 2));\n    \n    // 4. Identify weak modules and build objectives\n    // For each module, calculate: current score, trend (improving/declining/stable),\n    // gap to 100, improvement potential, priority rank\n    \n    // 5. Generate phased mission plan\n    // Phase 1: Quick Wins (high impact, low effort - modules close to next tier)\n    // Phase 2: Core Hardening (medium effort, high impact - weakest modules)\n    // Phase 3: Excellence Push (remaining gaps to reach target)\n    \n    // 6. For each objective, generate specific actions based on findings\n    \n    // 7. Output as console or JSON\n}\n```\n\nFor the console output, write directly with Console.Write/Console.WriteLine using ANSI colors (like other handlers do). Include:\n- Mission briefing header with codename (generate from date hash)\n- Current vs target score with ASCII progress bar\n- Module ranking table showing: Module | Score | Trend | Gap | Priority\n- Phased plan with objectives per phase\n- Estimated timeline\n- Proactive recommendations section\n\nFor JSON output (when options.Json is true), serialize a structured report object.\n\nMission codenames: generate from a list like [\"IRON_SHIELD\", \"STEEL_GATE\", \"DARK_FORTRESS\", \"SILENT_GUARDIAN\", \"FROST_WALL\", \"THUNDER_LOCK\", \"SHADOW_VAULT\", \"EAGLE_EYE\", \"WOLF_PACK\", \"STORM_BREAK\"] picked by (DateTime.Now.DayOfYear % 10).\n\n### 3. `src/WinSentinel.Cli/ConsoleFormatter.cs`\n- Add the --mission entry to the PrintHelp method's help text section, grouped with other analysis commands.\n  Find where --drift is listed in help and add after it:\n  ```\n  --mission              Generate goal-oriented security improvement plan\n    --mission-days N     Analysis period (default: 90)\n    --mission-target N   Target score 0-100 (0 = auto-calculate)\n    --mission-phases N   Number of plan phases 1-5 (default: 3)\n  ```\n\n## Build verification\nAfter making changes, run: `dotnet build --no-restore -q` in the repo root to verify compilation.\nIf it fails, fix the errors and rebuild.\n\n## Important patterns\n- Use `WriteOutput(json, options.OutputFile)` for JSON output (it's a helper already in Program.cs)\n- Use `AuditHistoryService` from `WinSentinel.Core.Services` namespace  \n- `history.GetHistory(days)` returns `List<AuditRun>` with `.Timestamp`, `.OverallScore`, `.ModuleScores` (list of objects with `.ModuleName` and `.Score`)\n- `options.Json` controls JSON vs console output\n- `options.OutputFile` for file output\n- `options.Quiet` for minimal output\n- Follow the exact same patterns as HandleRadar, HandleGenome, HandleDrift etc.\n- DO NOT add any new NuGet packages\n\n## Git\nAfter building successfully:\n```\ngit add -A\ngit commit -m \"feat: add Security Mission Planner (--mission) - goal-oriented improvement planning\n\nAutonomous security improvement planner that analyzes posture history,\nidentifies weakest modules, and generates phased mission plans with\nspecific objectives, effort estimates, and proactive recommendations.\n\nOptions: --mission-days, --mission-target, --mission-phases\nSupports JSON output with --json and file output with -o\"\ngit push origin HEAD:main\n```"
+          }
+        ]
+      }
+    }
+  ],
+  "updated_at": "2026-04-20T03:34:37.907Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {
+    "available_commands": [
+      "review",
+      "review-branch",
+      "review-commit",
+      "init",
+      "compact",
+      "undo",
+      "logout"
+    ]
+  }
+}
