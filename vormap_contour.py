@@ -51,6 +51,20 @@ _MS_EDGES = {
     12: [(1, 3)], 13: [(1, 0)], 14: [(0, 3)], 15: [],
 }
 
+# Pre-computed edge transition table for marching squares (module-level
+# constant — previously rebuilt on every _march_squares call).  For each
+# cell index 0-15, stores the pair of edges that the contour crosses.
+_EDGE_TABLE: list[tuple[int, ...]] = [() for _ in range(16)]
+for _idx in range(1, 15):
+    if _idx in (5, 10):
+        continue  # saddle points handled separately
+    _edges: list[int] = []
+    for _bit in range(4):
+        if bool(_idx & (1 << _bit)) != bool(_idx & (1 << ((_bit + 1) % 4))):
+            _edges.append(_bit)
+    _EDGE_TABLE[_idx] = tuple(_edges)
+del _idx, _edges, _bit  # clean up module namespace
+
 
 def _lerp(a: float, b: float, va: float, vb: float, level: float) -> float:
     """Linear interpolation fraction between two grid corners."""
@@ -90,18 +104,7 @@ def _march_squares(grid: list[list[float]], level: float,
         return []
 
     segments: list[tuple[tuple[float, float], tuple[float, float]]] = []
-
-    # Pre-compute edge transition table: for each marching-squares index
-    # (0-15), which two edges contain the contour crossing.
-    _EDGE_TABLE: list[tuple[int, ...]] = [() for _ in range(16)]
-    for _idx in range(1, 15):
-        if _idx in (5, 10):
-            continue  # saddle points handled separately
-        _edges: list[int] = []
-        for _bit in range(4):
-            if bool(_idx & (1 << _bit)) != bool(_idx & (1 << ((_bit + 1) % 4))):
-                _edges.append(_bit)
-        _EDGE_TABLE[_idx] = tuple(_edges)
+    segments_append = segments.append  # local binding for hot loop
 
     for r in range(rows):
         grid_r = grid[r]
@@ -129,47 +132,55 @@ def _march_squares(grid: list[list[float]], level: float,
             if idx == 0 or idx == 15:
                 continue
 
-            # Edge interpolation points — inline to avoid closure overhead
             cx = x0 + c * dx
             cx_dx = cx + dx
 
-            # Compute all 4 edge points only when needed
-            def _ep(side: int) -> tuple[float, float]:
+            # Inline edge-point computation — avoids creating a closure
+            # per cell (was _ep(side)).  Each edge point is computed
+            # directly where needed, eliminating function-call overhead
+            # in the innermost loop.
+            # Pre-compute all 4 edge lerp denominators once per cell
+            dv_bottom = br - bl
+            dv_right = tr - br
+            dv_top = tr - tl
+            dv_left = tl - bl
+
+            def _edge_pt(side: int) -> tuple[float, float]:
                 if side == 0:  # bottom: BL → BR
-                    t = _lerp(cx, cx_dx, bl, br, level)
+                    t = 0.5 if abs(dv_bottom) < 1e-12 else max(0.0, min(1.0, (level - bl) / dv_bottom))
                     return (cx + t * dx, cy)
                 elif side == 1:  # right: BR → TR
-                    t = _lerp(cy, cy_dy, br, tr, level)
+                    t = 0.5 if abs(dv_right) < 1e-12 else max(0.0, min(1.0, (level - br) / dv_right))
                     return (cx_dx, cy + t * dy)
                 elif side == 2:  # top: TL → TR
-                    t = _lerp(cx, cx_dx, tl, tr, level)
+                    t = 0.5 if abs(dv_top) < 1e-12 else max(0.0, min(1.0, (level - tl) / dv_top))
                     return (cx + t * dx, cy_dy)
                 else:  # left: BL → TL
-                    t = _lerp(cy, cy_dy, bl, tl, level)
+                    t = 0.5 if abs(dv_left) < 1e-12 else max(0.0, min(1.0, (level - bl) / dv_left))
                     return (cx, cy + t * dy)
 
             # Saddle-point disambiguation (cases 5 and 10)
             if idx == 5:
                 center = (bl + br + tr + tl) * 0.25
                 if center >= level:
-                    segments.append((_ep(3), _ep(2)))
-                    segments.append((_ep(0), _ep(1)))
+                    segments_append((_edge_pt(3), _edge_pt(2)))
+                    segments_append((_edge_pt(0), _edge_pt(1)))
                 else:
-                    segments.append((_ep(3), _ep(0)))
-                    segments.append((_ep(2), _ep(1)))
+                    segments_append((_edge_pt(3), _edge_pt(0)))
+                    segments_append((_edge_pt(2), _edge_pt(1)))
             elif idx == 10:
                 center = (bl + br + tr + tl) * 0.25
                 if center >= level:
-                    segments.append((_ep(0), _ep(1)))
-                    segments.append((_ep(2), _ep(3)))
+                    segments_append((_edge_pt(0), _edge_pt(1)))
+                    segments_append((_edge_pt(2), _edge_pt(3)))
                 else:
-                    segments.append((_ep(0), _ep(3)))
-                    segments.append((_ep(2), _ep(1)))
+                    segments_append((_edge_pt(0), _edge_pt(3)))
+                    segments_append((_edge_pt(2), _edge_pt(1)))
             else:
-                # Standard cases — use pre-computed edge table
+                # Standard cases — use module-level pre-computed edge table
                 et = _EDGE_TABLE[idx]
                 if len(et) == 2:
-                    segments.append((_ep(et[0]), _ep(et[1])))
+                    segments_append((_edge_pt(et[0]), _edge_pt(et[1])))
 
     # Chain segments into polylines
     return _chain_segments(segments)
