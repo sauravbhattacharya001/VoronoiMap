@@ -54,6 +54,7 @@ import json
 import math
 import os
 from collections import namedtuple
+from html import escape as _html_escape
 from datetime import datetime
 
 # ---------------------------------------------------------------------------
@@ -124,16 +125,16 @@ class SentinelReport:
             c = sev_colors.get(a["severity"], "#999")
             alert_rows += (
                 f'<tr><td style="color:{c};font-weight:bold">'
-                f'{a["severity"].upper()}</td>'
-                f'<td>{a["channel"]}</td>'
-                f'<td>{a["message"]}</td>'
+                f'{_html_escape(a["severity"].upper())}</td>'
+                f'<td>{_html_escape(str(a["channel"]))}</td>'
+                f'<td>{_html_escape(str(a["message"]))}</td>'
                 f'<td>{a["value"]:.4f}</td>'
                 f'<td>{a["threshold"]:.4f}</td></tr>\n'
             )
 
         metric_rows = ""
         for k, v in d["metrics"].items():
-            metric_rows += f"<tr><td>{k}</td><td>{v:.4f}</td></tr>\n"
+            metric_rows += f"<tr><td>{_html_escape(str(k))}</td><td>{v:.4f}</td></tr>\n"
 
         html = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
@@ -156,7 +157,7 @@ font-weight:600;margin:0 .3em}}
 .badge-info{{background:#3498db22;color:#3498db;border:1px solid #3498db}}
 </style></head><body>
 <h1>🛡️ Spatial Sentinel Report</h1>
-<p class="meta">Generated: {d["timestamp"]} · Source: {d["source_file"]}
+<p class="meta">Generated: {_html_escape(str(d["timestamp"]))} · Source: {_html_escape(str(d["source_file"]))}
  · Points: {d["point_count"]}</p>
 <div class="health">{d["health_score"]}</div>
 <p style="text-align:center;color:{health_color}">Health Score</p>
