@@ -74,41 +74,50 @@ def _find_shared_borders(
 ]:
     """Find shared border lengths between adjacent regions.
 
-    Uses an edge-ownership approach: each polygon edge (normalised to a
-    canonical vertex order) is mapped to the set of region seeds whose
-    polygon contains it.  Edges owned by exactly two regions are shared
-    borders.  The total shared length per region pair is the sum of
-    those edge lengths.
+    Uses a single-pass edge-ownership approach with no per-edge list
+    allocations.  Each canonical edge is first mapped to its first
+    owner seed; when a second owner is encountered the edge is
+    immediately recognised as a shared border and its length is
+    accumulated.  Edges with 3+ owners (rare, at Voronoi vertices
+    only due to rounding) are ignored to avoid double-counting.
 
     Returns a dict mapping ``(seed_a, seed_b)`` → ``shared_length``
     where ``seed_a < seed_b`` lexicographically.
     """
-    # Map each canonical edge → list of owning seeds.
-    edge_owners: Dict[
+    # Single-pass: map canonical edge → first owner seed.
+    # When a second owner is found, accumulate the shared border
+    # length directly, avoiding per-edge list allocations.
+    _SENTINEL = None  # marks edges with 3+ owners (skip them)
+    edge_first_owner: Dict[
         Tuple[Tuple[float, float], Tuple[float, float]],
-        List[Tuple[float, float]],
+        Optional[Tuple[float, float]],
     ] = {}
+    shared_borders: Dict[
+        Tuple[Tuple[float, float], Tuple[float, float]],
+        float,
+    ] = {}
+
     for seed, verts in regions.items():
         n = len(verts)
         for k in range(n):
             v1 = (round(verts[k][0], 4), round(verts[k][1], 4))
             v2 = (round(verts[(k + 1) % n][0], 4), round(verts[(k + 1) % n][1], 4))
             canon = (min(v1, v2), max(v1, v2))
-            if canon not in edge_owners:
-                edge_owners[canon] = []
-            edge_owners[canon].append(seed)
 
-    # Accumulate shared border lengths per region pair.
-    shared_borders: Dict[
-        Tuple[Tuple[float, float], Tuple[float, float]],
-        float,
-    ] = {}
-    for (v1, v2), owners in edge_owners.items():
-        if len(owners) != 2:
-            continue
-        pair = (min(owners[0], owners[1]), max(owners[0], owners[1]))
-        length = _edge_length(v1, v2)
-        shared_borders[pair] = shared_borders.get(pair, 0.0) + length
+            first = edge_first_owner.get(canon)
+            if first is None and canon not in edge_first_owner:
+                # First time seeing this edge
+                edge_first_owner[canon] = seed
+            elif first is _SENTINEL:
+                # Already 3+ owners — skip
+                continue
+            elif first is not None and first != seed:
+                # Second owner — record shared border and mark done
+                pair = (min(first, seed), max(first, seed))
+                length = _edge_length(canon[0], canon[1])
+                shared_borders[pair] = shared_borders.get(pair, 0.0) + length
+                edge_first_owner[canon] = _SENTINEL
+            # else: same seed revisiting its own edge (shouldn't happen)
 
     return shared_borders
 
@@ -265,11 +274,19 @@ def analyze_territories(
         )
         rm["shared_border_length"] = round(shared_len, 4)
 
-    # Count classifications
-    dominant = sum(1 for rm in region_metrics if rm["classification"] == "dominant")
-    marginal = sum(1 for rm in region_metrics if rm["classification"] == "marginal")
+    # Count classifications in a single pass instead of 3 separate scans
+    dominant = 0
+    marginal = 0
+    frontier_count = 0
+    for rm in region_metrics:
+        cls = rm["classification"]
+        if cls == "dominant":
+            dominant += 1
+        elif cls == "marginal":
+            marginal += 1
+        if rm["is_frontier"]:
+            frontier_count += 1
     average = n - dominant - marginal
-    frontier_count = sum(1 for rm in region_metrics if rm["is_frontier"])
 
     # Dominance ratio: largest area / total area
     max_area = max(areas)
