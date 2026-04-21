@@ -439,6 +439,8 @@ def _idw_grid(
     sx_arr = [s[0] for s in seeds]
     sy_arr = [s[1] for s in seeds]
 
+    is_pow2 = abs(power - 2.0) < 1e-12
+
     # Fast path: when using all seeds, skip the spatial index
     if k_nearest >= n_seeds:
         return _idw_grid_brute(sx_arr, sy_arr, values, x0, y0,
@@ -499,14 +501,24 @@ def _idw_grid(
             total_w = 0.0
             total_v = 0.0
             exact = None
-            for dist_sq, idx in candidates[:k_nearest]:
-                if dist_sq < 1e-20:
-                    exact = values[idx]
-                    break
-                d = _sqrt(dist_sq)
-                w = 1.0 / (d ** power)
-                total_w += w
-                total_v += w * values[idx]
+            # For power=2 (default), w = 1/dist² — skip sqrt entirely
+            if is_pow2:
+                for dist_sq, idx in candidates[:k_nearest]:
+                    if dist_sq < 1e-20:
+                        exact = values[idx]
+                        break
+                    w = 1.0 / dist_sq
+                    total_w += w
+                    total_v += w * values[idx]
+            else:
+                for dist_sq, idx in candidates[:k_nearest]:
+                    if dist_sq < 1e-20:
+                        exact = values[idx]
+                        break
+                    d = _sqrt(dist_sq)
+                    w = 1.0 / (d ** power)
+                    total_w += w
+                    total_v += w * values[idx]
 
             if exact is not None:
                 row.append(exact)
@@ -526,9 +538,15 @@ def _idw_grid_brute(
     cols: int, rows: int,
     power: float,
 ) -> list[list[float]]:
-    """Brute-force IDW for small seed counts (all seeds per grid point)."""
+    """Brute-force IDW for small seed counts (all seeds per grid point).
+
+    Optimised for the common case power=2: weight = 1/dist² so we skip
+    the sqrt entirely (dist² is already available from the dot product).
+    For other powers the general d**power path is used.
+    """
     n = len(values)
     _sqrt = math.sqrt
+    is_pow2 = abs(power - 2.0) < 1e-12
     grid: list[list[float]] = []
     for r in range(rows):
         row: list[float] = []
@@ -538,16 +556,29 @@ def _idw_grid_brute(
             total_w = 0.0
             total_v = 0.0
             exact = None
-            for k in range(n):
-                ddx = x - sx_arr[k]
-                ddy = y - sy_arr[k]
-                d = _sqrt(ddx * ddx + ddy * ddy)
-                if d < 1e-10:
-                    exact = values[k]
-                    break
-                w = 1.0 / (d ** power)
-                total_w += w
-                total_v += w * values[k]
+            if is_pow2:
+                # Fast path: w = 1/dist², no sqrt needed
+                for k in range(n):
+                    ddx = x - sx_arr[k]
+                    ddy = y - sy_arr[k]
+                    dist_sq = ddx * ddx + ddy * ddy
+                    if dist_sq < 1e-20:
+                        exact = values[k]
+                        break
+                    w = 1.0 / dist_sq
+                    total_w += w
+                    total_v += w * values[k]
+            else:
+                for k in range(n):
+                    ddx = x - sx_arr[k]
+                    ddy = y - sy_arr[k]
+                    d = _sqrt(ddx * ddx + ddy * ddy)
+                    if d < 1e-10:
+                        exact = values[k]
+                        break
+                    w = 1.0 / (d ** power)
+                    total_w += w
+                    total_v += w * values[k]
             if exact is not None:
                 row.append(exact)
             elif total_w > 0:
