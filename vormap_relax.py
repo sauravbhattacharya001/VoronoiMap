@@ -43,6 +43,7 @@ except ImportError:
     _HAS_SCIPY = False
 
 import vormap
+from vormap_utils import clip_polygon_to_rect as _clip_rect
 
 
 # ── Core Algorithm ───────────────────────────────────────────────────
@@ -190,9 +191,6 @@ def _clip_polygon_to_box(vertices, bounds):
     vertices : ndarray, shape (n, 2)
     bounds : tuple
         (x_min, x_max, y_min, y_max).
-    point_idx : int or None
-        Index of the point this region belongs to (avoids O(n) lookup
-        when the caller already knows it).
 
     Returns
     -------
@@ -200,51 +198,9 @@ def _clip_polygon_to_box(vertices, bounds):
         Clipped polygon vertices.
     """
     x_min, x_max, y_min, y_max = bounds
-
-    def clip_edge(poly, edge_func, intersect_func):
-        if len(poly) == 0:
-            return poly
-        output = []
-        prev = poly[-1]
-        prev_inside = edge_func(prev)
-        for curr in poly:
-            curr_inside = edge_func(curr)
-            if curr_inside:
-                if not prev_inside:
-                    output.append(intersect_func(prev, curr))
-                output.append(curr)
-            elif prev_inside:
-                output.append(intersect_func(prev, curr))
-            prev = curr
-            prev_inside = curr_inside
-        return output
-
-    def _lerp(a, b, t):
-        return np.array([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])])
-
-    poly = list(vertices)
-
-    # Clip left
-    poly = clip_edge(poly,
-        lambda p: p[0] >= x_min,
-        lambda a, b: _lerp(a, b, (x_min - a[0]) / (b[0] - a[0])) if abs(b[0] - a[0]) > 1e-15 else a)
-
-    # Clip right
-    poly = clip_edge(poly,
-        lambda p: p[0] <= x_max,
-        lambda a, b: _lerp(a, b, (x_max - a[0]) / (b[0] - a[0])) if abs(b[0] - a[0]) > 1e-15 else a)
-
-    # Clip bottom
-    poly = clip_edge(poly,
-        lambda p: p[1] >= y_min,
-        lambda a, b: _lerp(a, b, (y_min - a[1]) / (b[1] - a[1])) if abs(b[1] - a[1]) > 1e-15 else a)
-
-    # Clip top
-    poly = clip_edge(poly,
-        lambda p: p[1] <= y_max,
-        lambda a, b: _lerp(a, b, (y_max - a[1]) / (b[1] - a[1])) if abs(b[1] - a[1]) > 1e-15 else a)
-
-    return np.array(poly) if poly else np.empty((0, 2))
+    poly = [(float(p[0]), float(p[1])) for p in vertices]
+    clipped = _clip_rect(poly, x_min, y_min, x_max, y_max)
+    return np.array(clipped) if clipped else np.empty((0, 2))
 
 
 def lloyd_relaxation(points, iterations=20, bounds=None, tolerance=0.1,

@@ -71,41 +71,12 @@ class TreemapCell:
 
 from vormap_utils import polygon_area as _polygon_area, point_in_polygon as _point_in_polygon
 from vormap_utils import polygon_centroid as _polygon_centroid
+from vormap_utils import clip_polygon_to_rect as _clip_polygon_to_rect
 
 
 def _clip_polygon_to_bbox(poly, xmin, ymin, xmax, ymax):
     """Sutherland-Hodgman polygon clipping against an axis-aligned bbox."""
-    def clip_edge(points, edge_fn, inside_fn):
-        if not points:
-            return []
-        out = []
-        prev = points[-1]
-        for curr in points:
-            if inside_fn(curr):
-                if not inside_fn(prev):
-                    out.append(edge_fn(prev, curr))
-                out.append(curr)
-            elif inside_fn(prev):
-                out.append(edge_fn(prev, curr))
-            prev = curr
-        return out
-
-    def lerp(a, b, t):
-        return (a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]))
-
-    edges = [
-        (lambda p: p[0] >= xmin, lambda a, b: lerp(a, b, (xmin - a[0]) / (b[0] - a[0]) if abs(b[0] - a[0]) > 1e-12 else 0)),
-        (lambda p: p[0] <= xmax, lambda a, b: lerp(a, b, (xmax - a[0]) / (b[0] - a[0]) if abs(b[0] - a[0]) > 1e-12 else 0)),
-        (lambda p: p[1] >= ymin, lambda a, b: lerp(a, b, (ymin - a[1]) / (b[1] - a[1]) if abs(b[1] - a[1]) > 1e-12 else 0)),
-        (lambda p: p[1] <= ymax, lambda a, b: lerp(a, b, (ymax - a[1]) / (b[1] - a[1]) if abs(b[1] - a[1]) > 1e-12 else 0)),
-    ]
-
-    result = list(poly)
-    for inside_fn, intersect_fn in edges:
-        result = clip_edge(result, intersect_fn, inside_fn)
-        if not result:
-            break
-    return result
+    return _clip_polygon_to_rect(list(poly), xmin, ymin, xmax, ymax)
 
 
 def _bbox_polygon(xmin, ymin, xmax, ymax):

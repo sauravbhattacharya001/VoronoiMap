@@ -38,7 +38,7 @@ from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 import vormap
-from vormap_utils import polygon_centroid_mean as _polygon_centroid, point_in_polygon as _point_in_polygon
+from vormap_utils import polygon_centroid_mean as _polygon_centroid, point_in_polygon as _point_in_polygon, clip_polygon_to_rect as _clip_polygon_to_rect_impl
 
 # ── Core Voronoi computation (pure-Python fallback) ──
 
@@ -167,44 +167,7 @@ def _scipy_cells(points, clip_poly, bounds):
 def _clip_polygon_to_rect(poly, bounds):
     """Sutherland-Hodgman clip polygon to rectangle."""
     xmin, ymin, xmax, ymax = bounds
-
-    def clip_edge(poly, edge_fn, inside_fn):
-        if not poly:
-            return []
-        out = []
-        n = len(poly)
-        for i in range(n):
-            curr = poly[i]
-            prev = poly[i - 1]
-            c_in = inside_fn(curr)
-            p_in = inside_fn(prev)
-            if c_in:
-                if not p_in:
-                    out.append(edge_fn(prev, curr))
-                out.append(curr)
-            elif p_in:
-                out.append(edge_fn(prev, curr))
-        return out
-
-    def isect(p1, p2, val, axis):
-        x1, y1 = p1
-        x2, y2 = p2
-        if axis == 0:
-            if abs(x2 - x1) < 1e-12:
-                return (val, y1)
-            t = (val - x1) / (x2 - x1)
-            return (val, y1 + t * (y2 - y1))
-        else:
-            if abs(y2 - y1) < 1e-12:
-                return (x1, val)
-            t = (val - y1) / (y2 - y1)
-            return (x1 + t * (x2 - x1), val)
-
-    poly = clip_edge(poly, lambda a, b: isect(a, b, xmin, 0), lambda p: p[0] >= xmin)
-    poly = clip_edge(poly, lambda a, b: isect(a, b, xmax, 0), lambda p: p[0] <= xmax)
-    poly = clip_edge(poly, lambda a, b: isect(a, b, ymin, 1), lambda p: p[1] >= ymin)
-    poly = clip_edge(poly, lambda a, b: isect(a, b, ymax, 1), lambda p: p[1] <= ymax)
-    return poly
+    return _clip_polygon_to_rect_impl(poly, xmin, ymin, xmax, ymax)
 
 
 def _brute_cells(points, clip_poly, bounds):

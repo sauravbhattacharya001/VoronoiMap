@@ -48,6 +48,7 @@ import struct
 import sys
 
 from vormap_geometry import polygon_area as _polygon_area, polygon_centroid as _polygon_centroid
+from vormap_utils import clip_polygon_to_rect as _clip_polygon_to_rect
 
 # Optional dependencies — graceful degradation
 try:
@@ -154,33 +155,6 @@ def _intersect_line(p1, p2, mx, my, nx, ny):
     t = ((mx - p1[0]) * nx + (my - p1[1]) * ny) / denom
     return (p1[0] + t * dx, p1[1] + t * dy)
 
-
-def _clip_polygon_to_rect(poly, x0, y0, x1, y1):
-    """Sutherland-Hodgman clip of polygon to axis-aligned rectangle."""
-    # Clip against each edge
-    for edge_nx, edge_ny, edge_px, edge_py in [
-        (1, 0, x0, y0),   # left
-        (0, 1, x0, y0),   # top
-        (-1, 0, x1, y1),  # right
-        (0, -1, x1, y1),  # bottom
-    ]:
-        if not poly:
-            return []
-        output = []
-        n = len(poly)
-        for i in range(n):
-            curr = poly[i]
-            nxt = poly[(i + 1) % n]
-            dc = (curr[0] - edge_px) * edge_nx + (curr[1] - edge_py) * edge_ny
-            dn = (nxt[0] - edge_px) * edge_nx + (nxt[1] - edge_py) * edge_ny
-            if dc >= 0:
-                output.append(curr)
-                if dn < 0:
-                    output.append(_intersect_line(curr, nxt, edge_px, edge_py, edge_nx, edge_ny))
-            elif dn >= 0:
-                output.append(_intersect_line(curr, nxt, edge_px, edge_py, edge_nx, edge_ny))
-        poly = output
-    return poly
 
 
 def _points_to_svg_str(poly):

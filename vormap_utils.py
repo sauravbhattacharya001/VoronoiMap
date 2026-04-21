@@ -505,3 +505,59 @@ def mat_invert(A):
         e = [1.0 if i == col else 0.0 for i in range(n)]
         inv.append(lu_solve(L, U, perm, e))
     return mat_transpose(inv)
+
+
+# ── Sutherland-Hodgman polygon clipping ─────────────────────────────
+
+def clip_polygon_to_rect(poly, xmin, ymin, xmax, ymax):
+    """Clip a polygon to an axis-aligned rectangle (Sutherland-Hodgman).
+
+    Parameters
+    ----------
+    poly : list of (float, float)
+        Input polygon vertices.
+    xmin, ymin, xmax, ymax : float
+        Bounding rectangle.
+
+    Returns
+    -------
+    list of (float, float)
+        Clipped polygon vertices.  Empty list if fully outside.
+    """
+    def _clip_edge(pts, inside_fn, intersect_fn):
+        if not pts:
+            return []
+        out = []
+        prev = pts[-1]
+        prev_in = inside_fn(prev)
+        for curr in pts:
+            curr_in = inside_fn(curr)
+            if curr_in:
+                if not prev_in:
+                    out.append(intersect_fn(prev, curr))
+                out.append(curr)
+            elif prev_in:
+                out.append(intersect_fn(prev, curr))
+            prev = curr
+            prev_in = curr_in
+        return out
+
+    def _lerp_x(a, b, x):
+        dx = b[0] - a[0]
+        if abs(dx) < 1e-12:
+            return (x, a[1])
+        t = (x - a[0]) / dx
+        return (x, a[1] + t * (b[1] - a[1]))
+
+    def _lerp_y(a, b, y):
+        dy = b[1] - a[1]
+        if abs(dy) < 1e-12:
+            return (a[0], y)
+        t = (y - a[1]) / dy
+        return (a[0] + t * (b[0] - a[0]), y)
+
+    poly = _clip_edge(poly, lambda p: p[0] >= xmin, lambda a, b: _lerp_x(a, b, xmin))
+    poly = _clip_edge(poly, lambda p: p[0] <= xmax, lambda a, b: _lerp_x(a, b, xmax))
+    poly = _clip_edge(poly, lambda p: p[1] >= ymin, lambda a, b: _lerp_y(a, b, ymin))
+    poly = _clip_edge(poly, lambda p: p[1] <= ymax, lambda a, b: _lerp_y(a, b, ymax))
+    return poly
