@@ -55,15 +55,26 @@ def _random_points(n: int, w: float, h: float) -> List[Tuple[float, float]]:
 
 
 def _nearest_neighbor_dists(pts: List[Tuple[float, float]]) -> List[float]:
+    """O(n²) nearest-neighbor distances using squared-distance comparisons.
+
+    Only computes sqrt once per point (for the final minimum), avoiding
+    n-1 redundant sqrt calls per point.
+    """
+    _sqrt = math.sqrt
+    n = len(pts)
     dists = []
-    for i, p in enumerate(pts):
-        mn = float("inf")
-        for j, q in enumerate(pts):
-            if i != j:
-                d = _dist(p, q)
-                if d < mn:
-                    mn = d
-        dists.append(mn)
+    for i in range(n):
+        pix, piy = pts[i]
+        mn_sq = float("inf")
+        for j in range(n):
+            if i == j:
+                continue
+            dx = pix - pts[j][0]
+            dy = piy - pts[j][1]
+            d_sq = dx * dx + dy * dy
+            if d_sq < mn_sq:
+                mn_sq = d_sq
+        dists.append(_sqrt(mn_sq))
     return dists
 
 
@@ -93,22 +104,41 @@ def _voronoi_areas(pts: List[Tuple[float, float]], w: float, h: float,
 # All are *minimisation* targets.  max_spread is negated min-dist.
 
 def _obj_max_spread(pts: List[Tuple[float, float]], w: float, h: float) -> float:
-    mn = float("inf")
-    for i in range(len(pts)):
-        for j in range(i + 1, len(pts)):
-            d = _dist(pts[i], pts[j])
-            if d < mn:
-                mn = d
-    return -mn  # minimise negative → maximise min-dist
+    """Maximize minimum pairwise distance.
+
+    Uses squared distances throughout to eliminate O(n²) sqrt calls;
+    only one sqrt at the end for the final minimum distance.
+    """
+    mn_sq = float("inf")
+    n = len(pts)
+    for i in range(n):
+        pix, piy = pts[i]
+        for j in range(i + 1, n):
+            dx = pix - pts[j][0]
+            dy = piy - pts[j][1]
+            d_sq = dx * dx + dy * dy
+            if d_sq < mn_sq:
+                mn_sq = d_sq
+    return -math.sqrt(mn_sq)  # minimise negative → maximise min-dist
 
 
 def _obj_min_energy(pts: List[Tuple[float, float]], w: float, h: float) -> float:
+    """Minimize total pairwise repulsion energy (Σ 1/d).
+
+    Inlines distance computation and uses 1/sqrt(d_sq) to avoid
+    the overhead of math.hypot per pair.
+    """
+    _sqrt = math.sqrt
     total = 0.0
-    for i in range(len(pts)):
-        for j in range(i + 1, len(pts)):
-            d = _dist(pts[i], pts[j])
-            if d > 1e-9:
-                total += 1.0 / d
+    n = len(pts)
+    for i in range(n):
+        pix, piy = pts[i]
+        for j in range(i + 1, n):
+            dx = pix - pts[j][0]
+            dy = piy - pts[j][1]
+            d_sq = dx * dx + dy * dy
+            if d_sq > 1e-18:  # equivalent to d > 1e-9
+                total += 1.0 / _sqrt(d_sq)
     return total
 
 
