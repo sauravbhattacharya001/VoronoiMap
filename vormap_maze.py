@@ -41,6 +41,7 @@ from collections import deque
 
 import vormap
 import vormap_viz
+from vormap_utils import polygon_centroid_mean
 
 try:
     import numpy as np
@@ -115,11 +116,8 @@ def _extract_adjacency(regions_list, tol=0.5):
     return adj, edge_geometry, boundary_edges
 
 
-def _centroid(poly):
-    """Compute centroid of a polygon given as list of (x, y) tuples."""
-    cx = sum(p[0] for p in poly) / len(poly)
-    cy = sum(p[1] for p in poly) / len(poly)
-    return (cx, cy)
+# _centroid consolidated into vormap_utils.polygon_centroid_mean
+_centroid = polygon_centroid_mean
 
 
 # ── Maze carving algorithms ─────────────────────────────────────────

@@ -57,6 +57,8 @@ from collections import namedtuple
 from html import escape as _html_escape
 from datetime import datetime
 
+from vormap_utils import polygon_centroid_mean
+
 # ---------------------------------------------------------------------------
 # Data structures
 # ---------------------------------------------------------------------------
@@ -203,13 +205,8 @@ def _load_points(source):
     return list(source)
 
 
-def _centroid(pts):
-    n = len(pts)
-    if n == 0:
-        return (0.0, 0.0)
-    sx = sum(p[0] for p in pts)
-    sy = sum(p[1] for p in pts)
-    return (sx / n, sy / n)
+# _centroid consolidated into vormap_utils.polygon_centroid_mean
+_centroid = polygon_centroid_mean
 
 
 def _std_distance(pts, cx, cy):

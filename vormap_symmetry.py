@@ -41,6 +41,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 import vormap
+from vormap_utils import polygon_centroid_mean
 
 # ── Result containers ───────────────────────────────────────────────
 
@@ -92,12 +93,8 @@ class SymmetryResult:
 # ── Core analysis ───────────────────────────────────────────────────
 
 
-def _centroid(points: List[Tuple[float, float]]) -> Tuple[float, float]:
-    """Compute centroid of a point set."""
-    n = len(points)
-    cx = sum(p[0] for p in points) / n
-    cy = sum(p[1] for p in points) / n
-    return (cx, cy)
+# _centroid consolidated into vormap_utils.polygon_centroid_mean
+_centroid = polygon_centroid_mean
 
 
 def _translate(points, dx, dy):

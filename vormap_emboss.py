@@ -43,6 +43,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 import vormap
+from vormap_utils import assign_cells_grid
 
 # ---------------------------------------------------------------------------
 # Material palettes — base colour + highlight/shadow tints
@@ -103,20 +104,7 @@ class EmbossResult:
 # Voronoi cell assignment
 # ---------------------------------------------------------------------------
 
-def _assign_cells(width: int, height: int, seeds: List[Tuple[float, float]]) -> List[List[int]]:
-    """Assign each pixel to its nearest seed (brute-force for simplicity)."""
-    grid = [[0] * width for _ in range(height)]
-    for y in range(height):
-        for x in range(width):
-            best_dist = float("inf")
-            best_idx = 0
-            for i, (sx, sy) in enumerate(seeds):
-                d = (x - sx) ** 2 + (y - sy) ** 2
-                if d < best_dist:
-                    best_dist = d
-                    best_idx = i
-            grid[y][x] = best_idx
-    return grid
+# _assign_cells consolidated into vormap_utils.assign_cells_grid
 
 
 def _distance_to_edge(x: int, y: int, cell_id: int, grid: List[List[int]],
@@ -207,7 +195,7 @@ def generate(
         cell_heights = [1.0] * num_seeds
 
     # Assign cells
-    grid = _assign_cells(width, height, seeds)
+    grid = assign_cells_grid(width, height, seeds)
 
     # Light direction vector
     lx = math.cos(math.radians(light_angle))

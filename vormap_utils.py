@@ -105,6 +105,37 @@ def polygon_centroid_mean(vertices):
     return (cx, cy)
 
 
+def assign_cells_grid(width, height, seeds):
+    """Assign each pixel to its nearest seed (brute-force Voronoi).
+
+    Returns a 2D grid (list of lists) where ``grid[y][x]`` is the index
+    of the nearest seed in *seeds*.
+
+    Parameters
+    ----------
+    width, height : int
+        Grid dimensions.
+    seeds : list of (float, float)
+        Seed coordinates.
+
+    Returns
+    -------
+    list of list of int
+    """
+    grid = [[0] * width for _ in range(height)]
+    for y in range(height):
+        for x in range(width):
+            best_d = float("inf")
+            best_i = 0
+            for i, (sx, sy) in enumerate(seeds):
+                d = (x - sx) ** 2 + (y - sy) ** 2
+                if d < best_d:
+                    best_d = d
+                    best_i = i
+            grid[y][x] = best_i
+    return grid
+
+
 def euclidean_coords(x1, y1, x2, y2):
     """Euclidean distance between two 2D points given as separate coordinates.
 

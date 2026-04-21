@@ -44,6 +44,8 @@ import zlib
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
+from vormap_utils import assign_cells_grid
+
 # ---------------------------------------------------------------------------
 # DMC-inspired colour palettes
 # ---------------------------------------------------------------------------
@@ -144,20 +146,7 @@ class CrossStitchResult:
 # Voronoi cell assignment (stitch-grid resolution)
 # ---------------------------------------------------------------------------
 
-def _assign_cells(grid_w: int, grid_h: int,
-                  seeds: List[Tuple[float, float]]) -> List[List[int]]:
-    grid = [[0] * grid_w for _ in range(grid_h)]
-    for y in range(grid_h):
-        for x in range(grid_w):
-            best_d = float("inf")
-            best_i = 0
-            for i, (sx, sy) in enumerate(seeds):
-                d = (x - sx) ** 2 + (y - sy) ** 2
-                if d < best_d:
-                    best_d = d
-                    best_i = i
-            grid[y][x] = best_i
-    return grid
+# _assign_cells consolidated into vormap_utils.assign_cells_grid
 
 
 def _is_edge(grid: List[List[int]], x: int, y: int,
@@ -206,7 +195,7 @@ def generate(grid_w: int = 60, grid_h: int = 80, *,
              for _ in range(num_seeds)]
     colours = pal[:num_seeds]
 
-    grid = _assign_cells(grid_w, grid_h, seeds)
+    grid = assign_cells_grid(grid_w, grid_h, seeds)
 
     # Stitch counts
     counts: Dict[int, int] = {}
