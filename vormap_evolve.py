@@ -208,7 +208,7 @@ def evolve(n_points=30, width=500, height=500, objective="uniform",
     dict  with keys: points, fitness, objective, generations_run, history
     """
     if seed is not None:
-        random.seed(seed)
+        rng = random.Random(seed)
     fit_fn = _OBJECTIVES.get(objective)
     if fit_fn is None:
         raise ValueError(f"Unknown objective '{objective}'. Choose from: {list(_OBJECTIVES)}")

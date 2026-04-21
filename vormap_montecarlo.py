@@ -326,9 +326,9 @@ class MonteCarloTest:
         MonteCarloResult
         """
         if seed is not None:
-            random.seed(seed)
+            rng = random.Random(seed)
             if _HAS_SCIPY:
-                np.random.seed(seed)
+                rng_np = np.random.default_rng(seed)
 
         result = MonteCarloResult(self.n, self.bounds, simulations, seed)
 
@@ -356,7 +356,7 @@ class MonteCarloTest:
         sim_l_values = [[] for _ in radii]
 
         for _ in range(simulations):
-            sim_pts = self._generate_csr(self.n)
+            sim_pts = self._generate_csr(self.n, rng=rng, rng_np=rng_np)
 
             # Build KDTree once per simulation and reuse for both NNI
             # and Ripley's L — avoids building 2 trees per sim.
@@ -510,7 +510,7 @@ class MonteCarloTest:
 
     # ── Internal computations ───────────────────────────────────
 
-    def _generate_csr(self, n):
+    def _generate_csr(self, n, rng=None, rng_np=None):
         """Generate n uniform random points within bounds.
 
         Uses numpy vectorized generation when available — produces all
@@ -520,9 +520,13 @@ class MonteCarloTest:
         """
         s, north, w, e = self.bounds
         if _HAS_SCIPY:  # numpy is always available when scipy is
-            xs = np.random.uniform(w, e, size=n)
-            ys = np.random.uniform(s, north, size=n)
+            if rng_np is None:
+                rng_np = np.random.default_rng()
+            xs = rng_np.uniform(w, e, size=n)
+            ys = rng_np.uniform(s, north, size=n)
             return list(zip(xs.tolist(), ys.tolist()))
+        if rng is None:
+            rng = random.Random()
         _uniform = random.uniform
         return [(_uniform(w, e), _uniform(s, north))
                 for _ in range(n)]

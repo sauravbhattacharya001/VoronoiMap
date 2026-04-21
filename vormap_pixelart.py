@@ -169,7 +169,9 @@ def generate(
         Custom seed points in [0, grid_w) × [0, grid_h) space.
     """
     if seed_value is not None:
-        random.seed(seed_value)
+        rng = random.Random(seed_value)
+    else:
+        rng = random.Random()
 
     pal_name, colors = _parse_palette(palette)
 
@@ -178,7 +180,7 @@ def generate(
         seeds = list(points)
         num_seeds = len(seeds)
     else:
-        seeds = [(random.uniform(0, grid_w), random.uniform(0, grid_h))
+        seeds = [(rng.uniform(0, grid_w), rng.uniform(0, grid_h))
                  for _ in range(num_seeds)]
 
     # Assign each grid cell to nearest seed (Manhattan for retro feel)

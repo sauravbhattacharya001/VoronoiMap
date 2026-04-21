@@ -410,7 +410,7 @@ def render_from_pixels(pixels: List[Tuple[int, int, int]],
     LowPolyResult
     """
     if seed is not None:
-        random.seed(seed)
+        rng = random.Random(seed)
 
     num_seeds = min(num_seeds, width * height)
 

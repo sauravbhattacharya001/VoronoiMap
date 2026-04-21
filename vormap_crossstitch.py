@@ -185,7 +185,7 @@ def generate(grid_w: int = 60, grid_h: int = 80, *,
         RNG seed for reproducibility.
     """
     if seed is not None:
-        random.seed(seed)
+        rng = random.Random(seed)
 
     pal = PALETTES.get(palette, PALETTES["pastel"])
     # Clamp seeds to palette size

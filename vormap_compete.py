@@ -244,7 +244,7 @@ def simulate_competition(
 ) -> CompetitionResult:
     """Run a full territorial competition and return results."""
     if seed is not None:
-        random.seed(seed)
+        rng = random.Random(seed)
 
     if strategies is None:
         strategies = list(STRATEGIES[:n_competitors])
