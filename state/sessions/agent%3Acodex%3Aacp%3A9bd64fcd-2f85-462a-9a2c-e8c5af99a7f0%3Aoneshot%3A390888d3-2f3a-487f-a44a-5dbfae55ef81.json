@@ -1,0 +1,71 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:codex:acp:9bd64fcd-2f85-462a-9a2c-e8c5af99a7f0:oneshot:390888d3-2f3a-487f-a44a-5dbfae55ef81",
+  "acp_session_id": "019dae92-49fd-7450-b6c1-9ed18836c510",
+  "agent_command": "npx @zed-industries/codex-acp@^0.11.1",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+  "name": "agent:codex:acp:9bd64fcd-2f85-462a-9a2c-e8c5af99a7f0",
+  "created_at": "2026-04-21T05:45:11.014Z",
+  "last_used_at": "2026-04-21T05:45:24.783Z",
+  "last_seq": 0,
+  "last_request_id": "b39ca871-b93b-4ea3-93e4-9c33a8840162",
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Acodex%3Aacp%3A9bd64fcd-2f85-462a-9a2c-e8c5af99a7f0%3Aoneshot%3A390888d3-2f3a-487f-a44a-5dbfae55ef81.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": true,
+  "closed_at": "2026-04-21T05:45:24.948Z",
+  "pid": 2008,
+  "agent_started_at": "2026-04-21T05:45:12.583Z",
+  "last_prompt_at": "2026-04-21T05:45:16.134Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "loadSession": true,
+    "promptCapabilities": {
+      "image": true,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": false
+    },
+    "sessionCapabilities": {
+      "list": {},
+      "close": {}
+    },
+    "auth": {
+      "logout": {}
+    }
+  },
+  "title": null,
+  "messages": [
+    {
+      "User": {
+        "id": "a2b0bf8b-3fe7-49b3-abcb-e09d23a1979f",
+        "content": [
+          {
+            "Text": "[Mon 2026-04-20 22:45 PDT] Create a new file `src/PromptDriftMonitor.cs` in the `Prompt` namespace. This is a .NET library for prompt management. Match the existing code style (see other files in src/ like PromptResilience.cs, PromptSwarm.cs).\n\n## Feature: PromptDriftMonitor - Autonomous Prompt Performance Drift Detection\n\nAn autonomous monitoring system that tracks prompt effectiveness over time and detects degradation (\"drift\"). Think of it like a canary in a coal mine for prompt quality.\n\n### Core Concepts:\n1. **DriftObservation** - A recorded data point: timestamp, prompt ID, score (0-1), latency ms, token count, tags, model version\n2. **DriftWindow** - A time window of observations with computed statistics (mean, stddev, trend slope)\n3. **DriftAlert** - Generated when drift is detected, with severity, description, affected metric, recommendation\n4. **DriftPolicy** - Configurable thresholds for what constitutes drift (score drop %, latency increase %, z-score threshold)\n\n### Enums:\n- `DriftMetric` { QualityScore, Latency, TokenUsage, ErrorRate, Consistency }\n- `DriftSeverity` { Info, Warning, Critical, Emergency }\n- `DriftDirection` { Improving, Stable, Degrading, Volatile }\n\n### Classes:\n\n**DriftObservation** - record with: string PromptId, DateTime Timestamp, double Score, double LatencyMs, int TokenCount, string ModelVersion, Dictionary&lt;string,string&gt; Tags\n\n**DriftPolicy** - configurable:\n- ScoreDropThreshold (default 0.15) - absolute score drop to trigger alert\n- LatencyIncreasePercent (default 50) - % latency increase to trigger\n- ZScoreThreshold (default 2.5) - z-score for anomaly detection\n- MinObservationsForBaseline (default 20)\n- WindowSizeDays (default 7)\n- Enable/disable per-metric monitoring\n- static Sensitive(), Relaxed(), Standard() presets\n\n**DriftWindow** - computed from observations:\n- Mean, StdDev, Min, Max for each metric\n- TrendSlope (linear regression)\n- Direction (from slope)\n- ObservationCount\n\n**DriftAlert**:\n- Metric, Severity, Direction, Message, Recommendation\n- BaselineValue, CurrentValue, DeviationPercent\n- DetectedAt timestamp\n\n**PromptDriftMonitor** - the main class:\n- Constructor takes optional DriftPolicy (defaults to Standard)\n- `Record(DriftObservation obs)` - record an observation\n- `RecordBatch(IEnumerable&lt;DriftObservation&gt; observations)` - record many\n- `Analyze(string promptId)` → DriftReport - full analysis for a prompt\n- `AnalyzeAll()` → List&lt;DriftReport&gt; - analyze all tracked prompts\n- `GetAlerts(DriftSeverity minSeverity = Warning)` → List&lt;DriftAlert&gt;\n- `GetWindow(string promptId, int days)` → DriftWindow\n- `GetTrend(string promptId, DriftMetric metric)` → List&lt;(DateTime, double)&gt;\n- `CompareWindows(string promptId, int recentDays, int baselineDays)` → DriftComparison\n- `DetectAnomalies(string promptId)` → List&lt;DriftObservation&gt; - observations that are statistical outliers\n- `Recommend(string promptId)` → List&lt;string&gt; - proactive recommendations\n- `AutoAdapt(string promptId)` → AdaptationPlan - autonomous response plan\n- `GetHealthScore(string promptId)` → double (0-100) - overall prompt health\n- `ExportReport(DriftReport report, DriftExportFormat format)` → string - export as JSON/Markdown/HTML\n- `Reset(string promptId)` / `ResetAll()` - clear history\n\n**DriftReport**:\n- PromptId, GeneratedAt, HealthScore (0-100)\n- Windows (recent vs baseline DriftWindow)\n- Alerts list\n- Recommendations list\n- AdaptationPlan\n- PerMetricSummary dictionary\n\n**DriftComparison**:\n- BaselineWindow, RecentWindow\n- PerMetricDelta dictionary\n- OverallVerdict (Improving/Stable/Degrading/Volatile)\n- Confidence (0-1)\n\n**AdaptationPlan**:\n- Actions list (string descriptions)\n- Priority (Low/Medium/High/Critical)\n- EstimatedImpact (string)\n- AutoApplicable (bool)\n\n**DriftExportFormat** enum: Json, Markdown, Html\n\n### Implementation Details:\n- Store observations in Dictionary&lt;string, List&lt;DriftObservation&gt;&gt;\n- Linear regression for trend: use least squares on (dayOffset, metricValue)\n- Z-score anomaly detection: (value - mean) / stddev > threshold\n- Health score: weighted combination of all metrics' drift status (100 = perfect, 0 = all critical)\n- HTML export should include a simple inline-CSS drift timeline table\n- Recommendations should be context-aware (e.g., \"Score dropped 23% after model version change to gpt-4.1 - consider re-tuning prompts for the new model\")\n- AutoAdapt should suggest concrete actions based on detected drift patterns\n\n### Build Verification:\nAfter creating the file, run: `dotnet build --no-restore -q` in the repo root to verify it compiles.\n\nKeep the file self-contained (no new dependencies). Use only System, System.Collections.Generic, System.Linq, System.Text, System.Text.RegularExpressions."
+          }
+        ]
+      }
+    }
+  ],
+  "updated_at": "2026-04-21T05:45:16.138Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {
+    "available_commands": [
+      "review",
+      "review-branch",
+      "review-commit",
+      "init",
+      "compact",
+      "undo",
+      "logout"
+    ]
+  }
+}

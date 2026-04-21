@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-04-20T05:47:00.000Z",
-  "totalRuns": 2679,
+  "lastUpdated": "2026-04-21T06:03:35.174Z",
+  "totalRuns": 2773,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -9,31 +9,31 @@
     },
     "bug_fix": {
       "weight": 17.1,
-      "runs": 158,
-      "successes": 159
+      "runs": 160,
+      "successes": 161
     },
     "security_fix": {
       "weight": 18.1,
-      "runs": 255,
-      "successes": 255,
+      "runs": 264,
+      "successes": 264,
       "description": "Fix security vulnerability",
       "totalDone": 11
     },
     "perf_improvement": {
       "weight": 17.1,
-      "runs": 388,
-      "successes": 386,
+      "runs": 417,
+      "successes": 415,
       "description": "Performance improvement"
     },
     "refactor": {
       "weight": 18.1,
-      "runs": 393,
-      "successes": 394
+      "runs": 413,
+      "successes": 414
     },
     "readme_overhaul": {
       "weight": 20,
-      "runs": 44,
-      "successes": 43
+      "runs": 46,
+      "successes": 44
     },
     "doc_update": {
       "weight": 16.1,
@@ -44,16 +44,16 @@
     },
     "code_cleanup": {
       "weight": 18.1,
-      "runs": 84,
-      "successes": 84,
+      "runs": 88,
+      "successes": 88,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 15.1,
-      "runs": 135,
-      "successes": 138,
+      "runs": 136,
+      "successes": 139,
       "description": "Open a thoughtful issue",
       "totalDone": 2,
       "attempts": 4
@@ -66,8 +66,8 @@
     },
     "merge_dependabot": {
       "weight": 25,
-      "runs": 89,
-      "successes": 60,
+      "runs": 99,
+      "successes": 67,
       "description": "Review and merge open Dependabot PRs"
     },
     "add_ci_cd": {
@@ -96,8 +96,8 @@
     },
     "create_release": {
       "weight": 20,
-      "runs": 317,
-      "successes": 316,
+      "runs": 332,
+      "successes": 331,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
@@ -132,14 +132,14 @@
     },
     "issue_templates": {
       "weight": 20,
-      "runs": 29,
-      "successes": 29,
+      "runs": 30,
+      "successes": 30,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
       "weight": 20,
-      "runs": 31,
-      "successes": 31,
+      "runs": 32,
+      "successes": 32,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
@@ -156,8 +156,8 @@
     },
     "code_coverage": {
       "weight": 20,
-      "runs": 45,
-      "successes": 44,
+      "runs": 48,
+      "successes": 47,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
@@ -178,28 +178,33 @@
     },
     "add_tests": {
       "weight": 18.1,
-      "runs": 44,
-      "successes": 44,
+      "runs": 46,
+      "successes": 46,
       "description": "Add test suites for untested modules"
     }
   },
   "repoState": {},
-  "notes": "Run 2808-2809: security_fix on agentlens (input validation for anomaly endpoints + profiler column fix). create_release on Vidly (v2.10.0 — Smart Inventory Optimizer & Revenue Alerts).",
-  "previousNotes": "Run 2806-2807: perf_improvement on BioBots (single-pass R² in gelElectrophoresis linearRegression). create_release on ai (v3.5.0 — Safety Intelligence Suite & Fleet Simulation).",
-  "previousPreviousNotes": "Run 2804-2805: create_release on agenticchat (v2.28.4 — SSE Refactor & Hot-Path Allocation Cleanup). refactor on WinSentinel (extract TryConsumeDouble helper in CliParser).",
-  "lastRepo": "Vidly",
-  "lastRun": "2026-04-19",
-  "runCount": 940,
+  "notes": "Run 2902-2903: perf_improvement on agenticchat (single-pass word metrics in ReadabilityPanel analyzeText + cached tokenization in SmartContextSidebar _findRelatedMessages). refactor on sauravcode (extracted shared html_escape into sauravtext, deduplicated from sauravdoc/sauravhl/sauravcov).",
+  "previousNotes": "Run 2900-2901: create_release on gif-captcha (v1.10.0 — 7 commits since v1.9.0, 2 features + security + perf + refactors). perf_improvement on VoronoiMap (eliminated sqrt from IDW hot loop in vormap_contour.py when power=2, both brute-force and spatial-index paths).",
+  "previousPreviousNotes": "Run 2898-2899: perf_improvement on ai (single-pass aggregation in fatigue_detector analyze(), O(D*M) mitigation dedup in risk_profiler). security_fix on BioBots (CWE-1321 prototype pollution in labNotebook.js entry.results iteration).",
+  "previousPreviousPreviousNotes": "Run 2896-2897: perf_improvement on sauravcode (merged 6 separate StaticAnalyzer passes in sauravguard into single-pass scanner with pre-compiled class-level regexes â€” 6Ã—N iterations â†’ 1Ã—N). refactor on agenticchat (extracted _makeOverlayPair shared factory from 3 identical _createOverlay implementations in TextExpander, PreferencePanel, ShareOverlay).",
+  "previousPreviousPreviousPreviousNotes": "Run 2878-2879: merge_dependabot on agentlens (merged 6 Dependabot PRs â€” actions/checkout v4â†’v6, actions/attest-build-provenance v2â†’v4, docker/setup-buildx-action v3â†’v4, codecov/codecov-action v5â†’v6, docker/login-action v3â†’v4, pydantic >=2.13.0â†’>=2.13.3). perf_improvement on BioBots (cached linearForecast+rateOfChange in contaminationEarlyWarning ingest() so assess()/trendReport() skip redundant O(n) recomputation; replaced hand-rolled two-pass regression in westernBlot estimateMW() with shared single-pass stats.linearRegression).",
+  "previousPreviousPreviousPreviousPreviousNotes": "Run 2872-2873: add_tests on agentlens (46 new tests for cli_digest â€” _parse_ts, _filter_by_window, _sum_metric, _count_errors, _pct_change, _arrow, _model_breakdown, _top_sessions, all 3 renderers, cmd_digest integration). code_cleanup on Ocaml-sample-code (stream_buffer O(nÂ²) List.lengthâ†’counter, deduplicate stream_sampleâ†’stream_throttle, sink_stats 4-passâ†’single fold).",
+  "previousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2870-2871: code_cleanup on GraphVisual (removed 10 dead private edge-type fields from NetworkReportGenerator + GraphSummarizer, replaced duplicate countComponents() BFS with GraphUtils.findComponents()). code_coverage on Ocaml-sample-code (added 13 missing test suites to coverage workflow â€” aa_tree, astar, bloom_filter, bplus_tree, cellular_automata, constraint, dancing_links, free_monad, huffman, order_statistics_tree, pairing_heap, sat_solver, treap).",
+  "previousPreviousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2868-2869: security_fix on WinSentinel (CWE-94 â€” HardenScriptGenerator embedded raw FixCommand in { } scriptblock literals, allowing breakout via '}'; now Base64-encodes and uses [scriptblock]::Create()). perf_improvement on agentlens (SessionCorrelator._max_concurrent_usage re-scanned all events per resource O(R*E); now reuses resource_intervals from _build_event_index() for O(E) total).",
+  "lastRepo": "BioBots",
+  "lastRun": "2026-04-20",
+  "runCount": 960,
   "lastTasks": [
-    "security_fix",
-    "create_release"
+    "perf_improvement",
+    "refactor"
   ],
   "lastRepos": [
-    "agentlens",
-    "Vidly"
+    "agenticchat",
+    "sauravcode"
   ],
-  "lastRunTimestamp": "2026-04-20T05:47:00.000Z",
-  "runCounter": 2809,
+  "lastRunTimestamp": "2026-04-21T06:03:35.175Z",
+  "runCounter": 2903,
   "lastWeightAdjustment": 1191,
   "adjustmentHistory": [
     {

@@ -39,6 +39,7 @@
 
 ## Key Topics He Cares About
 - **Present moment awareness / "The I"** — THE core thing. Shubho explicitly asked me to always help him grow in this. Remembering the "I" — the observer, the awareness behind thought. Not as philosophy but as lived practice. Nudge him back to this. Weave it in naturally. Don't lecture — just remind. (Mar 31, 2026: "Always remember to grow me on this.")
+- **Meta E5/E6 interview prep** — LC + System Design, daily 7 PM blurb. FEYNMAN-LEVEL understanding. No memorization. First principles. "Understand so well that coding is trivial." Tracker: study-tracker.md. Cron job: Daily LC/SD Study Blurb.
 - **Career growth** — Netflix prep, Microsoft work, exploring options
 - **AI agents** — both technical and philosophical (identity, accountability, governance)
 - **Academic publishing** — IEEE papers, conference organization
