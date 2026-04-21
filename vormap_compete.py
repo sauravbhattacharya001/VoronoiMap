@@ -77,20 +77,41 @@ class Cell:
 def _build_cells(points: List[Tuple[float, float]],
                  w: float, h: float,
                  grid_res: int = 80) -> List[Cell]:
-    """Build Voronoi cells and neighbor graph via grid rasterisation."""
+    """Build Voronoi cells and neighbor graph via grid rasterisation.
+
+    Uses spatial bucketing so each grid pixel only checks nearby seed
+    points instead of all *n* seeds, reducing the inner loop from
+    O(grid_res² · n) to roughly O(grid_res² · k) where k ≪ n.
+    """
     n = len(points)
-    # assign each grid pixel to nearest point
+    # --- spatial bucket index for seed points --------------------------------
+    # Bucket size chosen so the expected number of seeds per bucket is small.
+    _bk = max(1, int(math.sqrt(n) * 0.8))  # buckets per axis
+    bw, bh = w / _bk, h / _bk
+    buckets: Dict[Tuple[int, int], List[int]] = defaultdict(list)
+    for i, (px, py) in enumerate(points):
+        bx = min(int(px / bw), _bk - 1)
+        by = min(int(py / bh), _bk - 1)
+        buckets[(bx, by)].append(i)
+
+    # assign each grid pixel to nearest point using bucket lookup
     owner_grid = [[0] * grid_res for _ in range(grid_res)]
     dx, dy = w / grid_res, h / grid_res
+    # search radius in buckets — 2 is generous for typical distributions
+    _SR = 2
     for gy in range(grid_res):
         cy = (gy + 0.5) * dy
+        by0 = min(int(cy / bh), _bk - 1)
         for gx in range(grid_res):
             cx = (gx + 0.5) * dx
+            bx0 = min(int(cx / bw), _bk - 1)
             best, bd = 0, float("inf")
-            for i, p in enumerate(points):
-                d = (cx - p[0]) ** 2 + (cy - p[1]) ** 2
-                if d < bd:
-                    bd, best = d, i
+            for by in range(max(0, by0 - _SR), min(_bk, by0 + _SR + 1)):
+                for bx in range(max(0, bx0 - _SR), min(_bk, bx0 + _SR + 1)):
+                    for i in buckets.get((bx, by), ()):
+                        d = (cx - points[i][0]) ** 2 + (cy - points[i][1]) ** 2
+                        if d < bd:
+                            bd, best = d, i
             owner_grid[gy][gx] = best
 
     # discover neighbors
@@ -128,15 +149,16 @@ _STRAT_ATTACK_BONUS = {
 }
 
 
-def _pick_action(cells: List[Cell], comp_id: int,
-                 strategy: str) -> List[Tuple[str, int]]:
-    """Return list of (action, target_cell_idx) for this competitor."""
-    owned = [c for c in cells if c.owner == comp_id]
-    if not owned:
+def _pick_action_indexed(cells: List[Cell], owned_idxs: set,
+                         comp_id: int,
+                         strategy: str) -> List[Tuple[str, int]]:
+    """Return actions using a pre-built ownership set (avoids full scan)."""
+    if not owned_idxs:
         return []
 
-    border_own = [c for c in owned
-                  if any(cells[n].owner != comp_id for n in c.neighbors)]
+    border_own = [cells[i] for i in owned_idxs
+                  if any(cells[n].owner != comp_id
+                         for n in cells[i].neighbors)]
     targets_neutral = []
     targets_enemy = []
     for c in border_own:
@@ -262,15 +284,18 @@ def simulate_competition(
 
     alive = set(range(n_competitors))
 
+    # --- ownership index: avoid O(cells) full scans each round ----
+    owned_sets: List[set] = [set() for _ in range(n_competitors)]
+    for c in cells:
+        if c.owner is not None:
+            owned_sets[c.owner].add(c.idx)
+
     for rnd in range(rounds):
         # snapshot before actions
         snap = [(c.owner, c.strength) for c in cells]
         result.history.append(snap)
 
-        sizes = [0] * n_competitors
-        for c in cells:
-            if c.owner is not None:
-                sizes[c.owner] += 1
+        sizes = [len(s) for s in owned_sets]
         result.territory_sizes.append(sizes)
 
         # check eliminations
@@ -282,17 +307,18 @@ def simulate_competition(
         if len(alive) <= 1:
             break
 
-        # resource accumulation
+        # resource accumulation (only iterate owned cells)
         income = [0.0] * n_competitors
-        for c in cells:
-            if c.owner is not None:
-                income[c.owner] += c.resource
+        for ci in alive:
+            for idx in owned_sets[ci]:
+                income[ci] += cells[idx].resource
 
         # each competitor acts
         order = list(alive)
         random.shuffle(order)
         for ci in order:
-            acts = _pick_action(cells, ci, strategies[ci])
+            acts = _pick_action_indexed(cells, owned_sets[ci], ci,
+                                        strategies[ci])
             budget = income[ci]
             bonus = _STRAT_ATTACK_BONUS[strategies[ci]]
             for act, tgt in acts:
@@ -302,12 +328,16 @@ def simulate_competition(
                 if act == "claim" and tc.owner is None:
                     tc.owner = ci
                     tc.strength = min(10.0, budget)
+                    owned_sets[ci].add(tgt)
                     budget -= 5
                 elif act == "attack" and tc.owner is not None and tc.owner != ci:
                     power = min(budget, 15.0) * bonus
+                    old_owner = tc.owner
                     if power > tc.strength:
+                        owned_sets[old_owner].discard(tgt)
                         tc.owner = ci
                         tc.strength = power - tc.strength
+                        owned_sets[ci].add(tgt)
                     else:
                         tc.strength -= power * 0.5
                     budget -= 10
@@ -321,15 +351,13 @@ def simulate_competition(
             if c.owner is not None:
                 c.strength = max(0, c.strength - 0.3)
                 if c.strength <= 0:
+                    owned_sets[c.owner].discard(c.idx)
                     c.owner = None
 
     # final snapshot
     snap = [(c.owner, c.strength) for c in cells]
     result.history.append(snap)
-    sizes = [0] * n_competitors
-    for c in cells:
-        if c.owner is not None:
-            sizes[c.owner] += 1
+    sizes = [len(s) for s in owned_sets]
     result.territory_sizes.append(sizes)
 
     # determine winner
