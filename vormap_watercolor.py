@@ -42,6 +42,7 @@ import struct
 import zlib
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
+from vormap_utils import clamp as _clamp, lerp as _lerp
 
 # ---------------------------------------------------------------------------
 # Palettes — soft, muted tones suited to watercolour
@@ -142,12 +143,8 @@ def _parse_palette(name_or_hex: str) -> List[Tuple[int, int, int]]:
     return colours
 
 
-def _lerp(a: float, b: float, t: float) -> float:
-    return a + (b - a) * t
 
 
-def _clamp(v: int, lo: int = 0, hi: int = 255) -> int:
-    return max(lo, min(hi, v))
 
 
 def _blend(base: Tuple[int, int, int], overlay: Tuple[int, int, int], alpha: float) -> Tuple[int, int, int]:

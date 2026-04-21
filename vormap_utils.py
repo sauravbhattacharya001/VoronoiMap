@@ -561,3 +561,29 @@ def clip_polygon_to_rect(poly, xmin, ymin, xmax, ymax):
     poly = _clip_edge(poly, lambda p: p[1] >= ymin, lambda a, b: _lerp_y(a, b, ymin))
     poly = _clip_edge(poly, lambda p: p[1] <= ymax, lambda a, b: _lerp_y(a, b, ymax))
     return poly
+
+
+# ── shared numeric helpers ──────────────────────────────────────────
+
+def clamp(v, lo=0, hi=255):
+    """Clamp *v* to the range [*lo*, *hi*]."""
+    return max(lo, min(hi, v))
+
+
+def lerp(a: float, b: float, t: float) -> float:
+    """Linearly interpolate between *a* and *b* at fraction *t*."""
+    return a + (b - a) * t
+
+
+def lerp_color(
+    c1: Tuple[int, int, int],
+    c2: Tuple[int, int, int],
+    t: float,
+) -> Tuple[int, int, int]:
+    """Linearly interpolate between two RGB colours.  *t* is clamped to [0, 1]."""
+    t = max(0.0, min(1.0, t))
+    return (
+        int(c1[0] + (c2[0] - c1[0]) * t),
+        int(c1[1] + (c2[1] - c1[1]) * t),
+        int(c1[2] + (c2[2] - c1[2]) * t),
+    )

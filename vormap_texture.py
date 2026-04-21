@@ -31,6 +31,7 @@ import os
 import random
 import struct
 import zlib
+from vormap_utils import clamp as _clamp, lerp_color as _lerp_color
 
 
 # ---------------------------------------------------------------------------
@@ -74,13 +75,6 @@ COLORMAPS = {
 }
 
 
-def _lerp_color(c1, c2, t):
-    t = max(0.0, min(1.0, t))
-    return (
-        int(c1[0] + (c2[0] - c1[0]) * t),
-        int(c1[1] + (c2[1] - c1[1]) * t),
-        int(c1[2] + (c2[2] - c1[2]) * t),
-    )
 
 
 def _sample_colormap(cmap, t):
@@ -137,8 +131,6 @@ def _generate_seeds(n, w, h, rng):
 # Style renderers
 # ---------------------------------------------------------------------------
 
-def _clamp(v, lo=0, hi=255):
-    return max(lo, min(hi, int(v)))
 
 
 def _style_stone(idx, d1, d2, cell_val, cmap):

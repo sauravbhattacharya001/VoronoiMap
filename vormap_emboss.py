@@ -43,7 +43,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 import vormap
-from vormap_utils import assign_cells_grid
+from vormap_utils import assign_cells_grid, clamp as _clamp, lerp_color as _lerp_color
 
 # ---------------------------------------------------------------------------
 # Material palettes — base colour + highlight/shadow tints
@@ -130,22 +130,6 @@ def _distance_to_edge(x: int, y: int, cell_id: int, grid: List[List[int]],
 # Shading
 # ---------------------------------------------------------------------------
 
-def _lerp_color(c1: Tuple[int, int, int], c2: Tuple[int, int, int], t: float) -> Tuple[int, int, int]:
-    t = max(0.0, min(1.0, t))
-    return (
-        int(c1[0] + (c2[0] - c1[0]) * t),
-        int(c1[1] + (c2[1] - c1[1]) * t),
-        int(c1[2] + (c2[2] - c1[2]) * t),
-    )
-
-
-def _clamp(v: int, lo: int = 0, hi: int = 255) -> int:
-    return max(lo, min(hi, v))
-
-
-# ---------------------------------------------------------------------------
-# Main generation
-# ---------------------------------------------------------------------------
 
 def generate(
     width: int,

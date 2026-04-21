@@ -39,6 +39,7 @@ import struct
 import zlib
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
+from vormap_utils import lerp_color as _lerp_color
 
 # ---------------------------------------------------------------------------
 # Palettes
@@ -82,19 +83,6 @@ DEFAULT_PALETTE = "sunset"
 # ---------------------------------------------------------------------------
 # Blend / easing helpers
 # ---------------------------------------------------------------------------
-
-
-def _lerp_color(
-    c1: Tuple[int, int, int],
-    c2: Tuple[int, int, int],
-    t: float,
-) -> Tuple[int, int, int]:
-    """Linearly interpolate between two RGB colours.  *t* in [0, 1]."""
-    return (
-        int(c1[0] + (c2[0] - c1[0]) * t),
-        int(c1[1] + (c2[1] - c1[1]) * t),
-        int(c1[2] + (c2[2] - c1[2]) * t),
-    )
 
 
 def _ease_t(t: float, blend: str) -> float:
