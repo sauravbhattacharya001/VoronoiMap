@@ -194,12 +194,17 @@ class ForecastModel:
             grids.append(grid)
 
         # Channel 1: Density Trend — linear extrapolation per cell
+        # Cache slopes/intercepts for reuse in hotspot, void, and confidence
         predicted = [[0.0] * res for _ in range(res)]
+        cell_slopes = [[0.0] * res for _ in range(res)]
+        cell_intercepts = [[0.0] * res for _ in range(res)]
         n = len(grids)
         for r in range(res):
             for c in range(res):
                 series = [grids[t][r][c] for t in range(n)]
                 slope, intercept = _linear_fit(series)
+                cell_slopes[r][c] = slope
+                cell_intercepts[r][c] = intercept
                 val = intercept + slope * (n - 1 + steps)
                 predicted[r][c] = max(0.0, val)
         # Renormalize
@@ -270,12 +275,11 @@ class ForecastModel:
         else:
             result.trend = "stable"
 
-        # Channel 4: Hotspot Emergence
+        # Channel 4: Hotspot Emergence (reuse cached slopes)
         if n >= 3:
             for r in range(res):
                 for c in range(res):
-                    series = [grids[t][r][c] for t in range(n)]
-                    slope, _ = _linear_fit(series)
+                    slope = cell_slopes[r][c]
                     if slope > 0.005 and predicted[r][c] > 1.5 / (res * res):
                         hx = xmin + (c + 0.5) / res * (xmax - xmin)
                         hy = ymin + (r + 0.5) / res * (ymax - ymin)
@@ -283,12 +287,11 @@ class ForecastModel:
             result.hotspots.sort(key=lambda h: h.intensity, reverse=True)
             result.hotspots = result.hotspots[:10]
 
-        # Channel 5: Void Prediction
+        # Channel 5: Void Prediction (reuse cached slopes)
         if n >= 3:
             for r in range(res):
                 for c in range(res):
-                    series = [grids[t][r][c] for t in range(n)]
-                    slope, _ = _linear_fit(series)
+                    slope = cell_slopes[r][c]
                     if slope < -0.003 and grids[-1][r][c] > 0.001:
                         vx = xmin + (c + 0.5) / res * (xmax - xmin)
                         vy = ymin + (r + 0.5) / res * (ymax - ymin)
@@ -296,19 +299,21 @@ class ForecastModel:
             result.voids.sort(key=lambda v: v.loss_rate, reverse=True)
             result.voids = result.voids[:10]
 
-        # Confidence scoring
+        # Confidence scoring (reuse cached slopes/intercepts)
         # Higher with more snapshots, lower with high variance in fits
         snapshot_factor = min(1.0, (n - 1) / 5.0)
         # Check density prediction consistency
-        residuals = []
-        for t in range(n):
-            for r in range(res):
-                for c in range(res):
-                    series = [grids[i][r][c] for i in range(n)]
-                    slope, intercept = _linear_fit(series)
+        total_residual = 0.0
+        count_residual = 0
+        for r in range(res):
+            for c in range(res):
+                slope = cell_slopes[r][c]
+                intercept = cell_intercepts[r][c]
+                for t in range(n):
                     fitted = intercept + slope * t
-                    residuals.append(abs(fitted - series[t]))
-        mean_residual = sum(residuals) / len(residuals) if residuals else 0.0
+                    total_residual += abs(fitted - grids[t][r][c])
+                count_residual += n
+        mean_residual = total_residual / count_residual if count_residual else 0.0
         fit_factor = max(0.0, 1.0 - mean_residual * 50)
         result.confidence = round(snapshot_factor * 0.4 + fit_factor * 0.6, 4)
 
