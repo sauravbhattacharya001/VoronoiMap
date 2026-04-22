@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spatial Clustering Report — vormap_cluster</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+.header{background:linear-gradient(135deg,#1e293b,#334155);padding:28px 32px;border-bottom:2px solid #6366f1}
+.header h1{font-size:1.6rem;font-weight:700;color:#a5b4fc}
+.header p{color:#94a3b8;margin-top:4px;font-size:.9rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:24px 32px;max-width:1400px;margin:0 auto}
+.card{background:#1e293b;border-radius:12px;border:1px solid #334155;padding:20px;overflow:hidden}
+.card h2{font-size:1.05rem;color:#a5b4fc;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.full{grid-column:1/-1}
+canvas{width:100%;border-radius:8px;background:#0f172a;cursor:crosshair}
+.stat{display:inline-block;background:#334155;border-radius:8px;padding:10px 16px;margin:4px;text-align:center}
+.stat .val{font-size:1.3rem;font-weight:700;color:#a5b4fc}
+.stat .lbl{font-size:.75rem;color:#94a3b8;margin-top:2px}
+.rec{background:#1e1b4b;border-left:3px solid #6366f1;padding:10px 14px;margin:6px 0;border-radius:0 8px 8px 0;font-size:.88rem;color:#c7d2fe}
+.tabs{display:flex;gap:4px;margin-bottom:14px}
+.tab{padding:6px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;border:1px solid #475569;color:#94a3b8;background:transparent;transition:.2s}
+.tab.active{background:#6366f1;color:#fff;border-color:#6366f1}
+.sil-bar{display:flex;align-items:center;gap:6px;margin:2px 0;font-size:.78rem}
+.sil-bar .bar{height:10px;border-radius:4px;min-width:2px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid #334155}
+th{color:#a5b4fc;font-weight:600}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style></head><body>
+<div class="header">
+<h1>🔬 Spatial Clustering Report</h1>
+<p>vormap_cluster — 180 points analyzed</p>
+</div>
+<div class="grid" id="grid"></div>
+<script>
+const pts=[[145.68, 144.81], [146.66, 171.06], [146.17, 105.08], [159.97, 141.98], [143.49, 153.48], [156.97, 184.91], [169.7, 153.32], [127.85, 119.56], [157.39, 189.33], [151.25, 146.81], [165.95, 106.39], [140.63, 164.71], [176.2, 142.78], [161.3, 157.45], [173.47, 116.6], [167.05, 104.56], [71.4, 131.79], [122.53, 176.28], [169.93, 113.43], [175.42, 119.93], [147.41, 141.18], [153.43, 174.56], [169.15, 160.5], [169.5, 164.35], [131.19, 128.48], [135.9, 164.98], [142.5, 220.07], [125.42, 117.03], [173.05, 192.66], [165.17, 175.07], [192.79, 147.18], [107.31, 134.04], [178.59, 106.69], [151.01, 157.6], [140.53, 171.71], [167.42, 219.64], [168.6, 131.72], [133.15, 125.05], [178.57, 133.0], [147.89, 172.48], [378.3, 91.19], [344.76, 67.53], [382.97, 112.47], [435.8, 99.45], [407.84, 105.04], [432.54, 126.8], [408.21, 69.67], [427.1, 111.43], [436.81, 99.1], [458.59, 89.23], [447.79, 103.45], [384.51, 66.15], [395.47, 142.7], [424.49, 120.67], [328.72, 121.33], [416.68, 83.5], [381.18, 99.93], [451.75, 68.35], [387.17, 140.85], [386.62, 89.07], [402.93, 62.76], [406.6, 63.71], [426.56, 100.1], [468.5, 108.43], [440.97, 60.9], [396.34, 109.69], [452.37, 49.57], [429.72, 117.74], [446.01, 121.37], [401.56, 84.35], [362.55, 105.86], [394.25, 160.61], [381.67, 109.61], [352.93, 88.14], [407.83, 124.72], [443.44, 98.68], [366.48, 113.74], [415.51, 114.75], [378.99, 134.0], [402.64, 120.99], [288.22, 368.28], [258.6, 414.58], [257.31, 341.12], [253.36, 394.48], [253.56, 365.58], [285.87, 334.61], [198.2, 358.98], [256.89, 331.76], [276.13, 368.23], [220.15, 365.55], [244.12, 305.51], [263.59, 348.64], [227.64, 365.69], [264.64, 332.67], [262.01, 380.45], [228.62, 361.43], [250.08, 417.98], [194.13, 370.86], [240.81, 346.99], [307.05, 349.74], [317.23, 336.74], [260.52, 335.27], [229.28, 351.87], [241.52, 356.07], [186.85, 410.07], [244.99, 402.29], [219.79, 358.78], [344.95, 323.91], [205.14, 333.6], [264.17, 370.8], [288.71, 342.29], [201.93, 336.95], [287.21, 363.97], [191.29, 348.95], [291.95, 413.8], [266.85, 359.28], [212.79, 324.7], [251.41, 365.1], [267.41, 335.65], [215.44, 326.67], [415.29, 369.3], [380.63, 340.0], [463.5, 395.66], [452.14, 380.04], [438.03, 327.67], [429.77, 395.82], [479.83, 364.62], [549.91, 349.03], [468.61, 359.23], [443.34, 419.49], [495.2, 308.02], [438.0, 362.85], [473.5, 309.55], [382.33, 292.81], [447.87, 346.9], [460.36, 326.91], [413.27, 289.31], [459.88, 361.1], [479.79, 373.72], [444.28, 390.48], [445.91, 330.17], [434.38, 332.46], [385.03, 354.69], [457.5, 339.13], [428.58, 361.15], [501.51, 351.15], [434.77, 332.26], [447.91, 312.06], [446.24, 351.84], [505.34, 378.3], [481.02, 328.61], [470.1, 315.82], [459.36, 362.56], [427.01, 409.98], [467.02, 292.92], [466.59, 337.78], [450.04, 363.97], [461.72, 288.83], [415.25, 373.18], [489.04, 407.09], [518.76, 488.1], [486.46, 440.71], [14.87, 368.28], [199.31, 465.41], [481.34, 432.03], [486.45, 133.4], [472.42, 54.05], [523.3, 429.3], [133.46, 408.29], [276.18, 152.6], [477.21, 113.8], [14.2, 96.56], [196.96, 432.18], [580.13, 139.56], [384.89, 199.84], [588.69, 268.11], [563.54, 57.67], [582.24, 89.28], [577.52, 132.73], [65.04, 217.28]];
+const km={"k": 4, "centroids": [[240.11, 363.5], [150.3, 149.97], [459.74, 356.55], [425.41, 103.71]], "silhouette": 0.6868, "k_scores": {"2": 0.4565, "3": 0.5073, "4": 0.6868, "5": 0.6082, "6": 0.6021, "7": 0.5121, "8": 0.4617, "9": 0.4647, "10": 0.3679}, "cluster_sizes": {"1": 43, "3": 48, "0": 44, "2": 45}, "labels": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 3, 3, 2, 0, 1, 3, 1, 0, 3, 3, 2, 3, 3, 3, 1]};
+const db={"eps": 61.7521, "n_clusters": 3, "n_noise": 8, "silhouette": 0.5963, "cluster_sizes": {"0": 40, "1": 45, "2": 87}, "labels": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, -1, 2, 2, 1, 1, 2, 2, 1, 1, -1, 2, -1, 1, -1, -1, -1, -1, -1]};
+const meta={"n_points": 180, "algo": "both", "recommendations": ["Moderate clustering \u2014 groups exist but overlap somewhat.", "Low agreement between k-means and DBSCAN \u2014 clusters may be non-convex or have variable density."], "agreement": 0.2616};
+const colors=["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc948", "#b07aa1", "#ff9da7", "#9c755f", "#bab0ac", "#6a3d9a", "#33a02c", "#fb9a99", "#1f78b4", "#ff7f00"];
+const grid=document.getElementById('grid');
+
+function h(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html)e.innerHTML=html;return e}
+function card(title,cls){const c=h('div','card'+(cls?' '+cls:''));c.appendChild(h('h2','','<span>'+title+'</span>'));return c}
+
+// Stats card
+const statsCard=card('📊 Overview','full');
+let statsHtml='';
+statsHtml+='<div class="stat"><div class="val">'+pts.length+'</div><div class="lbl">Points</div></div>';
+if(km)statsHtml+='<div class="stat"><div class="val">'+km.k+'</div><div class="lbl">K-Means K</div></div><div class="stat"><div class="val">'+km.silhouette+'</div><div class="lbl">K-Means Silhouette</div></div>';
+if(db)statsHtml+='<div class="stat"><div class="val">'+db.n_clusters+'</div><div class="lbl">DBSCAN Clusters</div></div><div class="stat"><div class="val">'+db.n_noise+'</div><div class="lbl">Noise Points</div></div><div class="stat"><div class="val">'+db.silhouette+'</div><div class="lbl">DBSCAN Silhouette</div></div>';
+if(meta.agreement!=null)statsHtml+='<div class="stat"><div class="val">'+(meta.agreement*100).toFixed(1)+'%</div><div class="lbl">Agreement</div></div>';
+statsCard.appendChild(h('div','',statsHtml));
+grid.appendChild(statsCard);
+
+// Scatter plot
+const scatterCard=card('🗺️ Cluster Map','full');
+const tabDiv=h('div','tabs');
+let activeAlgo=km?'kmeans':'dbscan';
+function mkTab(name,label){const b=h('button','tab'+(name===activeAlgo?' active':''),label);b.onclick=()=>{activeAlgo=name;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));b.classList.add('active');drawScatter()};tabDiv.appendChild(b)}
+if(km)mkTab('kmeans','K-Means');
+if(db)mkTab('dbscan','DBSCAN');
+scatterCard.appendChild(tabDiv);
+const cv=document.createElement('canvas');cv.width=900;cv.height=500;
+scatterCard.appendChild(cv);grid.appendChild(scatterCard);
+
+function drawScatter(){
+const ctx=cv.getContext('2d');const W=cv.width,H=cv.height;
+ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+const labels=activeAlgo==='kmeans'?km.labels:db.labels;
+let xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;
+pts.forEach(p=>{if(p[0]<xmin)xmin=p[0];if(p[0]>xmax)xmax=p[0];if(p[1]<ymin)ymin=p[1];if(p[1]>ymax)ymax=p[1]});
+const pad=40;const dx=xmax-xmin||1,dy=ymax-ymin||1;
+function tx(x){return pad+(x-xmin)/dx*(W-2*pad)}
+function ty(y){return H-pad-(y-ymin)/dy*(H-2*pad)}
+// grid
+ctx.strokeStyle='#1e293b';ctx.lineWidth=1;
+for(let i=0;i<=4;i++){const x=pad+i*(W-2*pad)/4;ctx.beginPath();ctx.moveTo(x,pad);ctx.lineTo(x,H-pad);ctx.stroke();
+const y=pad+i*(H-2*pad)/4;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke()}
+// points
+pts.forEach((p,i)=>{const l=labels[i];ctx.beginPath();ctx.arc(tx(p[0]),ty(p[1]),l<0?3:5,0,Math.PI*2);
+ctx.fillStyle=l<0?'#475569':colors[l%colors.length];ctx.globalAlpha=l<0?0.4:0.8;ctx.fill();ctx.globalAlpha=1});
+// centroids
+if(activeAlgo==='kmeans'&&km){km.centroids.forEach((c,i)=>{ctx.beginPath();ctx.arc(tx(c[0]),ty(c[1]),10,0,Math.PI*2);ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle=colors[i%colors.length];ctx.fill();
+ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(i,tx(c[0]),ty(c[1])+3)})}
+}
+drawScatter();
+
+// K-scores chart
+if(km&&km.k_scores){
+const kCard=card('📈 Silhouette by K');
+const kc=document.createElement('canvas');kc.width=400;kc.height=250;kCard.appendChild(kc);grid.appendChild(kCard);
+const kctx=kc.getContext('2d');const ks=Object.entries(km.k_scores).map(e=>[+e[0],e[1]]);
+const maxS=Math.max(...ks.map(e=>e[1]),0.01);
+kctx.fillStyle='#0f172a';kctx.fillRect(0,0,400,250);
+const bw=30,gap=12,startX=50;
+ks.forEach((e,i)=>{const bh=e[1]/maxS*180;const x=startX+i*(bw+gap);const y=230-bh;
+kctx.fillStyle=e[0]===km.k?'#6366f1':'#475569';kctx.fillRect(x,y,bw,bh);
+kctx.fillStyle='#e2e8f0';kctx.font='11px sans-serif';kctx.textAlign='center';
+kctx.fillText('k='+e[0],x+bw/2,245);kctx.fillText(e[1].toFixed(3),x+bw/2,y-5)})}
+
+// Cluster sizes table
+if(km||db){
+const tCard=card('📋 Cluster Sizes');
+let thtml='<table><tr><th>Cluster</th><th>Size</th><th>%</th></tr>';
+const sizes=km?km.cluster_sizes:(db?db.cluster_sizes:{});
+const total=pts.length;
+Object.entries(sizes).sort((a,b)=>a[0]-b[0]).forEach(e=>{
+thtml+='<tr><td><span style="color:'+colors[+e[0]%colors.length]+'">●</span> Cluster '+e[0]+'</td><td>'+e[1]+'</td><td>'+(e[1]/total*100).toFixed(1)+'%</td></tr>'});
+thtml+='</table>';tCard.appendChild(h('div','',thtml));grid.appendChild(tCard)}
+
+// Recommendations
+if(meta.recommendations&&meta.recommendations.length){
+const rCard=card('💡 Recommendations');
+let rhtml='';meta.recommendations.forEach(r=>rhtml+='<div class="rec">'+r+'</div>');
+rCard.appendChild(h('div','',rhtml));grid.appendChild(rCard)}
+</script></body></html>

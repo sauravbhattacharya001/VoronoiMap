@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-04-21T06:03:35.174Z",
-  "totalRuns": 2773,
+  "lastUpdated": "2026-04-22T05:40:00.000Z",
+  "totalRuns": 2867,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -9,26 +9,26 @@
     },
     "bug_fix": {
       "weight": 17.1,
-      "runs": 160,
-      "successes": 161
+      "runs": 161,
+      "successes": 162
     },
     "security_fix": {
       "weight": 18.1,
-      "runs": 264,
-      "successes": 264,
+      "runs": 276,
+      "successes": 276,
       "description": "Fix security vulnerability",
       "totalDone": 11
     },
     "perf_improvement": {
       "weight": 17.1,
-      "runs": 417,
-      "successes": 415,
+      "runs": 442,
+      "successes": 440,
       "description": "Performance improvement"
     },
     "refactor": {
       "weight": 18.1,
-      "runs": 413,
-      "successes": 414
+      "runs": 435,
+      "successes": 436
     },
     "readme_overhaul": {
       "weight": 20,
@@ -37,37 +37,37 @@
     },
     "doc_update": {
       "weight": 16.1,
-      "runs": 95,
-      "successes": 97,
+      "runs": 96,
+      "successes": 98,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
       "weight": 18.1,
-      "runs": 88,
-      "successes": 88,
+      "runs": 90,
+      "successes": 90,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 15.1,
-      "runs": 136,
-      "successes": 139,
+      "runs": 137,
+      "successes": 140,
       "description": "Open a thoughtful issue",
       "totalDone": 2,
       "attempts": 4
     },
     "fix_issue": {
       "weight": 15.1,
-      "runs": 246,
-      "successes": 245,
+      "runs": 247,
+      "successes": 246,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
       "weight": 25,
-      "runs": 99,
-      "successes": 67,
+      "runs": 101,
+      "successes": 68,
       "description": "Review and merge open Dependabot PRs"
     },
     "add_ci_cd": {
@@ -78,26 +78,26 @@
     },
     "add_codeql": {
       "weight": 10,
-      "runs": 18,
-      "successes": 18,
+      "runs": 19,
+      "successes": 19,
       "description": "Add CodeQL security scanning"
     },
     "add_dependabot": {
       "weight": 20,
-      "runs": 28,
-      "successes": 28,
+      "runs": 30,
+      "successes": 30,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
       "weight": 20,
-      "runs": 25,
-      "successes": 24,
+      "runs": 26,
+      "successes": 25,
       "description": "Deploy to GitHub Pages"
     },
     "create_release": {
       "weight": 20,
-      "runs": 332,
-      "successes": 331,
+      "runs": 352,
+      "successes": 351,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
@@ -120,8 +120,8 @@
     },
     "add_badges": {
       "weight": 10,
-      "runs": 21,
-      "successes": 21,
+      "runs": 22,
+      "successes": 22,
       "description": "Add badges to README"
     },
     "add_license": {
@@ -138,14 +138,14 @@
     },
     "contributing_md": {
       "weight": 20,
-      "runs": 32,
-      "successes": 32,
+      "runs": 33,
+      "successes": 33,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
       "weight": 10,
-      "runs": 24,
-      "successes": 24,
+      "runs": 25,
+      "successes": 25,
       "description": "Add repo topics/tags"
     },
     "branch_protection": {
@@ -162,8 +162,8 @@
     },
     "docs_site": {
       "weight": 20,
-      "runs": 32,
-      "successes": 31
+      "runs": 33,
+      "successes": 32
     },
     "auto_labeler": {
       "weight": 10,
@@ -178,33 +178,41 @@
     },
     "add_tests": {
       "weight": 18.1,
-      "runs": 46,
-      "successes": 46,
+      "runs": 48,
+      "successes": 48,
       "description": "Add test suites for untested modules"
     }
   },
   "repoState": {},
-  "notes": "Run 2902-2903: perf_improvement on agenticchat (single-pass word metrics in ReadabilityPanel analyzeText + cached tokenization in SmartContextSidebar _findRelatedMessages). refactor on sauravcode (extracted shared html_escape into sauravtext, deduplicated from sauravdoc/sauravhl/sauravcov).",
-  "previousNotes": "Run 2900-2901: create_release on gif-captcha (v1.10.0 — 7 commits since v1.9.0, 2 features + security + perf + refactors). perf_improvement on VoronoiMap (eliminated sqrt from IDW hot loop in vormap_contour.py when power=2, both brute-force and spatial-index paths).",
-  "previousPreviousNotes": "Run 2898-2899: perf_improvement on ai (single-pass aggregation in fatigue_detector analyze(), O(D*M) mitigation dedup in risk_profiler). security_fix on BioBots (CWE-1321 prototype pollution in labNotebook.js entry.results iteration).",
-  "previousPreviousPreviousNotes": "Run 2896-2897: perf_improvement on sauravcode (merged 6 separate StaticAnalyzer passes in sauravguard into single-pass scanner with pre-compiled class-level regexes â€” 6Ã—N iterations â†’ 1Ã—N). refactor on agenticchat (extracted _makeOverlayPair shared factory from 3 identical _createOverlay implementations in TextExpander, PreferencePanel, ShareOverlay).",
-  "previousPreviousPreviousPreviousNotes": "Run 2878-2879: merge_dependabot on agentlens (merged 6 Dependabot PRs â€” actions/checkout v4â†’v6, actions/attest-build-provenance v2â†’v4, docker/setup-buildx-action v3â†’v4, codecov/codecov-action v5â†’v6, docker/login-action v3â†’v4, pydantic >=2.13.0â†’>=2.13.3). perf_improvement on BioBots (cached linearForecast+rateOfChange in contaminationEarlyWarning ingest() so assess()/trendReport() skip redundant O(n) recomputation; replaced hand-rolled two-pass regression in westernBlot estimateMW() with shared single-pass stats.linearRegression).",
-  "previousPreviousPreviousPreviousPreviousNotes": "Run 2872-2873: add_tests on agentlens (46 new tests for cli_digest â€” _parse_ts, _filter_by_window, _sum_metric, _count_errors, _pct_change, _arrow, _model_breakdown, _top_sessions, all 3 renderers, cmd_digest integration). code_cleanup on Ocaml-sample-code (stream_buffer O(nÂ²) List.lengthâ†’counter, deduplicate stream_sampleâ†’stream_throttle, sink_stats 4-passâ†’single fold).",
-  "previousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2870-2871: code_cleanup on GraphVisual (removed 10 dead private edge-type fields from NetworkReportGenerator + GraphSummarizer, replaced duplicate countComponents() BFS with GraphUtils.findComponents()). code_coverage on Ocaml-sample-code (added 13 missing test suites to coverage workflow â€” aa_tree, astar, bloom_filter, bplus_tree, cellular_automata, constraint, dancing_links, free_monad, huffman, order_statistics_tree, pairing_heap, sat_solver, treap).",
-  "previousPreviousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2868-2869: security_fix on WinSentinel (CWE-94 â€” HardenScriptGenerator embedded raw FixCommand in { } scriptblock literals, allowing breakout via '}'; now Base64-encodes and uses [scriptblock]::Create()). perf_improvement on agentlens (SessionCorrelator._max_concurrent_usage re-scanned all events per resource O(R*E); now reuses resource_intervals from _build_event_index() for O(E) total).",
-  "lastRepo": "BioBots",
-  "lastRun": "2026-04-20",
-  "runCount": 960,
+  "notes": "Run 2996-2997: refactor on sauravcode (extracted _termcolors.py shared module — deduplicated ~70 lines of ANSI color helpers from sauravkata, sauravlearn, sauravpipe, sauravrepl, sauravtest into Colors class). create_release on GraphVisual (v2.54.0 — migration snapshot perf: reuse prev snapshot map, single-pass getSummary).",
+  "previousNotes": "Run 2990-2991: add_codeql on agenticchat (added .github/codeql-config.yml with security-and-quality query suite, path exclusions for tests/docs/node_modules, filtered noisy rules). deploy_pages on FeedReader (new changelog.html page with full release history v1.0.0-v1.3.0, added to nav across all 8 pages, updated sitemap).",
+  "previousNotes": "Run 2988-2989: perf_improvement on ai (pre-compiled 6 regex pattern lists and pre-matched statements in deception_detector — O(n²×2P) regex calls → O(n×2P) pre-match + O(n²) set intersections in inconsistency detection). security_fix on BioBots (XSS escaping in fleet-commander.html — escapeHtml for all localStorage-sourced string data rendered via innerHTML, plus type validation on load).",
+  "previousNotes": "Run 2986-2987: repo_topics on sauravbhattacharya001 (replaced redundant 'personal'/'about-me' with 'dotnet'/'natural-language-processing' for better discoverability). docs_site on gif-captcha (new directory.html — searchable catalog of all 67 interactive tools organized into 7 categories with live filtering and section counts, linked from index.html).",
+  "previousNotes": "Run 2978-2979: perf_improvement on agenticchat (spatial grid index for O(1) collision detection in WordCloudGenerator — replaced O(placed) linear scan with 64px grid partitioning for spiral placement). create_release on everything (v7.30.0 — Expense Forecaster, Smart Pattern Detector, Daily Challenge Generator, Smart Streak Guardian).",
+  "previousPreviousNotes": "Run 2970-2971: refactor on GraphVisual (cached directed adjacency map and analysis result in TopologicalSortAnalyzer — eliminated 3× redundant O(V+E) graph traversals in generateSummary/analyzeDependencies/countChoicePoints). create_release on gif-captcha (v1.12.0 — Genetic Arms Race simulator, Immune System adaptive defense, dependabot config).",
+  "previousNotes": "Run 2968-2969: perf_improvement on agentlens (single-pass event classification and model aggregation in NarrativeGenerator — O(4·E)→O(E) event classifying, O(models×E)→O(E) model token counting). security_fix on BioBots (prototype pollution guards in experimentTracker.importAll and PrintQueue.fromJSON — reject dangerous keys, sanitize imported JSON data).",
+  "previousNotes": "Run 2966-2967: refactor on GraphVisual (deduplicated 6 copy-pasted Edmonds-Karp BFS augmentation loops in VertexConnectivityAnalyzer — extracted buildResidual, buildEdgeCapacity, runMaxFlow, bfsFindPath, applyAugmentation, bfsReachable helpers, -116 lines). create_release on prompt (v5.11.0 — ReDoS timeout guards on 25+ unprotected Regex calls).",
+  "previousNotes": "Run 2964-2965: perf_improvement on ai (in-place DFS in attack_graph._find_all_paths — eliminated O(b^d * d) list allocations from path_ids+[x] concatenation, added visited set for O(1) cycle checks). security_fix on WinSentinel (reject Windows reserved device names CON/NUL/PRN/AUX/COMx/LPTx in InputSanitizer.ValidateFilePath — prevents silent data loss during quarantine and DoS via device name paths).",
+  "previousNotes": "Run 2962-2963: perf_improvement on BioBots (cached daily usage in equipmentScheduler slot suggestion — O(days×bookings) vs O(slots×bookings), inlined booking count in computeUtilization). refactor on agenticchat (deduplicated code-block stripping in ConversationSummarizer — extractDecisions+extractActionItems shared pre-stripped content).",
+  "previousPreviousNotes": "Run 2958-2959: security_fix on prompt (ReDoS timeout guards for 25+ unprotected Regex calls in PromptAutopilot and PromptAudienceAdapter). refactor on sauravcode (pre-compiled regexes + fixed 'func' keyword to 'function' in sauravintent and sauravmentor — both modules couldn't detect any function definitions).",
+  "previousPreviousPreviousNotes": "Run 2956-2957: refactor on VoronoiMap (deduplicated _clamp/_lerp/_lerp_color into vormap_utils — removed 10 inlined copies across 6 modules). add_dependabot on getagentbox (added npm ecosystem with grouped updates to dependabot config).",
+  "previousPreviousPreviousPreviousNotes": "Run 2952-2953: perf_improvement on agenticchat (pre-compiled gi-flagged RegExp patterns in ModelAdvisor _analyzeContent â€” eliminated up to 39 RegExp allocations per call). refactor on Vidly (deduplicated CalculateShannonEvenness from CustomerWrappedService into shared CustomerRentalAnalytics.ShannonEntropy overload).",
+  "previousPreviousPreviousPreviousPreviousNotes": "Run 2946-2947: refactor on gif-captcha (deduplicated ~80 lines of inlined LruTracker, _clamp, _now from trust-score-engine.js â€” replaced with imports from shared-utils.js). perf_improvement on VoronoiMap (eliminated O(nÂ²) sqrt calls in PSO objective functions â€” squared-distance comparisons in _obj_max_spread, _obj_min_energy, _nearest_neighbor_dists).",
+  "previousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2944-2945: perf_improvement on ai (eliminated redundant O(agents*N) interaction scans in game_theory â€” pre-built per-agent move sequences, single global_cooperation_rate computation). create_release on everything (v7.29.0 â€” Goal Autopilot, Smart Habit Insights, 56 tests, streak refactor, 2 CI bumps).",
+  "previousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2936-2937: perf_improvement on GraphVisual (lazy BFS initialization in EdgeBetweennessAnalyzer â€” O(reachable) per source instead of O(V) full-vertex init). add_tests on ai (25 tests for circuit_breaker â€” state machine lifecycle, adaptive thresholds, journal, fleet management).",
+  "lastRepo": "ai",
+  "lastRun": "2026-04-21",
+  "runCount": 974,
   "lastTasks": [
-    "perf_improvement",
-    "refactor"
+    "refactor",
+    "create_release"
   ],
   "lastRepos": [
-    "agenticchat",
-    "sauravcode"
+    "sauravcode",
+    "GraphVisual"
   ],
-  "lastRunTimestamp": "2026-04-21T06:03:35.175Z",
-  "runCounter": 2903,
+  "lastRunTimestamp": "2026-04-22T05:10:00.000Z",
+  "runCounter": 2997,
   "lastWeightAdjustment": 1191,
   "adjustmentHistory": [
     {
@@ -242,5 +250,6 @@
       "run": 1191,
       "note": "No changes needed - all task types stable."
     }
-  ]
+  ],
+  "previousPreviousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2934-2935: create_release on agentlens (v1.44.0 â€” 3 new dashboards, 5 perf improvements, 46 new tests, webhook refactor, cleanup). refactor on Vidly (extracted CustomerRentalAnalytics shared utility from WinBackService and ChurnPredictorService â€” deduplicated rental lookup, genre distribution, gap computation, late return rate, Shannon entropy)."
 }

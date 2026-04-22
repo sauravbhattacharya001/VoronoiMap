@@ -1,0 +1,71 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:codex:acp:decf5fa2-7bed-4ce6-a3fb-3773804ab689:oneshot:574946bc-0716-4813-b0ed-10039d40a363",
+  "acp_session_id": "019db080-6865-7d22-ba23-979fe10582db",
+  "agent_command": "npx @zed-industries/codex-acp@^0.11.1",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+  "name": "agent:codex:acp:decf5fa2-7bed-4ce6-a3fb-3773804ab689",
+  "created_at": "2026-04-21T14:44:53.210Z",
+  "last_used_at": "2026-04-21T14:45:08.204Z",
+  "last_seq": 0,
+  "last_request_id": "15d1db76-d311-4ab4-a307-e0cbceac040e",
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Acodex%3Aacp%3Adecf5fa2-7bed-4ce6-a3fb-3773804ab689%3Aoneshot%3A574946bc-0716-4813-b0ed-10039d40a363.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": true,
+  "closed_at": "2026-04-21T14:45:08.358Z",
+  "pid": 16860,
+  "agent_started_at": "2026-04-21T14:44:54.814Z",
+  "last_prompt_at": "2026-04-21T14:44:58.846Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "loadSession": true,
+    "promptCapabilities": {
+      "image": true,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": false
+    },
+    "sessionCapabilities": {
+      "list": {},
+      "close": {}
+    },
+    "auth": {
+      "logout": {}
+    }
+  },
+  "title": null,
+  "messages": [
+    {
+      "User": {
+        "id": "41526bdf-7bb3-49b2-83db-1886c37b4d20",
+        "content": [
+          {
+            "Text": "[Tue 2026-04-21 07:44 PDT] Add a new Security SLA Monitor CLI command (--sla) to WinSentinel. This is a C# .NET project.\n\n## What to Build\n\nA `--sla` command that provides autonomous remediation SLA tracking and enforcement. It analyzes scan history to track how long findings have been open, assigns SLA deadlines based on severity, detects breaches, and provides escalation recommendations.\n\n## Files to Create/Modify\n\n### 1. Create `src/WinSentinel.Cli/ConsoleFormatter.Sla.cs`\n\nA partial class extension of `ConsoleFormatter` with a `FormatSla` method. The output should include:\n\n**SLA Policy Table:**\n- Critical: 24h SLA\n- High: 72h SLA  \n- Medium: 7 days SLA\n- Low: 30 days SLA\n- Info: No SLA\n\n**SLA Dashboard sections:**\n1. **SLA Summary** - total findings tracked, on-track, at-risk (>75% elapsed), breached, compliance rate\n2. **Breached SLAs** - table of findings that exceeded their deadline with severity, age, overdue duration\n3. **At-Risk SLAs** - findings approaching deadline (>75% elapsed) with time remaining\n4. **SLA Compliance by Module** - per-module compliance rates with best/worst indicators\n5. **Escalation Queue** - prioritized list of findings needing immediate attention, sorted by overdue severity\n6. **Proactive Recommendations** - AI-style recommendations based on patterns (e.g., \"Module X has recurring breaches, consider dedicated remediation sprint\")\n7. **SLA Trend** - if multiple scans exist, show compliance trend over time\n\nUse colored console output (green=on-track, yellow=at-risk, red=breached). Use box-drawing characters for tables consistent with other ConsoleFormatter files.\n\n### 2. Modify `src/WinSentinel.Cli/Program.cs`\n\nAdd the `--sla` command handler. Look at how other commands like `--patrol`, `--watchdog`, `--drift` are registered in Program.cs. Follow the same pattern:\n- Add a case for `\"--sla\"` or `\"sla\"` \n- It should load scan history from the store (similar to how other commands do it)\n- Call `ConsoleFormatter.FormatSla(...)` with the findings data\n- Support optional flags: `--sla --module <name>` to filter by module, `--sla --severity critical,high` to filter by severity\n\n### 3. Modify `src/WinSentinel.Cli/CliParser.cs`\n\nAdd `--sla` to the CLI parser so it's recognized as a valid command. Follow the pattern of existing commands.\n\n## Important Guidelines\n\n- Read existing ConsoleFormatter partial classes (e.g., ConsoleFormatter.Patrol.cs, ConsoleFormatter.Drift.cs) to match the code style exactly\n- Read Program.cs to understand how commands are wired up (it's a large file, focus on the command dispatch section)\n- Read CliParser.cs to see how commands are registered\n- The SLA calculation should be based on finding severity and first-seen date from scan history\n- Use `DateTime.UtcNow` for time calculations\n- Keep all new code in the `WinSentinel.Cli` namespace\n- Make sure the code compiles: run `dotnet build --no-restore -q` from the repo root before finishing\n- If build fails, fix the errors\n\n## Verification\n\nRun `dotnet build --no-restore -q` from the repo root. Fix any errors until it compiles clean."
+          }
+        ]
+      }
+    }
+  ],
+  "updated_at": "2026-04-21T14:44:58.836Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {
+    "available_commands": [
+      "review",
+      "review-branch",
+      "review-commit",
+      "init",
+      "compact",
+      "undo",
+      "logout"
+    ]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:codex:acp:60b00e87-f638-4592-8673-af2061a215b3:oneshot:e0ecbcc8-e0b1-4ea4-9219-6836a945e796",
+  "acp_session_id": "019db02d-e14e-7322-be03-b18453c963d2",
+  "agent_command": "npx @zed-industries/codex-acp@^0.11.1",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+  "name": "agent:codex:acp:60b00e87-f638-4592-8673-af2061a215b3",
+  "created_at": "2026-04-21T13:14:43.584Z",
+  "last_used_at": "2026-04-21T13:14:58.636Z",
+  "last_seq": 0,
+  "last_request_id": "f1895a74-8d57-48a7-a8e1-717489602248",
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Acodex%3Aacp%3A60b00e87-f638-4592-8673-af2061a215b3%3Aoneshot%3Ae0ecbcc8-e0b1-4ea4-9219-6836a945e796.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": true,
+  "closed_at": "2026-04-21T13:14:58.814Z",
+  "pid": 14920,
+  "agent_started_at": "2026-04-21T13:14:46.164Z",
+  "last_prompt_at": "2026-04-21T13:14:50.222Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "loadSession": true,
+    "promptCapabilities": {
+      "image": true,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": false
+    },
+    "sessionCapabilities": {
+      "list": {},
+      "close": {}
+    },
+    "auth": {
+      "logout": {}
+    }
+  },
+  "title": null,
+  "messages": [
+    {
+      "User": {
+        "id": "25dcc58b-77f8-4a12-b9e7-fdee1a159abe",
+        "content": [
+          {
+            "Text": "[Tue 2026-04-21 06:14 PDT] Create a new dashboard page `dashboard/regression.html` for AgentLens - an \"Agent Regression Tracker\" that detects performance regressions across agent deployments using statistical analysis.\n\nIMPORTANT: This is a SINGLE self-contained HTML file with inline CSS and JavaScript. Follow the same pattern as other dashboard pages in `dashboard/` (e.g., `cost-anomaly.html`, `correlator.html`). Look at one of them for the HTML structure, nav sidebar pattern, and styling approach. Use the same `styles.css` link and visual theme (dark theme with CSS variables from styles.css).\n\n## Feature Specification\n\nThe dashboard should include:\n\n### 1. Deployment Timeline\n- Visual timeline showing deployments (versions) with performance metrics\n- Color-coded: green (improvement), yellow (neutral), red (regression)\n- Click a deployment to see detailed metrics\n\n### 2. Regression Detection Engine (JavaScript)\n- Compare consecutive deployment windows using Welch's t-test approximation\n- Metrics tracked: latency (p50, p95), error rate, token usage, cost per request, success rate\n- Configurable significance level (α = 0.01, 0.05, 0.10)\n- Effect size calculation (Cohen's d) to distinguish meaningful vs statistical regressions\n- Auto-generates simulated deployment data for demo purposes\n\n### 3. Regression Report Panel\n- List of detected regressions sorted by severity (critical/warning/info)\n- Each finding shows: metric name, old mean → new mean, % change, p-value, effect size, severity badge\n- Proactive recommendations for each regression (e.g., \"Latency p95 increased 23% - consider rolling back or investigating model changes\")\n\n### 4. Metric Comparison Charts\n- Canvas-based before/after distribution overlays for selected metrics\n- Sparkline trend across last N deployments for each metric\n- Highlight the exact deployment where regression started\n\n### 5. Auto-Monitor Mode\n- Toggle button for \"continuous monitoring\" simulation\n- When enabled, new \"deployments\" appear every few seconds\n- Auto-detects and surfaces regressions with notification badges\n- Proactive alerts appear as toast notifications\n\n### 6. Proactive Insights\n- \"Root cause hypotheses\" section that correlates regressions across metrics\n- E.g., \"Latency and token usage both regressed in v2.4.1 - likely a prompt change\"\n- Confidence scoring for each hypothesis\n- Suggested investigation steps\n\n## Navigation\nAdd a link to regression.html in the sidebar nav. Look at how other pages are linked in the existing HTML files and follow the same pattern.\n\n## Technical Notes\n- Pure HTML/CSS/JS, no external dependencies except styles.css\n- Generate realistic simulated data (15-20 deployments with version numbers like v2.1.0, v2.2.0, etc.)\n- Use Canvas API for charts\n- Responsive layout\n- All interactive, all client-side\n\n## Build Verification\nAfter creating the file, verify:\n1. The HTML is well-formed (check for unclosed tags)\n2. No syntax errors in the JavaScript (the file should be parseable)\n\nDo NOT modify any existing files except to add a nav link if you can identify the common nav pattern. If the nav is in app.js or styles.css and complex, skip modifying it - just create the new HTML file."
+          }
+        ]
+      }
+    }
+  ],
+  "updated_at": "2026-04-21T13:14:50.216Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {
+    "available_commands": [
+      "review",
+      "review-branch",
+      "review-commit",
+      "init",
+      "compact",
+      "undo",
+      "logout"
+    ]
+  }
+}

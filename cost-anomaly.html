@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentLens — Cost Anomaly Detector</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .anomaly-container { padding: 24px; max-width: 1400px; margin: 0 auto; }
+    .anomaly-header { margin-bottom: 24px; }
+    .anomaly-header h1 { font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+    .anomaly-header p { color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .stat-card h3 { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .stat-card .value { font-size: 2rem; font-weight: 700; }
+    .stat-card .sub { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+    .stat-card .trend-up { color: var(--red); }
+    .stat-card .trend-down { color: var(--green); }
+
+    .panel-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .panel-row.equal { grid-template-columns: 1fr 1fr; }
+    .panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .panel h2 { font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .panel-full { grid-column: 1 / -1; }
+
+    .chart-area { position: relative; width: 100%; height: 300px; }
+    .chart-area canvas { width: 100% !important; height: 100% !important; }
+    .chart-tooltip { position: absolute; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 0.8rem; pointer-events: none; display: none; z-index: 10; }
+
+    .config-panel { display: grid; gap: 16px; }
+    .config-row { display: flex; align-items: center; gap: 12px; }
+    .config-row label { font-size: 0.85rem; color: var(--text-secondary); min-width: 120px; }
+    .config-row input[type="range"] { flex: 1; accent-color: var(--accent); }
+    .config-row .val { font-size: 0.85rem; font-weight: 600; min-width: 40px; }
+    .config-row input[type="number"] { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); padding: 6px 10px; border-radius: var(--radius-sm); width: 100px; }
+
+    .anomaly-feed { max-height: 400px; overflow-y: auto; }
+    .anomaly-item { padding: 12px; border-bottom: 1px solid var(--bg-tertiary); display: flex; gap: 12px; align-items: flex-start; transition: background 0.2s; cursor: pointer; }
+    .anomaly-item:hover { background: var(--bg-hover); }
+    .anomaly-severity { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .anomaly-severity.critical { background: var(--red); box-shadow: 0 0 6px var(--red); }
+    .anomaly-severity.warning { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+    .anomaly-info { flex: 1; }
+    .anomaly-info .title { font-size: 0.85rem; font-weight: 600; }
+    .anomaly-info .meta { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
+    .anomaly-info .hypothesis { font-size: 0.8rem; color: var(--text-tertiary); margin-top: 4px; font-style: italic; }
+    .anomaly-zscore { font-size: 0.75rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+
+    .budget-gauge { margin: 16px 0; }
+    .budget-track { height: 20px; background: var(--bg-tertiary); border-radius: 10px; overflow: hidden; position: relative; }
+    .budget-fill { height: 100%; border-radius: 10px; transition: width 0.6s ease; }
+    .budget-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px; }
+    .forecast-stat { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--bg-tertiary); font-size: 0.85rem; }
+    .forecast-stat .label { color: var(--text-secondary); }
+    .forecast-stat .val { font-weight: 600; }
+    .forecast-stat .val.danger { color: var(--red); }
+    .forecast-stat .val.safe { color: var(--green); }
+
+    .rec-cards { display: grid; gap: 12px; }
+    .rec-card { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; transition: transform 0.2s, box-shadow 0.2s; }
+    .rec-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .rec-card .rec-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+    .rec-card .rec-desc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px; }
+    .rec-card .rec-meta { display: flex; gap: 16px; font-size: 0.75rem; }
+    .rec-card .savings { color: var(--green); font-weight: 700; }
+    .rec-card .confidence { color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .panel-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-left">
+        <h1 class="logo">🔍 AgentLens</h1>
+        <span class="tagline">Observability for AI Agents</span>
+      </div>
+      <div class="header-right">
+        <a href="index.html" class="btn btn-alert-header" style="text-decoration:none">📊 Dashboard</a>
+        <a href="costs.html" class="btn btn-alert-header" style="text-decoration:none">💰 Costs</a>
+        <a href="cost-anomaly.html" class="btn btn-alert-header" style="text-decoration:none;background:var(--accent);color:#000">🔮 Cost Anomaly</a>
+        <a href="alerts.html" class="btn btn-alert-header" style="text-decoration:none">🚨 Alerts</a>
+        <a href="correlator.html" class="btn btn-alert-header" style="text-decoration:none">🔗 Correlator</a>
+      </div>
+    </header>
+
+    <main class="anomaly-container">
+      <div class="anomaly-header">
+        <h1>🔮 Cost Anomaly Detector</h1>
+        <p>Proactive cost monitoring with statistical anomaly detection, budget forecasting, and optimization recommendations</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <!-- Chart + Config -->
+      <div class="panel-row">
+        <div class="panel">
+          <h2>📈 Cost Timeline & Anomalies</h2>
+          <div class="chart-area">
+            <canvas id="costChart"></canvas>
+            <div class="chart-tooltip" id="chartTooltip"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>⚙️ Detection Settings</h2>
+          <div class="config-panel">
+            <div class="config-row">
+              <label>Z-Score Threshold</label>
+              <input type="range" id="zThreshold" min="1.5" max="4" step="0.1" value="2.5">
+              <span class="val" id="zVal">2.5</span>
+            </div>
+            <div class="config-row">
+              <label>Window (hours)</label>
+              <input type="range" id="windowSize" min="12" max="168" step="12" value="48">
+              <span class="val" id="windowVal">48</span>
+            </div>
+            <div class="config-row">
+              <label>Monthly Budget ($)</label>
+              <input type="number" id="budgetInput" value="5000" min="100" step="100">
+            </div>
+            <div class="config-row">
+              <label>Use MAD</label>
+              <input type="checkbox" id="useMad" checked>
+              <span class="val" style="font-size:0.75rem;color:var(--text-secondary)">Modified Z-Score (robust)</span>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <h2>📊 Budget Forecast</h2>
+            <div class="budget-gauge">
+              <div class="budget-track"><div class="budget-fill" id="budgetFill"></div></div>
+              <div class="budget-labels"><span id="budgetSpent">$0</span><span id="budgetLimit">$5000</span></div>
+            </div>
+            <div id="forecastStats"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Anomaly Feed + Recommendations -->
+      <div class="panel-row equal">
+        <div class="panel">
+          <h2>🚨 Anomaly Feed <span style="font-size:0.75rem;color:var(--text-secondary);font-weight:400;margin-left:auto">Last 7 days</span></h2>
+          <div class="anomaly-feed" id="anomalyFeed"></div>
+        </div>
+        <div class="panel">
+          <h2>💡 Optimization Recommendations</h2>
+          <div class="rec-cards" id="recCards"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  (function() {
+    // Seeded PRNG
+    function mulberry32(a) { return function() { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+    const rng = mulberry32(42);
+
+    // Generate 90 days of hourly cost data
+    const HOURS = 90 * 24;
+    const agents = ['agent-writer', 'agent-researcher', 'agent-analyzer', 'agent-coder', 'agent-reviewer'];
+    const models = ['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'claude-3-opus', 'claude-3-sonnet'];
+    const now = Date.now();
+    const data = [];
+    for (let i = 0; i < HOURS; i++) {
+      const hour = i % 24;
+      const dow = Math.floor(i / 24) % 7;
+      // Base cost with daily/weekly pattern
+      let cost = 2.0 + 1.5 * Math.sin((hour - 6) * Math.PI / 12);
+      if (dow >= 5) cost *= 0.6; // weekends lower
+      cost += rng() * 0.8;
+      // Occasional spikes
+      if (rng() < 0.015) cost += 5 + rng() * 15;
+      if (rng() < 0.005) cost += 20 + rng() * 30;
+      data.push({ ts: now - (HOURS - i) * 3600000, cost: Math.max(0.1, cost), agent: agents[Math.floor(rng() * agents.length)], model: models[Math.floor(rng() * models.length)] });
+    }
+
+    // Anomaly detection
+    let zThreshold = 2.5, windowSize = 48, useMad = true, budget = 5000;
+    let anomalies = [];
+
+    function detectAnomalies() {
+      anomalies = [];
+      for (let i = windowSize; i < data.length; i++) {
+        const window = data.slice(i - windowSize, i).map(d => d.cost);
+        const mean = window.reduce((a, b) => a + b, 0) / window.length;
+        let score;
+        if (useMad) {
+          const median = [...window].sort((a, b) => a - b)[Math.floor(window.length / 2)];
+          const mad = [...window].map(v => Math.abs(v - median)).sort((a, b) => a - b)[Math.floor(window.length / 2)];
+          score = mad === 0 ? 0 : 0.6745 * (data[i].cost - median) / mad;
+        } else {
+          const std = Math.sqrt(window.reduce((s, v) => s + (v - mean) ** 2, 0) / window.length);
+          score = std === 0 ? 0 : (data[i].cost - mean) / std;
+        }
+        if (Math.abs(score) > zThreshold) {
+          anomalies.push({ ...data[i], index: i, zscore: score, severity: Math.abs(score) > zThreshold + 1.5 ? 'critical' : 'warning' });
+        }
+      }
+    }
+
+    // Hypotheses
+    const hypotheses = [
+      d => `Token spike in ${d.agent} — cost ${d.cost.toFixed(2)} vs avg`,
+      d => `Unusual ${d.model} usage pattern detected`,
+      d => `Repeated prompt pattern in ${d.agent} — possible cache miss`,
+      d => `High-token completion from ${d.model}`,
+      d => `Concurrent burst from ${d.agent} — parallelism spike`,
+      d => `Model fallback to expensive tier (${d.model})`,
+    ];
+
+    function renderStats() {
+      const last7d = data.filter(d => d.ts > now - 7 * 86400000);
+      const anomalies7d = anomalies.filter(a => a.ts > now - 7 * 86400000);
+      const totalCost7d = last7d.reduce((s, d) => s + d.cost, 0);
+      const wasteCost = anomalies7d.reduce((s, a) => s + Math.max(0, a.cost - 4), 0);
+      const prevWeekAnomalies = anomalies.filter(a => a.ts > now - 14 * 86400000 && a.ts <= now - 7 * 86400000);
+      const trend = anomalies7d.length > prevWeekAnomalies.length ? 'up' : 'down';
+
+      const daysInMonth = 30;
+      const monthStart = now - (new Date().getDate() - 1) * 86400000;
+      const monthCost = data.filter(d => d.ts > monthStart).reduce((s, d) => s + d.cost, 0);
+      const utilPct = (monthCost / budget * 100).toFixed(1);
+
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card"><h3>Anomalies (7d)</h3><div class="value">${anomalies7d.length}</div><div class="sub trend-${trend}">▲ ${trend === 'up' ? '+' : '-'}${Math.abs(anomalies7d.length - prevWeekAnomalies.length)} vs prev week</div></div>
+        <div class="stat-card"><h3>Est. Waste (7d)</h3><div class="value" style="color:var(--red)">$${wasteCost.toFixed(0)}</div><div class="sub">Above-normal spend</div></div>
+        <div class="stat-card"><h3>Budget Used</h3><div class="value">${utilPct}%</div><div class="sub">$${monthCost.toFixed(0)} / $${budget}</div></div>
+        <div class="stat-card"><h3>Anomaly Trend</h3><div class="value trend-${trend}">${trend === 'up' ? '📈' : '📉'} ${trend.charAt(0).toUpperCase() + trend.slice(1)}</div><div class="sub">vs previous 7d</div></div>
+      `;
+    }
+
+    function renderChart() {
+      const canvas = document.getElementById('costChart');
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * 2; canvas.height = rect.height * 2;
+      ctx.scale(2, 2);
+      const W = rect.width, H = rect.height;
+      ctx.clearRect(0, 0, W, H);
+
+      // Show last 14 days
+      const viewData = data.slice(-336);
+      const viewAnomalies = anomalies.filter(a => a.index >= data.length - 336);
+      const maxCost = Math.max(...viewData.map(d => d.cost)) * 1.1;
+      const padL = 50, padR = 20, padT = 20, padB = 30;
+      const cW = W - padL - padR, cH = H - padT - padB;
+
+      const x = i => padL + (i / (viewData.length - 1)) * cW;
+      const y = v => padT + cH - (v / maxCost) * cH;
+
+      // Rolling mean & std
+      const rollN = Math.min(windowSize, 48);
+      const means = [], uppers = [], lowers = [];
+      for (let i = 0; i < viewData.length; i++) {
+        const start = Math.max(0, i - rollN);
+        const slice = viewData.slice(start, i + 1).map(d => d.cost);
+        const m = slice.reduce((a, b) => a + b, 0) / slice.length;
+        const s = Math.sqrt(slice.reduce((a, v) => a + (v - m) ** 2, 0) / slice.length);
+        means.push(m); uppers.push(m + 2 * s); lowers.push(m - 2 * s);
+      }
+
+      // Bounds fill
+      ctx.fillStyle = 'rgba(100,100,255,0.07)';
+      ctx.beginPath();
+      for (let i = 0; i < viewData.length; i++) { i === 0 ? ctx.moveTo(x(i), y(uppers[i])) : ctx.lineTo(x(i), y(uppers[i])); }
+      for (let i = viewData.length - 1; i >= 0; i--) { ctx.lineTo(x(i), y(Math.max(0, lowers[i]))); }
+      ctx.closePath(); ctx.fill();
+
+      // Cost line
+      ctx.strokeStyle = 'rgba(150,180,255,0.6)'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      viewData.forEach((d, i) => { i === 0 ? ctx.moveTo(x(i), y(d.cost)) : ctx.lineTo(x(i), y(d.cost)); });
+      ctx.stroke();
+
+      // Mean line
+      ctx.strokeStyle = 'rgba(100,255,180,0.5)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      means.forEach((m, i) => { i === 0 ? ctx.moveTo(x(i), y(m)) : ctx.lineTo(x(i), y(m)); });
+      ctx.stroke(); ctx.setLineDash([]);
+
+      // Anomaly dots
+      viewAnomalies.forEach(a => {
+        const idx = a.index - (data.length - 336);
+        if (idx < 0 || idx >= viewData.length) return;
+        ctx.beginPath();
+        ctx.arc(x(idx), y(a.cost), 4, 0, Math.PI * 2);
+        ctx.fillStyle = a.severity === 'critical' ? '#ff4444' : '#ffaa00';
+        ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
+      });
+
+      // Axes
+      ctx.fillStyle = 'rgba(200,200,200,0.5)'; ctx.font = '11px monospace'; ctx.textAlign = 'right';
+      for (let i = 0; i <= 5; i++) {
+        const v = (maxCost / 5) * i;
+        ctx.fillText('$' + v.toFixed(1), padL - 5, y(v) + 4);
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(padL, y(v)); ctx.lineTo(W - padR, y(v)); ctx.stroke();
+      }
+
+      // Tooltip on hover
+      canvas.onmousemove = function(e) {
+        const br = canvas.getBoundingClientRect();
+        const mx = e.clientX - br.left, my = e.clientY - br.top;
+        const idx = Math.round(((mx - padL) / cW) * (viewData.length - 1));
+        if (idx < 0 || idx >= viewData.length) { document.getElementById('chartTooltip').style.display = 'none'; return; }
+        const d = viewData[idx];
+        const tip = document.getElementById('chartTooltip');
+        tip.style.display = 'block';
+        tip.style.left = (mx + 10) + 'px'; tip.style.top = (my - 30) + 'px';
+        const date = new Date(d.ts);
+        tip.innerHTML = `<strong>$${d.cost.toFixed(2)}</strong><br>${date.toLocaleDateString()} ${date.getHours()}:00<br>${d.agent} / ${d.model}`;
+      };
+      canvas.onmouseleave = () => { document.getElementById('chartTooltip').style.display = 'none'; };
+    }
+
+    function renderForecast() {
+      const monthStart = now - (new Date().getDate() - 1) * 86400000;
+      const monthData = data.filter(d => d.ts > monthStart);
+      const monthCost = monthData.reduce((s, d) => s + d.cost, 0);
+      const daysPassed = new Date().getDate();
+      const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+      const dailyRate = monthCost / daysPassed;
+      const projected = dailyRate * daysInMonth;
+      const overrunDay = budget / dailyRate;
+      const willOverrun = projected > budget;
+
+      const pct = Math.min(100, (monthCost / budget) * 100);
+      const fill = document.getElementById('budgetFill');
+      fill.style.width = pct + '%';
+      fill.style.background = pct > 90 ? 'var(--red)' : pct > 70 ? 'var(--yellow)' : 'var(--green)';
+      document.getElementById('budgetSpent').textContent = '$' + monthCost.toFixed(0);
+      document.getElementById('budgetLimit').textContent = '$' + budget;
+
+      document.getElementById('forecastStats').innerHTML = `
+        <div class="forecast-stat"><span class="label">Daily burn rate</span><span class="val">$${dailyRate.toFixed(1)}/day</span></div>
+        <div class="forecast-stat"><span class="label">Projected month-end</span><span class="val ${willOverrun ? 'danger' : 'safe'}">$${projected.toFixed(0)}</span></div>
+        <div class="forecast-stat"><span class="label">Budget exhausted</span><span class="val ${willOverrun ? 'danger' : 'safe'}">${overrunDay < daysInMonth ? 'Day ' + Math.floor(overrunDay) : 'N/A — within budget'}</span></div>
+        <div class="forecast-stat"><span class="label">Status</span><span class="val ${willOverrun ? 'danger' : 'safe'}">${willOverrun ? '⚠️ Overrun likely' : '✅ On track'}</span></div>
+      `;
+    }
+
+    function renderFeed() {
+      const recent = anomalies.filter(a => a.ts > now - 7 * 86400000).sort((a, b) => b.ts - a.ts).slice(0, 30);
+      const feed = document.getElementById('anomalyFeed');
+      feed.innerHTML = recent.map(a => {
+        const date = new Date(a.ts);
+        const hyp = hypotheses[Math.floor(mulberry32(a.index)() * hypotheses.length)](a);
+        return `<div class="anomaly-item">
+          <div class="anomaly-severity ${a.severity}"></div>
+          <div class="anomaly-info">
+            <div class="title">${a.severity === 'critical' ? '🔴' : '🟡'} $${a.cost.toFixed(2)} — ${a.agent}</div>
+            <div class="meta">${date.toLocaleDateString()} ${date.toLocaleTimeString()} · ${a.model}</div>
+            <div class="hypothesis">${hyp}</div>
+          </div>
+          <div class="anomaly-zscore">z=${a.zscore.toFixed(2)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function renderRecommendations() {
+      const recs = [
+        { title: 'Downgrade drafts to GPT-3.5', desc: 'agent-writer uses GPT-4 for initial drafts. Switch to GPT-3.5-turbo for first pass — quality delta is minimal for drafts.', savings: '$18.40/day', confidence: '92%' },
+        { title: 'Enable prompt caching for agent-analyzer', desc: '34% of prompts are duplicates within 1-hour windows. Caching would eliminate redundant API calls.', savings: '$7.20/day', confidence: '87%' },
+        { title: 'Set token limit on agent-researcher', desc: '3 spikes >10K tokens this week from unconstrained research queries. Cap at 4K tokens with pagination.', savings: '$12.80/day', confidence: '78%' },
+        { title: 'Batch agent-reviewer requests', desc: 'Multiple small sequential calls could be batched into single prompts. Reduces overhead tokens by ~40%.', savings: '$5.60/day', confidence: '84%' },
+        { title: 'Schedule non-urgent tasks off-peak', desc: 'agent-coder runs 40% of jobs during peak hours. Shifting to off-peak reduces queue contention and retry costs.', savings: '$3.20/day', confidence: '71%' },
+      ];
+      document.getElementById('recCards').innerHTML = recs.map(r => `
+        <div class="rec-card">
+          <div class="rec-title">💡 ${r.title}</div>
+          <div class="rec-desc">${r.desc}</div>
+          <div class="rec-meta"><span class="savings">↓ ${r.savings}</span><span class="confidence">Confidence: ${r.confidence}</span></div>
+        </div>
+      `).join('');
+    }
+
+    function render() {
+      detectAnomalies();
+      renderStats();
+      renderChart();
+      renderForecast();
+      renderFeed();
+      renderRecommendations();
+    }
+
+    // Bind controls
+    document.getElementById('zThreshold').oninput = function() { zThreshold = +this.value; document.getElementById('zVal').textContent = this.value; render(); };
+    document.getElementById('windowSize').oninput = function() { windowSize = +this.value; document.getElementById('windowVal').textContent = this.value; render(); };
+    document.getElementById('budgetInput').oninput = function() { budget = +this.value; render(); };
+    document.getElementById('useMad').onchange = function() { useMad = this.checked; render(); };
+
+    render();
+    window.addEventListener('resize', renderChart);
+  })();
+  </script>
+</body>
+</html>
