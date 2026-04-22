@@ -45,6 +45,8 @@ import math
 import sys
 from collections import namedtuple
 
+from vormap_utils import bounding_box as _bounding_box
+
 # ---------------------------------------------------------------------------
 # Data structures
 
@@ -176,10 +178,7 @@ def _stddev(vals):
     return math.sqrt(sum((v - m) ** 2 for v in vals) / (len(vals) - 1))
 
 
-def _bounding_box(points):
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
-    return min(xs), min(ys), max(xs), max(ys)
+# _bounding_box is now imported from vormap_utils (single-pass, memory-efficient)
 
 
 def _nn_distances(points):

@@ -45,6 +45,8 @@ import os
 import random
 from typing import Any, Dict, List, Optional, Tuple
 
+from vormap_utils import bounding_box as _bounding_box
+
 # ── Geometry helpers ────────────────────────────────────────────────
 
 
@@ -59,10 +61,7 @@ def _centroid(pts: List[Tuple[float, float]]) -> Tuple[float, float]:
     return (sum(p[0] for p in pts) / n, sum(p[1] for p in pts) / n)
 
 
-def _bounding_box(pts: List[Tuple[float, float]]) -> Tuple[float, float, float, float]:
-    xs = [p[0] for p in pts]
-    ys = [p[1] for p in pts]
-    return (min(xs), min(ys), max(xs), max(ys))
+# _bounding_box is now imported from vormap_utils (single-pass, memory-efficient)
 
 
 # ── Voronoi cell computation (Fortune's algorithm not needed — use
@@ -394,9 +393,10 @@ def _generate_recommendations(
     # Isolation clusters
     if len(pts) > 5:
         cx, cy = _centroid(pts)
+        bb = _bounding_box(pts)
         far_pts = [i for i, p in enumerate(pts) if _dist(p, (cx, cy)) > max(
-            _bounding_box(pts)[2] - _bounding_box(pts)[0],
-            _bounding_box(pts)[3] - _bounding_box(pts)[1]
+            bb[2] - bb[0],
+            bb[3] - bb[1]
         ) * 0.4]
         if far_pts:
             recs.append({
