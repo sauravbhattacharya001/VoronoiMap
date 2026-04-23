@@ -80,18 +80,27 @@ def _nearest_neighbor_dists(pts: List[Tuple[float, float]]) -> List[float]:
 
 def _voronoi_areas(pts: List[Tuple[float, float]], w: float, h: float,
                    res: int = 80) -> List[float]:
-    """Estimate Voronoi cell areas via grid rasterisation."""
-    counts = [0] * len(pts)
+    """Estimate Voronoi cell areas via grid rasterisation.
+
+    Pre-extracts x/y into parallel lists to eliminate tuple unpacking
+    and enumerate overhead in the O(res² × n) inner loop.
+    """
+    n = len(pts)
+    counts = [0] * n
     sx = w / res
     sy = h / res
+    xs = [p[0] for p in pts]
+    ys = [p[1] for p in pts]
     for gy in range(res):
         py = (gy + 0.5) * sy
         for gx in range(res):
             px = (gx + 0.5) * sx
             best_i = 0
             best_d = float("inf")
-            for i, (cx, cy) in enumerate(pts):
-                d = (px - cx) ** 2 + (py - cy) ** 2
+            for i in range(n):
+                dx = px - xs[i]
+                dy = py - ys[i]
+                d = dx * dx + dy * dy
                 if d < best_d:
                     best_d = d
                     best_i = i
@@ -162,23 +171,33 @@ def _obj_coverage(pts: List[Tuple[float, float]], w: float, h: float) -> float:
 
 def _obj_cluster_balance(pts: List[Tuple[float, float]], w: float, h: float) -> float:
     k = max(2, len(pts) // 5)
-    # simple k-means (10 iterations)
-    centroids = list(random.sample(pts, min(k, len(pts))))
+    nc = min(k, len(pts))
+    # simple k-means (10 iterations) with inlined distance + parallel coord arrays
+    centroids = list(random.sample(pts, nc))
+    cx_arr = [c[0] for c in centroids]
+    cy_arr = [c[1] for c in centroids]
+    buckets: Dict[int, List[Tuple[float, float]]] = defaultdict(list)
     for _ in range(10):
-        buckets: Dict[int, List[Tuple[float, float]]] = defaultdict(list)
+        buckets.clear()
         for p in pts:
-            best_c = min(range(len(centroids)), key=lambda c: _dist(p, centroids[c]))
+            px, py = p
+            best_c = 0
+            best_d = float("inf")
+            for ci in range(nc):
+                dx = px - cx_arr[ci]
+                dy = py - cy_arr[ci]
+                d = dx * dx + dy * dy
+                if d < best_d:
+                    best_d = d
+                    best_c = ci
             buckets[best_c].append(p)
-        new_c = []
-        for c in range(len(centroids)):
-            if buckets[c]:
-                mx = sum(p[0] for p in buckets[c]) / len(buckets[c])
-                my = sum(p[1] for p in buckets[c]) / len(buckets[c])
-                new_c.append((mx, my))
-            else:
-                new_c.append(centroids[c])
-        centroids = new_c
-    sizes = [len(buckets.get(c, [])) for c in range(len(centroids))]
+        for ci in range(nc):
+            b = buckets.get(ci)
+            if b:
+                nb = len(b)
+                cx_arr[ci] = sum(p[0] for p in b) / nb
+                cy_arr[ci] = sum(p[1] for p in b) / nb
+    sizes = [len(buckets.get(c, [])) for c in range(nc)]
     mean = sum(sizes) / len(sizes)
     if mean < 1e-9:
         return 1e9
