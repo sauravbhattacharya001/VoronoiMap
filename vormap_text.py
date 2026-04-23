@@ -41,6 +41,7 @@ CLI::
 """
 
 import argparse
+import html as _html_mod
 import math
 import random
 import sys
@@ -475,12 +476,14 @@ def export_text_html(
             )
         svg_body = "\n".join(parts)
 
+    _esc_title = _html_mod.escape(title)
+
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{title}</title>
+<title>{_esc_title}</title>
 <style>
   body {{ margin: 0; display: flex; justify-content: center; align-items: center;
          min-height: 100vh; background: {background}; font-family: sans-serif; }}

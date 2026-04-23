@@ -29,6 +29,7 @@ Requires scipy (``pip install scipy``).
 """
 
 import argparse
+import html as _html_mod
 import json
 import math
 import os
@@ -304,7 +305,7 @@ def export_svg(result, output_path, width=800, height=600,
 
     if title:
         lines.append(f'<text x="{width//2}" y="15" text-anchor="middle" '
-                      f'font-size="14" font-family="sans-serif">{title}</text>')
+                      f'font-size="14" font-family="sans-serif">{_html_mod.escape(title)}</text>')
 
     # Determine color values
     if color_by == "error":
