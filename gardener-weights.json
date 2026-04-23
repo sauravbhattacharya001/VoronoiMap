@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-04-22T05:40:00.000Z",
-  "totalRuns": 2867,
+  "lastUpdated": "2026-04-23T05:55:00.000Z",
+  "totalRuns": 2947,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -14,26 +14,26 @@
     },
     "security_fix": {
       "weight": 18.1,
-      "runs": 276,
-      "successes": 276,
+      "runs": 282,
+      "successes": 282,
       "description": "Fix security vulnerability",
       "totalDone": 11
     },
     "perf_improvement": {
       "weight": 17.1,
-      "runs": 442,
-      "successes": 440,
+      "runs": 472,
+      "successes": 470,
       "description": "Performance improvement"
     },
     "refactor": {
       "weight": 18.1,
-      "runs": 435,
-      "successes": 436
+      "runs": 455,
+      "successes": 456
     },
     "readme_overhaul": {
       "weight": 20,
-      "runs": 46,
-      "successes": 44
+      "runs": 47,
+      "successes": 45
     },
     "doc_update": {
       "weight": 16.1,
@@ -44,29 +44,29 @@
     },
     "code_cleanup": {
       "weight": 18.1,
-      "runs": 90,
-      "successes": 90,
+      "runs": 93,
+      "successes": 93,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 15.1,
-      "runs": 137,
-      "successes": 140,
+      "runs": 138,
+      "successes": 141,
       "description": "Open a thoughtful issue",
       "totalDone": 2,
       "attempts": 4
     },
     "fix_issue": {
       "weight": 15.1,
-      "runs": 247,
-      "successes": 246,
+      "runs": 249,
+      "successes": 248,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
       "weight": 25,
-      "runs": 101,
+      "runs": 103,
       "successes": 68,
       "description": "Review and merge open Dependabot PRs"
     },
@@ -78,8 +78,8 @@
     },
     "add_codeql": {
       "weight": 10,
-      "runs": 19,
-      "successes": 19,
+      "runs": 20,
+      "successes": 20,
       "description": "Add CodeQL security scanning"
     },
     "add_dependabot": {
@@ -96,8 +96,8 @@
     },
     "create_release": {
       "weight": 20,
-      "runs": 352,
-      "successes": 351,
+      "runs": 379,
+      "successes": 378,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
@@ -156,14 +156,14 @@
     },
     "code_coverage": {
       "weight": 20,
-      "runs": 48,
-      "successes": 47,
+      "runs": 49,
+      "successes": 48,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
       "weight": 20,
-      "runs": 33,
-      "successes": 32
+      "runs": 34,
+      "successes": 33
     },
     "auto_labeler": {
       "weight": 10,
@@ -173,46 +173,42 @@
     },
     "add_docstrings": {
       "weight": 12,
-      "runs": 38,
-      "successes": 38
+      "runs": 39,
+      "successes": 39
     },
     "add_tests": {
       "weight": 18.1,
-      "runs": 48,
-      "successes": 48,
+      "runs": 50,
+      "successes": 50,
       "description": "Add test suites for untested modules"
     }
   },
   "repoState": {},
-  "notes": "Run 2996-2997: refactor on sauravcode (extracted _termcolors.py shared module — deduplicated ~70 lines of ANSI color helpers from sauravkata, sauravlearn, sauravpipe, sauravrepl, sauravtest into Colors class). create_release on GraphVisual (v2.54.0 — migration snapshot perf: reuse prev snapshot map, single-pass getSummary).",
-  "previousNotes": "Run 2990-2991: add_codeql on agenticchat (added .github/codeql-config.yml with security-and-quality query suite, path exclusions for tests/docs/node_modules, filtered noisy rules). deploy_pages on FeedReader (new changelog.html page with full release history v1.0.0-v1.3.0, added to nav across all 8 pages, updated sitemap).",
-  "previousNotes": "Run 2988-2989: perf_improvement on ai (pre-compiled 6 regex pattern lists and pre-matched statements in deception_detector — O(n²×2P) regex calls → O(n×2P) pre-match + O(n²) set intersections in inconsistency detection). security_fix on BioBots (XSS escaping in fleet-commander.html — escapeHtml for all localStorage-sourced string data rendered via innerHTML, plus type validation on load).",
-  "previousNotes": "Run 2986-2987: repo_topics on sauravbhattacharya001 (replaced redundant 'personal'/'about-me' with 'dotnet'/'natural-language-processing' for better discoverability). docs_site on gif-captcha (new directory.html — searchable catalog of all 67 interactive tools organized into 7 categories with live filtering and section counts, linked from index.html).",
-  "previousNotes": "Run 2978-2979: perf_improvement on agenticchat (spatial grid index for O(1) collision detection in WordCloudGenerator — replaced O(placed) linear scan with 64px grid partitioning for spiral placement). create_release on everything (v7.30.0 — Expense Forecaster, Smart Pattern Detector, Daily Challenge Generator, Smart Streak Guardian).",
-  "previousPreviousNotes": "Run 2970-2971: refactor on GraphVisual (cached directed adjacency map and analysis result in TopologicalSortAnalyzer — eliminated 3× redundant O(V+E) graph traversals in generateSummary/analyzeDependencies/countChoicePoints). create_release on gif-captcha (v1.12.0 — Genetic Arms Race simulator, Immune System adaptive defense, dependabot config).",
-  "previousNotes": "Run 2968-2969: perf_improvement on agentlens (single-pass event classification and model aggregation in NarrativeGenerator — O(4·E)→O(E) event classifying, O(models×E)→O(E) model token counting). security_fix on BioBots (prototype pollution guards in experimentTracker.importAll and PrintQueue.fromJSON — reject dangerous keys, sanitize imported JSON data).",
-  "previousNotes": "Run 2966-2967: refactor on GraphVisual (deduplicated 6 copy-pasted Edmonds-Karp BFS augmentation loops in VertexConnectivityAnalyzer — extracted buildResidual, buildEdgeCapacity, runMaxFlow, bfsFindPath, applyAugmentation, bfsReachable helpers, -116 lines). create_release on prompt (v5.11.0 — ReDoS timeout guards on 25+ unprotected Regex calls).",
-  "previousNotes": "Run 2964-2965: perf_improvement on ai (in-place DFS in attack_graph._find_all_paths — eliminated O(b^d * d) list allocations from path_ids+[x] concatenation, added visited set for O(1) cycle checks). security_fix on WinSentinel (reject Windows reserved device names CON/NUL/PRN/AUX/COMx/LPTx in InputSanitizer.ValidateFilePath — prevents silent data loss during quarantine and DoS via device name paths).",
-  "previousNotes": "Run 2962-2963: perf_improvement on BioBots (cached daily usage in equipmentScheduler slot suggestion — O(days×bookings) vs O(slots×bookings), inlined booking count in computeUtilization). refactor on agenticchat (deduplicated code-block stripping in ConversationSummarizer — extractDecisions+extractActionItems shared pre-stripped content).",
-  "previousPreviousNotes": "Run 2958-2959: security_fix on prompt (ReDoS timeout guards for 25+ unprotected Regex calls in PromptAutopilot and PromptAudienceAdapter). refactor on sauravcode (pre-compiled regexes + fixed 'func' keyword to 'function' in sauravintent and sauravmentor — both modules couldn't detect any function definitions).",
-  "previousPreviousPreviousNotes": "Run 2956-2957: refactor on VoronoiMap (deduplicated _clamp/_lerp/_lerp_color into vormap_utils — removed 10 inlined copies across 6 modules). add_dependabot on getagentbox (added npm ecosystem with grouped updates to dependabot config).",
-  "previousPreviousPreviousPreviousNotes": "Run 2952-2953: perf_improvement on agenticchat (pre-compiled gi-flagged RegExp patterns in ModelAdvisor _analyzeContent â€” eliminated up to 39 RegExp allocations per call). refactor on Vidly (deduplicated CalculateShannonEvenness from CustomerWrappedService into shared CustomerRentalAnalytics.ShannonEntropy overload).",
-  "previousPreviousPreviousPreviousPreviousNotes": "Run 2946-2947: refactor on gif-captcha (deduplicated ~80 lines of inlined LruTracker, _clamp, _now from trust-score-engine.js â€” replaced with imports from shared-utils.js). perf_improvement on VoronoiMap (eliminated O(nÂ²) sqrt calls in PSO objective functions â€” squared-distance comparisons in _obj_max_spread, _obj_min_energy, _nearest_neighbor_dists).",
-  "previousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2944-2945: perf_improvement on ai (eliminated redundant O(agents*N) interaction scans in game_theory â€” pre-built per-agent move sequences, single global_cooperation_rate computation). create_release on everything (v7.29.0 â€” Goal Autopilot, Smart Habit Insights, 56 tests, streak refactor, 2 CI bumps).",
-  "previousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2936-2937: perf_improvement on GraphVisual (lazy BFS initialization in EdgeBetweennessAnalyzer â€” O(reachable) per source instead of O(V) full-vertex init). add_tests on ai (25 tests for circuit_breaker â€” state machine lifecycle, adaptive thresholds, journal, fleet management).",
-  "lastRepo": "ai",
-  "lastRun": "2026-04-21",
-  "runCount": 974,
+  "notes": "Run 3092-3093: create_release on VoronoiMap (v1.43.1 — XSS security patch release). perf_improvement on prompt (PromptHeatmap instruction keyword scoring — replaced O(K×N) substring scan with O(W) HashSet lookup for single-word keywords, ~8× fewer substring searches per segment).",
+  "previousNotes": "Run 3090-3091: refactor on agentlens (consolidated percentile into _utils.py — eliminated duplicate implementations in alerts.py and cli_common.py). perf_improvement on BioBots (replaced JSON.parse(JSON.stringify) with targeted shallow copies in mediaPrep.scale() — eliminated 2 full serialize/parse round-trips per call).",
+  "previousPreviousNotes": "Run 3088-3089: perf_improvement on Vidly (single-pass ForecastDemand — replaced 4 LINQ passes with one for-loop for min/max/dayOfWeek/recent30). create_release on Vidly (v2.14.0 — Forecast Performance & Code Quality).",
+  "previousPreviousPreviousNotes": "Run 3086-3087: create_release on Vidly (v2.13.0 — Movie Taste DNA with 8-dimension preference analysis, archetype classification, radar chart). add_docstrings on everything (comprehensive docstrings for GameOfLifeService and AgeCalculatorService — 69 new doc-comment lines).",
+  "previousPreviousPreviousPreviousNotes": "Run 3084-3085: add_codeql on gif-captcha (added dependency-review.yml for supply chain security + hardcoded secret scanning step in codeql.yml — detects AWS keys, OpenAI/Stripe secrets, GitHub PATs, Slack tokens, Google API keys, SendGrid keys). readme_overhaul on ai (added Table of Contents, Who Is This For? audience table, Key Concepts section explaining 5 core abstractions).",
+  "previousPreviousPreviousPreviousPreviousNotes": "Run 3082-3083: refactor on agenticchat (deduplicated style injection across 9 modules — migrated manual styleInjected boolean + createElement pattern to shared _injectCSS helper, -49 lines boilerplate). security_fix on VoronoiMap (XSS fix — escaped user-supplied title strings in 5 SVG/HTML-generating modules: vormap_cartogram, vormap_spiral, vormap_variogram, vormap_label, vormap_text).",
+  "previousPreviousPreviousPreviousPreviousPreviousNotes": "Run 3080-3081: perf_improvement on GraphVisual (pre-built adjSets map in GraphAnomalyDetector — eliminates O(V) JUNG getNeighbors() allocations in triangle counting, removes per-vertex ArrayList+HashSet in clustering coeff). create_release on GraphVisual (v2.57.0 — What-If Analyzer, Influence Maximizer, anomaly detection perf).",
+  "previousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "Run 3064-3065: security_fix on sauravcode (sandboxed API-served functions — disabled env_list/env_get/file I/O/HTTP builtins in sauravapi.py per-request interpreter copies to prevent secret exfiltration and SSRF). create_release on agenticchat (v2.35.0 — Smart Deadline Tracker with autonomous deadline detection + countdown dashboard, O(n) rate limiter fix).",
+  "previousPreviousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "Run 3060-3061: perf_improvement on ai (pre-computed cat_counts/resources once in BehaviorProfiler._analyze_agent — eliminated 4 redundant O(N) passes across 4 check methods). create_release on prompt (v5.12.0 — PromptContextAllocator, ReDoS hardening, regex pre-compilation, Truncate dedup).",
+  "previousPreviousPreviousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "Run 3056-3057: perf_improvement on FeedReader (cached normalizedURL + deduplicated uniqued() in ArticleDeduplicator.scan). create_release on sauravcode (v7.0.0 — 9 new tools, 5 security fixes, 8 perf improvements, 6 refactors). merge_dependabot re-rolled to create_release (no Dependabot PRs open anywhere).",
+  "previousPreviousPreviousPreviousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "(trimmed)",
+  "_oldNotes": "Run 2946-2947: refactor on gif-captcha (deduplicated ~80 lines of inlined LruTracker, _clamp, _now from trust-score-engine.js â€” replaced with imports from shared-utils.js). perf_improvement on VoronoiMap (eliminated O(nÂ²) sqrt calls in PSO objective functions â€” squared-distance comparisons in _obj_max_spread, _obj_min_energy, _nearest_neighbor_dists).",
+  "lastRepo": "prompt",
+  "lastRun": "2026-04-22",
+  "runCount": 996,
   "lastTasks": [
-    "refactor",
-    "create_release"
+    "create_release",
+    "perf_improvement"
   ],
   "lastRepos": [
-    "sauravcode",
-    "GraphVisual"
+    "VoronoiMap",
+    "prompt"
   ],
-  "lastRunTimestamp": "2026-04-22T05:10:00.000Z",
-  "runCounter": 2997,
+  "lastRunTimestamp": "2026-04-23T05:55:00.000Z",
+  "runCounter": 3093,
   "lastWeightAdjustment": 1191,
   "adjustmentHistory": [
     {
@@ -251,5 +247,5 @@
       "note": "No changes needed - all task types stable."
     }
   ],
-  "previousPreviousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "Run 2934-2935: create_release on agentlens (v1.44.0 â€” 3 new dashboards, 5 perf improvements, 46 new tests, webhook refactor, cleanup). refactor on Vidly (extracted CustomerRentalAnalytics shared utility from WinBackService and ChurnPredictorService â€” deduplicated rental lookup, genre distribution, gap computation, late return rate, Shannon entropy)."
+  "previousPreviousPreviousPreviousPreviousPreviousPreviousPreviousPreviousNotes": "(trimmed)"
 }

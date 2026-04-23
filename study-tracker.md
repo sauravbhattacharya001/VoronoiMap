@@ -9,23 +9,25 @@
 
 ### LeetCode Patterns
 *(date — pattern — subtopic)*
-- 2026-04-21 — Sliding Window — Day 1: Core intuition (fixed-size window)
-- April 21 — Two Pointers — Day 1/3: Origin story, first principles, sorted two-sum
+- 2026-04-21 — Sliding Window — Day 1: Core intuition, grow/shrink, caterpillar analogy, queue connection, LP-in-1D insight, Kadane's, negative numbers breaking monotonicity
+- 2026-04-22 — Sliding Window — Day 2: Longest vs shortest (opposing pointer triggers), monotonic property requirement, LC #3 (longest substring no repeats — set), LC #159 (at most K distinct — hashmap vs set)
+- 2026-04-22 — Two Pointers — Sorted two-sum, 3Sum, duplicate skipping, closest-to-target (via cron blurb)
 
 ### System Design
 *(date — system — subtopic)*
 
 ## Multi-Day Series Tracking
-Some complex topics are broken into multi-day series:
-- Day 1: Core intuition + simple example
-- Day 2: Variations + harder problems
-- Day 3: Edge cases + Meta-specific twists
-
-**ACTIVE:** Two Pointers (started April 21)
-- ✅ Day 1 (April 21): Origin story, first principles, hallway analogy, two-sum on sorted array
-- ⬜ Day 2: Unsorted arrays, 3Sum, closest-to-target variations
-- ⬜ Day 3: Edge cases, when NOT to use, Meta-specific hard combos
+- **Sliding Window** ✅ COMPLETE
+  - Day 1 (Apr 21): Core intuition, caterpillar, queue, LP connection, Kadane's, negatives
+  - Day 2 (Apr 22): Longest/shortest recipes, monotonic property, LC #3, K distinct chars
+  - Key insights earned: "LP applied to 1D arrays", opposing pointer triggers, hashmap bookkeeping
+- **Two Pointers** (partially covered Apr 22 via cron)
+  - ✅ Sorted two-sum, 3Sum, duplicate skipping, closest-to-target
+  - ⬜ Edge cases, 4Sum generalization, when NOT to use
 
 ## Upcoming Queue
-*(Agent will pick from uncovered patterns/systems, continuing any active series first)*
-- **Active series:** Sliding Window (Day 2 next — variable-size window + shrinking logic)
+- Two Pointers completion
+- Binary Search variations
+- BFS/DFS
+- Monotonic Stack/Queue
+- Dynamic Programming (multi-day series)

@@ -1,0 +1,177 @@
+{
+  "schema": "acpx.session.v1",
+  "acpx_record_id": "agent:codex:acp:781dec01-d775-4b80-9b28-c034c9c02c95:oneshot:97de17c3-d000-4fe9-b6f0-142e66ddbf86",
+  "acp_session_id": "019db435-5be9-7b92-86c3-4171f7ea96c6",
+  "agent_command": "npx @zed-industries/codex-acp@^0.11.1",
+  "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+  "name": "agent:codex:acp:781dec01-d775-4b80-9b28-c034c9c02c95",
+  "created_at": "2026-04-22T08:01:23.838Z",
+  "last_used_at": "2026-04-22T08:03:30.214Z",
+  "last_seq": 0,
+  "last_request_id": "b286119d-d9a0-462c-85cd-4dbe9179482f",
+  "event_log": {
+    "active_path": "C:\\Users\\onlin\\.acpx\\sessions\\agent%3Acodex%3Aacp%3A781dec01-d775-4b80-9b28-c034c9c02c95%3Aoneshot%3A97de17c3-d000-4fe9-b6f0-142e66ddbf86.stream.ndjson",
+    "segment_count": 5,
+    "max_segment_bytes": 67108864,
+    "max_segments": 5,
+    "last_write_error": null
+  },
+  "closed": true,
+  "closed_at": "2026-04-22T08:03:30.409Z",
+  "pid": 7304,
+  "agent_started_at": "2026-04-22T08:01:25.602Z",
+  "last_prompt_at": "2026-04-22T08:01:29.171Z",
+  "protocol_version": 1,
+  "agent_capabilities": {
+    "loadSession": true,
+    "promptCapabilities": {
+      "image": true,
+      "audio": false,
+      "embeddedContext": true
+    },
+    "mcpCapabilities": {
+      "http": true,
+      "sse": false
+    },
+    "sessionCapabilities": {
+      "list": {},
+      "close": {}
+    },
+    "auth": {
+      "logout": {}
+    }
+  },
+  "title": null,
+  "messages": [
+    {
+      "User": {
+        "id": "0a165bc8-68d2-40d9-a254-2e9901e0f028",
+        "content": [
+          {
+            "Text": "[Wed 2026-04-22 01:01 PDT] Create a new file `dashboard/canary.html` for AgentLens — an **Agent Canary Deployer** dashboard. This is a standalone HTML page (like the existing regression.html, compliance.html etc in the same directory).\n\n## What it does\nInteractive canary deployment simulator for AI agents. Users configure a canary rollout (traffic split, metrics thresholds) and the tool simulates real-time metric comparison between baseline and canary versions, then autonomously recommends promote/rollback.\n\n## Technical requirements\n- Single HTML file with `<link rel=\"stylesheet\" href=\"styles.css\">` for base theming\n- All custom CSS in `<style>` block, all JS in `<script>` block  \n- Uses CSS variables from styles.css: `var(--bg-primary)`, `var(--bg-secondary)`, `var(--bg-tertiary)`, `var(--text-primary)`, `var(--text-secondary)`, `var(--border)`, `var(--radius)`, `var(--radius-sm)`, `var(--accent)`, `var(--success)`, `var(--warning)`, `var(--danger)`\n- Canvas-based charts (no external libraries)\n- Back link to index.html in header\n\n## Features\n\n### 1. Canary Configuration Panel\n- Agent name (text input)\n- Baseline version / Canary version (text inputs, defaults v2.3.1 / v2.4.0)\n- Traffic split slider (1%-50%, default 10%)\n- Duration selector (5min, 15min, 30min, 1hr simulated)\n- Metric thresholds: max error rate %, max latency increase %, min success rate %\n- \"Deploy Canary\" button\n\n### 2. Live Metrics Comparison (after deploy)\n- Two-column layout: Baseline vs Canary\n- Metrics tracked (simulated with realistic random data):\n  - Success rate (%)\n  - Error rate (%)\n  - P50/P95/P99 latency (ms)\n  - Token usage (avg per request)\n  - Cost per request ($)\n- Each metric shows current value + trend arrow (↑↓→)\n- Color coding: green if canary is within thresholds, yellow if borderline (within 80-100% of threshold), red if exceeding\n\n### 3. Real-time Canvas Chart\n- Time series chart showing baseline vs canary error rate over time\n- Two lines (blue=baseline, orange=canary) with filled area\n- X-axis: time elapsed, Y-axis: error rate %\n- Threshold line drawn as red dashed horizontal line\n- Updates every 500ms during simulation\n\n### 4. Autonomous Decision Engine\n- Runs analysis after each data point\n- Shows current recommendation: \"🟢 PROMOTE — Canary outperforming baseline\", \"🟡 OBSERVING — Insufficient data\", \"🔴 ROLLBACK — Error rate exceeds threshold\"\n- Confidence percentage (increases over time as more data collected)\n- Reasoning text explaining the decision factors\n- Auto-decision: after enough data points (70%+ of duration), if confidence > 85%, show \"Auto-action recommended\" with countdown\n\n### 5. Deployment History Table\n- Shows previous canary deploys (simulated: 5 historical entries)\n- Columns: Date, Agent, Versions, Duration, Traffic %, Outcome (Promoted/Rolled Back/Aborted), Key Finding\n- Sortable by clicking column headers\n\n### 6. Rollout Strategy Presets\n- 3 preset buttons: Conservative (5% traffic, tight thresholds), Standard (10%), Aggressive (25%, loose thresholds)\n- Clicking a preset fills in the config form\n\n### 7. Export\n- \"Export Report\" button generates JSON download of the canary analysis\n\n## Layout\nFollow the pattern of regression.html:\n- `.canary-container` wrapper with padding/max-width\n- Header with title \"🐤 Agent Canary Deployer\" and subtitle\n- Stats grid at top (4 cards: Total Deploys, Promote Rate, Avg Canary Duration, Current Status)\n- Config panel on left, live metrics on right (panel-row grid)\n- Canvas chart below\n- Decision engine panel below chart\n- History table at bottom\n\n## Simulation behavior\n- When \"Deploy Canary\" is clicked, generate data points at intervals\n- Baseline metrics: stable with small random noise\n- Canary metrics: generally similar to baseline but with configurable drift\n- 3 simulation scenarios (randomly chosen): canary-wins (canary slightly better), canary-neutral (similar), canary-fails (canary degrades over time)\n- Simulation runs for the configured duration (compressed: 1hr = ~30 seconds real time)\n- \"Stop & Rollback\" button available during simulation\n\nMake it polished and professional. ~500-800 lines of HTML/CSS/JS."
+          }
+        ]
+      }
+    },
+    {
+      "Agent": {
+        "content": [
+          {
+            "Text": "I’m locating the existing dashboard pages and reading the patterns from `regression.html` / `compliance.html` first so the new page matches the structure and theme."
+          },
+          {
+            "ToolUse": {
+              "id": "call_SX4nOZ9FsKf7uDjsKRIlvdYL",
+              "name": "Run Get-ChildItem -Path .\\dashboard -Force",
+              "raw_input": "{\"call_id\":\"call_SX4nOZ9FsKf7uDjsKRIlvdYL\",\"turn_id\":\"019db435-5c7d-72a0-8fa8-cb4404b22745\",\"command\":[\"C:\\\\Program Files\\\\PowerShell\\\\7\\\\pwsh.exe\",\"-Command\",\"Get-ChildItem -Path .\\\\dashboard -Force\"],\"cwd\":\"C:\\\\Users\\\\onlin\\\\.openclaw\\\\workspace\\\\temp-builder\",\"parsed_cmd\":[{\"type\":\"unknown\",\"cmd\":\"Get-ChildItem -Path .\\\\dashboard -Force\"}],\"source\":\"agent\"}",
+              "input": {
+                "call_id": "call_SX4nOZ9FsKf7uDjsKRIlvdYL",
+                "turn_id": "019db435-5c7d-72a0-8fa8-cb4404b22745",
+                "command": [
+                  "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+                  "-Command",
+                  "Get-ChildItem -Path .\\dashboard -Force"
+                ],
+                "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+                "parsed_cmd": [
+                  {
+                    "type": "unknown",
+                    "cmd": "Get-ChildItem -Path .\\dashboard -Force"
+                  }
+                ],
+                "source": "agent"
+              },
+              "is_input_complete": true,
+              "thought_signature": null
+            }
+          },
+          {
+            "ToolUse": {
+              "id": "call_n5UdSapsFNlMUY46mTOelrn8",
+              "name": "Run Get-ChildItem -Path . -Recurse -File | Where-Object { $_.FullName -match '\\\\dashboard\\\\(regression|compliance|index|styles)\\.html$|\\\\dashboard\\\\styles\\.css$' } | Select-Object FullName",
+              "raw_input": "{\"call_id\":\"call_n5UdSapsFNlMUY46mTOelrn8\",\"turn_id\":\"019db435-5c7d-72a0-8fa8-cb4404b22745\",\"command\":[\"C:\\\\Program Files\\\\PowerShell\\\\7\\\\pwsh.exe\",\"-Command\",\"Get-ChildItem -Path . -Recurse -File | Where-Object { $_.FullName -match '\\\\\\\\dashboard\\\\\\\\(regression|compliance|index|styles)\\\\.html$|\\\\\\\\dashboard\\\\\\\\styles\\\\.css$' } | Select-Object FullName\"],\"cwd\":\"C:\\\\Users\\\\onlin\\\\.openclaw\\\\workspace\\\\temp-builder\",\"parsed_cmd\":[{\"type\":\"unknown\",\"cmd\":\"Get-ChildItem -Path . -Recurse -File | Where-Object { $_.FullName -match '\\\\\\\\dashboard\\\\\\\\(regression|compliance|index|styles)\\\\.html$|\\\\\\\\dashboard\\\\\\\\styles\\\\.css$' } | Select-Object FullName\"}],\"source\":\"agent\"}",
+              "input": {
+                "call_id": "call_n5UdSapsFNlMUY46mTOelrn8",
+                "turn_id": "019db435-5c7d-72a0-8fa8-cb4404b22745",
+                "command": [
+                  "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+                  "-Command",
+                  "Get-ChildItem -Path . -Recurse -File | Where-Object { $_.FullName -match '\\\\dashboard\\\\(regression|compliance|index|styles)\\.html$|\\\\dashboard\\\\styles\\.css$' } | Select-Object FullName"
+                ],
+                "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+                "parsed_cmd": [
+                  {
+                    "type": "unknown",
+                    "cmd": "Get-ChildItem -Path . -Recurse -File | Where-Object { $_.FullName -match '\\\\dashboard\\\\(regression|compliance|index|styles)\\.html$|\\\\dashboard\\\\styles\\.css$' } | Select-Object FullName"
+                  }
+                ],
+                "source": "agent"
+              },
+              "is_input_complete": false,
+              "thought_signature": null
+            }
+          }
+        ],
+        "tool_results": {
+          "call_SX4nOZ9FsKf7uDjsKRIlvdYL": {
+            "tool_use_id": "call_SX4nOZ9FsKf7uDjsKRIlvdYL",
+            "tool_name": "Run Get-ChildItem -Path .\\dashboard -Force",
+            "is_error": false,
+            "content": {
+              "Text": "{\"call_id\":\"call_SX4nOZ9FsKf7uDjsKRIlvdYL\",\"turn_id\":\"019db435-5c7d-72a0-8fa8-cb4404b22745\",\"command\":[\"C:\\\\Program Files\\\\PowerShell\\\\7\\\\pwsh.exe\",\"-Command\",\"Get-ChildItem -Path .\\\\dashboard -Force\"],\"cwd\":\"C:\\\\Users\\\\onlin\\\\.openclaw\\\\workspace\\\\temp-builder\",\"parsed_cmd\":[{\"type\":\"unknown\",\"cmd\":\"Get-ChildItem -Path .\\\\dashboard -Force\"}],\"source\":\"agent\",\"stdout\":\"\\r\\n    Directory: C:\\\\Users\\\\onlin\\\\.openclaw\\\\workspace\\\\temp-builder\\\\dashboard\\r\\n\\r\\n\\u001b[32;1mMode   \\u001b[0m\\u001b[32;1m              LastWriteTime\\u001b[0m\\u001b[32;1m         Length\\u001b[0m\\u001b[32;1m Name\\u001b[0m\\r\\n\\u001b[32;1m----   \\u001b[0m \\u001b[32;1m             -------------\\u001b[0m \\u001b[32;1m        ------\\u001b[0m \\u001b[32;1m----\\u001b[0m\\r\\n-a---           4/22/2026  1:00 AM          26935 alerts.html\\r\\n-a---           4/22/2026  1:00 AM         149978 \\u001b[32;1mapp.js\\u001b[0m\\r\\n-a---           4/22/2026  1:00 AM          11026 command-center.html\\r\\n-a---           4/22/2026  1:00 AM          35513 compliance.html\\r\\n-a---           4/22/2026  1:00 AM          16455 correlator.html\\r\\n-a---           4/22/2026  1:00 AM          22523 cost-anomaly.html\\r\\n-a---           4/22/2026  1:00 AM          29883 costs.html\\r\\n-a---           4/22/2026  1:00 AM          22145 dependencies.html\\r\\n-a---           4/22/2026  1:00 AM          18051 diff.html\\r\\n-a---           4/22/2026  1:00 AM          20210 errors.html\\r\\n-a---           4/22/2026  1:00 AM          35790 index.html\\r\\n-a---           4/22/2026  1:00 AM          38213 postmortem.html\\r\\n-a---           4/22/2026  1:00 AM          12748 profiler.html\\r\\n-a---           4/22/2026  1:00 AM          25068 regression.html\\r\\n-a---           4/22/2026  1:00 AM          20849 replay.html\\r\\n-a---           4/22/2026  1:00 AM          31267 runbooks.html\\r\\n-a---           4/22/2026  1:00 AM          13563 scorecards.html\\r\\n-a---           4/22/2026  1:00 AM          20497 sla.html\\r\\n-a---           4/22/2026  1:00 AM          46912 styles.css\\r\\n-a---           4/22/2026  1:00 AM          25993 timeline.html\\r\\n-a---           4/22/2026  1:00 AM          24261 topology.html\\r\\n-a---           4/22/2026  1:00 AM          29426 waterfall.html\\r\\n\\r\\n\",\"stderr\":\"\",\"aggregated_output\":\"\\r\\n    Directory: C:\\\\Users\\\\onlin\\\\.openclaw\\\\workspace\\\\temp-builder\\\\dashboard\\r\\n\\r\\n\\u001b[32;1mMode   \\u001b[0m\\u001b[32;1m              LastWriteTime\\u001b[0m\\u001b[32;1m         Length\\u001b[0m\\u001b[32;1m Name\\u001b[0m\\r\\n\\u001b[32;1m----   \\u001b[0m \\u001b[32;1m             -------------\\u001b[0m \\u001b[32;1m        ------\\u001b[0m \\u001b[32;1m----\\u001b[0m\\r\\n-a---           4/22/2026  1:00 AM          26935 alerts.html\\r\\n-a---           4/22/2026  1:00 AM         149978 \\u001b[32;1mapp.js\\u001b[0m\\r\\n-a---           4/22/2026  1:00 AM          11026 command-center.html\\r\\n-a---           4/22/2026  1:00 AM          35513 compliance.html\\r\\n-a---           4/22/2026  1:00 AM          16455 correlator.html\\r\\n-a---           4/22/2026  1:00 AM          22523 cost-anomaly.html\\r\\n-a---           4/22/2026  1:00 AM          29883 costs.html\\r\\n-a---           4/22/2026  1:00 AM          22145 dependencies.html\\r\\n-a---           4/22/2026  1:00 AM          18051 diff.html\\r\\n-a---           4/22/2026  1:00 AM          20210 errors.html\\r\\n-a---           4/22/2026  1:00 AM          35790 index.html\\r\\n-a---           4/22/2026  1:00 AM          38213 postmortem.html\\r\\n-a---           4/22/2026  1:00 AM          12748 profiler.html\\r\\n-a---           4/22/2026  1:00 AM          25068 regression.html\\r\\n-a---           4/22/2026  1:00 AM          20849 replay.html\\r\\n-a---           4/22/2026  1:00 AM          31267 runbooks.html\\r\\n-a---           4/22/2026  1:00 AM          13563 scorecards.html\\r\\n-a---           4/22/2026  1:00 AM          20497 sla.html\\r\\n-a---           4/22/2026  1:00 AM          46912 styles.css\\r\\n-a---           4/22/2026  1:00 AM          25993 timeline.htm..."
+            },
+            "output": {
+              "call_id": "call_SX4nOZ9FsKf7uDjsKRIlvdYL",
+              "turn_id": "019db435-5c7d-72a0-8fa8-cb4404b22745",
+              "command": [
+                "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+                "-Command",
+                "Get-ChildItem -Path .\\dashboard -Force"
+              ],
+              "cwd": "C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder",
+              "parsed_cmd": [
+                {
+                  "type": "unknown",
+                  "cmd": "Get-ChildItem -Path .\\dashboard -Force"
+                }
+              ],
+              "source": "agent",
+              "stdout": "\r\n    Directory: C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder\\dashboard\r\n\r\n\u001b[32;1mMode   \u001b[0m\u001b[32;1m              LastWriteTime\u001b[0m\u001b[32;1m         Length\u001b[0m\u001b[32;1m Name\u001b[0m\r\n\u001b[32;1m----   \u001b[0m \u001b[32;1m             -------------\u001b[0m \u001b[32;1m        ------\u001b[0m \u001b[32;1m----\u001b[0m\r\n-a---           4/22/2026  1:00 AM          26935 alerts.html\r\n-a---           4/22/2026  1:00 AM         149978 \u001b[32;1mapp.js\u001b[0m\r\n-a---           4/22/2026  1:00 AM          11026 command-center.html\r\n-a---           4/22/2026  1:00 AM          35513 compliance.html\r\n-a---           4/22/2026  1:00 AM          16455 correlator.html\r\n-a---           4/22/2026  1:00 AM          22523 cost-anomaly.html\r\n-a---           4/22/2026  1:00 AM          29883 costs.html\r\n-a---           4/22/2026  1:00 AM          22145 dependencies.html\r\n-a---           4/22/2026  1:00 AM          18051 diff.html\r\n-a---           4/22/2026  1:00 AM          20210 errors.html\r\n-a---           4/22/2026  1:00 AM          35790 index.html\r\n-a---           4/22/2026  1:00 AM          38213 postmortem.html\r\n-a---           4/22/2026  1:00 AM          12748 profiler.html\r\n-a---           4/22/2026  1:00 AM          25068 regression.html\r\n-a---           4/22/2026  1:00 AM          20849 replay.html\r\n-a---           4/22/2026  1:00 AM          31267 runbooks.html\r\n-a---           4/22/2026  1:00 AM          13563 scorecards.html\r\n-a---           4/22/2026  1:00 AM          20497 sla.html\r\n-a---           4/22/2026  1:00 AM          46912 styles.css\r\n-a---           4/22/2026  1:00 AM          25993 timeline.html\r\n-a---           4/22/2026  1:00 AM          24261 topology.html\r\n-a---           4/22/2026  1:00 AM          29426 waterfall.html\r\n\r\n",
+              "stderr": "",
+              "aggregated_output": "\r\n    Directory: C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder\\dashboard\r\n\r\n\u001b[32;1mMode   \u001b[0m\u001b[32;1m              LastWriteTime\u001b[0m\u001b[32;1m         Length\u001b[0m\u001b[32;1m Name\u001b[0m\r\n\u001b[32;1m----   \u001b[0m \u001b[32;1m             -------------\u001b[0m \u001b[32;1m        ------\u001b[0m \u001b[32;1m----\u001b[0m\r\n-a---           4/22/2026  1:00 AM          26935 alerts.html\r\n-a---           4/22/2026  1:00 AM         149978 \u001b[32;1mapp.js\u001b[0m\r\n-a---           4/22/2026  1:00 AM          11026 command-center.html\r\n-a---           4/22/2026  1:00 AM          35513 compliance.html\r\n-a---           4/22/2026  1:00 AM          16455 correlator.html\r\n-a---           4/22/2026  1:00 AM          22523 cost-anomaly.html\r\n-a---           4/22/2026  1:00 AM          29883 costs.html\r\n-a---           4/22/2026  1:00 AM          22145 dependencies.html\r\n-a---           4/22/2026  1:00 AM          18051 diff.html\r\n-a---           4/22/2026  1:00 AM          20210 errors.html\r\n-a---           4/22/2026  1:00 AM          35790 index.html\r\n-a---           4/22/2026  1:00 AM          38213 postmortem.html\r\n-a---           4/22/2026  1:00 AM          12748 profiler.html\r\n-a---           4/22/2026  1:00 AM          25068 regression.html\r\n-a---           4/22/2026  1:00 AM          20849 replay.html\r\n-a---           4/22/2026  1:00 AM          31267 runbooks.html\r\n-a---           4/22/2026  1:00 AM          13563 scorecards.html\r\n-a---           4/22/2026  1:00 AM          20497 sla.html\r\n-a---           4/22/2026  1:00 AM          46912 styles.css\r\n-a---           4/22/2026  1:00 AM          25993 timeline.html\r\n-a---           4/22/2026  1:00 AM          24261 topology.html\r\n-a---           4/22/2026  1:00 AM          29426 waterfall.html\r\n\r\n",
+              "exit_code": 0,
+              "duration": {
+                "secs": 0,
+                "nanos": 755296700
+              },
+              "formatted_output": "\r\n    Directory: C:\\Users\\onlin\\.openclaw\\workspace\\temp-builder\\dashboard\r\n\r\n\u001b[32;1mMode   \u001b[0m\u001b[32;1m              LastWriteTime\u001b[0m\u001b[32;1m         Length\u001b[0m\u001b[32;1m Name\u001b[0m\r\n\u001b[32;1m----   \u001b[0m \u001b[32;1m             -------------\u001b[0m \u001b[32;1m        ------\u001b[0m \u001b[32;1m----\u001b[0m\r\n-a---           4/22/2026  1:00 AM          26935 alerts.html\r\n-a---           4/22/2026  1:00 AM         149978 \u001b[32;1mapp.js\u001b[0m\r\n-a---           4/22/2026  1:00 AM          11026 command-center.html\r\n-a---           4/22/2026  1:00 AM          35513 compliance.html\r\n-a---           4/22/2026  1:00 AM          16455 correlator.html\r\n-a---           4/22/2026  1:00 AM          22523 cost-anomaly.html\r\n-a---           4/22/2026  1:00 AM          29883 costs.html\r\n-a---           4/22/2026  1:00 AM          22145 dependencies.html\r\n-a---           4/22/2026  1:00 AM          18051 diff.html\r\n-a---           4/22/2026  1:00 AM          20210 errors.html\r\n-a---           4/22/2026  1:00 AM          35790 index.html\r\n-a---           4/22/2026  1:00 AM          38213 postmortem.html\r\n-a---           4/22/2026  1:00 AM          12748 profiler.html\r\n-a---           4/22/2026  1:00 AM          25068 regression.html\r\n-a---           4/22/2026  1:00 AM          20849 replay.html\r\n-a---           4/22/2026  1:00 AM          31267 runbooks.html\r\n-a---           4/22/2026  1:00 AM          13563 scorecards.html\r\n-a---           4/22/2026  1:00 AM          20497 sla.html\r\n-a---           4/22/2026  1:00 AM          46912 styles.css\r\n-a---           4/22/2026  1:00 AM          25993 timeline.html\r\n-a---           4/22/2026  1:00 AM          24261 topology.html\r\n-a---           4/22/2026  1:00 AM          29426 waterfall.html\r\n\r\n",
+              "status": "completed"
+            }
+          },
+          "call_n5UdSapsFNlMUY46mTOelrn8": {
+            "tool_use_id": "call_n5UdSapsFNlMUY46mTOelrn8",
+            "tool_name": "Run Get-ChildItem -Path . -Recurse -File | Where-Object { $_.FullName -match '\\\\dashboard\\\\(regression|compliance|index|styles)\\.html$|\\\\dashboard\\\\styles\\.css$' } | Select-Object FullName",
+            "is_error": false,
+            "content": {
+              "Text": ""
+            }
+          }
+        }
+      }
+    }
+  ],
+  "updated_at": "2026-04-22T08:01:58.956Z",
+  "cumulative_token_usage": {},
+  "request_token_usage": {},
+  "acpx": {
+    "available_commands": [
+      "review",
+      "review-branch",
+      "review-commit",
+      "init",
+      "compact",
+      "undo",
+      "logout"
+    ]
+  }
+}
