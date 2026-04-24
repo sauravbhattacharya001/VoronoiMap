@@ -39,6 +39,9 @@ import random
 import sys
 from copy import deepcopy
 
+# Module-level RNG — replaced per-call in run_evolution().  Fixes #183.
+_rng: random.Random = random.Random()
+
 from vormap_utils import compute_nn_distances, euclidean
 from vormap_hull import convex_hull
 from vormap_geometry import polygon_area as _polygon_area
@@ -158,7 +161,7 @@ _OBJECTIVES = {
 # ---------------------------------------------------------------------------
 
 def _random_individual(n, w, h):
-    return [(random.uniform(0, w), random.uniform(0, h)) for _ in range(n)]
+    return [(_rng.uniform(0, w), _rng.uniform(0, h)) for _ in range(n)]
 
 
 def _mutate(ind, w, h, rate=0.15, sigma_frac=0.05):
@@ -166,10 +169,10 @@ def _mutate(ind, w, h, rate=0.15, sigma_frac=0.05):
     sigma_y = h * sigma_frac
     return [
         (
-            max(0, min(w, x + random.gauss(0, sigma_x))),
-            max(0, min(h, y + random.gauss(0, sigma_y))),
+            max(0, min(w, x + _rng.gauss(0, sigma_x))),
+            max(0, min(h, y + _rng.gauss(0, sigma_y))),
         )
-        if random.random() < rate
+        if _rng.random() < rate
         else (x, y)
         for x, y in ind
     ]
@@ -177,11 +180,11 @@ def _mutate(ind, w, h, rate=0.15, sigma_frac=0.05):
 
 def _crossover(a, b):
     """Uniform crossover — pick each point from parent A or B."""
-    return [a[i] if random.random() < 0.5 else b[i] for i in range(len(a))]
+    return [a[i] if _rng.random() < 0.5 else b[i] for i in range(len(a))]
 
 
 def _tournament_select(pop, fits, k=3):
-    contestants = random.sample(list(zip(pop, fits)), k)
+    contestants = _rng.sample(list(zip(pop, fits)), k)
     return max(contestants, key=lambda x: x[1])[0]
 
 
@@ -207,8 +210,10 @@ def evolve(n_points=30, width=500, height=500, objective="uniform",
     -------
     dict  with keys: points, fitness, objective, generations_run, history
     """
-    if seed is not None:
-        random.seed(seed)
+    # Local RNG — avoids polluting global state.  Fixes #183.
+    _rng = random.Random(seed)
+    import vormap_evolve as _self
+    _self._rng = _rng
     fit_fn = _OBJECTIVES.get(objective)
     if fit_fn is None:
         raise ValueError(f"Unknown objective '{objective}'. Choose from: {list(_OBJECTIVES)}")

@@ -325,10 +325,13 @@ class MonteCarloTest:
         -------
         MonteCarloResult
         """
-        if seed is not None:
-            random.seed(seed)
-            if _HAS_SCIPY:
-                np.random.seed(seed)
+        # Use local RNG instances for thread safety and to avoid
+        # polluting global random state (numpy.random.seed is deprecated
+        # since NumPy 1.17).  Fixes #183.
+        self._rng = random.Random(seed)
+        self._rng_np = (
+            np.random.default_rng(seed) if _HAS_SCIPY else None
+        )
 
         result = MonteCarloResult(self.n, self.bounds, simulations, seed)
 
@@ -519,11 +522,11 @@ class MonteCarloTest:
         zero per-point Python overhead.
         """
         s, north, w, e = self.bounds
-        if _HAS_SCIPY:  # numpy is always available when scipy is
-            xs = np.random.uniform(w, e, size=n)
-            ys = np.random.uniform(s, north, size=n)
+        if _HAS_SCIPY and self._rng_np is not None:
+            xs = self._rng_np.uniform(w, e, size=n)
+            ys = self._rng_np.uniform(s, north, size=n)
             return list(zip(xs.tolist(), ys.tolist()))
-        _uniform = random.uniform
+        _uniform = self._rng.uniform
         return [(_uniform(w, e), _uniform(s, north))
                 for _ in range(n)]
 
