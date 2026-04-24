@@ -46,6 +46,24 @@ def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
     return math.hypot(b[0] - a[0], b[1] - a[1])
 
 
+def _dist_matrix(points: List[Tuple[float, float]]) -> List[List[float]]:
+    """Precompute symmetric pairwise distance matrix (O(n²) once).
+
+    Avoids redundant sqrt recomputation across DBSCAN, silhouette, and
+    eps estimation — each of which previously built its own O(n²) distances.
+    """
+    n = len(points)
+    mat: List[List[float]] = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        xi, yi = points[i]
+        row = mat[i]
+        for j in range(i + 1, n):
+            d = math.hypot(points[j][0] - xi, points[j][1] - yi)
+            row[j] = d
+            mat[j][i] = d
+    return mat
+
+
 def _mean_point(pts: List[Tuple[float, float]]) -> Tuple[float, float]:
     n = len(pts)
     if n == 0:
@@ -100,20 +118,32 @@ def kmeans(points: List[Tuple[float, float]], k: int,
 # ── DBSCAN ───────────────────────────────────────────────────────────
 
 def dbscan(points: List[Tuple[float, float]], eps: float,
-           min_samples: int = 5) -> List[int]:
-    """Density-based clustering.  Returns labels (-1 = noise)."""
+           min_samples: int = 5,
+           _dmat: Optional[List[List[float]]] = None) -> List[int]:
+    """Density-based clustering.  Returns labels (-1 = noise).
+
+    Accepts an optional precomputed distance matrix (*_dmat*) to avoid
+    redundant O(n²) distance recomputation when the caller already has one.
+    """
     n = len(points)
+    dmat = _dmat if _dmat is not None else _dist_matrix(points)
     labels = [-2] * n  # unvisited
 
-    def _region_query(idx):
-        p = points[idx]
-        return [j for j in range(n) if _euclidean(p, points[j]) <= eps]
+    # Precompute neighbour lists once — O(n²) scan but only one pass
+    # instead of O(n) per _region_query call (which was invoked O(n) times).
+    neighbours_of: List[List[int]] = [[] for _ in range(n)]
+    for i in range(n):
+        row = dmat[i]
+        nbs = neighbours_of[i]
+        for j in range(n):
+            if row[j] <= eps:
+                nbs.append(j)
 
     cluster_id = -1
     for i in range(n):
         if labels[i] != -2:
             continue
-        neighbours = _region_query(i)
+        neighbours = neighbours_of[i]
         if len(neighbours) < min_samples:
             labels[i] = -1  # noise
             continue
@@ -127,19 +157,24 @@ def dbscan(points: List[Tuple[float, float]], eps: float,
                 labels[q] = cluster_id
             elif labels[q] == -2:
                 labels[q] = cluster_id
-                q_neighbours = _region_query(q)
+                q_neighbours = neighbours_of[q]
                 if len(q_neighbours) >= min_samples:
                     seed_set.extend(q_neighbours)
             j += 1
     return labels
 
 
-def estimate_eps(points: List[Tuple[float, float]], k: int = 5) -> float:
+def estimate_eps(points: List[Tuple[float, float]], k: int = 5,
+                 _dmat: Optional[List[List[float]]] = None) -> float:
     """Estimate DBSCAN eps via k-distance elbow heuristic."""
     n = len(points)
+    dmat = _dmat if _dmat is not None else _dist_matrix(points)
     k_dists = []
     for i in range(n):
-        dists = sorted(_euclidean(points[i], points[j]) for j in range(n) if j != i)
+        row = dmat[i]
+        # Sort distances excluding self (row[i]==0); O(n log n) per point
+        # but avoids recomputing sqrt for every pair.
+        dists = sorted(row[j] for j in range(n) if j != i)
         k_dists.append(dists[min(k - 1, len(dists) - 1)])
     k_dists.sort()
     # find elbow: max second derivative
@@ -158,50 +193,77 @@ def estimate_eps(points: List[Tuple[float, float]], k: int = 5) -> float:
 # ── Silhouette score ─────────────────────────────────────────────────
 
 def silhouette_scores(points: List[Tuple[float, float]],
-                      labels: List[int]) -> List[float]:
-    """Per-point silhouette coefficients.  Ignores noise (-1)."""
+                      labels: List[int],
+                      _dmat: Optional[List[List[float]]] = None) -> List[float]:
+    """Per-point silhouette coefficients.  Ignores noise (-1).
+
+    Uses a precomputed distance matrix when available, avoiding O(n²)
+    redundant distance calls.  Also pre-groups point indices by cluster
+    so each point's a_i / b_i computation is a simple sum over the
+    pre-built index lists instead of scanning all n points per cluster.
+    """
     n = len(points)
     unique = set(labels) - {-1}
     if len(unique) < 2:
         return [0.0] * n
+
+    dmat = _dmat if _dmat is not None else _dist_matrix(points)
+
+    # Pre-group indices by cluster label — avoids repeated linear scans.
+    cluster_members: Dict[int, List[int]] = {c: [] for c in unique}
+    for idx, lbl in enumerate(labels):
+        if lbl in cluster_members:
+            cluster_members[lbl].append(idx)
+
     scores = [0.0] * n
     for i in range(n):
-        if labels[i] == -1:
+        li = labels[i]
+        if li == -1:
             scores[i] = -1.0
             continue
-        same = [j for j in range(n) if labels[j] == labels[i] and j != i]
-        if not same:
+        same = cluster_members[li]
+        same_len = len(same) - 1  # exclude self
+        if same_len <= 0:
             scores[i] = 0.0
             continue
-        a_i = sum(_euclidean(points[i], points[j]) for j in same) / len(same)
+        row = dmat[i]
+        a_i = (sum(row[j] for j in same) ) / same_len  # row[i]==0 so sum is fine minus 0
+        # Actually row[i]==0 adds 0 to sum, but we divided by same_len (count-1),
+        # so we need to not include self. Just subtract 0 — it's fine.
         b_i = float("inf")
         for c in unique:
-            if c == labels[i]:
+            if c == li:
                 continue
-            others = [j for j in range(n) if labels[j] == c]
-            if others:
-                avg_d = sum(_euclidean(points[i], points[j]) for j in others) / len(others)
-                b_i = min(b_i, avg_d)
+            members = cluster_members[c]
+            if members:
+                avg_d = sum(row[j] for j in members) / len(members)
+                if avg_d < b_i:
+                    b_i = avg_d
         if b_i == float("inf"):
             b_i = 0.0
         scores[i] = (b_i - a_i) / max(a_i, b_i, 1e-12)
     return scores
 
 
-def mean_silhouette(points, labels) -> float:
-    ss = [s for s, l in zip(silhouette_scores(points, labels), labels) if l != -1]
+def mean_silhouette(points, labels, _dmat=None) -> float:
+    ss = [s for s, l in zip(silhouette_scores(points, labels, _dmat=_dmat), labels) if l != -1]
     return statistics.mean(ss) if ss else 0.0
 
 
 # ── Auto-k ───────────────────────────────────────────────────────────
 
 def auto_k(points: List[Tuple[float, float]], k_max: int = 10) -> Tuple[int, Dict[int, float]]:
-    """Find optimal k for k-means via silhouette sweep.  Returns (best_k, scores_dict)."""
+    """Find optimal k for k-means via silhouette sweep.  Returns (best_k, scores_dict).
+
+    Precomputes the distance matrix once and reuses it for every
+    silhouette evaluation — previously each k recomputed O(n²) distances.
+    """
     k_max = min(k_max, len(points) - 1, 15)
+    dmat = _dist_matrix(points)
     scores: Dict[int, float] = {}
     for k in range(2, k_max + 1):
         labels, _ = kmeans(points, k)
-        scores[k] = mean_silhouette(points, labels)
+        scores[k] = mean_silhouette(points, labels, _dmat=dmat)
     best_k = max(scores, key=scores.get) if scores else 2
     return best_k, scores
 
@@ -236,11 +298,13 @@ def analyze(points: List[Tuple[float, float]],
             "cluster_sizes": km_cluster_sizes,
         }
 
-    # DBSCAN
+    # DBSCAN — share a single distance matrix across eps estimation,
+    # clustering, and silhouette scoring (3× O(n²) → 1× O(n²)).
     if algo in ("dbscan", "both"):
-        eps = estimate_eps(points)
-        db_labels = dbscan(points, eps)
-        db_sil = mean_silhouette(points, db_labels)
+        dmat = _dist_matrix(points)
+        eps = estimate_eps(points, _dmat=dmat)
+        db_labels = dbscan(points, eps, _dmat=dmat)
+        db_sil = mean_silhouette(points, db_labels, _dmat=dmat)
         n_clusters = len(set(db_labels) - {-1})
         n_noise = db_labels.count(-1)
         db_cluster_sizes = {}
