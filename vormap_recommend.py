@@ -43,21 +43,7 @@ from vormap_geometry import polygon_area as _polygon_area
 Recommendation = namedtuple("Recommendation", ["priority", "tool", "command", "reason"])
 
 
-def _load_points(path):
-    """Load 2D points from a whitespace-delimited text file."""
-    points = []
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            parts = line.split()
-            if len(parts) >= 2:
-                try:
-                    points.append((float(parts[0]), float(parts[1])))
-                except ValueError:
-                    continue
-    return points
+from vormap_utils import load_points as _load_points
 
 
 def _bounding_box(pts):

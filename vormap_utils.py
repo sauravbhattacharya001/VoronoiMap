@@ -575,6 +575,30 @@ def lerp(a: float, b: float, t: float) -> float:
     return a + (b - a) * t
 
 
+def load_points(filepath: str) -> List[Tuple[float, float]]:
+    """Load 2-D points from a whitespace- or comma-delimited text file.
+
+    Lines starting with ``#`` and blank lines are skipped.  Each data
+    line must contain at least two numeric tokens (x, y); extra columns
+    are ignored.  Both ``x y`` and ``x,y`` formats are accepted.
+
+    Returns a list of ``(x, y)`` tuples.
+    """
+    points: List[Tuple[float, float]] = []
+    with open(filepath, "r", encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.replace(",", " ").split()
+            if len(parts) >= 2:
+                try:
+                    points.append((float(parts[0]), float(parts[1])))
+                except ValueError:
+                    continue
+    return points
+
+
 def lerp_color(
     c1: Tuple[int, int, int],
     c2: Tuple[int, int, int],

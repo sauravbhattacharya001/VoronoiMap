@@ -327,22 +327,7 @@ class ForecastModel:
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _load_points(filepath):
-    """Load points from whitespace-separated text file."""
-    points = []
-    with open(filepath, "r") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            parts = line.split()
-            if len(parts) >= 2:
-                try:
-                    x, y = float(parts[0]), float(parts[1])
-                    points.append((x, y))
-                except ValueError:
-                    continue
-    return points
+from vormap_utils import load_points as _load_points
 
 
 def _linear_fit(series):
