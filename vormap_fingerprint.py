@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import html as _html
 import json
 import math
 import os
@@ -602,7 +603,7 @@ def _radar_svg(fps: List[Dict], width=500, height=500) -> str:
         y = 20 + fi * 18
         svg.append(f'<rect x="10" y="{y}" width="12" height="12" fill="{color}" rx="2"/>')
         svg.append(f'<text x="28" y="{y + 10}" fill="#ccc" font-size="11" '
-                   f'font-family="monospace">{fp["name"]}</text>')
+                   f'font-family="monospace">{_html.escape(fp["name"])}</text>')
 
     svg.append("</svg>")
     return "\n".join(svg)
@@ -650,12 +651,12 @@ def _heatmap_svg(names, matrix, width=None) -> str:
         short = name[:12]
         # Row labels
         svg.append(f'<text x="{margin - 5}" y="{margin + i * cell + cell // 2 + 4}" '
-                   f'text-anchor="end" fill="#aaa" font-size="10" font-family="monospace">{short}</text>')
+                   f'text-anchor="end" fill="#aaa" font-size="10" font-family="monospace">{_html.escape(short)}</text>')
         # Col labels (rotated)
         x = margin + i * cell + cell // 2
         y = margin - 5
         svg.append(f'<text x="{x}" y="{y}" text-anchor="end" fill="#aaa" font-size="10" '
-                   f'font-family="monospace" transform="rotate(-45 {x} {y})">{short}</text>')
+                   f'font-family="monospace" transform="rotate(-45 {x} {y})">{_html.escape(short)}</text>')
 
     svg.append("</svg>")
     return "\n".join(svg)
@@ -665,7 +666,7 @@ def generate_html(fps: List[Dict], comparisons=None, matrix=None) -> str:
     """Generate interactive HTML report."""
     title = "Spatial Fingerprint Report"
     if len(fps) == 1:
-        title = f"Fingerprint — {fps[0]['name']}"
+        title = f"Fingerprint — {_html.escape(fps[0]['name'])}"
 
     radar = _radar_svg(fps)
     heatmap = ""
@@ -684,7 +685,7 @@ def generate_html(fps: List[Dict], comparisons=None, matrix=None) -> str:
         cards += f"""
         <div style="background:#16213e;border-radius:12px;padding:20px;margin:10px;
                     display:inline-block;vertical-align:top;min-width:280px">
-            <h3 style="color:#00d2ff;margin:0 0 8px">{fp['name']}</h3>
+            <h3 style="color:#00d2ff;margin:0 0 8px">{_html.escape(fp['name'])}</h3>
             <p style="color:#888;margin:4px 0">{fp['n_points']} points</p>
             <p style="margin:8px 0">
                 <span style="background:#0f3460;color:#e94560;padding:4px 12px;border-radius:20px;
