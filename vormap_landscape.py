@@ -134,14 +134,31 @@ def _shape_index(area: float, perimeter: float) -> float:
 
 
 def _fractal_dimension(area: float, perimeter: float) -> float:
-    """Patch fractal dimension (perimeter-area relationship)."""
+    """Patch fractal dimension (perimeter-area relationship).
+
+    FRAGSTATS formula: FRAC = 2 * ln(0.25 * P) / ln(A).
+    Valid range is [1, 2]: 1 = simple shape (square), 2 = maximally
+    convoluted plane-filling boundary.  Returns 1.0 for degenerate
+    inputs (area ≤ 1 or perimeter ≤ 4) where the log ratio is
+    undefined or yields values outside the geometric range.
+    """
     if area <= 0 or perimeter <= 0:
-        return 0.0
-    ln_p = math.log(0.25 * perimeter)  # FRAGSTATS perimeter normalization
+        return 1.0  # degenerate patch — treat as simple shape
+    quarter_p = 0.25 * perimeter
+    # Both ln(A) and ln(P/4) must be positive for a meaningful ratio;
+    # area ≤ 1 ⇒ ln(A) ≤ 0 which makes the formula undefined or
+    # nonsensical, and perimeter ≤ 4 ⇒ ln(P/4) ≤ 0 (sub-unit square).
+    if area <= 1.0 or quarter_p <= 1.0:
+        return 1.0
     ln_a = math.log(area)
-    if ln_a == 0:
-        return 0.0
-    return 2 * ln_p / ln_a
+    ln_p = math.log(quarter_p)
+    # Guard exact-zero denominator (area == 1.0 already caught above)
+    if ln_a < 1e-15:
+        return 1.0
+    frac = 2.0 * ln_p / ln_a
+    # Clamp to theoretical bounds — numerical noise or unusual
+    # geometry (e.g. self-intersecting boundaries) can push outside.
+    return max(1.0, min(2.0, frac))
 
 
 def _core_area(area: float, perimeter: float, edge_depth: float) -> float:
