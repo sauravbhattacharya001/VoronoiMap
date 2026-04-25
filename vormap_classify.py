@@ -58,6 +58,7 @@ Usage (CLI)::
 from __future__ import annotations
 
 import argparse
+import bisect
 import csv
 import json
 import math
@@ -191,19 +192,25 @@ def _classify_jenks(values: List[float], n_classes: int) -> Tuple[List[float], f
     while len(breaks) >= n_classes:
         breaks.pop()
 
-    # Goodness of Variance Fit
+    # Goodness of Variance Fit — single-pass class grouping
     overall_mean = sum(sorted_vals) / n
     sdam = sum((v - overall_mean) ** 2 for v in sorted_vals)
     if sdam == 0:
         gvf = 1.0
     else:
         assignments = _assign_classes(values, breaks)
+        n_cls = len(breaks) + 1
+        cls_sums = [0.0] * n_cls
+        cls_sum_sq = [0.0] * n_cls
+        cls_counts = [0] * n_cls
+        for val, a in zip(values, assignments):
+            cls_sums[a] += val
+            cls_sum_sq[a] += val * val
+            cls_counts[a] += 1
         sdcm = 0.0
-        for cls in range(len(breaks) + 1):
-            cls_vals = [values[i] for i, a in enumerate(assignments) if a == cls]
-            if cls_vals:
-                cls_mean = sum(cls_vals) / len(cls_vals)
-                sdcm += sum((v - cls_mean) ** 2 for v in cls_vals)
+        for c in range(n_cls):
+            if cls_counts[c] > 0:
+                sdcm += cls_sum_sq[c] - (cls_sums[c] ** 2) / cls_counts[c]
         gvf = 1.0 - sdcm / sdam
 
     return breaks, gvf
@@ -324,34 +331,47 @@ def _classify_manual(values: List[float], breaks: List[float]) -> List[float]:
 # ── Class assignment ─────────────────────────────────────────────
 
 def _assign_classes(values: List[float], breaks: List[float]) -> List[int]:
-    """Assign each value to a class based on breakpoints."""
-    assignments: List[int] = []
-    for v in values:
-        cls = 0
-        for bp in breaks:
-            if v >= bp:
-                cls += 1
-            else:
-                break
-        assignments.append(cls)
-    return assignments
+    """Assign each value to a class based on breakpoints.
+
+    Uses ``bisect_right`` for O(log k) lookup per value instead of a
+    linear scan through the break list.  For large datasets with many
+    classes this reduces total work from O(n*k) to O(n*log k).
+    """
+    return [bisect.bisect_right(breaks, v) for v in values]
 
 
 def _compute_summaries(
     values: List[float], assignments: List[int], n_classes: int,
 ) -> List[Dict[str, Any]]:
-    """Compute per-class summary statistics."""
+    """Compute per-class summary statistics.
+
+    Groups values in a single O(n) pass instead of scanning the full
+    list once per class (O(n*k)).
+    """
+    counts = [0] * n_classes
+    sums = [0.0] * n_classes
+    mins = [float('inf')] * n_classes
+    maxs = [float('-inf')] * n_classes
+
+    for val, cls in zip(values, assignments):
+        counts[cls] += 1
+        sums[cls] += val
+        if val < mins[cls]:
+            mins[cls] = val
+        if val > maxs[cls]:
+            maxs[cls] = val
+
     summaries: List[Dict[str, Any]] = []
     for cls in range(n_classes):
-        cls_vals = [values[i] for i, a in enumerate(assignments) if a == cls]
-        if cls_vals:
+        c = counts[cls]
+        if c > 0:
             summaries.append({
                 "class": cls,
-                "count": len(cls_vals),
-                "min": min(cls_vals),
-                "max": max(cls_vals),
-                "mean": round(sum(cls_vals) / len(cls_vals), 6),
-                "sum": round(sum(cls_vals), 6),
+                "count": c,
+                "min": mins[cls],
+                "max": maxs[cls],
+                "mean": round(sums[cls] / c, 6),
+                "sum": round(sums[cls], 6),
             })
         else:
             summaries.append({
@@ -502,12 +522,7 @@ def _classification_svg(
 
     for i in range(n_bins):
         bin_mid = lo + (i + 0.5) * bin_width
-        cls = 0
-        for bp in result.breaks:
-            if bin_mid >= bp:
-                cls += 1
-            else:
-                break
+        cls = bisect.bisect_right(result.breaks, bin_mid)
         color = palette[cls % len(palette)]
         bar_h = (bins[i] / max_count) * chart_h if max_count > 0 else 0
         x = margin_l + i * bar_w
