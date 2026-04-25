@@ -34,18 +34,27 @@ def _grid_voronoi(pts, bbox, res=500):
     x0, y0, x1, y1 = bbox
     sx, sy = (x1 - x0) / res, (y1 - y0) / res
     grid = [[0]*res for _ in range(res)]
-    areas = [0]*len(pts)
-    cx = [0.0]*len(pts); cy = [0.0]*len(pts)
+    n = len(pts)
+    areas = [0]*n
+    cx = [0.0]*n; cy = [0.0]*n
+    # Pre-extract coordinates to avoid per-pixel tuple unpacking
+    gxs = [p[0] for p in pts]
+    gys = [p[1] for p in pts]
+    # Pre-compute column x-coords once
+    col_x = [x0 + (c + 0.5) * sx for c in range(res)]
     for r in range(res):
         py = y0 + (r + 0.5) * sy
+        row = grid[r]
+        # Pre-compute (py - gy)^2 for all generators once per row
+        dy2 = [(py - gys[i])**2 for i in range(n)]
         for c in range(res):
-            px = x0 + (c + 0.5) * sx
+            px = col_x[c]
             best, bd = 0, float('inf')
-            for i, (gx, gy) in enumerate(pts):
-                d = (px - gx)**2 + (py - gy)**2
+            for i in range(n):
+                d = (px - gxs[i])**2 + dy2[i]
                 if d < bd:
                     bd = d; best = i
-            grid[r][c] = best
+            row[c] = best
             areas[best] += 1
             cx[best] += px; cy[best] += py
     cell_area = sx * sy
@@ -58,35 +67,36 @@ def _grid_voronoi(pts, bbox, res=500):
             centroids.append(pts[i])
     return grid, real_areas, centroids, areas
 
-# Approximate perimeter via grid boundary pixels
-def _grid_perimeters(grid, res, n, cell_area_per_pixel_side_x, cell_area_per_pixel_side_y):
+# Single-pass perimeter + neighbor adjacency from grid
+# Merges two O(res²) scans into one, and fixes a bug where vertical
+# adjacency previously only checked column res-2 (stale loop variable).
+def _grid_perimeters_and_neighbors(grid, res, n, cell_area_per_pixel_side_x, cell_area_per_pixel_side_y):
     perims = [0.0]*n
-    avg_side = (cell_area_per_pixel_side_x + cell_area_per_pixel_side_y) / 2
-    for r in range(res):
-        for c in range(res):
-            v = grid[r][c]
-            boundary = False
-            for dr, dc in ((-1,0),(1,0),(0,-1),(0,1)):
-                nr, nc2 = r+dr, c+dc
-                if nr < 0 or nr >= res or nc2 < 0 or nc2 >= res or grid[nr][nc2] != v:
-                    boundary = True; break
-            if boundary:
-                perims[v] += avg_side
-    return perims
-
-# Neighbor adjacency from grid
-def _grid_neighbors(grid, res, n):
     adj = [set() for _ in range(n)]
+    avg_side = (cell_area_per_pixel_side_x + cell_area_per_pixel_side_y) / 2
+    last_row = res - 1
+    last_col = res - 1
     for r in range(res):
-        for c in range(res-1):
-            a, b = grid[r][c], grid[r][c+1]
-            if a != b:
-                adj[a].add(b); adj[b].add(a)
-        if r < res - 1:
-            a, b = grid[r][c], grid[r+1][c]
-            if a != b:
-                adj[a].add(b); adj[b].add(a)
-    return [len(s) for s in adj]
+        row = grid[r]
+        next_row = grid[r + 1] if r < last_row else None
+        for c in range(res):
+            v = row[c]
+            is_boundary = (r == 0 or r == last_row or c == 0 or c == last_col)
+            # Check right neighbor
+            if c < last_col:
+                nb = row[c + 1]
+                if nb != v:
+                    is_boundary = True
+                    adj[v].add(nb); adj[nb].add(v)
+            # Check bottom neighbor
+            if next_row is not None:
+                nb = next_row[c]
+                if nb != v:
+                    is_boundary = True
+                    adj[v].add(nb); adj[nb].add(v)
+            if is_boundary:
+                perims[v] += avg_side
+    return perims, [len(s) for s in adj]
 
 def _gini(values):
     if not values: return 0.0
@@ -112,8 +122,7 @@ def analyze(pts, bbox, weights=None, res=500, do_autofix=False):
     grid, areas, centroids, pixel_counts = _grid_voronoi(pts, bbox, res)
     x0, y0, x1, y1 = bbox
     sx, sy = (x1-x0)/res, (y1-y0)/res
-    perims = _grid_perimeters(grid, res, n, sx, sy)
-    neighbors = _grid_neighbors(grid, res, n)
+    perims, neighbors = _grid_perimeters_and_neighbors(grid, res, n, sx, sy)
 
     # Compactness (Polsby-Popper)
     compactness = []
