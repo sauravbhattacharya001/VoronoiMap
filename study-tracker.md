@@ -16,6 +16,7 @@
 
 ### System Design
 *(date — system — subtopic)*
+- 2026-04-24 — News Feed — Day 1: Core problem, fan-out-on-read vs fan-out-on-write, hybrid approach, write/read pipeline overview
 
 ## Multi-Day Series Tracking
 - **Sliding Window** ✅ COMPLETE
@@ -27,8 +28,13 @@
   - Day 2 (Apr 23): Edge cases, when NOT to use, K-Sum generalization, Container With Most Water
   - Key insights: sorted assumption is load-bearing, two pointers = innermost engine, monotonic pruning on geometry not just values
 
+## Multi-Day Series In Progress
+- **News Feed** 🔄 IN PROGRESS
+  - Day 1 (Apr 24): Pull vs push, hybrid fan-out, write/read pipeline
+  - Day 2: Ranking, caching strategies, feed invalidation
+  - Day 3: Edge cases, consistency, celebrity problem deep dive
+
 ## Upcoming Queue
-- Two Pointers completion
 - Binary Search variations
 - BFS/DFS
 - Monotonic Stack/Queue

@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-04-24T06:09:35.618Z",
-  "lastRepo": "WinSentinel",
-  "lastFeature": "Security Rhythm Analyzer (--rhythm) - temporal pattern analysis with hourly/weekly profiling, autocorrelation cycle detection, scan window recommendations",
-  "runsCompleted": 425,
+  "lastRun": "2026-04-25T05:43:21.571Z",
+  "lastRepo": "gif-captcha",
+  "lastFeature": "CAPTCHA Decay Simulator - effectiveness degradation modeling with fleet management, animated timeline, shelf life estimator, proactive alerts, rotation planner",
+  "runsCompleted": 472,
   "repoFeatures": {
     "WinSentinel": [
       "Peer Benchmark CLI command (--peers)",
@@ -28,7 +28,11 @@
       "Security Weather Report CLI (--weather) - weather metaphor posture display with temperature/wind/humidity/visibility/pressure/UV, 7-day forecast, storm tracker, advisories",
       "Security Mentor CLI command (--mentor) - personalized training coach with skill assessment, learning paths, challenges, streak tracking",
       "Security Prophecy CLI command (--prophecy) - predictive threat forecasting with storm probability, rising/dormant/fading threats, module momentum, proactive recommendations",
-      "Security Rhythm Analyzer CLI command (--rhythm) - temporal pattern analysis with hourly/weekly profiling, autocorrelation cycle detection, quiet/hot scan windows, rhythm score"
+      "Security Rhythm Analyzer CLI command (--rhythm) - temporal pattern analysis with hourly/weekly profiling, autocorrelation cycle detection, quiet/hot scan windows, rhythm score",
+      "Security Negotiator CLI command (--negotiate) - autonomous effort/impact negotiation with 3 strategies, phased implementation plans, module compromises, deal terms, proactive recommendations",
+      "Security Compass CLI command (--compass) - directional gap analysis with ASCII compass rose, per-module headings, waypoints, trajectory analysis",
+      "Security Topology CLI command (--topology) - module interconnection mapping with Pearson correlation, keystone detection, vulnerability chains, cascade impact analysis",
+      "Security Replay CLI command (--replay) - time-travel debugger with snapshot replay, bisect regression finder, state diff"
     ],
     "agentlens": [
       "Light/dark theme toggle for dashboard",
@@ -53,7 +57,11 @@
       "Smart Triage Queue - autonomous incident prioritization with multi-factor scoring, auto-escalation, auto-resolution, proactive recommendations",
       "Agent Communication Graph - interactive Canvas message flow visualization with 5 topologies, bottleneck detection, pattern recognition, auto-monitor",
       "SLO Dashboard - interactive service level objectives with error budget gauge, multi-window burn rate alerts, autonomous deploy recommendations, compliance history, JSON export",
-      "What-If Scenario Planner - interactive failure scenario modeling with impact propagation, cascade animation, comparison mode, custom JSON editor, auto-mitigation"
+      "What-If Scenario Planner - interactive failure scenario modeling with impact propagation, cascade animation, comparison mode, custom JSON editor, auto-mitigation",
+      "Agent Fatigue Monitor - performance degradation detection with fatigue scoring, fleet map, timeline, auto-monitor, recovery recommendations, JSON export",
+      "Agent Resource Optimizer - fleet utilization table, waste detector, auto-rebalance engine, exhaustion forecast chart, auto-optimize mode with live activity log, JSON export",
+      "Agent Experiment Lab - A/B testing dashboard with Welch t-test, Cohen d effect size, auto-decide, Canvas charts, AI recommendations",
+      "Agent Knowledge Graph - interactive knowledge mapping with auto-discovery, fleet health scoring, proactive recommendations, auto-monitor"
     ],
     "sauravcode": [
       "sauravheal - autonomous self-healing runtime with error diagnosis, auto-patching, knowledge base learning",
@@ -78,7 +86,11 @@
       "sauravadapt - autonomous adaptive optimizer with 7 passes (dead code, constant folding, redundant assignment, loop invariant, complexity, string concat, duplicate code), auto-fix, HTML reports, watch mode",
       "sauravcontract - design-by-contract verifier with @requires/@ensures/@invariant parsing, violation detection, auto-suggest, blame analysis, contract inheritance, HTML reports, watch mode",
       "sauravsentinel - autonomous project health sentinel with history timeline, regression detection, goals system, complexity budgets, HTML dashboard, watch mode",
-      "sauravduel - competitive code duel arena with head-to-head battles, autonomous judge scoring, ELO rankings, tournament mode"
+      "sauravduel - competitive code duel arena with head-to-head battles, autonomous judge scoring, ELO rankings, tournament mode",
+      "sauravmutant - autonomous mutation testing engine with 6 operator categories, HTML reports, auto-harden suggestions, watch mode",
+      "sauravmap - autonomous codebase cartographer with call graph analysis, orphan detection, hot path identification, circular dependency detection, complexity scoring, interactive HTML visualization, watch mode",
+      "sauravreflex - autonomous reactive programming engine with ReactiveVar/Computed/Effect/Stream primitives, dependency graph, reactivity scoring, HTML playground, watch mode",
+      "sauravquest - RPG-style coding quest system with 5 chapters, 15 quests, 3 character classes, XP/leveling, 10 achievements, adaptive difficulty, save/load, leaderboard, HTML reports"
     ],
     "VoronoiMap": [
       "Dataset summary CLI (--summary, --summary-json)",
@@ -103,7 +115,11 @@
       "vormap_morph - smooth animated Voronoi interpolation between point sets with greedy matching, 5 easings, auto-discovery, interactive HTML",
       "vormap_narrative - autonomous spatial storytelling generator with prose narratives, Hopkins/Clark-Evans analysis, PCA direction, hotspots, HTML reports",
       "vormap_architect - Autonomous Spatial Layout Architect with SA optimization, constraint negotiation, feasibility detection, proactive recommendations",
-      "vormap_fingerprint - spatial distribution fingerprinting with 14-dim signatures, auto-classification, cosine similarity, batch matching, interactive HTML radar/heatmap reports"
+      "vormap_fingerprint - spatial distribution fingerprinting with 14-dim signatures, auto-classification, cosine similarity, batch matching, interactive HTML radar/heatmap reports",
+      "vormap_balance - Autonomous Spatial Load Balancer with Gini coefficient, equity scoring, 3 rebalancing strategies, convergence detection, interactive HTML reports",
+      "vormap_dispatch - Autonomous Spatial Dispatch Optimizer with demand assignment, overload detection, auto-facility placement, interactive HTML report",
+      "vormap_contagion - Spatial Contagion Simulator with SIR model, autopilot quarantine/vaccination, R0 estimation, interactive HTML report",
+      "vormap_voronoi3d - 3D Voronoi tessellation with 5 presets, cell volume/surface analysis, outlier detection, interactive Three.js HTML with orbit controls, heatmap coloring, cross-section slicer, click-to-inspect"
     ],
     "GraphVisual": [
       "Interactive Random Walk Simulator with visit heatmap, cover time, and preset graphs",
@@ -165,7 +181,9 @@
       "Smart Knowledge Map - autonomous entity/concept extraction with interactive Canvas force-directed graph, insights panel, JSON/PNG export",
       "SmartDeadlineTracker - autonomous deadline detection from conversations with countdown dashboard, proactive alerts (Alt+D)",
       "SmartContradictionDetector - autonomous contradiction detection with 5 strategies, confidence scoring, clarification prompts",
-      "Smart Follow-Up Reminder - autonomous action item detection with timed browser notifications, snooze, manual add, per-session persistence"
+      "Smart Follow-Up Reminder - autonomous action item detection with timed browser notifications, snooze, manual add, per-session persistence",
+      "Smart Conversation Brancher - branch tree panel with visual hierarchy, autonomous topic drift detection via Jaccard similarity, side-by-side branch comparison mode",
+      "Smart Response Critic - autonomous 5-dimension response quality evaluation (completeness, specificity, confidence, actionability, depth) with star ratings, expandable detail panels"
     ],
     "gif-captcha": [
       "Personal stats tracker page (my-stats.html)",
@@ -192,7 +210,11 @@
       "CAPTCHA Threat Radar - 360Ã‚Â° real-time threat radar with Canvas sweep animation, 5 attack vectors, autopilot countermeasure deployment, severity classification, event timeline",
       "CAPTCHA Session Replay Analyzer (session-replay.html) - record solving sessions, replay with mouse trails/heatmap/velocity overlays, 6-dimension behavioral analysis, real-time auto-detect, side-by-side comparison, radar chart, JSON export",
       "PoW Calibrator (pow-calibrator.html) - dynamic proof-of-work difficulty calibration with trust scoring, live SHA-256 mining, autonomous calibration mode, proactive recommendations",
-      "CAPTCHA Mutation Lab (mutation-lab.html) - autonomous parameter evolution with 10 genes, GA crossover/mutation, autopilot with stagnation detection, proactive insights, JSON export"
+      "CAPTCHA Mutation Lab (mutation-lab.html) - autonomous parameter evolution with 10 genes, GA crossover/mutation, autopilot with stagnation detection, proactive insights, JSON export",
+      "CAPTCHA Canary Deployer (canary-deployer.html) - autonomous canary fleet with deploy/rotate/capability shift detection, bot capability timeline, proactive insights",
+      "Cognitive Fingerprint (cognitive-fingerprint.html) - 8-dimension behavioral profiling, bot classification, auto-profile mode, fingerprint comparison, proactive insights",
+      "CAPTCHA Threat Index Dashboard - composite 8-signal threat scoring with Canvas gauge, autonomous defense escalation, signal correlation matrix, 3 attack scenarios, JSON export",
+      "CAPTCHA Decay Simulator - effectiveness degradation modeling with animated Canvas timeline, shelf life estimator, auto-retire, threat acceleration, rotation planner, JSON/CSV export"
     ],
     "getagentbox": [
       "Visual sitemap page with search and categorized navigation",
@@ -218,7 +240,11 @@
       "Agent SLA Dashboard - autonomous SLA monitoring with uptime tracking, error budget burn-down, breach prediction, response time sparklines, incident timeline, proactive recommendations, auto-monitor mode",
       "Agent War Room - interactive multi-agent incident command center with 8 scenarios, 6 agents, 5-phase lifecycle, live sparkline metrics, auto-escalation",
       "Agent Sentiment Analyzer - interactive conversation sentiment analysis with rule-based NLP, SVG gauge, Canvas trend chart, emotional drift detection, communication health scoring, proactive insights",
-      "Agent Threat Model Builder - interactive STRIDE-based threat modeling with 12 capabilities, risk matrix, auto-scan, mitigations, JSON export"
+      "Agent Threat Model Builder - interactive STRIDE-based threat modeling with 12 capabilities, risk matrix, auto-scan, mitigations, JSON export",
+      "Agent Pulse Monitor - real-time fleet health dashboard with heartbeat animations, z-score anomaly detection, 5 scenarios, auto-heal, proactive insights",
+      "Agent Workflow Builder - interactive drag-and-drop visual automation designer with 16 node types, bezier connections, auto-suggest, validation, complexity scoring, 4 preset templates, simulation mode, export/import JSON",
+      "Agent Capacity Planner - interactive fleet capacity planning with workload configurator, 24h load chart, auto-scaling simulation, bottleneck detection, what-if scenarios, optimization recommendations",
+      "Agent Memory Palace - interactive spatial memory visualization with 6 rooms, forgetting curve decay, auto-consolidation, retrieval search"
     ],
     "BioBots": [
       "Global command palette (Ctrl+K) for quick tool navigation",
@@ -245,7 +271,11 @@
       "Lab Downtime Analyzer - autonomous equipment downtime tracking with pattern detection, cascade detection, frequency acceleration, proactive maintenance recommendations",
       "Protocol Deviation Tracker - autonomous deviation detection with severity classification, CAPA recommendations, trend analysis, recurring pattern alerts",
       "Smart Experiment Replicator - autonomous replication planner with power analysis, priority scoring, greedy info-gain scheduling, proactive insights, multi-format export",
-      "Lab Digital Twin - autonomous lab environment simulation with equipment failure prediction, reagent depletion forecasting, environmental anomaly detection, health scoring, action recommendations"
+      "Lab Digital Twin - autonomous lab environment simulation with equipment failure prediction, reagent depletion forecasting, environmental anomaly detection, health scoring, action recommendations",
+      "Bioink Batch Genealogy Tracker - lineage/provenance tracking with drift detection, at-risk flagging, chain auditing, proactive action suggestions",
+      "Lab Personnel Training Tracker - autonomous certification & qualification management with expiry alerts, skill matrix, qualification decay detection, coverage gap analysis, training schedule suggestions",
+      "Print Quality Autopilot - autonomous quality monitoring with degradation detection, parameter auto-tuning, learning engine",
+      "Lab Emergency Response Planner - autonomous emergency preparedness with 8 protocols, drill walkthrough, incident pattern detection, auto-monitor"
     ],
     "everything": [
       "Sleep Calculator for optimal bedtime/wake-up times based on 90-minute cycles",
@@ -290,7 +320,9 @@
       "Smart Accountability Partner - autonomous cross-tracker commitment monitoring with proactive nudges, risk prediction, weekly trends, category breakdown",
       "Smart Digital Detox Planner - autonomous screen time analysis with pattern detection, proactive insights, auto-generated detox scheduling",
       "Social Battery Tracker - social energy monitoring with context-aware logging, 10+ proactive insight rules, burnout detection, drain/recharge pattern analysis",
-      "Smart Weekly Reflection - autonomous cross-tracker weekly review with 8-dimension scoring, pattern detection, insights, goal suggestions, reflection history"
+      "Smart Weekly Reflection - autonomous cross-tracker weekly review with 8-dimension scoring, pattern detection, insights, goal suggestions, reflection history",
+      "Smart Daily Planner - energy-aware auto-scheduling with time blocks, energy curve visualization, automatic breaks, proactive insights",
+      "Smart Procrastination Buster - autonomous procrastination pattern detection with 8 reason categories, productivity score gauge, proactive insights, intervention playbook"
     ],
     "ai": [
       "Quick-scan consolidated safety assessment command (preflight + scorecard + compliance + policy-lint)",
@@ -325,7 +357,8 @@
       "Agent Goal Drift Detector - autonomous goal alignment monitoring with JSD distribution shift, instrumental convergence, mesa-optimization, velocity spike, entropy change detection, interactive HTML dashboard",
       "Agent Isolation Verifier - 8-category sandbox probe (filesystem, network, IPC, shared memory, environment, timing, resource contention, DNS exfiltration) with scoring, HTML reports, watch mode",
       "Sycophancy Detector - detect excessive agreement, opinion reversal, praise inflation, conflict avoidance, echo chamber, truth bending",
-      "Deceptive Alignment Detector - treacherous turn detection with 7 strategies (observation sensitivity, evaluation gaming, context-dependent compliance, behavioral bifurcation, sandbagging reversal, instrumental deception, timing anomaly)"
+      "Deceptive Alignment Detector - treacherous turn detection with 7 strategies (observation sensitivity, evaluation gaming, context-dependent compliance, behavioral bifurcation, sandbagging reversal, instrumental deception, timing anomaly)",
+      "Agent Cognitive Load Monitor - 5-dimension load scoring with EMA forecasting, load-shedding recommendations, burnout detection, fleet overview, HTML reports"
     ],
     "Vidly": [
       "Movie Showdown head-to-head voting game with leaderboard",
@@ -356,7 +389,8 @@
       "Smart Seasonal Recommender - season-aware movie recommendations with genre heatmap, seasonal scoring, proactive insights",
       "Smart Customer Segmentation Engine - autonomous RFM-based segmentation with migration tracking, health scoring, proactive campaign recommendations",
       "Movie Rental Negotiator - autonomous deal negotiation with loyalty scoring, keyword-aware argument processing, chat-style rounds, proactive insights",
-      "Smart Shelf Optimizer - autonomous shelf layout engine with co-rental clustering, genre heat, hidden gems, staleness monitoring, proactive recommendations"
+      "Smart Shelf Optimizer - autonomous shelf layout engine with co-rental clustering, genre heat, hidden gems, staleness monitoring, proactive recommendations",
+      "Smart Movie Mood Engine - autonomous mood inference with radar wheel, trajectory tracking, 4 recommendation strategies, proactive insights, fleet overview"
     ],
     "prompt": [
       "PromptShareFormatter for multi-format prompt sharing (PlainText, Markdown, HTML, JSON, YAML)",
@@ -385,7 +419,11 @@
       "PromptContextAllocator - autonomous context window budget manager with priority-based allocation, 4 overflow strategies, proactive insights",
       "Agent Sandbagging Detector - 6 detection strategies (sudden jump, effort mismatch, selective excellence, capability regression, strategic timing, peer divergence), fleet risk scoring, 7 presets, HTML dashboard",
       "PromptCachingOptimizer - autonomous prompt caching analysis with segment detection, common prefix grouping, restructuring, drift monitoring, efficiency scoring",
-      "PromptMixtureOfExperts - MoE routing with keyword matching, top-K ensemble, adaptive weights, fallback, reporting"
+      "PromptMixtureOfExperts - MoE routing with keyword matching, top-K ensemble, adaptive weights, fallback, reporting",
+      "PromptAdversary - autonomous red-team prompt attack engine with 8 attack strategies, vulnerability scoring, auto-hardening, campaign comparison, multi-format reporting",
+      "PromptContractTester - design-by-contract verification with 15 check types, 3 presets, batch verification, proactive recommendations",
+      "PromptSymbiosis - autonomous prompt synergy detector with 5 relationship types, 10 capability dimensions, coverage chain recommendation, gap analysis, ecosystem health scoring, multi-format reports",
+      "PromptGenealogyTracker - autonomous prompt lineage tracking with family trees, convergent evolution detection, diversity scoring, inbreeding risk alerts, multi-format export"
     ],
     "Ocaml-sample-code": [
       "Maze generator & solver with BFS/DFS/A* and ASCII visualization",
@@ -419,7 +457,12 @@
       "Automated Negotiation Protocol Simulator - 6 strategies (Boulware/Conceder/Linear/TfT/Zeuthen/Random), 2 protocols, 3 domains, Nash bargaining, Pareto frontier, deal advisor, tournament, REPL",
       "Graph What-If Analyzer - interactive hypothetical modification tool with 8 presets, real-time metrics comparison, autonomous recommendations (articulation points, bridges, diameter reduction), node impact heatmap, undo/redo, JSON export",
       "Graph Consensus Simulator - interactive distributed consensus visualization with 3 algorithms (Simple Majority, Raft, PBFT), 8 presets, Canvas animation, Byzantine fault injection, autonomous insights",
-      "Behavior Tree Engine - hierarchical task planning with Sequence/Selector/Parallel nodes, decorators, blackboard memory, 3 domains, interactive REPL"
+      "Behavior Tree Engine - hierarchical task planning with Sequence/Selector/Parallel nodes, decorators, blackboard memory, 3 domains, interactive REPL",
+      "Influence Maximization - greedy CELF seed selection with IC/LT diffusion models, 5 graph generators, budget advisor, cross-model comparison, interactive REPL",
+      "Contract Net Protocol Simulator - FIPA multi-agent task allocation with CFP/bid/award, 6 bidding strategies, 3 award strategies, reputation tracking, failure re-bid, 3 domains, interactive REPL",
+      "Gossip Protocol Simulator - epidemic info dissemination with push/pull/push-pull strategies, network partitions, anti-entropy, autonomous protocol advisor, interactive REPL",
+      "Leader Election Simulator - Bully, Ring, Chang-Roberts algorithms with crash/recovery, partitions, autonomous failure detection, interactive REPL",
+      "Abstract Machine Simulator - SECD, CEK, Krivine machines with parser, step traces, comparison, interactive REPL"
     ],
     "FeedReader": [
       "Feed Weather Reporter - weather metaphor for feed activity analytics",
@@ -446,7 +489,11 @@
       "FeedContentCalendar - autonomous publication pattern detection with schedule forecasting, gap alerts, weekly heatmap, regularity scoring, fleet insights",
       "FeedInboxZero - autonomous inbox-zero strategy engine with action buckets, velocity tracking, streaks, accumulation insights",
       "FeedReadingCoach - autonomous personal reading coach with session tracking, habit analysis, 15 coaching insights, goal system, weekly reports, focus scoring, smart suggestions",
-      "FeedAnomalyDetector - autonomous 6-channel feed behavior anomaly detection with z-score analysis, trust scoring, baseline learning, dismiss workflow, JSON export"
+      "FeedAnomalyDetector - autonomous 6-channel feed behavior anomaly detection with z-score analysis, trust scoring, baseline learning, dismiss workflow, JSON export",
+      "FeedDebateArena - autonomous argument extraction with stance classification, topic clustering, balance scoring, echo chamber detection, cross-topic insights",
+      "FeedImpactTracker - autonomous article impact tracking with Jaccard ripple detection, 5 ripple types, lifecycle phases, viral/cross-feed/contradiction alerts, auto-monitor",
+      "FeedForgettingCurve - autonomous Ebbinghaus forgetting curve memory retention tracker with decay modeling, topic aggregation, refresher suggestions, auto-monitor, forecasting",
+      "FeedCuriosityEngine - autonomous curiosity-driven exploration with knowledge gap detection, question generation, exploration paths, curiosity profiling, auto-monitor"
     ]
   }
 }

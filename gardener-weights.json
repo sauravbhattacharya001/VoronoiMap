@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2026-04-24T05:45:33.899Z",
-  "totalRuns": 3033,
+  "lastUpdated": "2026-04-25T06:01:15.074Z",
+  "totalRuns": 3127,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
@@ -9,26 +9,26 @@
     },
     "bug_fix": {
       "weight": 17.1,
-      "runs": 162,
-      "successes": 163
+      "runs": 165,
+      "successes": 166
     },
     "security_fix": {
       "weight": 18.1,
-      "runs": 290,
-      "successes": 290,
+      "runs": 306,
+      "successes": 306,
       "description": "Fix security vulnerability",
       "totalDone": 11
     },
     "perf_improvement": {
       "weight": 17.1,
-      "runs": 497,
-      "successes": 495,
+      "runs": 525,
+      "successes": 523,
       "description": "Performance improvement"
     },
     "refactor": {
       "weight": 18.1,
-      "runs": 474,
-      "successes": 475
+      "runs": 499,
+      "successes": 500
     },
     "readme_overhaul": {
       "weight": 20,
@@ -44,8 +44,8 @@
     },
     "code_cleanup": {
       "weight": 18.1,
-      "runs": 93,
-      "successes": 93,
+      "runs": 95,
+      "successes": 95,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
@@ -60,20 +60,20 @@
     },
     "fix_issue": {
       "weight": 15.1,
-      "runs": 250,
-      "successes": 249,
+      "runs": 251,
+      "successes": 250,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
       "weight": 25,
-      "runs": 106,
+      "runs": 107,
       "successes": 68,
       "description": "Review and merge open Dependabot PRs"
     },
     "add_ci_cd": {
       "weight": 10,
-      "runs": 18,
-      "successes": 18,
+      "runs": 19,
+      "successes": 19,
       "description": "Add GitHub Actions CI/CD workflow"
     },
     "add_codeql": {
@@ -96,8 +96,8 @@
     },
     "create_release": {
       "weight": 20,
-      "runs": 404,
-      "successes": 403,
+      "runs": 418,
+      "successes": 417,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
@@ -132,14 +132,14 @@
     },
     "issue_templates": {
       "weight": 20,
-      "runs": 30,
-      "successes": 30,
+      "runs": 32,
+      "successes": 32,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
       "weight": 20,
-      "runs": 35,
-      "successes": 35,
+      "runs": 37,
+      "successes": 37,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
@@ -162,50 +162,56 @@
     },
     "docs_site": {
       "weight": 20,
-      "runs": 36,
-      "successes": 35
+      "runs": 37,
+      "successes": 36
     },
     "auto_labeler": {
       "weight": 10,
-      "runs": 28,
-      "successes": 28,
+      "runs": 29,
+      "successes": 29,
       "description": "Add auto-labeler or stale bot"
     },
     "add_docstrings": {
       "weight": 12,
-      "runs": 40,
-      "successes": 40
+      "runs": 41,
+      "successes": 41
     },
     "add_tests": {
       "weight": 18.1,
-      "runs": 53,
-      "successes": 53,
+      "runs": 54,
+      "successes": 54,
       "description": "Add test suites for untested modules"
     }
   },
   "repoState": {},
-  "notes": "Run 3182-3183: perf_improvement on FeedReader (single-pass tokenizer in FeedSentimentRadar + eliminated redundant title re-tokenization in analyze()). readme_overhaul on sauravcode (fixed builtin count 95/105→124, added TOC and Docker section).",
-  "previousNotes": "Run 3180-3181: refactor on FeedReader (migrated 9 files from inline JSONEncoder/JSONDecoder to shared JSONCoding instances — eliminated ~30 redundant allocations, -107/+33 lines). create_release on gif-captcha (v1.16.0 — CAPTCHA Mutation Lab genetic algorithm tool, shared-utils stats deduplication).",
-  "previousPreviousNotes": "Run 3164-3165: security_fix on WinSentinel (closed call-operator & variable-exec bypass in InputSanitizer — CallOperatorPattern now catches &(expr) and &$var, added VariableExecPattern for variable-assignment-then-invoke). create_release on GraphVisual (v2.59.0 — Interactive Motif Census with significance testing).",
-  "previousPreviousPreviousNotes": "Run 3162-3163: perf_improvement on sauravcode (O(1) type-dispatch for compile_statement in sauravcc.py — replaced 19-branch isinstance chain with dict lookup, matching existing compile_expression pattern). refactor on agenticchat (consolidated 14 manual JSON.parse/stringify calls across 10 modules to use centralized SafeStorage.getJSON/setJSON API).",
-  "previousPreviousPreviousPreviousNotes": "Run 3160-3161: perf_improvement on VoronoiMap (parallel coord arrays in _voronoi_areas + inlined k-means distance in _obj_cluster_balance of vormap_swarm.py). security_fix on gif-captcha (bounded blockIP/allowIP stores with maxBlockedIPs/maxAllowedIPs caps to prevent CWE-400 memory exhaustion in geo-risk-scorer.js).",
-  "previousPreviousPreviousPreviousPreviousNotes": "Run 3156-3157: perf_improvement on agentlens (single-pass peak_utilization O(5n)→O(n) + reuse _compute_all_trends in detect_bottlenecks eliminating redundant cpu_vals extraction). merge_dependabot on gif-captcha — no open PRs found, re-rolled to create_release on agentlens (v1.50.0 — Capacity Planner & SLA Evaluator Performance).",
-  "previousPreviousPreviousPreviousPreviousPreviousNotes": "(trimmed)",
+  "notes": "Run 3278-3279: perf_improvement on WinSentinel (precomputed per-run finding key sets in FindingPersistenceAnalyzer.CountConsecutiveFromEnd — eliminated O(F_latest × R × F_per_run) re-normalization, now O(R) per finding via HashSet lookups). refactor on sauravcode (deduplicated scan_file in sauravsentinel — delegates to sauravdigest.analyze_file instead of reimplementing ~50 lines of line classification/function detection/nesting/complexity).",
+  "previousNotes": "Run 3276-3277: refactor on ai (shared influence graph in analyze() — eliminated 2 redundant O(N) build_influence_graph() calls by threading prebuilt graph through detect_monopolies/detect_echo_chambers). perf_improvement on gif-captcha (evaluateAll _percentileSorted + inline mean — eliminated 3 redundant Array.slice().sort() + uniform _weightedAverage).",
+  "_previousNotes2": "Run 3244-3245: security_fix on WinSentinel (fixed CWE-78 command injection in ScheduledTaskAudit — attacker-controlled task names interpolated raw into schtasks FixCommand strings; added SafeSchtasksQuery/SafeSchtasksDelete with single-quote escaping). refactor on gif-captcha (extracted _countInWindow + _classifyRate in captcha-health-monitor — deduplicated 4 identical reverse-iterate-count-classify loops into shared helpers, -68/+57 lines, all 59 tests pass).",
+  "_prevNotesOld2": "Run 3238-3239: auto_labeler on BioBots (added issue-triage.yml — content-based issue auto-labeling with category/area/priority detection and auto-label creation). refactor on sauravbhattacharya001 (extracted logSpacedRates() shared helper from duplicate curve generators + declarative factorDefs/evaluateRules in analyzePrintability — replaced 60+ lines of nested if/else).",
+  "_prevNotesOld": "Run 3214-3215: perf_improvement on ai (precomputed feature-vector magnitudes + time-sorted early exit in anomaly_cluster.py O(n²) clustering — eliminates per-pair sqrt and enables inner-loop break on time gap). refactor on gif-captcha (O(1) country risk lookups in geo-risk-scorer via hash sets instead of indexOf; single-pass listAll in captcha-incident-manager replacing 5 chained .filter() calls).",
+  "previousPreviousNotes": "Run 3236-3237: refactor on VoronoiMap (deduplicated 5 identical _load_points into shared vormap_utils.load_points — removed ~74 lines). create_release on BioBots (v1.37.0 — Print Quality Autopilot, Lab Personnel Training Tracker, Bioink Batch Genealogy Tracker, labDigitalTwin perf, 4 refactoring cleanups).",
+  "previousPreviousPreviousNotes": "Run 3234-3235: perf_improvement on agenticchat (O(1) branch tree lookups — cached _loadTree with Map indices by parentId/childId, eliminating N×JSON.parse in BFS traversal). security_fix on GraphVisual (HTML-escape vertex names in 3 Swing panel controllers — CWE-79 via malicious graph file vertex names in JLabel HTML).",
+  "_prev4": "Run 3204-3205: perf_improvement on everything (threaded activeContacts list through generateReport in ContactTrackerService — eliminated 4 redundant filter passes, reducing O(5N) to O(N)). refactor on Vidly (extracted AnalyzeInternal in FraudDetectorService — batch-fetches all rentals once in GetSummary instead of 2N+1 repository queries).",
+  "_prev5a": "Run 3200-3201: perf_improvement on sauravcode (pre-grouped tokens by line in sauravcomplex.py — reduced function body extraction from O(F×T) to O(T + F×body_lines)). security_fix on BioBots (fixed prototype-pollution in experimentRandomizer — generateBlindingCodes used user-supplied treatment names as {} keys; now Object.create(null) + isDangerousKey guard).",
+  "_prev5b": "Run 3198-3199: bug_fix on gif-captcha (fixed #127 — bounded memory growth in solve-funnel-analyzer with maxSessions/maxRecords LRU eviction). code_cleanup on FeedReader (replaced 22 raw print() calls across 14 files with privacy-aware os_log via FeedReaderLogger — prevents CWE-532 data exposure).",
+  "_prev5": "Run 3192-3193: perf_improvement on VoronoiMap (precomputed symmetric distance matrix shared across DBSCAN, silhouette, eps estimation — eliminated 3× redundant O(n²) distance recomputation; pre-grouped cluster indices in silhouette_scores; precomputed DBSCAN neighbour lists in single pass). refactor on prompt (replaced ~120 lines of lambda-per-attack boilerplate in PromptAdversary.GetAttackGenerators with declarative AttackTemplate record catalog + MaterialiseVariant dispatcher — pure data, no closures, O(1) strategy lookup).",
+  "_prev6": "Run 3190-3191: security_fix on ai (fixed broken DLP scanner — missing Severity import made entire module non-functional, also fixed deprecated utcnow() in evidence_collector). perf_improvement on GraphVisual (O(1) edge lookup via HashSet + linear-time pruneTree in SteinerTreeAnalyzer — replaced O(E) containsEdgeInfo scans and O(V²·E) degree recount).",
+  "_prev7": "(trimmed)",
   "_trimmedPrev10": true,
   "_oldNotes": "Run 2946-2947: refactor on gif-captcha (deduplicated ~80 lines of inlined LruTracker, _clamp, _now from trust-score-engine.js â€” replaced with imports from shared-utils.js). perf_improvement on VoronoiMap (eliminated O(nÂ²) sqrt calls in PSO objective functions â€” squared-distance comparisons in _obj_max_spread, _obj_min_energy, _nearest_neighbor_dists).",
-  "lastRepo": "gif-captcha",
-  "lastRun": "2026-04-23",
-  "runCount": 1011,
+  "lastRepo": "agenticchat",
+  "lastRun": "2026-04-24",
+  "runCount": 1030,
   "lastTasks": [
     "perf_improvement",
-    "readme_overhaul"
+    "refactor"
   ],
   "lastRepos": [
-    "FeedReader",
+    "WinSentinel",
     "sauravcode"
   ],
-  "lastRunTimestamp": "2026-04-24T05:45:33.898Z",
-  "runCounter": 3183,
+  "lastRunTimestamp": "2026-04-25T06:01:15.073Z",
+  "runCounter": 3279,
   "lastWeightAdjustment": 1191,
   "adjustmentHistory": [
     {
