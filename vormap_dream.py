@@ -245,27 +245,46 @@ def _sample_from_personality(personality, novelty, rng):
 
         points.append((max(0.0, min(1.0, x)), max(0.0, min(1.0, y))))
 
-    # Apply repulsion pass to respect NN distance character
+    # Apply repulsion pass to respect NN distance character.
+    # Uses a grid-based spatial index for O(n) average-case neighbor
+    # lookups instead of the previous O(n²) brute-force per iteration.
     if nn_mean > 0 and len(points) > 1:
         target_nn = nn_mean * (1.0 + (novelty - 0.5) * 0.3)
+        half_target = target_nn * 0.5
+        # Grid cell size = search radius so only 9 cells need checking
+        cell_size = max(half_target, 1e-9)
+
         for _ in range(5):
+            # Rebuild spatial grid each iteration (points move)
+            grid = defaultdict(list)
+            for idx, (px, py) in enumerate(points):
+                gx = int(px / cell_size)
+                gy = int(py / cell_size)
+                grid[(gx, gy)].append(idx)
+
             for i in range(len(points)):
+                px, py = points[i]
+                gx = int(px / cell_size)
+                gy = int(py / cell_size)
                 min_d = float("inf")
                 closest = -1
-                for j in range(len(points)):
-                    if i == j:
-                        continue
-                    d = euclidean(points[i], points[j])
-                    if d < min_d:
-                        min_d = d
-                        closest = j
-                if min_d < target_nn * 0.5 and closest >= 0:
-                    dx = points[i][0] - points[closest][0]
-                    dy = points[i][1] - points[closest][1]
-                    dist = max(math.sqrt(dx * dx + dy * dy), 1e-9)
-                    push = (target_nn * 0.5 - min_d) * 0.3
-                    nx = points[i][0] + dx / dist * push
-                    ny = points[i][1] + dy / dist * push
+                # Search 3×3 neighborhood
+                for dx in (-1, 0, 1):
+                    for dy in (-1, 0, 1):
+                        for j in grid.get((gx + dx, gy + dy), ()):
+                            if j == i:
+                                continue
+                            d = euclidean(points[i], points[j])
+                            if d < min_d:
+                                min_d = d
+                                closest = j
+                if min_d < half_target and closest >= 0:
+                    ddx = px - points[closest][0]
+                    ddy = py - points[closest][1]
+                    dist = max(math.sqrt(ddx * ddx + ddy * ddy), 1e-9)
+                    push = (half_target - min_d) * 0.3
+                    nx = px + ddx / dist * push
+                    ny = py + ddy / dist * push
                     points[i] = (max(0, min(1, nx)), max(0, min(1, ny)))
 
     return points
