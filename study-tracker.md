@@ -3,39 +3,27 @@
 ## Progress
 - **Start date:** April 21, 2026
 - **Target:** Meta E5/E6 interview prep
-- **Schedule:** Daily 7 PM PST, alternating LC (odd days) / SD (even days)
+- **Approach:** FEYNMAN-LEVEL. Understand so deeply that coding is trivial.
+
+## Schedule
+- **Mon-Fri 7 PM PST:** LeetCode patterns — conceptual drops + interactive problem solving (I solve, Zalenix verifies/teaches until grokked)
+- **Sat-Sun 10 AM PST:** System Design deep dives — NOT example systems, but COMPONENTS (rate limiter, load balancer, sharding, caching, message queues, etc.) as building blocks that compose into full systems
 
 ## Covered Topics
 
 ### LeetCode Patterns
-*(date — pattern — subtopic)*
 - 2026-04-21 — Sliding Window — Day 1: Core intuition, grow/shrink, caterpillar analogy, queue connection, LP-in-1D insight, Kadane's, negative numbers breaking monotonicity
-- 2026-04-22 — Sliding Window — Day 2: Longest vs shortest (opposing pointer triggers), monotonic property requirement, LC #3 (longest substring no repeats — set), LC #159 (at most K distinct — hashmap vs set)
-- 2026-04-22 — Two Pointers — Sorted two-sum, 3Sum, duplicate skipping, closest-to-target (via cron blurb)
-- 2026-04-23 — Two Pointers — Day 2: Edge cases, when NOT to use, 4Sum/K-Sum generalization, duplicate skip proof, Container With Most Water
+- 2026-04-22 — Sliding Window — Day 2: Longest vs shortest (opposing pointer triggers), monotonic property requirement, LC #3 (longest substring no repeats — set), LC #159 (at most K distinct — hashmap), hashmap vs set bookkeeping
 
-### System Design
-*(date — system — subtopic)*
-- 2026-04-24 — News Feed — Day 1: Core problem, fan-out-on-read vs fan-out-on-write, hybrid approach, write/read pipeline overview
+### System Design Components
+*(none yet — starts this Saturday)*
 
-## Multi-Day Series Tracking
-- **Sliding Window** ✅ COMPLETE
-  - Day 1 (Apr 21): Core intuition, caterpillar, queue, LP connection, Kadane's, negatives
-  - Day 2 (Apr 22): Longest/shortest recipes, monotonic property, LC #3, K distinct chars
-  - Key insights earned: "LP applied to 1D arrays", opposing pointer triggers, hashmap bookkeeping
-- **Two Pointers** ✅ COMPLETE
-  - Day 1 (Apr 22): Sorted two-sum, 3Sum, duplicate skipping, closest-to-target
-  - Day 2 (Apr 23): Edge cases, when NOT to use, K-Sum generalization, Container With Most Water
-  - Key insights: sorted assumption is load-bearing, two pointers = innermost engine, monotonic pruning on geometry not just values
+## Completed Patterns
+- **Sliding Window** ✅ GROKKED
+  - Key insights: caterpillar analogy, queue structure, "LP applied to 1D arrays", opposing pointer triggers for longest vs shortest, monotonic property requirement, hashmap bookkeeping
 
-## Multi-Day Series In Progress
-- **News Feed** 🔄 IN PROGRESS
-  - Day 1 (Apr 24): Pull vs push, hybrid fan-out, write/read pipeline
-  - Day 2: Ranking, caching strategies, feed invalidation
-  - Day 3: Edge cases, consistency, celebrity problem deep dive
+## SD Components to Cover
+Rate Limiter, Load Balancer, Sharding/Partitioning, Consistent Hashing, Caching (layers, eviction, invalidation), Message Queues, CDN, Database Replication, Consensus (Paxos/Raft), Service Discovery, API Gateway, Circuit Breaker, Bloom Filters, Write-Ahead Log, SSTable/LSM Tree, Reverse Proxy, Connection Pooling, Pub/Sub, Leader Election, Heartbeat/Failure Detection
 
-## Upcoming Queue
-- Binary Search variations
-- BFS/DFS
-- Monotonic Stack/Queue
-- Dynamic Programming (multi-day series)
+## LC Patterns to Cover
+Two Pointers, Binary Search variations, BFS/DFS, Topological Sort, Union-Find, Trie, Monotonic Stack/Queue, Dynamic Programming (1D, 2D, interval, bitmask), Graph algorithms, Greedy, Backtracking, Segment Tree/BIT, String matching (KMP, Rabin-Karp), Prefix Sum, Heap/Priority Queue, Intervals
