@@ -33,6 +33,7 @@ Usage (Python API)::
     print(story["sections"])
 """
 
+import html as _html
 import io
 import json
 import math
@@ -487,18 +488,19 @@ def _generate_html(result, path):
     """Generate an interactive HTML report."""
     sections_html = ""
     for sec in result["sections"]:
-        body = sec["body"].replace("\n", "<br>") if sec["body"] else ""
-        sections_html += f'<div class="section"><h2>{sec["title"]}</h2><p>{body}</p></div>\n'
+        body = _html.escape(sec["body"]).replace("\n", "<br>") if sec["body"] else ""
+        sections_html += f'<div class="section"><h2>{_html.escape(sec["title"])}</h2><p>{body}</p></div>\n'
 
     stats = result["stats"]
     pts_json = json.dumps(stats.get("bbox", [0, 0, 1000, 2000]))
+    safe_path = _html.escape(str(path))
 
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Spatial Narrative — {path}</title>
+<title>Spatial Narrative — {safe_path}</title>
 <style>
 *{{margin:0;padding:0;box-sizing:border-box}}
 body{{font-family:Georgia,'Times New Roman',serif;background:#faf9f6;color:#2c2c2c;max-width:800px;margin:0 auto;padding:2rem 1.5rem;line-height:1.7}}
@@ -516,7 +518,7 @@ footer{{margin-top:2rem;text-align:center;color:#aaa;font-size:.8rem}}
 </head>
 <body>
 <h1>📖 Spatial Narrative</h1>
-<p class="subtitle">Autonomous analysis of <strong>{path}</strong></p>
+<p class="subtitle">Autonomous analysis of <strong>{safe_path}</strong></p>
 
 <div class="stats-grid">
   <div class="stat-card"><div class="val">{stats.get('n_points',0):,}</div><div class="lbl">Points</div></div>
