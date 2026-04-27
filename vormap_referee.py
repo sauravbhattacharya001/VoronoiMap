@@ -16,12 +16,11 @@ Usage:
 import argparse, csv, hashlib, json, math, os, sys, time
 from collections import defaultdict
 
+from vormap_utils import euclidean as _dist
+
 # ---------------------------------------------------------------------------
 # Geometry helpers (pure Python, no deps)
 # ---------------------------------------------------------------------------
-
-def _dist(a, b):
-    return math.hypot(a[0] - b[0], a[1] - b[1])
 
 def _bbox(pts, pad=0.10):
     xs = [p[0] for p in pts]; ys = [p[1] for p in pts]

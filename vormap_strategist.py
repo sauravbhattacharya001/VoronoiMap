@@ -53,12 +53,11 @@ import sys
 from collections import defaultdict
 from typing import List, Tuple, Dict, Optional
 
+from vormap_utils import euclidean as _dist
+
 # ---------------------------------------------------------------------------
 # Geometry helpers
 # ---------------------------------------------------------------------------
-
-def _dist(a: Tuple[float,float], b: Tuple[float,float]) -> float:
-    return math.hypot(a[0]-b[0], a[1]-b[1])
 
 def _centroid(pts: List[Tuple[float,float]]) -> Tuple[float,float]:
     if not pts:

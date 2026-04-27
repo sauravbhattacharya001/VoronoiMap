@@ -44,6 +44,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional, Sequence, Tuple
 
+from vormap_utils import euclidean as _dist
+
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
@@ -138,10 +140,6 @@ EASING_MAP = {
 # ---------------------------------------------------------------------------
 
 Point = Tuple[float, float]
-
-
-def _dist(a: Point, b: Point) -> float:
-    return math.hypot(a[0] - b[0], a[1] - b[1])
 
 
 def match_points(

@@ -22,13 +22,11 @@ import random
 import sys
 from collections import defaultdict
 
+from vormap_utils import euclidean as _dist
+
 # ---------------------------------------------------------------------------
 # Geometry helpers
 # ---------------------------------------------------------------------------
-
-def _dist(a, b):
-    return math.hypot(a[0] - b[0], a[1] - b[1])
-
 
 def _cross(o, a, b):
     return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])

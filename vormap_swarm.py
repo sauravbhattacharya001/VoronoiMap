@@ -44,11 +44,9 @@ import random
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
+from vormap_utils import euclidean as _dist
+
 # ── Geometry helpers ────────────────────────────────────────────────
-
-def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    return math.hypot(a[0] - b[0], a[1] - b[1])
-
 
 def _random_points(n: int, w: float, h: float) -> List[Tuple[float, float]]:
     return [(random.uniform(0, w), random.uniform(0, h)) for _ in range(n)]

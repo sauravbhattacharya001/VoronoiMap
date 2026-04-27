@@ -45,13 +45,9 @@ import os
 import random
 from typing import Any, Dict, List, Optional, Tuple
 
-from vormap_utils import bounding_box as _bounding_box
+from vormap_utils import bounding_box as _bounding_box, euclidean as _dist
 
 # ── Geometry helpers ────────────────────────────────────────────────
-
-
-def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    return math.hypot(a[0] - b[0], a[1] - b[1])
 
 
 def _centroid(pts: List[Tuple[float, float]]) -> Tuple[float, float]:

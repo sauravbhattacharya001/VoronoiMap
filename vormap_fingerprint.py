@@ -51,6 +51,8 @@ import sys
 from collections import Counter
 from typing import Any, Dict, List, Optional, Tuple
 
+from vormap_utils import euclidean as _dist
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -70,10 +72,6 @@ def _read_points(path: str) -> List[Tuple[float, float]]:
                 except ValueError:
                     continue
     return pts
-
-
-def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
-    return math.hypot(a[0] - b[0], a[1] - b[1])
 
 
 def _bbox(pts):
