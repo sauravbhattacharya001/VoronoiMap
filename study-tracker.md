@@ -16,7 +16,7 @@
 - 2026-04-22 — Sliding Window — Day 2: Longest vs shortest (opposing pointer triggers), monotonic property requirement, LC #3 (longest substring no repeats — set), LC #159 (at most K distinct — hashmap), hashmap vs set bookkeeping
 
 ### System Design Components
-*(none yet — starts this Saturday)*
+- 2026-04-26 — Rate Limiter — fixed window, sliding window, token bucket, leaky bucket, distributed challenges (Redis), fail-open vs fail-closed, connections to API gateway/circuit breaker/cache
 
 ## Completed Patterns
 - **Sliding Window** ✅ GROKKED

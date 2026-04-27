@@ -1,8 +1,8 @@
 {
-  "lastRun": "2026-04-26T06:05:31.795Z",
-  "lastRepo": "metacognition",
-  "lastFeature": "ConsensusReplayAnimator",
-  "runsCompleted": 519,
+  "lastRun": "2026-04-27T06:06:14.060Z",
+  "lastRepo": "gif-captcha",
+  "lastFeature": "Trust Network Analyzer - Sybil attack detection with trust propagation, force-directed graph, auto-monitor, 5 scenarios",
+  "runsCompleted": 549,
   "repoFeatures": {
     "WinSentinel": [
       "Peer Benchmark CLI command (--peers)",
@@ -240,7 +240,9 @@
       "Cognitive Fingerprint (cognitive-fingerprint.html) - 8-dimension behavioral profiling, bot classification, auto-profile mode, fingerprint comparison, proactive insights",
       "CAPTCHA Threat Index Dashboard - composite 8-signal threat scoring with Canvas gauge, autonomous defense escalation, signal correlation matrix, 3 attack scenarios, JSON export",
       "CAPTCHA Decay Simulator - effectiveness degradation modeling with animated Canvas timeline, shelf life estimator, auto-retire, threat acceleration, rotation planner, JSON/CSV export",
-      "CAPTCHA Replay Attack Detector - token replay detection, timing anomaly analysis, credential stuffing pattern matching, fingerprint clustering, auto-block, interactive Canvas dashboard with 5 attack simulations"
+      "CAPTCHA Replay Attack Detector - token replay detection, timing anomaly analysis, credential stuffing pattern matching, fingerprint clustering, auto-block, interactive Canvas dashboard with 5 attack simulations",
+      "Response Time Profiler - interactive human vs bot timing analysis with statistical tests, ROC/AUC, autonomous optimizer, JSON/CSV export",
+      "Trust Network Analyzer - Sybil attack detection with trust propagation, force-directed graph, auto-monitor, 5 scenarios, JSON/CSV export"
     ],
     "getagentbox": [
       "Visual sitemap page with search and categorized navigation",
@@ -357,7 +359,8 @@
       "Social Battery Tracker - social energy monitoring with context-aware logging, 10+ proactive insight rules, burnout detection, drain/recharge pattern analysis",
       "Smart Weekly Reflection - autonomous cross-tracker weekly review with 8-dimension scoring, pattern detection, insights, goal suggestions, reflection history",
       "Smart Daily Planner - energy-aware auto-scheduling with time blocks, energy curve visualization, automatic breaks, proactive insights",
-      "Smart Procrastination Buster - autonomous procrastination pattern detection with 8 reason categories, productivity score gauge, proactive insights, intervention playbook"
+      "Smart Procrastination Buster - autonomous procrastination pattern detection with 8 reason categories, productivity score gauge, proactive insights, intervention playbook",
+      "Smart Context Switcher - autonomous life-context detection with activity pattern analysis, recency weighting, time-of-day heuristics, proactive tool suggestions"
     ],
     "ai": [
       "Quick-scan consolidated safety assessment command (preflight + scorecard + compliance + policy-lint)",
@@ -465,7 +468,8 @@
       "PromptSymbiosis - autonomous prompt synergy detector with 5 relationship types, 10 capability dimensions, coverage chain recommendation, gap analysis, ecosystem health scoring, multi-format reports",
       "PromptGenealogyTracker - autonomous prompt lineage tracking with family trees, convergent evolution detection, diversity scoring, inbreeding risk alerts, multi-format export",
       "PromptFeedbackLoop - autonomous feedback-driven prompt improvement with pattern detection, auto-refinement, health scoring, multi-format export",
-      "PromptEcosystem - autonomous portfolio health analyzer with 7-dimension scoring (diversity/coverage/freshness/redundancy/complexity/consistency/resilience), Jaccard clustering, interactive HTML dashboard"
+      "PromptEcosystem - autonomous portfolio health analyzer with 7-dimension scoring (diversity/coverage/freshness/redundancy/complexity/consistency/resilience), Jaccard clustering, interactive HTML dashboard",
+      "PromptSLAMonitor - autonomous SLA compliance engine with multi-metric SLA definitions, error budget tracking, burn-rate forecasting, pattern detection, 3 presets, multi-format export"
     ],
     "Ocaml-sample-code": [
       "Maze generator & solver with BFS/DFS/A* and ASCII visualization",
@@ -505,7 +509,8 @@
       "Gossip Protocol Simulator - epidemic info dissemination with push/pull/push-pull strategies, network partitions, anti-entropy, autonomous protocol advisor, interactive REPL",
       "Leader Election Simulator - Bully, Ring, Chang-Roberts algorithms with crash/recovery, partitions, autonomous failure detection, interactive REPL",
       "Abstract Machine Simulator - SECD, CEK, Krivine machines with parser, step traces, comparison, interactive REPL",
-      "Term Rewriting System - pattern matching, unification, normalization (outermost/innermost), critical pair confluence analysis, 4 built-in TRS domains (Peano/Bool/SKI/Group), interactive REPL"
+      "Term Rewriting System - pattern matching, unification, normalization (outermost/innermost), critical pair confluence analysis, 4 built-in TRS domains (Peano/Bool/SKI/Group), interactive REPL",
+      "CTL Model Checker - temporal logic verification over Kripke structures with fixpoint evaluation, witness/counterexample traces, 4 examples, interactive REPL"
     ],
     "FeedReader": [
       "Feed Weather Reporter - weather metaphor for feed activity analytics",
@@ -545,7 +550,33 @@
     "metacognition": [
       "Consensus Resilience Monitor - autonomous stress-testing with Byzantine sweep, threshold sweep, recommendations, interactive HTML report",
       "Consensus Resilience Monitor - autonomous stress-testing with Byzantine sweep, threshold sweep, recommendations, interactive HTML report",
-      "Consensus Replay Animator - interactive HTML step-through visualization with vote flow arrows, reputation bars, aggregate gauge, timeline navigation"
+      "Consensus Replay Animator - interactive HTML step-through visualization with vote flow arrows, reputation bars, aggregate gauge, timeline navigation",
+      "Agent Calibration Benchmarker - ECE/MCE/Brier scoring, 7 agent profiles, per-agent diagnosis, consensus accuracy tracking, interactive HTML reliability diagrams",
+      "Network Partition Simulator - split-brain testing with 4 strategies, healing simulation, HTML reports, JSON export",
+      "Trust Evolution Tracker - multi-scenario reputation analysis with anomaly detection, trust grading, interactive HTML report",
+      "Consensus Parameter Optimizer - autonomous parameter search with grid sweep, safety scoring, HTML reports, JSON export",
+      "Autonomous Consensus Mediator - disagreement pattern detection, faction analysis, mediation strategy recommendations, interactive HTML report",
+      "Autonomous Fault Injector - systematic vulnerability probing with 8 attack patterns, severity classification, interactive HTML report",
+      "Consensus Epidemic Simulator - SIR belief propagation model with Byzantine super-spreaders, 4 topologies, reputation immunity, autopilot sweep, interactive HTML report",
+      "Consensus Epidemic Simulator - SIR belief propagation, 4 topologies, reputation immunity, autopilot, HTML report",
+      "Consensus Forensics Analyzer - autonomous post-run forensic investigation with agent profiling, voting bloc detection, collusion/reputation/confidence analysis, interactive HTML report",
+      "Consensus Tournament Arena - round-robin agent team competitions with ELO ratings, 6 team archetypes, interactive HTML report",
+      "Consensus Governance Engine - autonomous self-governance with ideological agents, amendment deliberation, faction analysis, parameter evolution, interactive HTML report",
+      "Consensus Learning Curve Analyzer - progressive difficulty analysis with autopilot, breakthrough/plateau/collapse detection, interactive HTML report",
+      "Consensus Emergence Detector - autonomous pattern detection with Gini leadership, alignment waves, faction clustering, reputation phases, momentum tracking, interactive HTML report, auto-monitor mode",
+      "Autonomous Consensus Red Team - 8 attack strategies, Byzantine ratio sweep, resilience scoring, interactive HTML report with heatmap and chart",
+      "Consensus Memory & Grudge System - persistent relationship tracking with betrayal/support memory, grudge/alliance detection, forgiveness dynamics, stability analysis, interactive HTML report",
+      "Consensus Influence Mapper - vote influence analysis with swing power, kingmaker detection, coalition discovery, Gini power asymmetry, interactive HTML report",
+      "Consensus Deadlock Detector - deadlock pattern analysis with circular vetoes, oscillation, stalemate, polarization detection, autonomous resolution engine, interactive HTML report",
+      "Consensus Deadlock Detector - deadlock pattern analysis with circular vetoes, oscillation, stalemate, polarization detection, autonomous resolution engine, interactive HTML report",
+      "Adversarial Trainer - progressive hardening with 8 attack strategies, fitness scoring, convergence detection, interactive HTML report",
+      "Consensus Diversity Index - cognitive diversity measurement, groupthink detection, agent profiling, composition recommendations, interactive HTML report",
+      "Consensus Spectral Analyzer - FFT-based voting frequency analysis with oscillation detection, phase coherence, resonance groups, interactive HTML report",
+      "Consensus Quorum Predictor - autonomous pre-round outcome forecasting with MC commit probability, risk agent detection, optimal subset selection, interactive HTML report",
+      "Consensus Diplomacy Engine - autonomous faction negotiation with treaty tracking, alliance heatmap, diplomatic pressure, auto-negotiate, interactive HTML report",
+      "Consensus Lineage Tracker - causal ancestry tracing with similarity-based lineage graph, agent influence scoring, innovation detection, convergence analysis, interactive HTML report",
+      "Consensus Protocol Fuzzer - feedback-driven mutation fuzzer with 14 operators, energy-based mutation selection, 5 outcome classifications, autopilot, interactive HTML report",
+      "Consensus Stability Landscape - autonomous phase-transition mapper with grid sweep, phase region classification, tipping point detection, autopilot zoom, interactive HTML report"
     ]
   }
 }
