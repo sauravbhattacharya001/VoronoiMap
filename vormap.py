@@ -2913,6 +2913,10 @@ def _build_parser():
     from vormap_sentinel import add_sentinel_args
     add_sentinel_args(parser)
 
+    # ── Spatial Resilience ───────────────────────────────────────
+    from vormap_resilience import add_resilience_args
+    add_resilience_args(parser)
+
     return parser
 
 
@@ -3166,6 +3170,17 @@ def main():
     if sentinel_requested:
         from vormap_sentinel import run_sentinel_cli
         run_sentinel_cli(args, args.datafile)
+
+    # Spatial Resilience
+    resilience_requested = any([
+        getattr(args, 'resilience', False),
+        getattr(args, 'resilience_json', None),
+        getattr(args, 'resilience_html', None),
+        getattr(args, 'resilience_what_if', None),
+    ])
+    if resilience_requested:
+        from vormap_resilience import run_resilience_cli
+        run_resilience_cli(args, args.datafile)
 
 
 if __name__ == '__main__':

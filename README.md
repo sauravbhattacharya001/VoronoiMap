@@ -53,7 +53,7 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
 
-## Module Catalog (53 Modules)
+## Module Catalog (54 Modules)
 
 VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is every module organized by category:
 
@@ -156,6 +156,23 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_pathplan` | Path planning: obstacle-aware navigation using Voronoi edge roadmaps |
 | `vormap_fractal` | Fractal dimension analysis of boundary complexity |
 | `vormap_temporal` | Temporal dynamics: track diagram evolution over time series |
+
+### Agentic & Autonomous
+
+| Module | Description |
+|--------|-------------|
+| `vormap_sentinel` | Distribution monitoring: drift detection, anomaly alerting, baseline comparison |
+| `vormap_forecast` | Point pattern forecasting: density trends, hotspot emergence, void prediction |
+| `vormap_strategist` | Autonomous strategy planner: coverage, balance, spread, frontier advisors |
+| `vormap_doctor` | Spatial diagnostician: 12 checks, health scoring, auto-fix prescriptions |
+| `vormap_narrative` | Prose narrative generator: automatic story about spatial structure |
+| `vormap_recommend` | Analysis recommender: inspect data and suggest best tools |
+| `vormap_patrol` | Patrol planner: threat-weighted routes, coverage analysis, shift scheduling |
+| `vormap_dispatch` | Dispatch optimizer: demand assignment, overload detection, auto-rebalancing |
+| `vormap_balance` | Load balancer: Gini/entropy equity metrics, iterative rebalancing |
+| `vormap_compete` | Territorial competition: multi-agent strategy simulation |
+| `vormap_contagion` | Contagion simulator: SIR epidemic spread with auto-quarantine |
+| `vormap_resilience` | **NEW** Resilience analyzer: failure simulation, critical point detection, cascade analysis, redundancy planning |
 
 
 ## 🔧 Installation
