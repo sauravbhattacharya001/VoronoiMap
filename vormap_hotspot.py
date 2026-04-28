@@ -54,6 +54,7 @@ from vormap_geometry import (
     edge_length as _distance,
     SVGCoordinateTransform,
 )
+from vormap_utils import build_vertex_adjacency
 
 try:
     from scipy.spatial import cKDTree as _KDTree
@@ -69,13 +70,15 @@ def _centroids_from_stats(stats):
     return [(s["centroid_x"], s["centroid_y"]) for s in stats]
 
 
+
 def _shared_edge_or_vertex(verts_a, verts_b, tol=1e-9):
-    """Check if two polygons share an edge or vertex (queen contiguity)."""
-    for va in verts_a:
-        for vb in verts_b:
-            if abs(va[0] - vb[0]) < tol and abs(va[1] - vb[1]) < tol:
-                return True
-    return False
+    """Check if two polygons share an edge or vertex (queen contiguity).
+
+    Thin wrapper kept for backward compatibility and test coverage.
+    The heavy lifting is now in :func:`vormap_utils.build_vertex_adjacency`.
+    """
+    adj = build_vertex_adjacency([verts_a, verts_b], tol=tol, min_shared=1)
+    return bool(adj.get(0))
 
 
 def build_queen_weights(regions, stats):
@@ -83,8 +86,8 @@ def build_queen_weights(regions, stats):
 
     Two regions are neighbors if they share at least one vertex.
 
-    Uses a spatial vertex hash for O(n·V) average-case performance
-    instead of the naive O(n²·V²) pairwise vertex comparison.
+    Delegates to :func:`vormap_utils.build_vertex_adjacency` for the
+    vertex-hash adjacency computation.
 
     Parameters
     ----------
@@ -102,7 +105,6 @@ def build_queen_weights(regions, stats):
     seeds = [(s["seed_x"], s["seed_y"]) for s in stats]
 
     # Build a lookup dict for region keys to avoid O(n) linear scan per seed.
-    # Keys are rounded to tolerance for consistent matching.
     _TOL = 1e-9
     region_lookup = {}
     for k in regions:
@@ -115,31 +117,7 @@ def build_queen_weights(regions, stats):
         key = region_lookup.get(rk)
         seed_verts.append(regions[key] if key is not None else [])
 
-    # Use a spatial hash on vertices to find adjacency in O(n·V) average case.
-    # Two regions sharing at least one vertex (within tolerance) are neighbors.
-    # We discretize vertex coordinates into grid buckets; vertices that round
-    # to the same bucket belong to the same spatial location.
-    _GRID_TOL = 1e-6  # coarser bucket for vertex grouping
-    vertex_map = {}  # rounded (x, y) -> set of region indices
-    for i, verts in enumerate(seed_verts):
-        for vx, vy in verts:
-            key = (round(vx / _GRID_TOL), round(vy / _GRID_TOL))
-            if key not in vertex_map:
-                vertex_map[key] = set()
-            vertex_map[key].add(i)
-
-    weights = {i: set() for i in range(n)}
-    for region_indices in vertex_map.values():
-        if len(region_indices) < 2:
-            continue
-        # All regions sharing this vertex are neighbors
-        idx_list = list(region_indices)
-        for a in range(len(idx_list)):
-            for b in range(a + 1, len(idx_list)):
-                i, j = idx_list[a], idx_list[b]
-                weights[i].add(j)
-                weights[j].add(i)
-    return weights
+    return build_vertex_adjacency(seed_verts, tol=1e-6, min_shared=1)
 
 
 def build_distance_weights(stats, threshold=None):

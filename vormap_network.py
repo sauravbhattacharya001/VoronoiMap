@@ -45,6 +45,7 @@ from collections import deque
 from dataclasses import dataclass, field
 
 from vormap_geometry import edge_length, SVGCoordinateTransform
+from vormap_utils import build_vertex_adjacency
 
 # Alias for backward compatibility (used by tests)
 _euclidean = edge_length
@@ -95,36 +96,19 @@ def build_delaunay_graph(stats):
     edges = []
     seen = set()
 
-    # Build shared-edge adjacency via vertex matching.
-    # Two polygons are adjacent if they share at least 2 vertices.
-    tol = 1e-6
-    vertex_map = {}  # (rounded x, rounded y) -> list of region indices
+    # Delegate vertex-hash adjacency to shared utility (min_shared=2 = rook/edge contiguity).
+    polygons = [s.get("polygon", []) for s in stats]
+    adj_sets = build_vertex_adjacency(polygons, tol=1e-6, min_shared=2)
 
-    for i, s in enumerate(stats):
-        poly = s.get("polygon", [])
-        for vx, vy in poly:
-            # Round to tolerance level for consistent vertex matching
-            key = (round(vx / tol) * tol, round(vy / tol) * tol)
-            vertex_map.setdefault(key, []).append(i)
-
-    # Count shared vertices per region pair
-    pair_counts = {}
-    for rkey, region_indices in vertex_map.items():
-        unique = list(set(region_indices))
-        for a_idx in range(len(unique)):
-            for b_idx in range(a_idx + 1, len(unique)):
-                pair = (unique[a_idx], unique[b_idx])
-                pair_counts[pair] = pair_counts.get(pair, 0) + 1
-
-    # Pairs sharing >= 2 vertices are adjacent (share an edge)
-    for (i, j), count in pair_counts.items():
-        if count >= 2 and (i, j) not in seen:
-            seen.add((i, j))
-            seen.add((j, i))
-            dist = edge_length(centroids[i], centroids[j])
-            edges.append({"source": i, "target": j, "weight": dist})
-            adjacency[i].append(j)
-            adjacency[j].append(i)
+    for i in range(n):
+        for j in adj_sets.get(i, set()):
+            if (i, j) not in seen:
+                seen.add((i, j))
+                seen.add((j, i))
+                dist = edge_length(centroids[i], centroids[j])
+                edges.append({"source": i, "target": j, "weight": dist})
+                adjacency[i].append(j)
+                adjacency[j].append(i)
 
     nodes = []
     for i, s in enumerate(stats):

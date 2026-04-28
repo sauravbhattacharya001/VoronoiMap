@@ -611,3 +611,76 @@ def lerp_color(
         int(c1[1] + (c2[1] - c1[1]) * t),
         int(c1[2] + (c2[2] - c1[2]) * t),
     )
+
+
+def build_vertex_adjacency(
+    polygons: list,
+    *,
+    tol: float = 1e-6,
+    min_shared: int = 1,
+) -> dict:
+    """Build region adjacency from shared polygon vertices.
+
+    Uses a spatial vertex hash (O(n·V) average-case) to detect which
+    polygons share vertices.  This is the standard queen-contiguity
+    adjacency computation used by hotspot detection, network analysis,
+    and report generation.
+
+    Parameters
+    ----------
+    polygons : list of list of (float, float)
+        Each element is a list of vertex (x, y) tuples for one polygon.
+    tol : float
+        Coordinate rounding tolerance for vertex matching (default 1e-6).
+    min_shared : int
+        Minimum number of shared vertices to consider two polygons
+        adjacent (1 = queen contiguity, 2 = rook/edge contiguity).
+
+    Returns
+    -------
+    dict[int, set[int]]
+        Maps polygon index to set of adjacent polygon indices.
+    """
+    n = len(polygons)
+    vertex_map: dict = {}  # rounded (x, y) -> set of polygon indices
+    inv_tol = 1.0 / tol if tol > 0 else 1.0
+
+    for i, verts in enumerate(polygons):
+        for vx, vy in verts:
+            key = (round(vx * inv_tol), round(vy * inv_tol))
+            bucket = vertex_map.get(key)
+            if bucket is None:
+                vertex_map[key] = {i}
+            else:
+                bucket.add(i)
+
+    if min_shared <= 1:
+        # Fast path: any shared vertex means adjacency
+        adj: dict = {i: set() for i in range(n)}
+        for region_indices in vertex_map.values():
+            if len(region_indices) < 2:
+                continue
+            idx_list = list(region_indices)
+            for a in range(len(idx_list)):
+                for b in range(a + 1, len(idx_list)):
+                    adj[idx_list[a]].add(idx_list[b])
+                    adj[idx_list[b]].add(idx_list[a])
+        return adj
+
+    # General path: count shared vertices per pair
+    pair_counts: dict = {}
+    for region_indices in vertex_map.values():
+        if len(region_indices) < 2:
+            continue
+        idx_list = list(region_indices)
+        for a in range(len(idx_list)):
+            for b in range(a + 1, len(idx_list)):
+                pair = (idx_list[a], idx_list[b])
+                pair_counts[pair] = pair_counts.get(pair, 0) + 1
+
+    adj = {i: set() for i in range(n)}
+    for (i, j), count in pair_counts.items():
+        if count >= min_shared:
+            adj[i].add(j)
+            adj[j].add(i)
+    return adj
