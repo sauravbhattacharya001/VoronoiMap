@@ -53,9 +53,9 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
 
-## Module Catalog (54 Modules)
+## Module Catalog (129 Modules)
 
-VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is every module organized by category:
+VoronoiMap has grown into a comprehensive spatial analysis toolkit with **129 modules** spanning core algorithms, visualization, spatial statistics, simulation, planning, artistic rendering, and autonomous analysis. Every module is listed below by category.
 
 ### Core
 
@@ -67,6 +67,10 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_seeds` | Seed point generators: grid, hexagonal, random, Poisson disk, clustered |
 | `vormap_generate` | Synthetic point pattern generator: 6 patterns, NNI stats, CLI |
 | `vormap_pipeline` | Pipeline runner: chain multiple analysis steps into automated workflows |
+| `vormap_utils` | Shared utility functions for VoronoiMap modules |
+| `vormap_benchmark` | Performance benchmark suite for VoronoiMap operations |
+| `vormap_profile` | Spatial data profiler: comprehensive dataset summary statistics |
+| `vormap_quality` | Spatial data quality assessment for Voronoi diagrams |
 
 ### Visualization & Export
 
@@ -74,12 +78,18 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 |--------|-------------|
 | `vormap_heatmap` | Density heatmap: color cells by density, area, compactness with 3 color ramps |
 | `vormap_color` | Map coloring: four-color theorem for conflict-free cell coloring |
+| `vormap_coloring` | Graph coloring algorithms for Voronoi diagrams |
 | `vormap_animate` | Animated HTML visualization of diagram evolution over time |
 | `vormap_mosaic` | Image mosaic filter: stained-glass and pixel-art effects |
 | `vormap_report` | Self-contained HTML analysis report with stats, histograms, region table |
 | `vormap_geojson` | GeoJSON export (RFC 7946) for GIS tools (QGIS, Mapbox, Leaflet, ArcGIS) |
 | `vormap_kml` | KML export for Google Earth visualization |
 | `vormap_gpx` | GPX import/export: load waypoints/tracks/routes, export points for GPS devices |
+| `vormap_ascii` | Terminal (ASCII/Unicode) rendering of Voronoi diagrams |
+| `vormap_label` | Automatic label placement for Voronoi diagrams |
+| `vormap_gallery` | Interactive HTML showcase of VoronoiMap art styles |
+| `vormap_playground` | Interactive HTML Voronoi playground generator |
+| `vormap_cvd` | Color-vision-deficiency (deuteranopia) simulation on SVG output |
 
 ### Spatial Statistics
 
@@ -95,6 +105,11 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_kde` | Kernel density estimation: Gaussian KDE with Silverman/Scott bandwidth |
 | `vormap_regularity` | Voronoi entropy, Lewis's law, Aboav-Weaire law, regularity index |
 | `vormap_montecarlo` | Monte Carlo spatial simulation: CSR testing, confidence envelopes |
+| `vormap_crossval` | Leave-one-out cross-validation for spatial interpolation methods |
+| `vormap_regress` | Spatial regression analysis for Voronoi diagrams |
+| `vormap_fingerprint` | Spatial distribution fingerprinting: compact signatures for point patterns |
+| `vormap_centroid` | Spatial center analysis for Voronoi point datasets |
+| `vormap_zonal` | Zonal statistics for Voronoi tessellations |
 
 ### Graph & Network
 
@@ -103,6 +118,7 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_graph` | Neighbourhood graph: adjacency extraction, 14 structural metrics |
 | `vormap_network` | Delaunay network: MST, betweenness centrality, components, efficiency |
 | `vormap_edge` | Edge analysis: boundary lengths, shared edges, edge density |
+| `vormap_delaunay` | Delaunay triangulation quality analysis for Voronoi tessellations |
 
 ### Shape & Geometry
 
@@ -114,6 +130,9 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_power` | Weighted (power) Voronoi diagrams: site weights affect cell sizes |
 | `vormap_relax` | Lloyd's relaxation: iterative centroid smoothing for uniform tessellations |
 | `vormap_stability` | Stability analysis: sensitivity to point perturbation |
+| `vormap_symmetry` | Voronoi symmetry analysis: detect rotational and reflective symmetry |
+| `vormap_buffer` | Buffer zone analysis for Voronoi point datasets |
+| `vormap_circlepack` | Voronoi circle packing: largest inscribed circles per cell |
 
 ### Spatial Operations
 
@@ -127,6 +146,9 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_sample` | Spatial sampling: stratified, systematic, centroid, boundary, density-weighted |
 | `vormap_transect` | Transect profiler: cross-section analysis along lines through the diagram |
 | `vormap_compare` | Diagram comparison: seed displacement, area change, topology difference |
+| `vormap_smooth` | Spatial smoothing of attribute values across Voronoi cells |
+| `vormap_isochrone` | Isochrone (travel-time zone) generator for Voronoi networks |
+| `vormap_changedetect` | Spatial change detection for Voronoi point datasets |
 
 ### Clustering & Classification
 
@@ -143,6 +165,14 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_automata` | Cellular automata: Game of Life, majority, forest fire, epidemic on irregular grids |
 | `vormap_gravity` | Gravity models: classic, Huff, Hansen, doubly-constrained spatial interaction |
 | `vormap_watershed` | Watershed & flow: flow direction, accumulation, basin delineation |
+| `vormap_erosion` | Terrain erosion simulation over Voronoi networks |
+| `vormap_crystal` | Voronoi crystal growth simulator: anisotropic nucleation & growth |
+| `vormap_ecosystem` | Autonomous spatial ecosystem simulator on Voronoi tessellations |
+| `vormap_contagion` | Contagion simulator: SIR epidemic spread with auto-quarantine |
+| `vormap_evolve` | Evolutionary point placement optimizer for Voronoi diagrams |
+| `vormap_swarm` | Autonomous particle swarm optimizer for Voronoi point layouts |
+| `vormap_morph` | Smooth animated interpolation between point configurations |
+| `vormap_noise` | Worley (cellular) noise generator |
 
 ### Planning & Territory
 
@@ -156,6 +186,11 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_pathplan` | Path planning: obstacle-aware navigation using Voronoi edge roadmaps |
 | `vormap_fractal` | Fractal dimension analysis of boundary complexity |
 | `vormap_temporal` | Temporal dynamics: track diagram evolution over time series |
+| `vormap_compete` | Territorial competition: multi-agent strategy simulation |
+| `vormap_cartogram` | Voronoi cartogram: area-proportional region distortion |
+| `vormap_treemap` | Hierarchical data layout as Voronoi treemap |
+| `vormap_displacement` | Voronoi displacement & normal-map generator |
+| `vormap_privacy` | Spatial privacy engine: differential privacy & k-anonymity for point data |
 
 ### Agentic & Autonomous
 
@@ -170,9 +205,41 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit. Here is ever
 | `vormap_patrol` | Patrol planner: threat-weighted routes, coverage analysis, shift scheduling |
 | `vormap_dispatch` | Dispatch optimizer: demand assignment, overload detection, auto-rebalancing |
 | `vormap_balance` | Load balancer: Gini/entropy equity metrics, iterative rebalancing |
-| `vormap_compete` | Territorial competition: multi-agent strategy simulation |
-| `vormap_contagion` | Contagion simulator: SIR epidemic spread with auto-quarantine |
-| `vormap_resilience` | **NEW** Resilience analyzer: failure simulation, critical point detection, cascade analysis, redundancy planning |
+| `vormap_resilience` | Resilience analyzer: failure simulation, critical point detection, cascade analysis |
+| `vormap_radar` | Autonomous spatial radar system for Voronoi point datasets |
+| `vormap_referee` | Autonomous spatial fairness referee |
+| `vormap_dream` | Autonomous spatial dreamer: generate synthetic distributions from learned patterns |
+| `vormap_terraform` | Autonomous terrain sculptor |
+| `vormap_architect` | Autonomous spatial layout architect |
+
+### Artistic Rendering
+
+| Module | Description |
+|--------|-------------|
+| `vormap_stainedglass` | Stained-glass renderer |
+| `vormap_watercolor` | Watercolour painter |
+| `vormap_stipple` | Voronoi stippling: image-to-dot-art using weighted tessellation |
+| `vormap_lowpoly` | Low-poly image renderer |
+| `vormap_pixelart` | Pixel-art generator |
+| `vormap_halftone` | Halftone renderer |
+| `vormap_hatch` | Hatch pattern generator: pen-plotter / engraving style output |
+| `vormap_crossstitch` | Cross-stitch pattern generator |
+| `vormap_stringart` | String art generator |
+| `vormap_emboss` | Emboss / relief renderer |
+| `vormap_gradient` | Gradient-fill renderer |
+| `vormap_photomosaic` | Photo-mosaic renderer |
+| `vormap_text` | Voronoi typography: render text as cell mosaics |
+| `vormap_texture` | Seamless tileable texture generator |
+| `vormap_tile` | Seamless tileable Voronoi pattern generator |
+| `vormap_spiral` | Spiral pattern generator |
+| `vormap_kaleidoscope` | Kaleidoscope generator |
+| `vormap_penrose` | Penrose tiling generator |
+| `vormap_fracture` | Fracture simulator: realistic material fracture patterns |
+| `vormap_jigsaw` | Jigsaw puzzle generator: split images into puzzle pieces |
+| `vormap_flowfield` | Flow-field visualiser: vector fields & streamlines over diagrams |
+| `vormap_maze` | Voronoi-based maze generator |
+| `vormap_mesh3d` | 3D mesh exporter: extrude Voronoi cells into 3D geometry |
+| `vormap_voronoi3d` | 3D Voronoi tessellation visualizer |
 
 
 ## 🔧 Installation
@@ -446,7 +513,7 @@ vormap_viz.generate_graph("datauni5.txt", "graph.json", fmt="json")
 
 ## 📚 API Reference
 
-> **Full API documentation:** See [docs/API.md](docs/API.md) for complete reference of all 25 modules and 150+ functions.
+> **Full API documentation:** See [docs/API.md](docs/API.md) for complete reference of all 129 modules and their functions.
 
 ### Core Functions
 
@@ -543,8 +610,8 @@ vormap_viz.generate_graph("datauni5.txt", "graph.json", fmt="json")
 VoronoiMap/
 ├── vormap.py                    # Core algorithm implementation
 ├── vormap_viz.py                # SVG + interactive HTML visualization
-├── vormap_*.py (50 modules)     # Spatial analysis toolkit (see catalog above)
-├── test_*.py (14 test files)    # Unit & integration tests
+├── vormap_*.py (128 modules)    # Spatial analysis toolkit (see catalog above)
+├── tests/                       # Unit & integration tests
 ├── requirements.txt             # Optional dependencies
 ├── pyproject.toml               # Package configuration
 ├── Dockerfile                   # Container build
