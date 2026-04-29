@@ -1,554 +1,1033 @@
-"""Autonomous Particle Swarm Optimizer for Voronoi Point Layouts.
+#!/usr/bin/env python3
+"""Spatial Swarm Intelligence Engine — autonomous collective spatial optimization.
 
-Uses Particle Swarm Optimization (PSO) to find optimal point placements
-for various spatial objectives on a 2-D canvas.  Produces an interactive
-HTML report with before/after Voronoi diagrams, fitness curve, and
-proactive recommendations.
+Treats Voronoi cells as intelligent swarm agents that sense neighbors,
+propagate signals, and collectively solve spatial problems through emergent
+behavior.  Five behavior modes simulate distinct collective-intelligence
+phenomena on any point dataset.
 
-Objectives:
-    * **max_spread**      — maximize minimum pairwise distance
-    * **min_energy**      — minimize total pairwise repulsion energy (Σ 1/d)
-    * **uniform_density** — minimize CV of nearest-neighbor distances
-    * **coverage**        — minimize std-dev of Voronoi cell areas
-    * **cluster_balance** — minimize imbalance across k-means clusters
+This is an *agentic* capability — the engine autonomously runs a swarm
+simulation where each cell acts as an independent agent communicating via
+local signals, producing emergent global behavior that no single cell could
+achieve alone.
 
-Autonomous features:
-    * **Auto-objective** (``--auto``) — quick pre-scan picks the objective
-      with most room for improvement
-    * **Adaptive swarm** — particle count auto-scales for large point sets
-    * **Stagnation rescue** — random perturbation when progress stalls
-    * **Convergence report** — improvement %, convergence iteration, tips
+Five behavior modes:
 
-CLI examples::
+- **Consensus** — cells vote on spatial classifications and converge toward
+  agreement; faction boundaries emerge at opinion frontiers.
+- **Balance** — cells redistribute energy to minimize variance; stubborn
+  hotspots are identified where balancing stalls.
+- **Alert** — anomaly cells broadcast alert signals that propagate through
+  the neighbor network with decay; relay bottleneck cells are identified.
+- **Territory** — weighted cells negotiate influence zones; stable borders
+  and contested zones emerge.
+- **Pathfind** — stigmergic pheromone signals discover optimal routes
+  through the spatial network; highway corridors emerge.
 
-    python vormap_swarm.py --objective max_spread --points 25 --output swarm.html
-    python vormap_swarm.py --auto --points 30 --output result.html
-    python vormap_swarm.py --points 20 --particles 40 --iterations 200
+Usage (Python API)::
 
-Programmatic::
+    from vormap_swarm import SwarmEngine, swarm_simulate, swarm_demo
 
-    from vormap_swarm import SwarmOptimizer, export_html
+    # Quick one-liner
+    result = swarm_simulate("points.txt", behavior="consensus")
+    print(f"Converged: {result.convergence_history[-1]:.1%} in {result.ticks_run} ticks")
 
-    opt = SwarmOptimizer(n_points=20, objective="max_spread")
-    result = opt.run()
-    export_html(result, "output.html")
+    # Detailed API
+    engine = SwarmEngine(points=[(0,0),(10,0),(5,8)], behavior="balance")
+    result = engine.run()
+    engine.to_json("swarm.json")
+    engine.to_html("swarm.html")
+
+    # Demo all behaviors
+    swarm_demo()
+
+CLI::
+
+    python vormap_swarm.py points.txt --behavior consensus
+    python vormap_swarm.py points.txt --behavior balance --max-ticks 200
+    python vormap_swarm.py points.txt --json result.json --html dashboard.html
+    python vormap_swarm.py --demo
 """
 
 from __future__ import annotations
 
 import argparse
+import collections
+import copy
 import json
 import math
 import os
 import random
-from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple
+import textwrap
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from vormap_utils import euclidean as _dist
+# ---------------------------------------------------------------------------
+# Data types
+# ---------------------------------------------------------------------------
 
-# ── Geometry helpers ────────────────────────────────────────────────
+CellAgent = collections.namedtuple(
+    "CellAgent",
+    ["cell_id", "center", "area", "neighbors", "energy", "role", "signals", "memory"],
+)
 
-def _random_points(n: int, w: float, h: float) -> List[Tuple[float, float]]:
-    return [(random.uniform(0, w), random.uniform(0, h)) for _ in range(n)]
+Signal = collections.namedtuple(
+    "Signal",
+    ["source_id", "signal_type", "strength", "payload", "timestamp", "hops"],
+)
+
+SwarmState = collections.namedtuple(
+    "SwarmState",
+    ["tick", "agents", "active_signals", "global_metrics", "convergence"],
+)
+
+SwarmResult = collections.namedtuple(
+    "SwarmResult",
+    [
+        "behavior_type",
+        "ticks_run",
+        "final_state",
+        "convergence_history",
+        "emergent_patterns",
+        "recommendations",
+        "tick_snapshots",
+    ],
+)
+
+EmergentPattern = collections.namedtuple(
+    "EmergentPattern",
+    ["pattern_type", "description", "involved_cells", "confidence"],
+)
+
+# ---------------------------------------------------------------------------
+# Geometry helpers
+# ---------------------------------------------------------------------------
 
 
-def _nearest_neighbor_dists(pts: List[Tuple[float, float]]) -> List[float]:
-    """O(n²) nearest-neighbor distances using squared-distance comparisons.
+def _dist(a, b):
+    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
-    Only computes sqrt once per point (for the final minimum), avoiding
-    n-1 redundant sqrt calls per point.
-    """
-    _sqrt = math.sqrt
+
+def _centroid(pts):
     n = len(pts)
-    dists = []
+    if n == 0:
+        return (0.0, 0.0)
+    return (sum(p[0] for p in pts) / n, sum(p[1] for p in pts) / n)
+
+
+def _approx_area(center, neighbors_centers, bounds):
+    """Rough Voronoi cell area estimate via Monte-Carlo or bounding box fraction."""
+    if not neighbors_centers:
+        dx = bounds[2] - bounds[0]
+        dy = bounds[3] - bounds[1]
+        return dx * dy
+    # Use midpoint polygon approximation
+    midpoints = []
+    for nc in neighbors_centers:
+        mx = (center[0] + nc[0]) / 2.0
+        my = (center[1] + nc[1]) / 2.0
+        midpoints.append((mx, my))
+    # Sort by angle from center
+    midpoints.sort(key=lambda p: math.atan2(p[1] - center[1], p[0] - center[0]))
+    # Shoelace area
+    area = 0.0
+    n = len(midpoints)
     for i in range(n):
-        pix, piy = pts[i]
-        mn_sq = float("inf")
+        j = (i + 1) % n
+        area += midpoints[i][0] * midpoints[j][1]
+        area -= midpoints[j][0] * midpoints[i][1]
+    return abs(area) / 2.0
+
+
+def _build_adjacency(points, k_factor=2.0):
+    """Build neighbor graph: two points are neighbors if distance < k_factor * avg_spacing."""
+    n = len(points)
+    if n <= 1:
+        return {i: [] for i in range(n)}
+    if n == 2:
+        return {0: [1], 1: [0]}
+
+    # Compute all pairwise distances and find average nearest-neighbor distance
+    nn_dists = []
+    for i in range(n):
+        min_d = float("inf")
         for j in range(n):
-            if i == j:
-                continue
-            dx = pix - pts[j][0]
-            dy = piy - pts[j][1]
-            d_sq = dx * dx + dy * dy
-            if d_sq < mn_sq:
-                mn_sq = d_sq
-        dists.append(_sqrt(mn_sq))
-    return dists
+            if i != j:
+                d = _dist(points[i], points[j])
+                if d < min_d:
+                    min_d = d
+        nn_dists.append(min_d)
+    avg_nn = sum(nn_dists) / len(nn_dists)
+    threshold = avg_nn * k_factor
 
-
-def _voronoi_areas(pts: List[Tuple[float, float]], w: float, h: float,
-                   res: int = 80) -> List[float]:
-    """Estimate Voronoi cell areas via grid rasterisation.
-
-    Pre-extracts x/y into parallel lists to eliminate tuple unpacking
-    and enumerate overhead in the O(res² × n) inner loop.
-    """
-    n = len(pts)
-    counts = [0] * n
-    sx = w / res
-    sy = h / res
-    xs = [p[0] for p in pts]
-    ys = [p[1] for p in pts]
-    for gy in range(res):
-        py = (gy + 0.5) * sy
-        for gx in range(res):
-            px = (gx + 0.5) * sx
-            best_i = 0
-            best_d = float("inf")
-            for i in range(n):
-                dx = px - xs[i]
-                dy = py - ys[i]
-                d = dx * dx + dy * dy
-                if d < best_d:
-                    best_d = d
-                    best_i = i
-            counts[best_i] += 1
-    cell_area = sx * sy
-    return [c * cell_area for c in counts]
-
-
-# ── Objective functions ─────────────────────────────────────────────
-# All are *minimisation* targets.  max_spread is negated min-dist.
-
-def _obj_max_spread(pts: List[Tuple[float, float]], w: float, h: float) -> float:
-    """Maximize minimum pairwise distance.
-
-    Uses squared distances throughout to eliminate O(n²) sqrt calls;
-    only one sqrt at the end for the final minimum distance.
-    """
-    mn_sq = float("inf")
-    n = len(pts)
+    adj = {i: [] for i in range(n)}
     for i in range(n):
-        pix, piy = pts[i]
         for j in range(i + 1, n):
-            dx = pix - pts[j][0]
-            dy = piy - pts[j][1]
-            d_sq = dx * dx + dy * dy
-            if d_sq < mn_sq:
-                mn_sq = d_sq
-    return -math.sqrt(mn_sq)  # minimise negative → maximise min-dist
+            if _dist(points[i], points[j]) <= threshold:
+                adj[i].append(j)
+                adj[j].append(i)
+    return adj
 
 
-def _obj_min_energy(pts: List[Tuple[float, float]], w: float, h: float) -> float:
-    """Minimize total pairwise repulsion energy (Σ 1/d).
-
-    Inlines distance computation and uses 1/sqrt(d_sq) to avoid
-    the overhead of math.hypot per pair.
-    """
-    _sqrt = math.sqrt
-    total = 0.0
-    n = len(pts)
-    for i in range(n):
-        pix, piy = pts[i]
-        for j in range(i + 1, n):
-            dx = pix - pts[j][0]
-            dy = piy - pts[j][1]
-            d_sq = dx * dx + dy * dy
-            if d_sq > 1e-18:  # equivalent to d > 1e-9
-                total += 1.0 / _sqrt(d_sq)
-    return total
+def _bounds(points):
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
+    return (min(xs), min(ys), max(xs), max(ys))
 
 
-def _obj_uniform_density(pts: List[Tuple[float, float]], w: float, h: float) -> float:
-    nn = _nearest_neighbor_dists(pts)
-    mean = sum(nn) / len(nn)
-    if mean < 1e-9:
-        return 1e9
-    var = sum((v - mean) ** 2 for v in nn) / len(nn)
-    return math.sqrt(var) / mean  # CV
+# ---------------------------------------------------------------------------
+# Swarm Engine
+# ---------------------------------------------------------------------------
+
+BEHAVIORS = ("consensus", "balance", "alert", "territory", "pathfind")
 
 
-def _obj_coverage(pts: List[Tuple[float, float]], w: float, h: float) -> float:
-    areas = _voronoi_areas(pts, w, h)
-    mean = sum(areas) / len(areas)
-    if mean < 1e-9:
-        return 1e9
-    var = sum((a - mean) ** 2 for a in areas) / len(areas)
-    return math.sqrt(var) / mean
+class SwarmEngine:
+    """Autonomous swarm intelligence simulator for Voronoi cell agents."""
 
+    def __init__(
+        self,
+        points=None,
+        behavior="consensus",
+        max_ticks=100,
+        signal_decay=0.85,
+        seed=42,
+    ):
+        if points is None:
+            points = []
+        if behavior not in BEHAVIORS:
+            raise ValueError(
+                f"Unknown behavior {behavior!r}; choose from {BEHAVIORS}"
+            )
+        self.points = list(points)
+        self.behavior = behavior
+        self.max_ticks = max(1, int(max_ticks))
+        self.signal_decay = float(signal_decay)
+        self.rng = random.Random(seed)
+        self._result = None
 
-def _obj_cluster_balance(pts: List[Tuple[float, float]], w: float, h: float) -> float:
-    k = max(2, len(pts) // 5)
-    nc = min(k, len(pts))
-    # simple k-means (10 iterations) with inlined distance + parallel coord arrays
-    centroids = list(random.sample(pts, nc))
-    cx_arr = [c[0] for c in centroids]
-    cy_arr = [c[1] for c in centroids]
-    buckets: Dict[int, List[Tuple[float, float]]] = defaultdict(list)
-    for _ in range(10):
-        buckets.clear()
-        for p in pts:
-            px, py = p
-            best_c = 0
-            best_d = float("inf")
-            for ci in range(nc):
-                dx = px - cx_arr[ci]
-                dy = py - cy_arr[ci]
-                d = dx * dx + dy * dy
-                if d < best_d:
-                    best_d = d
-                    best_c = ci
-            buckets[best_c].append(p)
-        for ci in range(nc):
-            b = buckets.get(ci)
-            if b:
-                nb = len(b)
-                cx_arr[ci] = sum(p[0] for p in b) / nb
-                cy_arr[ci] = sum(p[1] for p in b) / nb
-    sizes = [len(buckets.get(c, [])) for c in range(nc)]
-    mean = sum(sizes) / len(sizes)
-    if mean < 1e-9:
-        return 1e9
-    var = sum((s - mean) ** 2 for s in sizes) / len(sizes)
-    return math.sqrt(var) / mean
+    # -- initialization -----------------------------------------------------
 
+    def _init_agents(self):
+        pts = self.points
+        n = len(pts)
+        if n == 0:
+            return [], {}
 
-OBJECTIVES = {
-    "max_spread": _obj_max_spread,
-    "min_energy": _obj_min_energy,
-    "uniform_density": _obj_uniform_density,
-    "coverage": _obj_coverage,
-    "cluster_balance": _obj_cluster_balance,
-}
-
-# ── PSO Engine ──────────────────────────────────────────────────────
-
-class SwarmOptimizer:
-    """Particle Swarm Optimizer for 2-D point layouts."""
-
-    def __init__(self, n_points: int = 20, objective: Optional[str] = None,
-                 n_particles: int = 30, n_iterations: int = 100,
-                 width: float = 800, height: float = 600,
-                 auto: bool = False, seed: Optional[int] = None):
-        self.n_points = n_points
-        self.width = width
-        self.height = height
-        self.n_particles = max(n_particles, n_points) if n_points > 30 else n_particles
-        self.n_iterations = n_iterations
-        self.auto = auto or (objective is None)
-        self.obj_name = objective or "max_spread"
-        self._seed = seed
-        if seed is not None:
-            random.seed(seed)
-        self.initial_points: List[Tuple[float, float]] = _random_points(n_points, width, height)
-
-    # ── helpers ──
-
-    def _decode(self, flat: List[float]) -> List[Tuple[float, float]]:
-        return [(flat[i * 2], flat[i * 2 + 1]) for i in range(self.n_points)]
-
-    def _encode(self, pts: List[Tuple[float, float]]) -> List[float]:
-        out: List[float] = []
-        for x, y in pts:
-            out.extend([x, y])
-        return out
-
-    def _clamp(self, pos: List[float]) -> None:
-        for i in range(0, len(pos), 2):
-            pos[i] = max(0, min(self.width, pos[i]))
-            pos[i + 1] = max(0, min(self.height, pos[i + 1]))
-
-    def _evaluate(self, flat: List[float], obj_fn) -> float:
-        return obj_fn(self._decode(flat), self.width, self.height)
-
-    # ── auto-objective ──
-
-    def _auto_pick(self) -> str:
-        base = self._encode(self.initial_points)
-        scores: Dict[str, float] = {}
-        for name, fn in OBJECTIVES.items():
-            # quick 10-iteration mini-swarm
-            best = self._evaluate(base, fn)
-            for _ in range(10):
-                trial = [v + random.gauss(0, 20) for v in base]
-                self._clamp(trial)
-                s = self._evaluate(trial, fn)
-                if s < best:
-                    best = s
-            orig = self._evaluate(base, fn)
-            improvement = (orig - best) / (abs(orig) + 1e-9)
-            scores[name] = improvement
-        pick = max(scores, key=lambda k: scores[k])
-        return pick
-
-    # ── main run ──
-
-    def run(self) -> Dict[str, Any]:
-        if self.auto:
-            self.obj_name = self._auto_pick()
-
-        obj_fn = OBJECTIVES[self.obj_name]
-        dim = self.n_points * 2
-        w_max, w_min = 0.9, 0.4
-        c1, c2 = 2.0, 2.0
-
-        # initialise particles
-        positions: List[List[float]] = []
-        velocities: List[List[float]] = []
-        p_best_pos: List[List[float]] = []
-        p_best_val: List[float] = []
-
-        for _ in range(self.n_particles):
-            pos = self._encode(_random_points(self.n_points, self.width, self.height))
-            vel = [random.uniform(-5, 5) for _ in range(dim)]
-            positions.append(pos)
-            velocities.append(vel)
-            val = self._evaluate(pos, obj_fn)
-            p_best_pos.append(list(pos))
-            p_best_val.append(val)
-
-        g_best_idx = min(range(self.n_particles), key=lambda i: p_best_val[i])
-        g_best_pos = list(p_best_pos[g_best_idx])
-        g_best_val = p_best_val[g_best_idx]
-
-        history: List[float] = [g_best_val]
-        stagnation = 0
-        converged_iter = self.n_iterations
-
-        initial_fitness = self._evaluate(self._encode(self.initial_points), obj_fn)
-
-        for it in range(self.n_iterations):
-            w = w_max - (w_max - w_min) * it / max(1, self.n_iterations - 1)
-            improved = False
-
-            for pi in range(self.n_particles):
-                for d in range(dim):
-                    r1, r2 = random.random(), random.random()
-                    velocities[pi][d] = (w * velocities[pi][d]
-                                         + c1 * r1 * (p_best_pos[pi][d] - positions[pi][d])
-                                         + c2 * r2 * (g_best_pos[d] - positions[pi][d]))
-                    positions[pi][d] += velocities[pi][d]
-                self._clamp(positions[pi])
-
-                val = self._evaluate(positions[pi], obj_fn)
-                if val < p_best_val[pi]:
-                    p_best_val[pi] = val
-                    p_best_pos[pi] = list(positions[pi])
-                    if val < g_best_val:
-                        g_best_val = val
-                        g_best_pos = list(positions[pi])
-                        improved = True
-
-            history.append(g_best_val)
-
-            if improved:
-                stagnation = 0
+        adj = _build_adjacency(pts)
+        bds = _bounds(pts)
+        agents = []
+        for i in range(n):
+            nb_centers = [pts[j] for j in adj[i]]
+            area = _approx_area(pts[i], nb_centers, bds)
+            energy = self.rng.uniform(0, 100)
+            if self.behavior == "consensus":
+                role = self.rng.randint(0, 4)
+            elif self.behavior == "territory":
+                role = self.rng.uniform(1, 10)  # weight
             else:
-                stagnation += 1
+                role = 0
+            agents.append(
+                CellAgent(
+                    cell_id=i,
+                    center=pts[i],
+                    area=area,
+                    neighbors=list(adj[i]),
+                    energy=energy,
+                    role=role,
+                    signals=[],
+                    memory={},
+                )
+            )
+        return agents, adj
 
-            if stagnation >= 15:
-                # perturb worst 25%
-                ranked = sorted(range(self.n_particles), key=lambda i: p_best_val[i])
-                worst = ranked[-(self.n_particles // 4):]
-                for wi in worst:
-                    positions[wi] = self._encode(
-                        _random_points(self.n_points, self.width, self.height))
-                    velocities[wi] = [random.uniform(-5, 5) for _ in range(dim)]
-                stagnation = 0
+    # -- behavior tick functions --------------------------------------------
 
-            if converged_iter == self.n_iterations and stagnation == 0 and it > 5:
-                converged_iter = it
+    def _tick_consensus(self, agents, tick):
+        """Each cell adopts majority opinion of neighbors."""
+        new_agents = []
+        for ag in agents:
+            if not ag.neighbors:
+                new_agents.append(ag)
+                continue
+            opinions = [agents[nb].role for nb in ag.neighbors]
+            opinions.append(ag.role)
+            counts = collections.Counter(opinions)
+            majority = counts.most_common(1)[0][0]
+            new_agents.append(ag._replace(role=majority))
+        # Convergence = fraction with most popular opinion
+        all_roles = [a.role for a in new_agents]
+        if not all_roles:
+            return new_agents, 1.0
+        most_common_count = collections.Counter(all_roles).most_common(1)[0][1]
+        convergence = most_common_count / len(all_roles)
+        return new_agents, convergence
 
-        best_points = self._decode(g_best_pos)
-        improvement = (initial_fitness - g_best_val) / (abs(initial_fitness) + 1e-9) * 100
+    def _tick_balance(self, agents, tick):
+        """Cells with above-avg energy transfer to below-avg neighbors."""
+        n = len(agents)
+        if n == 0:
+            return agents, 1.0
+        avg_e = sum(a.energy for a in agents) / n
+        new_energy = [a.energy for a in agents]
+        transfer_rate = 0.2
+        for ag in agents:
+            if ag.energy > avg_e:
+                for nb in ag.neighbors:
+                    if agents[nb].energy < avg_e:
+                        transfer = (ag.energy - avg_e) * transfer_rate / max(1, len(ag.neighbors))
+                        new_energy[ag.cell_id] -= transfer
+                        new_energy[nb] += transfer
+        new_agents = [ag._replace(energy=new_energy[ag.cell_id]) for ag in agents]
+        # Convergence = 1 - normalized variance
+        if n <= 1:
+            return new_agents, 1.0
+        mean_e = sum(new_energy) / n
+        var = sum((e - mean_e) ** 2 for e in new_energy) / n
+        max_var = 2500  # max theoretical variance for [0,100]
+        convergence = max(0.0, 1.0 - var / max_var)
+        return new_agents, convergence
 
-        recommendations = self._recommendations(improvement, converged_iter)
+    def _tick_alert(self, agents, signals, tick):
+        """Propagate alert signals through neighbor network."""
+        alerted = set()
+        for ag in agents:
+            if ag.signals:
+                alerted.add(ag.cell_id)
 
+        new_signals = []
+        for sig in signals:
+            if sig.strength < 0.01:
+                continue
+            source_agent = agents[sig.source_id]
+            for nb in source_agent.neighbors:
+                if nb not in alerted:
+                    new_sig = Signal(
+                        source_id=nb,
+                        signal_type="alert",
+                        strength=sig.strength * self.signal_decay,
+                        payload=sig.payload,
+                        timestamp=tick,
+                        hops=sig.hops + 1,
+                    )
+                    new_signals.append(new_sig)
+                    alerted.add(nb)
+
+        new_agents = []
+        for ag in agents:
+            if ag.cell_id in alerted:
+                new_sigs = ag.signals + [s for s in new_signals if s.source_id == ag.cell_id]
+                new_agents.append(ag._replace(signals=new_sigs))
+            else:
+                new_agents.append(ag)
+
+        n = len(agents)
+        convergence = len(alerted) / n if n > 0 else 1.0
+        return new_agents, new_signals, convergence
+
+    def _tick_territory(self, agents, tick):
+        """High-weight cells recruit low-weight neighbors."""
+        new_agents = list(agents)
+        territory = {ag.cell_id: ag.cell_id for ag in agents}
+        # Initialize territories from memory or self
+        for ag in agents:
+            territory[ag.cell_id] = ag.memory.get("owner", ag.cell_id)
+
+        for ag in agents:
+            for nb in ag.neighbors:
+                nb_ag = agents[nb]
+                if ag.role > nb_ag.role * 1.3:
+                    # Stronger cell claims neighbor
+                    territory[nb] = territory[ag.cell_id]
+
+        new_agents_out = []
+        for ag in agents:
+            mem = dict(ag.memory)
+            mem["owner"] = territory[ag.cell_id]
+            new_agents_out.append(ag._replace(memory=mem))
+
+        # Convergence = fraction of cells in largest territory
+        owner_counts = collections.Counter(territory.values())
+        if not owner_counts:
+            return new_agents_out, 1.0
+        largest = owner_counts.most_common(1)[0][1]
+        convergence = largest / len(agents) if agents else 1.0
+        return new_agents_out, convergence
+
+    def _tick_pathfind(self, agents, tick, source_id, target_id):
+        """Stigmergic pathfinding: pheromone flows from source toward target."""
+        n = len(agents)
+        if n == 0:
+            return agents, 1.0
+
+        target_center = agents[target_id].center
+        pheromone = [ag.memory.get("pheromone", 0.0) for ag in agents]
+
+        # Source emits pheromone
+        pheromone[source_id] = max(pheromone[source_id], 1.0)
+
+        # Propagate: each cell shares pheromone with neighbors closer to target
+        new_pheromone = list(pheromone)
+        for ag in agents:
+            if pheromone[ag.cell_id] > 0.01:
+                my_dist = _dist(ag.center, target_center)
+                for nb in ag.neighbors:
+                    nb_dist = _dist(agents[nb].center, target_center)
+                    if nb_dist < my_dist:
+                        spread = pheromone[ag.cell_id] * 0.5 * self.signal_decay
+                        new_pheromone[nb] = max(new_pheromone[nb], spread)
+
+        # Decay all pheromone
+        new_pheromone = [p * self.signal_decay for p in new_pheromone]
+
+        new_agents = []
+        for ag in agents:
+            mem = dict(ag.memory)
+            mem["pheromone"] = new_pheromone[ag.cell_id]
+            new_agents.append(ag._replace(memory=mem))
+
+        # Convergence = pheromone at target / pheromone at source
+        src_p = max(new_pheromone[source_id], 0.001)
+        tgt_p = new_pheromone[target_id]
+        convergence = min(1.0, tgt_p / src_p) if src_p > 0 else 0.0
+        return new_agents, convergence
+
+    # -- main run -----------------------------------------------------------
+
+    def run(self):
+        """Execute swarm simulation and return SwarmResult."""
+        if not self.points:
+            empty_state = SwarmState(0, [], [], {}, 1.0)
+            self._result = SwarmResult(
+                self.behavior, 0, empty_state, [1.0], [], [], []
+            )
+            return self._result
+
+        agents, adj = self._init_agents()
+        convergence_history = []
+        tick_snapshots = []
+        signals = []
+
+        # For alert mode: inject anomalies
+        if self.behavior == "alert":
+            n = len(agents)
+            anomaly_count = max(1, int(n * 0.05))
+            anomaly_ids = self.rng.sample(range(n), min(anomaly_count, n))
+            initial_signals = []
+            for aid in anomaly_ids:
+                sig = Signal(aid, "alert", 1.0, {"anomaly": True}, 0, 0)
+                initial_signals.append(sig)
+                agents[aid] = agents[aid]._replace(
+                    signals=[sig], memory={"anomaly": True}
+                )
+            signals = initial_signals
+
+        # For pathfind: pick source/target
+        source_id = target_id = 0
+        if self.behavior == "pathfind" and len(agents) >= 2:
+            source_id = 0
+            target_id = len(agents) - 1
+
+        for tick in range(1, self.max_ticks + 1):
+            if self.behavior == "consensus":
+                agents, conv = self._tick_consensus(agents, tick)
+            elif self.behavior == "balance":
+                agents, conv = self._tick_balance(agents, tick)
+            elif self.behavior == "alert":
+                agents, signals, conv = self._tick_alert(agents, signals, tick)
+            elif self.behavior == "territory":
+                agents, conv = self._tick_territory(agents, tick)
+            elif self.behavior == "pathfind":
+                agents, conv = self._tick_pathfind(agents, tick, source_id, target_id)
+            else:
+                conv = 1.0
+
+            convergence_history.append(conv)
+
+            # Save snapshot every 5 ticks or first/last
+            if tick == 1 or tick % 5 == 0 or tick == self.max_ticks:
+                snapshot = SwarmState(
+                    tick=tick,
+                    agents=[self._agent_summary(a) for a in agents],
+                    active_signals=len(signals) if self.behavior == "alert" else 0,
+                    global_metrics=self._global_metrics(agents),
+                    convergence=conv,
+                )
+                tick_snapshots.append(snapshot)
+
+            # Early stop if converged
+            if conv >= 0.95 and tick >= 3:
+                break
+
+        # Detect emergent patterns
+        patterns = self._detect_patterns(agents)
+
+        # Generate recommendations
+        recommendations = self._generate_recommendations(agents, convergence_history, patterns)
+
+        final_state = SwarmState(
+            tick=tick,
+            agents=[self._agent_summary(a) for a in agents],
+            active_signals=len(signals) if self.behavior == "alert" else 0,
+            global_metrics=self._global_metrics(agents),
+            convergence=convergence_history[-1] if convergence_history else 1.0,
+        )
+
+        self._result = SwarmResult(
+            behavior_type=self.behavior,
+            ticks_run=tick,
+            final_state=final_state,
+            convergence_history=convergence_history,
+            emergent_patterns=patterns,
+            recommendations=recommendations,
+            tick_snapshots=tick_snapshots,
+        )
+        return self._result
+
+    # -- analysis helpers ---------------------------------------------------
+
+    def _agent_summary(self, ag):
+        """Lightweight agent summary for snapshots."""
         return {
-            "objective": self.obj_name,
-            "auto_selected": self.auto,
-            "n_points": self.n_points,
-            "n_particles": self.n_particles,
-            "n_iterations": self.n_iterations,
-            "width": self.width,
-            "height": self.height,
-            "initial_points": self.initial_points,
-            "best_points": best_points,
-            "initial_fitness": initial_fitness,
-            "best_fitness": g_best_val,
-            "improvement_pct": round(improvement, 2),
-            "converged_iteration": converged_iter,
-            "history": history,
-            "recommendations": recommendations,
+            "id": ag.cell_id,
+            "center": ag.center,
+            "energy": round(ag.energy, 2),
+            "role": ag.role,
+            "signal_count": len(ag.signals),
+            "memory_keys": list(ag.memory.keys()),
         }
 
-    def _recommendations(self, improvement: float, conv_iter: int) -> List[str]:
-        tips = []
-        if improvement < 5:
-            tips.append("Low improvement — try more iterations or particles.")
-        if conv_iter < self.n_iterations * 0.3:
-            tips.append("Converged early — consider fewer iterations to save time.")
-        if conv_iter >= self.n_iterations:
-            tips.append("Did not fully converge — increase iterations for better results.")
-        if self.n_points > 40:
-            tips.append("Large point set — consider coverage or uniform_density objectives.")
-        if self.obj_name == "max_spread":
-            tips.append("For spread layouts, try combining with Lloyd relaxation (vormap_relax).")
-        if self.obj_name == "coverage":
-            tips.append("Compare results with vormap_evolve for evolutionary optimisation.")
-        if not tips:
-            tips.append("Good convergence! Experiment with different objectives for variety.")
-        return tips
+    def _global_metrics(self, agents):
+        if not agents:
+            return {}
+        energies = [a.energy for a in agents]
+        n = len(energies)
+        mean_e = sum(energies) / n
+        var_e = sum((e - mean_e) ** 2 for e in energies) / n
+        roles = [a.role for a in agents]
+        role_dist = dict(collections.Counter(roles))
+        return {
+            "agent_count": n,
+            "mean_energy": round(mean_e, 2),
+            "energy_variance": round(var_e, 2),
+            "role_distribution": {str(k): v for k, v in role_dist.items()},
+            "total_signals": sum(len(a.signals) for a in agents),
+        }
+
+    def _detect_patterns(self, agents):
+        """Detect emergent patterns based on behavior type."""
+        patterns = []
+        if not agents:
+            return patterns
+
+        if self.behavior == "consensus":
+            # Detect faction boundaries: cells whose neighbors disagree
+            boundary_cells = []
+            for ag in agents:
+                neighbor_roles = set(agents[nb].role for nb in ag.neighbors)
+                if len(neighbor_roles) > 1:
+                    boundary_cells.append(ag.cell_id)
+            if boundary_cells:
+                patterns.append(EmergentPattern(
+                    "faction_boundary",
+                    f"{len(boundary_cells)} cells at opinion frontiers",
+                    boundary_cells,
+                    min(1.0, len(boundary_cells) / max(1, len(agents))),
+                ))
+            # Detect dominant faction
+            roles = [a.role for a in agents]
+            counter = collections.Counter(roles)
+            dominant, count = counter.most_common(1)[0]
+            if count > len(agents) * 0.6:
+                patterns.append(EmergentPattern(
+                    "dominant_faction",
+                    f"Opinion {dominant} dominates with {count}/{len(agents)} cells",
+                    [a.cell_id for a in agents if a.role == dominant],
+                    count / len(agents),
+                ))
+
+        elif self.behavior == "balance":
+            # Detect stubborn hotspots: cells still far from mean
+            energies = [a.energy for a in agents]
+            mean_e = sum(energies) / len(energies)
+            std_e = math.sqrt(sum((e - mean_e) ** 2 for e in energies) / len(energies))
+            hotspots = [a.cell_id for a in agents if abs(a.energy - mean_e) > 2 * max(std_e, 0.1)]
+            if hotspots:
+                patterns.append(EmergentPattern(
+                    "stubborn_hotspot",
+                    f"{len(hotspots)} cells resist energy balancing",
+                    hotspots,
+                    min(1.0, len(hotspots) / max(1, len(agents))),
+                ))
+
+        elif self.behavior == "alert":
+            # Detect relay bottlenecks: cells with most signals relayed
+            signal_counts = [(a.cell_id, len(a.signals)) for a in agents]
+            signal_counts.sort(key=lambda x: -x[1])
+            if signal_counts and signal_counts[0][1] > 0:
+                top_relays = [cid for cid, cnt in signal_counts[:max(1, len(agents) // 10)]
+                              if cnt > 0]
+                patterns.append(EmergentPattern(
+                    "relay_bottleneck",
+                    f"{len(top_relays)} cells are critical signal relays",
+                    top_relays,
+                    0.8,
+                ))
+            # Detect unreached cells
+            unreached = [a.cell_id for a in agents if not a.signals]
+            if unreached:
+                patterns.append(EmergentPattern(
+                    "alert_shadow",
+                    f"{len(unreached)} cells never received alert signals",
+                    unreached,
+                    len(unreached) / len(agents),
+                ))
+
+        elif self.behavior == "territory":
+            # Detect contested zones: cells whose neighbors have different owners
+            contested = []
+            for ag in agents:
+                my_owner = ag.memory.get("owner", ag.cell_id)
+                for nb in ag.neighbors:
+                    nb_owner = agents[nb].memory.get("owner", nb)
+                    if nb_owner != my_owner:
+                        contested.append(ag.cell_id)
+                        break
+            if contested:
+                patterns.append(EmergentPattern(
+                    "contested_zone",
+                    f"{len(contested)} cells at territory borders",
+                    contested,
+                    min(1.0, len(contested) / max(1, len(agents))),
+                ))
+
+        elif self.behavior == "pathfind":
+            # Detect highway corridors: cells with highest pheromone
+            pheromones = [(a.cell_id, a.memory.get("pheromone", 0)) for a in agents]
+            pheromones.sort(key=lambda x: -x[1])
+            threshold = 0.1
+            highway = [cid for cid, p in pheromones if p > threshold]
+            if highway:
+                patterns.append(EmergentPattern(
+                    "highway_corridor",
+                    f"{len(highway)} cells form pheromone highway",
+                    highway,
+                    min(1.0, len(highway) / max(1, len(agents))),
+                ))
+
+        return patterns
+
+    def _generate_recommendations(self, agents, history, patterns):
+        """Generate actionable recommendations."""
+        recs = []
+        if not agents:
+            return ["Add more data points for meaningful swarm analysis."]
+
+        if self.behavior == "consensus":
+            if history and history[-1] < 0.5:
+                recs.append("Low consensus — consider weighted voting or leader nodes.")
+            for p in patterns:
+                if p.pattern_type == "faction_boundary":
+                    recs.append(f"Faction boundary at {len(p.involved_cells)} cells — "
+                                "investigate spatial feature causing opinion divide.")
+
+        elif self.behavior == "balance":
+            for p in patterns:
+                if p.pattern_type == "stubborn_hotspot":
+                    recs.append(f"{len(p.involved_cells)} stubborn hotspots — "
+                                "increase transfer rate or add relay nodes.")
+            if history and history[-1] > 0.95:
+                recs.append("Excellent energy balance achieved.")
+
+        elif self.behavior == "alert":
+            for p in patterns:
+                if p.pattern_type == "alert_shadow":
+                    recs.append(f"{len(p.involved_cells)} unreached cells — "
+                                "add relay infrastructure in shadowed regions.")
+                if p.pattern_type == "relay_bottleneck":
+                    recs.append(f"Critical bottleneck relays found — "
+                                "add redundant paths to avoid single-point failure.")
+
+        elif self.behavior == "territory":
+            for p in patterns:
+                if p.pattern_type == "contested_zone":
+                    recs.append(f"{len(p.involved_cells)} contested border cells — "
+                                "consider mediation or buffer zones.")
+
+        elif self.behavior == "pathfind":
+            for p in patterns:
+                if p.pattern_type == "highway_corridor":
+                    recs.append(f"Highway corridor: {len(p.involved_cells)} cells — "
+                                "optimize these cells as primary transit route.")
+
+        if not recs:
+            recs.append("Swarm simulation completed successfully.")
+        return recs
+
+    # -- export -------------------------------------------------------------
+
+    def to_json(self, path):
+        """Export result to JSON."""
+        if self._result is None:
+            raise RuntimeError("Run the simulation first via .run()")
+        data = {
+            "behavior_type": self._result.behavior_type,
+            "ticks_run": self._result.ticks_run,
+            "convergence_history": [round(c, 4) for c in self._result.convergence_history],
+            "emergent_patterns": [
+                {
+                    "pattern_type": p.pattern_type,
+                    "description": p.description,
+                    "involved_cells": p.involved_cells,
+                    "confidence": round(p.confidence, 4),
+                }
+                for p in self._result.emergent_patterns
+            ],
+            "recommendations": self._result.recommendations,
+            "final_state": {
+                "tick": self._result.final_state.tick,
+                "convergence": round(self._result.final_state.convergence, 4),
+                "global_metrics": self._result.final_state.global_metrics,
+                "agents": self._result.final_state.agents,
+            },
+        }
+        with open(path, "w") as f:
+            json.dump(data, f, indent=2)
+
+    def to_html(self, path):
+        """Export interactive HTML dashboard."""
+        if self._result is None:
+            raise RuntimeError("Run the simulation first via .run()")
+        r = self._result
+        snapshots_json = json.dumps([
+            {
+                "tick": s.tick,
+                "convergence": round(s.convergence, 4),
+                "agents": s.agents,
+                "metrics": s.global_metrics,
+            }
+            for s in r.tick_snapshots
+        ])
+        patterns_json = json.dumps([
+            {"type": p.pattern_type, "desc": p.description,
+             "cells": p.involved_cells, "conf": round(p.confidence, 2)}
+            for p in r.emergent_patterns
+        ])
+        recs_json = json.dumps(r.recommendations)
+        points_json = json.dumps([list(p) for p in self.points])
+
+        html = _HTML_TEMPLATE.replace("{{BEHAVIOR}}", r.behavior_type)
+        html = html.replace("{{TICKS}}", str(r.ticks_run))
+        html = html.replace("{{CONVERGENCE}}", f"{r.convergence_history[-1]:.1%}" if r.convergence_history else "N/A")
+        html = html.replace("{{SNAPSHOTS}}", snapshots_json)
+        html = html.replace("{{PATTERNS}}", patterns_json)
+        html = html.replace("{{RECS}}", recs_json)
+        html = html.replace("{{POINTS}}", points_json)
+        html = html.replace("{{CONV_HISTORY}}", json.dumps([round(c, 4) for c in r.convergence_history]))
+
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(html)
 
 
-# ── HTML export ─────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# HTML template
+# ---------------------------------------------------------------------------
 
-def export_html(result: Dict[str, Any], path: str) -> None:
-    """Write a self-contained interactive HTML report."""
-    w = result["width"]
-    h = result["height"]
-    init_json = json.dumps(result["initial_points"])
-    best_json = json.dumps(result["best_points"])
-    hist_json = json.dumps(result["history"])
-    recs_html = "".join(f"<li>{r}</li>" for r in result["recommendations"])
-
-    html = f"""<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<title>Swarm Optimizer — {result["objective"]}</title>
+_HTML_TEMPLATE = textwrap.dedent("""\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Swarm Intelligence — {{BEHAVIOR}}</title>
 <style>
-*{{margin:0;padding:0;box-sizing:border-box}}
-body{{font-family:system-ui,sans-serif;background:#0d1117;color:#c9d1d9;padding:20px}}
-h1{{text-align:center;margin-bottom:10px;color:#58a6ff}}
-.row{{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:16px 0}}
-canvas{{background:#161b22;border:1px solid #30363d;border-radius:8px}}
-.card{{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;min-width:260px}}
-.card h3{{color:#58a6ff;margin-bottom:8px}}
-table{{width:100%;border-collapse:collapse}}
-td,th{{padding:4px 8px;text-align:left;border-bottom:1px solid #21262d}}
-th{{color:#8b949e}}
-.recs li{{margin:4px 0;color:#d2a8ff}}
-.btn{{background:#238636;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;margin:4px}}
-.btn:hover{{background:#2ea043}}
-</style></head><body>
-<h1>🐝 Swarm Optimizer — {result["objective"]}</h1>
-<p style="text-align:center;color:#8b949e">{result["n_points"]} points · {result["n_particles"]} particles · {result["n_iterations"]} iterations
-{"· auto-selected" if result["auto_selected"] else ""}</p>
-<div class="row">
-<div><h3 style="text-align:center;color:#8b949e">Before</h3>
-<canvas id="cBefore" width="{int(w)}" height="{int(h)}"></canvas></div>
-<div><h3 style="text-align:center;color:#8b949e">After</h3>
-<canvas id="cAfter" width="{int(w)}" height="{int(h)}"></canvas></div>
+:root{--bg:#1a1a2e;--fg:#e0e0e0;--accent:#00d4ff;--panel:#16213e;--border:#0f3460}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);color:var(--fg);padding:20px}
+h1{color:var(--accent);margin-bottom:8px;font-size:1.6em}
+.subtitle{color:#888;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px}
+.panel h2{color:var(--accent);font-size:1.1em;margin-bottom:10px}
+.stat{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #ffffff10}
+.stat-label{color:#999}.stat-value{font-weight:bold}
+svg{width:100%;height:300px}
+.controls{display:flex;gap:10px;align-items:center;margin:10px 0}
+.controls button{background:var(--accent);color:#000;border:none;border-radius:4px;
+  padding:6px 14px;cursor:pointer;font-weight:bold}
+.controls button:hover{opacity:0.8}
+input[type=range]{flex:1}
+.pattern{padding:8px;margin:4px 0;background:#ffffff08;border-radius:4px;border-left:3px solid var(--accent)}
+.rec{padding:6px 0;border-bottom:1px solid #ffffff08}
+.theme-toggle{position:fixed;top:10px;right:10px;cursor:pointer;background:var(--panel);
+  border:1px solid var(--border);border-radius:50%;width:36px;height:36px;display:flex;
+  align-items:center;justify-content:center;font-size:18px}
+.light{--bg:#f5f5f5;--fg:#222;--panel:#fff;--border:#ddd;--accent:#0066cc}
+</style>
+</head>
+<body>
+<div class="theme-toggle" onclick="document.body.classList.toggle('light')">🌓</div>
+<h1>🐝 Swarm Intelligence Engine</h1>
+<p class="subtitle">Behavior: <strong>{{BEHAVIOR}}</strong> — {{TICKS}} ticks — Convergence: {{CONVERGENCE}}</p>
+
+<div class="grid">
+  <div class="panel">
+    <h2>📊 Spatial Map</h2>
+    <svg id="mapSvg" viewBox="0 0 500 500"></svg>
+    <div class="controls">
+      <button id="playBtn" onclick="togglePlay()">▶ Play</button>
+      <input type="range" id="tickSlider" min="0" max="0" value="0" oninput="showTick(+this.value)">
+      <span id="tickLabel">Tick 0</span>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>📈 Convergence</h2>
+    <svg id="convSvg" viewBox="0 0 500 300"></svg>
+  </div>
+  <div class="panel">
+    <h2>🔍 Emergent Patterns</h2>
+    <div id="patterns"></div>
+  </div>
+  <div class="panel">
+    <h2>💡 Recommendations</h2>
+    <div id="recs"></div>
+  </div>
 </div>
-<div class="row">
-<div class="card" style="min-width:500px">
-<h3>📈 Fitness Curve</h3>
-<canvas id="cChart" width="500" height="200"></canvas>
-</div>
-<div class="card">
-<h3>📊 Stats</h3>
-<table>
-<tr><th>Objective</th><td>{result["objective"]}</td></tr>
-<tr><th>Initial Fitness</th><td>{result["initial_fitness"]:.6f}</td></tr>
-<tr><th>Best Fitness</th><td>{result["best_fitness"]:.6f}</td></tr>
-<tr><th>Improvement</th><td>{result["improvement_pct"]}%</td></tr>
-<tr><th>Converged At</th><td>Iteration {result["converged_iteration"]}</td></tr>
-</table>
-</div>
-<div class="card">
-<h3>💡 Recommendations</h3>
-<ul class="recs">{recs_html}</ul>
-</div>
-</div>
+
 <script>
-const W={int(w)},H={int(h)};
-const init={init_json};
-const best={best_json};
-const hist={hist_json};
-function voronoi(ctx,pts,w,h){{
-  const img=ctx.createImageData(w,h);
-  const colors=pts.map((_,i)=>[(i*67+80)%256,(i*131+100)%256,(i*199+120)%256]);
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++){{
-    let mi=0,md=1e18;
-    for(let i=0;i<pts.length;i++){{
-      const d=(x-pts[i][0])**2+(y-pts[i][1])**2;
-      if(d<md){{md=d;mi=i}}
-    }}
-    const o=(y*w+x)*4;
-    img.data[o]=colors[mi][0];img.data[o+1]=colors[mi][1];
-    img.data[o+2]=colors[mi][2];img.data[o+3]=200;
-  }}
-  ctx.putImageData(img,0,0);
-  ctx.fillStyle="#fff";
-  pts.forEach(p=>{{ctx.beginPath();ctx.arc(p[0],p[1],3,0,Math.PI*2);ctx.fill()}});
-}}
-voronoi(document.getElementById("cBefore").getContext("2d"),init,W,H);
-voronoi(document.getElementById("cAfter").getContext("2d"),best,W,H);
-// chart
-(()=>{{
-  const c=document.getElementById("cChart"),ctx=c.getContext("2d");
-  const cw=c.width,ch=c.height,pad=40;
-  const mn=Math.min(...hist),mx=Math.max(...hist);
-  const rng=mx-mn||1;
-  ctx.strokeStyle="#30363d";ctx.beginPath();
-  ctx.moveTo(pad,pad);ctx.lineTo(pad,ch-pad);ctx.lineTo(cw-pad,ch-pad);ctx.stroke();
-  ctx.strokeStyle="#58a6ff";ctx.lineWidth=2;ctx.beginPath();
-  hist.forEach((v,i)=>{{
-    const x=pad+i/(hist.length-1)*(cw-2*pad);
-    const y=ch-pad-(v-mn)/rng*(ch-2*pad);
-    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  }});ctx.stroke();
-  ctx.fillStyle="#8b949e";ctx.font="11px system-ui";
-  ctx.fillText("Iteration",cw/2-20,ch-5);
-  ctx.save();ctx.translate(10,ch/2);ctx.rotate(-Math.PI/2);
-  ctx.fillText("Fitness",0,0);ctx.restore();
-}})();
-</script></body></html>"""
+const snapshots={{SNAPSHOTS}};
+const patterns={{PATTERNS}};
+const recs={{RECS}};
+const points={{POINTS}};
+const convHistory={{CONV_HISTORY}};
+const behavior="{{BEHAVIOR}}";
 
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(html)
+// Colors for roles/states
+const COLORS=["#ff6b6b","#4ecdc4","#45b7d1","#96ceb4","#ffd93d","#ff8a5c","#a8e6cf","#dda0dd"];
+
+function drawMap(snapIdx){
+  const svg=document.getElementById("mapSvg");
+  svg.innerHTML="";
+  if(!points.length)return;
+  const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
+  const mnx=Math.min(...xs),mxx=Math.max(...xs),mny=Math.min(...ys),mxy=Math.max(...ys);
+  const dx=mxx-mnx||1,dy=mxy-mny||1,pad=20,scale=Math.min((500-2*pad)/dx,(500-2*pad)/dy);
+  const snap=snapshots[snapIdx]||snapshots[0];
+  if(!snap)return;
+  const agents=snap.agents||[];
+  agents.forEach(function(a,i){
+    const px=pad+(points[i][0]-mnx)*scale;
+    const py=pad+(points[i][1]-mny)*scale;
+    let col=COLORS[0];
+    if(behavior==="consensus")col=COLORS[Math.floor(a.role)%COLORS.length];
+    else if(behavior==="balance"){const t=Math.min(a.energy/100,1);col="rgb("+Math.floor(255*t)+","+Math.floor(100+155*(1-t))+",100)";}
+    else if(behavior==="alert")col=a.signal_count>0?"#ff6b6b":"#4ecdc4";
+    else if(behavior==="territory")col=COLORS[(a.memory_keys.indexOf("owner")>=0?Math.floor(a.role)%COLORS.length:i%COLORS.length)];
+    else if(behavior==="pathfind")col=a.memory_keys.indexOf("pheromone")>=0?"#ffd93d":"#4ecdc4";
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",px);c.setAttribute("cy",py);c.setAttribute("r",6);
+    c.setAttribute("fill",col);c.setAttribute("opacity","0.85");
+    const title=document.createElementNS("http://www.w3.org/2000/svg","title");
+    title.textContent="Cell "+a.id+" | Energy: "+a.energy+" | Role: "+a.role;
+    c.appendChild(title);svg.appendChild(c);
+  });
+}
+
+function drawConv(){
+  const svg=document.getElementById("convSvg");svg.innerHTML="";
+  if(!convHistory.length)return;
+  const n=convHistory.length,w=500,h=300,pad=40;
+  // Axes
+  const ax=document.createElementNS("http://www.w3.org/2000/svg","line");
+  ax.setAttribute("x1",pad);ax.setAttribute("y1",h-pad);ax.setAttribute("x2",w-10);ax.setAttribute("y2",h-pad);
+  ax.setAttribute("stroke","#666");svg.appendChild(ax);
+  const ay=document.createElementNS("http://www.w3.org/2000/svg","line");
+  ay.setAttribute("x1",pad);ay.setAttribute("y1",10);ay.setAttribute("x2",pad);ay.setAttribute("y2",h-pad);
+  ay.setAttribute("stroke","#666");svg.appendChild(ay);
+  // Line
+  let pts=[];
+  for(let i=0;i<n;i++){
+    const x=pad+(w-pad-10)*i/(Math.max(1,n-1));
+    const y=(h-pad)-convHistory[i]*(h-pad-10);
+    pts.push(x+","+y);
+  }
+  const pl=document.createElementNS("http://www.w3.org/2000/svg","polyline");
+  pl.setAttribute("points",pts.join(" "));pl.setAttribute("fill","none");
+  pl.setAttribute("stroke","#00d4ff");pl.setAttribute("stroke-width","2");
+  svg.appendChild(pl);
+  // Labels
+  const lbl=document.createElementNS("http://www.w3.org/2000/svg","text");
+  lbl.setAttribute("x",w/2);lbl.setAttribute("y",h-5);lbl.setAttribute("text-anchor","middle");
+  lbl.setAttribute("fill","#888");lbl.setAttribute("font-size","12");lbl.textContent="Tick";
+  svg.appendChild(lbl);
+}
+
+function showTick(idx){
+  document.getElementById("tickLabel").textContent="Tick "+(snapshots[idx]?snapshots[idx].tick:0);
+  drawMap(idx);
+}
+
+let playing=false,playTimer=null;
+function togglePlay(){
+  playing=!playing;
+  document.getElementById("playBtn").textContent=playing?"⏸ Pause":"▶ Play";
+  if(playing){
+    playTimer=setInterval(function(){
+      const s=document.getElementById("tickSlider");
+      let v=+s.value+1;if(v>=snapshots.length)v=0;
+      s.value=v;showTick(v);
+    },400);
+  }else{clearInterval(playTimer);}
+}
+
+// Init
+document.getElementById("tickSlider").max=Math.max(0,snapshots.length-1);
+drawMap(0);drawConv();
+
+const pd=document.getElementById("patterns");
+patterns.forEach(function(p){
+  pd.innerHTML+='<div class="pattern"><strong>'+p.type+'</strong> ('+Math.round(p.conf*100)+'%)<br>'+p.desc+'</div>';
+});
+
+const rd=document.getElementById("recs");
+recs.forEach(function(r){rd.innerHTML+='<div class="rec">• '+r+'</div>';});
+</script>
+</body>
+</html>
+""")
 
 
-# ── CLI ─────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# File loading
+# ---------------------------------------------------------------------------
 
-def main() -> None:
-    ap = argparse.ArgumentParser(
-        description="Autonomous Particle Swarm Optimizer for Voronoi layouts")
-    ap.add_argument("--objective", choices=list(OBJECTIVES.keys()),
-                    help="Optimisation objective (omit for auto)")
-    ap.add_argument("--auto", action="store_true",
-                    help="Auto-select best objective")
-    ap.add_argument("--points", type=int, default=20,
-                    help="Number of points (default 20)")
-    ap.add_argument("--particles", type=int, default=30,
-                    help="Swarm size (default 30)")
-    ap.add_argument("--iterations", type=int, default=100,
-                    help="PSO iterations (default 100)")
-    ap.add_argument("--width", type=float, default=800)
-    ap.add_argument("--height", type=float, default=600)
-    ap.add_argument("--seed", type=int, default=None)
-    ap.add_argument("--output", "-o", default=None,
-                    help="HTML report path")
-    args = ap.parse_args()
 
-    opt = SwarmOptimizer(
-        n_points=args.points,
-        objective=args.objective,
-        n_particles=args.particles,
-        n_iterations=args.iterations,
-        width=args.width,
-        height=args.height,
-        auto=args.auto or args.objective is None,
+def _load_points(path):
+    pts = []
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.replace(",", " ").split()
+            if len(parts) >= 2:
+                try:
+                    pts.append((float(parts[0]), float(parts[1])))
+                except ValueError:
+                    continue
+    return pts
+
+
+# ---------------------------------------------------------------------------
+# Convenience functions
+# ---------------------------------------------------------------------------
+
+
+def swarm_simulate(points_or_file, behavior="consensus", **kwargs):
+    """Run a swarm simulation on points (list or file path).
+
+    Returns a ``SwarmResult`` named tuple.
+    """
+    if isinstance(points_or_file, str):
+        pts = _load_points(points_or_file)
+    else:
+        pts = list(points_or_file)
+    engine = SwarmEngine(pts, behavior=behavior, **kwargs)
+    return engine.run()
+
+
+def swarm_demo():
+    """Run all five behaviors on synthetic data and print summaries."""
+    rng = random.Random(99)
+    pts = [(rng.uniform(0, 500), rng.uniform(0, 500)) for _ in range(80)]
+
+    print("=" * 60)
+    print("  SPATIAL SWARM INTELLIGENCE — DEMO")
+    print("=" * 60)
+
+    for beh in BEHAVIORS:
+        engine = SwarmEngine(pts, behavior=beh, max_ticks=60, seed=42)
+        result = engine.run()
+        final_conv = result.convergence_history[-1] if result.convergence_history else 0
+        print(f"\n  [{beh.upper()}]")
+        print(f"    Ticks: {result.ticks_run}")
+        print(f"    Convergence: {final_conv:.1%}")
+        print(f"    Patterns: {len(result.emergent_patterns)}")
+        for p in result.emergent_patterns:
+            print(f"      • {p.pattern_type}: {p.description}")
+        print(f"    Recommendations:")
+        for r in result.recommendations:
+            print(f"      → {r}")
+
+    print(f"\n{'=' * 60}\n")
+    return True
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+
+def _build_cli():
+    p = argparse.ArgumentParser(
+        description="Spatial Swarm Intelligence Engine",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument("input", nargs="?", help="Point data file (one 'x y' per line)")
+    p.add_argument(
+        "--behavior", "-b", choices=BEHAVIORS, default="consensus",
+        help="Swarm behavior mode (default: consensus)",
+    )
+    p.add_argument("--max-ticks", type=int, default=100, help="Maximum ticks (default 100)")
+    p.add_argument("--signal-decay", type=float, default=0.85, help="Signal decay rate (default 0.85)")
+    p.add_argument("--seed", type=int, default=42, help="Random seed (default 42)")
+    p.add_argument("--json", dest="json_out", help="Export JSON report")
+    p.add_argument("--html", dest="html_out", help="Export HTML dashboard")
+    p.add_argument("--demo", action="store_true", help="Run demo with all behaviors")
+    return p
+
+
+def main(argv=None):
+    parser = _build_cli()
+    args = parser.parse_args(argv)
+
+    if args.demo:
+        swarm_demo()
+        return
+
+    if not args.input:
+        parser.error("Input file required (or use --demo)")
+
+    pts = _load_points(args.input)
+    engine = SwarmEngine(
+        pts,
+        behavior=args.behavior,
+        max_ticks=args.max_ticks,
+        signal_decay=args.signal_decay,
         seed=args.seed,
     )
+    result = engine.run()
 
-    print(f"[Swarm] Optimizer -- {opt.n_points} points, "
-          f"{opt.n_particles} particles, {opt.n_iterations} iterations")
-    if opt.auto:
-        print("   Auto-selecting objective ...")
+    final_conv = result.convergence_history[-1] if result.convergence_history else 0
+    print(f"\n{'=' * 60}")
+    print(f"  SWARM INTELLIGENCE REPORT — {args.behavior.upper()}")
+    print(f"{'=' * 60}")
+    print(f"  Ticks:       {result.ticks_run}")
+    print(f"  Convergence: {final_conv:.1%}")
+    print(f"  Patterns:    {len(result.emergent_patterns)}")
+    for p in result.emergent_patterns:
+        print(f"    [{p.pattern_type}] {p.description} (confidence {p.confidence:.0%})")
+    print(f"  Recommendations:")
+    for r in result.recommendations:
+        print(f"    • {r}")
+    print(f"{'=' * 60}\n")
 
-    result = opt.run()
-
-    print(f"   Objective : {result['objective']}"
-          f"{'  (auto-selected)' if result['auto_selected'] else ''}")
-    print(f"   Fitness   : {result['initial_fitness']:.6f} -> {result['best_fitness']:.6f}")
-    print(f"   Improvement: {result['improvement_pct']}%")
-    print(f"   Converged : iteration {result['converged_iteration']}")
-    for r in result["recommendations"]:
-        print(f"   * {r}")
-
-    if args.output:
-        export_html(result, args.output)
-        print(f"   📄 Report: {args.output}")
+    if args.json_out:
+        engine.to_json(args.json_out)
+        print(f"JSON report saved to {args.json_out}")
+    if args.html_out:
+        engine.to_html(args.html_out)
+        print(f"HTML dashboard saved to {args.html_out}")
 
 
 if __name__ == "__main__":
