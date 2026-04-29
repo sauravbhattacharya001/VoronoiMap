@@ -33,7 +33,7 @@
 ### LeetCode Patterns
 - 2026-04-21 — Sliding Window — Day 1: Core intuition, grow/shrink, caterpillar analogy, queue connection, LP-in-1D insight, Kadane's, negative numbers breaking monotonicity
 - 2026-04-22 — Sliding Window — Day 2: Longest vs shortest (opposing pointer triggers), monotonic property requirement, LC #3 (longest substring no repeats — set), LC #159 (at most K distinct — hashmap), hashmap vs set bookkeeping
-- 2026-04-27 — Two Pointers — Day 1: ⚠️ PENDING DELIVERY (saved to lc-blurb-pending.md) — opposite-direction pointers, mountain analogy, monotonicity as core requirement, connection to sliding window, Container With Most Water walkthrough, 3Sum as exercise
+- 2026-04-27 — Two Pointers — Day 1: ⚠️ PENDING DELIVERY (saved to lc-blurb-pending.md, retry failed 2026-04-28) — opposite-direction pointers, mountain analogy, monotonicity as core requirement, connection to sliding window, Container With Most Water walkthrough, 3Sum as exercise
 
 ### System Design Components
 - 2026-04-26 — Rate Limiter (mentioned only, not deep-dived)

@@ -1,79 +1,79 @@
 {
-  "lastUpdated": "2026-04-28T06:02:05.494Z",
-  "totalRuns": 3341,
+  "lastUpdated": "2026-04-29T05:44:36.590532+00:00",
+  "totalRuns": 3419,
   "taskTypes": {
     "setup_copilot_agent": {
       "weight": 20,
-      "runs": 38,
-      "successes": 38
+      "runs": 40,
+      "successes": 40
     },
     "bug_fix": {
       "weight": 17.1,
-      "runs": 170,
-      "successes": 171
+      "runs": 172,
+      "successes": 173
     },
     "security_fix": {
       "weight": 18.1,
-      "runs": 327,
-      "successes": 327,
+      "runs": 333,
+      "successes": 333,
       "description": "Fix security vulnerability",
       "totalDone": 11
     },
     "perf_improvement": {
       "weight": 17.1,
-      "runs": 564,
-      "successes": 562,
+      "runs": 572,
+      "successes": 570,
       "description": "Performance improvement"
     },
     "refactor": {
       "weight": 18.1,
-      "runs": 531,
-      "successes": 532
+      "runs": 539,
+      "successes": 540
     },
     "readme_overhaul": {
       "weight": 20,
-      "runs": 53,
-      "successes": 51
+      "runs": 56,
+      "successes": 54
     },
     "doc_update": {
       "weight": 16.1,
-      "runs": 103,
-      "successes": 105,
+      "runs": 109,
+      "successes": 111,
       "description": "Improve non-README documentation",
       "attempts": 1
     },
     "code_cleanup": {
       "weight": 18.1,
-      "runs": 106,
-      "successes": 106,
+      "runs": 112,
+      "successes": 112,
       "description": "Remove dead code, unused deps",
       "totalDone": 1,
       "attempts": 4
     },
     "open_issue": {
       "weight": 15.1,
-      "runs": 142,
-      "successes": 145,
+      "runs": 147,
+      "successes": 150,
       "description": "Open a thoughtful issue",
       "totalDone": 2,
       "attempts": 4
     },
     "fix_issue": {
       "weight": 15.1,
-      "runs": 256,
-      "successes": 255,
+      "runs": 258,
+      "successes": 257,
       "description": "Fix an existing open issue"
     },
     "merge_dependabot": {
       "weight": 25,
-      "runs": 111,
+      "runs": 113,
       "successes": 71,
       "description": "Review and merge open Dependabot PRs"
     },
     "add_ci_cd": {
       "weight": 10,
-      "runs": 20,
-      "successes": 20,
+      "runs": 21,
+      "successes": 21,
       "description": "Add GitHub Actions CI/CD workflow"
     },
     "add_codeql": {
@@ -84,8 +84,8 @@
     },
     "add_dependabot": {
       "weight": 20,
-      "runs": 31,
-      "successes": 31,
+      "runs": 33,
+      "successes": 33,
       "description": "Add dependabot config"
     },
     "deploy_pages": {
@@ -96,8 +96,8 @@
     },
     "create_release": {
       "weight": 20,
-      "runs": 455,
-      "successes": 454,
+      "runs": 463,
+      "successes": 462,
       "description": "Create GitHub Release with tag + changelog"
     },
     "add_dockerfile": {
@@ -108,20 +108,20 @@
     },
     "docker_workflow": {
       "weight": 20,
-      "runs": 38,
-      "successes": 38,
+      "runs": 40,
+      "successes": 40,
       "description": "Add Docker build/push workflow"
     },
     "package_publish": {
       "weight": 20,
-      "runs": 35,
-      "successes": 34,
+      "runs": 38,
+      "successes": 37,
       "description": "Set up package publishing (PyPI/npm/NuGet)"
     },
     "add_badges": {
       "weight": 10,
-      "runs": 22,
-      "successes": 22,
+      "runs": 23,
+      "successes": 23,
       "description": "Add badges to README"
     },
     "add_license": {
@@ -132,14 +132,14 @@
     },
     "issue_templates": {
       "weight": 20,
-      "runs": 34,
-      "successes": 34,
+      "runs": 39,
+      "successes": 39,
       "description": "Add issue/PR templates"
     },
     "contributing_md": {
       "weight": 20,
-      "runs": 43,
-      "successes": 43,
+      "runs": 44,
+      "successes": 44,
       "description": "Add CONTRIBUTING.md"
     },
     "repo_topics": {
@@ -150,76 +150,76 @@
     },
     "branch_protection": {
       "weight": 10,
-      "runs": 35,
-      "successes": 35,
+      "runs": 37,
+      "successes": 37,
       "description": "Configure branch protection"
     },
     "code_coverage": {
       "weight": 20,
-      "runs": 54,
-      "successes": 53,
+      "runs": 59,
+      "successes": 58,
       "description": "Add code coverage reporting"
     },
     "docs_site": {
       "weight": 20,
-      "runs": 45,
-      "successes": 44
+      "runs": 49,
+      "successes": 48
     },
     "auto_labeler": {
       "weight": 10,
-      "runs": 33,
-      "successes": 33,
+      "runs": 35,
+      "successes": 35,
       "description": "Add auto-labeler or stale bot"
     },
     "add_docstrings": {
       "weight": 12,
-      "runs": 41,
-      "successes": 41
+      "runs": 43,
+      "successes": 43
     },
     "add_tests": {
       "weight": 18.1,
-      "runs": 65,
-      "successes": 65,
+      "runs": 70,
+      "successes": 70,
       "description": "Add test suites for untested modules"
     }
   },
   "repoState": {},
-  "notes": "Run 3502-3503: add_ci_cd on FeedReader (added concurrency control, SPM package caching via actions/cache@v4, job timeouts 30/20/10min, permissions hardening). create_release on Vidly (v2.18.0 — RentalPolicyConstants refactor, NuGet SBOM CI, AffinityNetwork O(1) cohesion perf).",
-  "previousNotes": "Run 3500-3501: security_fix on gif-captcha (fixed CWE-400/CWE-754 in captcha-replay-detector). create_release on metacognition (v1.2.0).",
-  "previousPreviousPreviousNotes_": "Run 3482-3483: package_publish on gif-captcha (enhanced publish.yml with npm provenance, GitHub Packages dual-publish, version-tag validation, package size reporting; added exports map + engines + publishConfig to package.json). docker_workflow on ai (added Trivy SARIF upload to GitHub Security, weekly scheduled CVE scan job, path filters; added docker-compose.yml with read-only fs + security hardening + test profile).",
-  "_previousPreviousPreviousPreviousNotes_": "Run 3476-3477: contributing_md on GraphVisual (comprehensive CONTRIBUTING.md rewrite with full 147-class module catalog across 10 functional areas). add_tests on gif-captcha (65 node:test tests for SessionRiskAggregator — construction, addSignal validation/alias normalization/clamping/trimming, evaluate weighted average/decay/correlations/timeline, evaluateAll batch+TTL pruning, session management, trends, stats, weights, prune, report, export/import, reset, session isolation).",
-  "_previousPreviousPreviousPreviousNotes": "Run 3464-3465: docs_site on Ocaml-sample-code (added 6 documentation pages: abstract-machine, bytecode-vm, petri-net, theorem-prover, turing-machine, raytracer — covering SECD/CEK/Krivine evaluation, stack-based VM architecture, concurrency modeling, proof search, tape simulation, Phong shading; updated index.html nav + overview cards). issue_templates on sauravbhattacharya001 (migrated 3 issue templates from Markdown to YAML issue forms — added structured dropdowns, field validation, placeholder guidance).",
-  "_previousPreviousPreviousNotes": "Run 3462-3463: perf_improvement on GraphVisual (O(1) adjacency/degree lookups in GraphColoringAnalyzer — pre-built HashSet adjacency + degreeCache at construction; replaced O(degree) isNeighbor() in chromaticLowerBound/analyzeColorClasses, O(V log V) graph.degree() in LARGEST_FIRST sort, redundant O(V) maxDegree scans; 75/75 tests pass). refactor on gif-captcha (extracted _refreshTokenBucket/_refreshLeakyBucket in captcha-rate-limiter — deduplicated init+refill/leak logic between check() and consume(); removed duplicate JSDoc; 80/80 rate-limiter tests pass).",
-  "previousPreviousNotes_": "Run 3432-3433: setup_copilot_agent on prompt (rewrote copilot-instructions.md to document 155+ source classes across 12 functional areas, added XML doc verification step). code_cleanup on BioBots (replaced 2 inlined round() with shared validation.round, removed 2 superseded test files — 915 lines of dead duplication).",
+  "notes": "Run 3594-3595: branch_protection on sauravbhattacharya001 (added required CodeQL status check, required linear history, required conversation resolution on master). add_dependabot on Vidly (added Docker ecosystem to dependabot.yml for base image tracking of dotnet/framework/sdk:4.8 and aspnet:4.8).",
+  "previousNotes": "Run 3592-3593: readme_overhaul on getagentbox (added 30+ page catalog organized by category, keyboard shortcuts docs, build instructions, enhanced security section with specific details, fixed single-file to multi-page description). security_fix on BioBots (added prototype pollution guards to qualityControlAutopilot.configure(), resourceForecaster.registerResource(), contaminationEarlyWarning.ingest() -- user-supplied keys used as object properties without isDangerousKey/hasOwnProperty; 104/104 tests pass).",
+  "previousPreviousNotes": "Run 3590-3591: create_release on WinSentinel (v1.13.0 \u2014 Process Lineage Audit with 12 MITRE ATT&CK rules, Network Beacon Detector with 10 C2 framework profiles, Security Regression Predictor with fix stability analysis, Docker attestation fix + weekly vulnerability rescan). open_issue on FeedReader (#109 \u2014 data race in ArticleReactionManager: concurrent DispatchQueue declared but entries array accessed without synchronization in all 15+ methods; crashes + data loss risk).",
+  "previousPreviousPreviousNotes": "Run 3588-3589: refactor on VoronoiMap (decomposed 169-line ForecastModel.forecast() into 9 focused private methods \u2014 _compute_bounds, _build_density_grids, _density_trend, _centroid_trajectory, _spread_forecast, _determine_trend, _detect_hotspots, _detect_voids, _compute_confidence; orchestrator now ~40 lines). doc_update on prompt (added docs/articles/caching.md covering PromptCache LRU+TTL+persistence, PromptCachingOptimizer segment analysis, PromptRateLimiter per-profile RPM/TPM/concurrency, PromptPerformanceProfiler percentile stats+variant comparison, end-to-end production integration example; updated toc.yml + coverage-gaps.md).",
+  "_previousPreviousPreviousPreviousNotes": "Run 3568-3569: docs_site on sauravcode (added Cookbook & Recipes page with 10 end-to-end workflows \u2014 CI pipeline, debugging, security audit, genetic programming, profiling, migration, production release, code review, learning, health monitoring; updated mkdocs.yml nav). add_docstrings on agenticchat (added JSDoc blocks to 9 undocumented module-level IIFEs \u2014 MessageScheduler, PdfExport, ConversationExport, MessageHighlighter, AutoSaveDraft, ScrollLock, MessageReply, StickyNotesBoard, SmartContextSidebar; each with @namespace, @returns, purpose/persistence/interaction docs).",
+  "_previousPreviousPreviousPreviousNotes_": "Run 3476-3477: contributing_md on GraphVisual (comprehensive CONTRIBUTING.md rewrite with full 147-class module catalog across 10 functional areas). add_tests on gif-captcha (65 node:test tests for SessionRiskAggregator \u2014 construction, addSignal validation/alias normalization/clamping/trimming, evaluate weighted average/decay/correlations/timeline, evaluateAll batch+TTL pruning, session management, trends, stats, weights, prune, report, export/import, reset, session isolation).",
+  "_previousPreviousPreviousNotes": "Run 3462-3463: perf_improvement on GraphVisual (O(1) adjacency/degree lookups in GraphColoringAnalyzer \u2014 pre-built HashSet adjacency + degreeCache at construction; replaced O(degree) isNeighbor() in chromaticLowerBound/analyzeColorClasses, O(V log V) graph.degree() in LARGEST_FIRST sort, redundant O(V) maxDegree scans; 75/75 tests pass). refactor on gif-captcha (extracted _refreshTokenBucket/_refreshLeakyBucket in captcha-rate-limiter \u2014 deduplicated init+refill/leak logic between check() and consume(); removed duplicate JSDoc; 80/80 rate-limiter tests pass).",
   "_previousNotes_prev": "Run 3420-3421: add_license on metacognition (added MIT LICENSE, pyproject.toml license field, README badge). docs_site on FeedReader (new autonomous-intelligence.html documenting 11 undocumented features: PredictiveAlerts, KnowledgeGraph, CuriosityEngine, DebateArena, NarrativeTracker, SignalBooster, SerendipityEngine, ImpactTracker, BurnoutDetector, Autopilot, InboxZero; updated sitemap + nav on all pages).",
-  "_previousNotes_old3": "Run 3318-3319: refactor on agentlens (extracted _window_totals + _pool_used_tokens in quota.py — deduplicated window-filter logic across 5 methods). create_release on WinSentinel (v1.11.0 — Security Flight Recorder CLI).",
-  "_previousNotes_old2": "Run 3338-3339: security_fix on agenticchat (routed SmartConversationDigest.allSessions() through SafeStorage + sanitizeStorageObject — was bypassing incognito mode and prototype-pollution guards via raw localStorage reads). branch_protection on BioBots (added required status checks for build/lint/test CI jobs with strict up-to-date requirement).",
-  "_previousNotes_old": "Run 3236-3237: refactor on VoronoiMap (deduplicated 5 identical _load_points into shared vormap_utils.load_points — removed ~74 lines). create_release on BioBots (v1.37.0 — Print Quality Autopilot, Lab Personnel Training Tracker, Bioink Batch Genealogy Tracker, labDigitalTwin perf, 4 refactoring cleanups).",
-  "_previousNotes2": "Run 3302-3303: doc_update on GraphVisual (created TESTING.md — comprehensive testing guide with conventions, coverage gap inventory of 40 untested classes, updated README testing section). add_tests on FeedReader (25 tests for ArticleEngagementPredictor — cold start, prediction scoring, factor verification, score clamping, FIFO trimming, model retraining, analytics, label classification, reset, export).",
-  "_prevNotesOld2": "Run 3238-3239: auto_labeler on BioBots (added issue-triage.yml — content-based issue auto-labeling with category/area/priority detection and auto-label creation). refactor on sauravbhattacharya001 (extracted logSpacedRates() shared helper from duplicate curve generators + declarative factorDefs/evaluateRules in analyzePrintability — replaced 60+ lines of nested if/else).",
-  "_prevNotesOld": "Run 3214-3215: perf_improvement on ai (precomputed feature-vector magnitudes + time-sorted early exit in anomaly_cluster.py O(n²) clustering — eliminates per-pair sqrt and enables inner-loop break on time gap). refactor on gif-captcha (O(1) country risk lookups in geo-risk-scorer via hash sets instead of indexOf; single-pass listAll in captcha-incident-manager replacing 5 chained .filter() calls).",
-  "_prev4": "Run 3204-3205: perf_improvement on everything (threaded activeContacts list through generateReport in ContactTrackerService — eliminated 4 redundant filter passes, reducing O(5N) to O(N)). refactor on Vidly (extracted AnalyzeInternal in FraudDetectorService — batch-fetches all rentals once in GetSummary instead of 2N+1 repository queries).",
-  "_prev5a": "Run 3200-3201: perf_improvement on sauravcode (pre-grouped tokens by line in sauravcomplex.py — reduced function body extraction from O(F×T) to O(T + F×body_lines)). security_fix on BioBots (fixed prototype-pollution in experimentRandomizer — generateBlindingCodes used user-supplied treatment names as {} keys; now Object.create(null) + isDangerousKey guard).",
-  "_prev5b": "Run 3198-3199: bug_fix on gif-captcha (fixed #127 — bounded memory growth in solve-funnel-analyzer with maxSessions/maxRecords LRU eviction). code_cleanup on FeedReader (replaced 22 raw print() calls across 14 files with privacy-aware os_log via FeedReaderLogger — prevents CWE-532 data exposure).",
-  "_prev5": "Run 3192-3193: perf_improvement on VoronoiMap (precomputed symmetric distance matrix shared across DBSCAN, silhouette, eps estimation — eliminated 3× redundant O(n²) distance recomputation; pre-grouped cluster indices in silhouette_scores; precomputed DBSCAN neighbour lists in single pass). refactor on prompt (replaced ~120 lines of lambda-per-attack boilerplate in PromptAdversary.GetAttackGenerators with declarative AttackTemplate record catalog + MaterialiseVariant dispatcher — pure data, no closures, O(1) strategy lookup).",
-  "_prev6": "Run 3190-3191: security_fix on ai (fixed broken DLP scanner — missing Severity import made entire module non-functional, also fixed deprecated utcnow() in evidence_collector). perf_improvement on GraphVisual (O(1) edge lookup via HashSet + linear-time pruneTree in SteinerTreeAnalyzer — replaced O(E) containsEdgeInfo scans and O(V²·E) degree recount).",
+  "_previousNotes_old3": "Run 3318-3319: refactor on agentlens (extracted _window_totals + _pool_used_tokens in quota.py \u2014 deduplicated window-filter logic across 5 methods). create_release on WinSentinel (v1.11.0 \u2014 Security Flight Recorder CLI).",
+  "_previousNotes_old2": "Run 3338-3339: security_fix on agenticchat (routed SmartConversationDigest.allSessions() through SafeStorage + sanitizeStorageObject \u2014 was bypassing incognito mode and prototype-pollution guards via raw localStorage reads). branch_protection on BioBots (added required status checks for build/lint/test CI jobs with strict up-to-date requirement).",
+  "_previousNotes_old": "Run 3236-3237: refactor on VoronoiMap (deduplicated 5 identical _load_points into shared vormap_utils.load_points \u2014 removed ~74 lines). create_release on BioBots (v1.37.0 \u2014 Print Quality Autopilot, Lab Personnel Training Tracker, Bioink Batch Genealogy Tracker, labDigitalTwin perf, 4 refactoring cleanups).",
+  "_previousNotes2": "Run 3302-3303: doc_update on GraphVisual (created TESTING.md \u2014 comprehensive testing guide with conventions, coverage gap inventory of 40 untested classes, updated README testing section). add_tests on FeedReader (25 tests for ArticleEngagementPredictor \u2014 cold start, prediction scoring, factor verification, score clamping, FIFO trimming, model retraining, analytics, label classification, reset, export).",
+  "_prevNotesOld2": "Run 3238-3239: auto_labeler on BioBots (added issue-triage.yml \u2014 content-based issue auto-labeling with category/area/priority detection and auto-label creation). refactor on sauravbhattacharya001 (extracted logSpacedRates() shared helper from duplicate curve generators + declarative factorDefs/evaluateRules in analyzePrintability \u2014 replaced 60+ lines of nested if/else).",
+  "_prevNotesOld": "Run 3214-3215: perf_improvement on ai (precomputed feature-vector magnitudes + time-sorted early exit in anomaly_cluster.py O(n\u00b2) clustering \u2014 eliminates per-pair sqrt and enables inner-loop break on time gap). refactor on gif-captcha (O(1) country risk lookups in geo-risk-scorer via hash sets instead of indexOf; single-pass listAll in captcha-incident-manager replacing 5 chained .filter() calls).",
+  "_prev4": "Run 3204-3205: perf_improvement on everything (threaded activeContacts list through generateReport in ContactTrackerService \u2014 eliminated 4 redundant filter passes, reducing O(5N) to O(N)). refactor on Vidly (extracted AnalyzeInternal in FraudDetectorService \u2014 batch-fetches all rentals once in GetSummary instead of 2N+1 repository queries).",
+  "_prev5a": "Run 3200-3201: perf_improvement on sauravcode (pre-grouped tokens by line in sauravcomplex.py \u2014 reduced function body extraction from O(F\u00d7T) to O(T + F\u00d7body_lines)). security_fix on BioBots (fixed prototype-pollution in experimentRandomizer \u2014 generateBlindingCodes used user-supplied treatment names as {} keys; now Object.create(null) + isDangerousKey guard).",
+  "_prev5b": "Run 3198-3199: bug_fix on gif-captcha (fixed #127 \u2014 bounded memory growth in solve-funnel-analyzer with maxSessions/maxRecords LRU eviction). code_cleanup on FeedReader (replaced 22 raw print() calls across 14 files with privacy-aware os_log via FeedReaderLogger \u2014 prevents CWE-532 data exposure).",
+  "_prev5": "Run 3192-3193: perf_improvement on VoronoiMap (precomputed symmetric distance matrix shared across DBSCAN, silhouette, eps estimation \u2014 eliminated 3\u00d7 redundant O(n\u00b2) distance recomputation; pre-grouped cluster indices in silhouette_scores; precomputed DBSCAN neighbour lists in single pass). refactor on prompt (replaced ~120 lines of lambda-per-attack boilerplate in PromptAdversary.GetAttackGenerators with declarative AttackTemplate record catalog + MaterialiseVariant dispatcher \u2014 pure data, no closures, O(1) strategy lookup).",
+  "_prev6": "Run 3190-3191: security_fix on ai (fixed broken DLP scanner \u2014 missing Severity import made entire module non-functional, also fixed deprecated utcnow() in evidence_collector). perf_improvement on GraphVisual (O(1) edge lookup via HashSet + linear-time pruneTree in SteinerTreeAnalyzer \u2014 replaced O(E) containsEdgeInfo scans and O(V\u00b2\u00b7E) degree recount).",
   "_prev7": "(trimmed)",
   "_trimmedPrev10": true,
-  "_oldNotes": "Run 2946-2947: refactor on gif-captcha (deduplicated ~80 lines of inlined LruTracker, _clamp, _now from trust-score-engine.js â€” replaced with imports from shared-utils.js). perf_improvement on VoronoiMap (eliminated O(nÂ²) sqrt calls in PSO objective functions â€” squared-distance comparisons in _obj_max_spread, _obj_min_energy, _nearest_neighbor_dists).",
+  "_oldNotes": "Run 2946-2947: refactor on gif-captcha (deduplicated ~80 lines of inlined LruTracker, _clamp, _now from trust-score-engine.js \u00e2\u20ac\u201d replaced with imports from shared-utils.js). perf_improvement on VoronoiMap (eliminated O(n\u00c2\u00b2) sqrt calls in PSO objective functions \u00e2\u20ac\u201d squared-distance comparisons in _obj_max_spread, _obj_min_energy, _nearest_neighbor_dists).",
   "lastRepo": "Vidly",
   "lastRun": "2026-04-28",
-  "runCount": 1066,
+  "runCount": 1083,
   "lastTasks": [
-    "add_ci_cd",
-    "create_release"
+    "branch_protection",
+    "add_dependabot"
   ],
   "lastRepos": [
-    "FeedReader",
+    "sauravbhattacharya001",
     "Vidly"
   ],
-  "lastRunTimestamp": "2026-04-28T05:28:00.000Z",
-  "runCounter": 3503,
-  "lastWeightAdjustment": 1191,
+  "lastRunTimestamp": "2026-04-29T05:44:36.590532+00:00",
+  "runCounter": 3595,
+  "lastWeightAdjustment": 3587,
   "adjustmentHistory": [
     {
       "run": 650,
@@ -255,6 +255,24 @@
     {
       "run": 1191,
       "note": "No changes needed - all task types stable."
+    },
+    {
+      "run": 3466,
+      "note": "No changes needed - all task types stable."
+    },
+    {
+      "run": 3549,
+      "note": "No changes needed - all task types stable."
+    },
+    {
+      "run": 3575,
+      "note": "No changes needed - all task types stable with high success rates."
+    },
+    {
+      "run": 3587,
+      "note": "No changes needed - all task types stable with high success rates."
     }
-  ]
+  ],
+  "previousNotes_": "Run 3504-3505: perf_improvement on metacognition (pre-tokenized query in find_similar, time.time() hoisting in hot loops, inlined config_similarity, single-pass health_check; 37/37 tests pass). create_release on agentlens (v1.59.0 \u2014 Session Autopsy, Auto-Triage, README overhaul, dependency bumps).",
+  "previousPreviousNotes_": "Run 3506-3507: code_cleanup on agentlens (removed 6 unused imports across 5 backend route files \u2014 safeJsonParse in annotations, getDb in command-center, daysAgoCutoff in forecast, parseLimit in profiler, pctDelta+eventsToCsv in sessions). issue_templates on Ocaml-sample-code (added performance_issue.yml and question.yml structured issue forms, OCaml Discuss Forum contact link in config.yml)."
 }
