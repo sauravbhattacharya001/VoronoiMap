@@ -107,13 +107,6 @@ def _dist(a, b):
     return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
-def _centroid(pts):
-    n = len(pts)
-    if n == 0:
-        return (0.0, 0.0)
-    return (sum(p[0] for p in pts) / n, sum(p[1] for p in pts) / n)
-
-
 def _approx_area(center, neighbors_centers, bounds):
     """Rough Voronoi cell area estimate via Monte-Carlo or bounding box fraction."""
     if not neighbors_centers:

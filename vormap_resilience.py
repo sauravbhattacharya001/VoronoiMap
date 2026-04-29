@@ -79,37 +79,8 @@ from vormap_utils import (
 # ---------------------------------------------------------------------------
 
 
-def _cross(o, a, b):
-    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
-
-
-def _convex_hull(points):
-    pts = sorted(set(points))
-    if len(pts) <= 1:
-        return pts
-    lower = []
-    for p in pts:
-        while len(lower) >= 2 and _cross(lower[-2], lower[-1], p) <= 0:
-            lower.pop()
-        lower.append(p)
-    upper = []
-    for p in reversed(pts):
-        while len(upper) >= 2 and _cross(upper[-2], upper[-1], p) <= 0:
-            upper.pop()
-        upper.append(p)
-    return lower[:-1] + upper[:-1]
-
-
-def _polygon_area(vertices):
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += vertices[i][0] * vertices[j][1]
-        area -= vertices[j][0] * vertices[i][1]
-    return abs(area) / 2.0
+# _cross, _convex_hull removed — dead code duplicating vormap_utils.
+from vormap_utils import polygon_area as _polygon_area  # backward compat for tests
 
 
 def _build_adjacency(points):

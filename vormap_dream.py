@@ -52,18 +52,11 @@ import random
 import sys
 from collections import defaultdict
 
-from vormap_utils import load_points, compute_nn_distances, euclidean
+from vormap_utils import load_points, compute_nn_distances, euclidean, polygon_centroid_mean as _centroid
 
 # ---------------------------------------------------------------------------
 # Spatial personality extraction
 # ---------------------------------------------------------------------------
-
-
-def _centroid(pts):
-    n = len(pts)
-    if n == 0:
-        return (0.0, 0.0)
-    return (sum(p[0] for p in pts) / n, sum(p[1] for p in pts) / n)
 
 
 def _bounding_box(pts):

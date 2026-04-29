@@ -38,6 +38,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from vormap import validate_output_path
+from vormap_utils import polygon_centroid_mean as _centroid, bounding_box as _bounding_box
 
 # ---------------------------------------------------------------------------
 # Geometry helpers
@@ -57,16 +58,6 @@ def _bearing(origin: Tuple[float, float], target: Tuple[float, float]) -> float:
     angle = math.degrees(math.atan2(dx, dy)) % 360
     return angle
 
-
-def _centroid(pts: List[Tuple[float, float]]) -> Tuple[float, float]:
-    n = len(pts)
-    return (sum(p[0] for p in pts) / n, sum(p[1] for p in pts) / n)
-
-
-def _bounding_box(pts: List[Tuple[float, float]]) -> Tuple[float, float, float, float]:
-    xs = [p[0] for p in pts]
-    ys = [p[1] for p in pts]
-    return (min(xs), min(ys), max(xs), max(ys))
 
 # ---------------------------------------------------------------------------
 # Data classes

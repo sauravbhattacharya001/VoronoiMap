@@ -45,19 +45,12 @@ import os
 import random
 from typing import Any, Dict, List, Optional, Tuple
 
-from vormap_utils import bounding_box as _bounding_box, euclidean as _dist
+from vormap_utils import bounding_box as _bounding_box, euclidean as _dist, polygon_centroid_mean as _centroid
 
 # ── Geometry helpers ────────────────────────────────────────────────
 
 
-def _centroid(pts: List[Tuple[float, float]]) -> Tuple[float, float]:
-    n = len(pts)
-    if n == 0:
-        return (0.0, 0.0)
-    return (sum(p[0] for p in pts) / n, sum(p[1] for p in pts) / n)
-
-
-# _bounding_box is now imported from vormap_utils (single-pass, memory-efficient)
+# _centroid and _bounding_box are now imported from vormap_utils
 
 
 # ── Voronoi cell computation (Fortune's algorithm not needed — use

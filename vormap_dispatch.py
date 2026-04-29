@@ -27,6 +27,8 @@ from vormap_utils import euclidean as _dist
 # ---------------------------------------------------------------------------
 # Geometry helpers
 # ---------------------------------------------------------------------------
+from vormap_utils import polygon_area
+
 
 def _cross(o, a, b):
     return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
@@ -47,18 +49,6 @@ def convex_hull(points):
             upper.pop()
         upper.append(p)
     return lower[:-1] + upper[:-1]
-
-
-def polygon_area(vertices):
-    n = len(vertices)
-    if n < 3:
-        return 0.0
-    a = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        a += vertices[i][0] * vertices[j][1]
-        a -= vertices[j][0] * vertices[i][1]
-    return abs(a) / 2.0
 
 
 # ---------------------------------------------------------------------------

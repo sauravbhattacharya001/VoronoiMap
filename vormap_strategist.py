@@ -53,23 +53,11 @@ import sys
 from collections import defaultdict
 from typing import List, Tuple, Dict, Optional
 
-from vormap_utils import euclidean as _dist
+from vormap_utils import euclidean as _dist, polygon_centroid_mean as _centroid, bounding_box as _bbox
 
 # ---------------------------------------------------------------------------
 # Geometry helpers
 # ---------------------------------------------------------------------------
-
-def _centroid(pts: List[Tuple[float,float]]) -> Tuple[float,float]:
-    if not pts:
-        return (0.0, 0.0)
-    cx = sum(p[0] for p in pts) / len(pts)
-    cy = sum(p[1] for p in pts) / len(pts)
-    return (cx, cy)
-
-def _bbox(pts: List[Tuple[float,float]]):
-    xs = [p[0] for p in pts]
-    ys = [p[1] for p in pts]
-    return min(xs), min(ys), max(xs), max(ys)
 
 def _nn_dists(pts):
     """Nearest-neighbor distances for each point."""

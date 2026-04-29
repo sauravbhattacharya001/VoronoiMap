@@ -43,7 +43,7 @@ import statistics
 import sys
 from collections import namedtuple
 
-from vormap_utils import bounding_box as _bounding_box, euclidean as _dist
+from vormap_utils import bounding_box as _bounding_box, euclidean as _dist, polygon_centroid_mean as _centroid
 
 # ---------------------------------------------------------------------------
 # Data helpers
@@ -70,13 +70,6 @@ def _save_points(pts, path):
     with open(path, "w") as fh:
         for x, y in pts:
             fh.write(f"{x:.6f} {y:.6f}\n")
-
-
-def _centroid(pts):
-    n = len(pts)
-    if n == 0:
-        return (0, 0)
-    return (sum(p[0] for p in pts) / n, sum(p[1] for p in pts) / n)
 
 
 def _nn_distances(pts):
