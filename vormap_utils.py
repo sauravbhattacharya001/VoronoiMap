@@ -303,6 +303,49 @@ def compute_nn_distances(points):
     return nn_dists
 
 
+def build_distance_adjacency(points, threshold_factor=2.0):
+    """Build spatial adjacency based on average nearest-neighbor distance.
+
+    Two points are neighbours if their Euclidean distance is at most
+    ``threshold_factor * avg_nn_distance``.  Uses :func:`compute_nn_distances`
+    for the nearest-neighbour computation (O(n log n) with scipy, O(n²)
+    fallback).
+
+    Parameters
+    ----------
+    points : list of (x, y)
+        Point coordinates.
+    threshold_factor : float, default 2.0
+        Multiplier on the average nearest-neighbour distance to determine
+        the neighbourhood radius.
+
+    Returns
+    -------
+    dict[int, list[int]]
+        Adjacency mapping: index → list of neighbor indices.
+    """
+    n = len(points)
+    if n <= 1:
+        return {i: [] for i in range(n)}
+    if n == 2:
+        return {0: [1], 1: [0]}
+
+    nn_dists = compute_nn_distances(points)
+    avg_nn = sum(nn_dists) / len(nn_dists)
+    threshold = avg_nn * threshold_factor
+
+    adj = {i: [] for i in range(n)}
+    for i in range(n):
+        xi, yi = points[i]
+        for j in range(i + 1, n):
+            dx = xi - points[j][0]
+            dy = yi - points[j][1]
+            if math.sqrt(dx * dx + dy * dy) <= threshold:
+                adj[i].append(j)
+                adj[j].append(i)
+    return adj
+
+
 def point_to_segment_distance(px: float, py: float,
                               ax: float, ay: float,
                               bx: float, by: float) -> float:

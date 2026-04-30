@@ -61,6 +61,8 @@ import random
 import textwrap
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+from vormap_utils import build_distance_adjacency as _build_distance_adjacency
+
 # ---------------------------------------------------------------------------
 # Data types
 # ---------------------------------------------------------------------------
@@ -132,33 +134,11 @@ def _approx_area(center, neighbors_centers, bounds):
 
 
 def _build_adjacency(points, k_factor=2.0):
-    """Build neighbor graph: two points are neighbors if distance < k_factor * avg_spacing."""
-    n = len(points)
-    if n <= 1:
-        return {i: [] for i in range(n)}
-    if n == 2:
-        return {0: [1], 1: [0]}
+    """Build neighbor graph: two points are neighbors if distance < k_factor * avg_spacing.
 
-    # Compute all pairwise distances and find average nearest-neighbor distance
-    nn_dists = []
-    for i in range(n):
-        min_d = float("inf")
-        for j in range(n):
-            if i != j:
-                d = _dist(points[i], points[j])
-                if d < min_d:
-                    min_d = d
-        nn_dists.append(min_d)
-    avg_nn = sum(nn_dists) / len(nn_dists)
-    threshold = avg_nn * k_factor
-
-    adj = {i: [] for i in range(n)}
-    for i in range(n):
-        for j in range(i + 1, n):
-            if _dist(points[i], points[j]) <= threshold:
-                adj[i].append(j)
-                adj[j].append(i)
-    return adj
+    Delegates to :func:`vormap_utils.build_distance_adjacency`.
+    """
+    return _build_distance_adjacency(points, k_factor)
 
 
 def _bounds(points):

@@ -45,7 +45,7 @@ import os
 import random
 from typing import Any, Dict, List, Optional, Tuple
 
-from vormap_utils import euclidean as _dist
+from vormap_utils import build_distance_adjacency, euclidean as _dist
 
 # ── Geometry helpers ────────────────────────────────────────────────
 
@@ -54,27 +54,11 @@ def _random_points(n: int, w: float = 500.0, h: float = 500.0) -> List[Tuple[flo
 
 
 def _build_adjacency(pts: List[Tuple[float, float]], threshold_factor: float = 2.0) -> Dict[int, List[int]]:
-    n = len(pts)
-    if n < 2:
-        return {i: [] for i in range(n)}
-    avg_nn = 0.0
-    for i in range(n):
-        mn = float("inf")
-        for j in range(n):
-            if i != j:
-                d = _dist(pts[i], pts[j])
-                if d < mn:
-                    mn = d
-        avg_nn += mn
-    avg_nn /= n
-    thresh = avg_nn * threshold_factor
-    adj: Dict[int, List[int]] = {i: [] for i in range(n)}
-    for i in range(n):
-        for j in range(i + 1, n):
-            if _dist(pts[i], pts[j]) <= thresh:
-                adj[i].append(j)
-                adj[j].append(i)
-    return adj
+    """Build adjacency based on distance threshold (avg spacing x factor).
+
+    Delegates to :func:`vormap_utils.build_distance_adjacency`.
+    """
+    return build_distance_adjacency(pts, threshold_factor)
 
 
 # ── Presets ─────────────────────────────────────────────────────────
