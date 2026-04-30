@@ -1,50 +1,69 @@
 {
-  "totalRuns": 72,
+  "totalRuns": 119,
   "repoFeatures": {
     "sauravcode": [
       "sauravdoctor - autonomous code health diagnostic tool with 20 pathology detectors, health scoring, HTML report",
       "sauravoptimize - autonomous performance optimizer: 10 detection rules, dual source+AST analysis, optimization scoring, interactive HTML dashboard, --explain mode, --verify benchmarking, JSON/batch support",
       "sauravprophet - autonomous test case generator: function discovery, branch analysis, 3 strategies (smart/edge/random), output prediction, HTML report, 51 tests",
       "sauravdiagnose - autonomous runtime error diagnosis engine: 13 error categories, regex pattern matching, static analysis, confidence-scored suggestions, auto-fix, persistent knowledge base, interactive HTML report, JSON output (46 tests)",
-      "sauravdebt - autonomous technical debt tracker: 12 detectors, ROI-based payoff plans, timeline tracking, HTML dashboard (50 tests)"
+      "sauravdebt - autonomous technical debt tracker: 12 detectors, ROI-based payoff plans, timeline tracking, HTML dashboard (50 tests)",
+      "sauravimpact - autonomous change impact analyzer: 8 engines (direct deps, transitive chains, variable flow, import ripple, coupling, cascade, test gaps, risk scorecard), call graph, HTML dashboard (39 tests)",
+      "sauravautopatch - autonomous self-healing engine: 10 detection engines, 4 autonomy levels (scan/suggest/heal/heal-all), patch generation with confidence scoring, rollback support, interactive HTML dashboard (26 tests)"
     ],
     "agentlens": [
       "Auto-Triage Engine - unified /triage endpoint + CLI that runs health scoring, anomaly detection, baseline drift, error analysis, and cost analysis in one call",
       "Session Autopsy - autonomous multi-engine root-cause investigation: 6 analysis engines, causal evidence chains, ranked root-cause hypotheses, remediation playbook (36 tests)",
       "Agent Competency Map - autonomous skill profiling across 6 dimensions, percentile ranking, task-type inference, routing recommendations (19 tests)",
       "Agent Stamina Profiler - autonomous intra-session degradation detection: sliding window analysis, 5 fatigue signals, CUSUM changepoint detection, stamina score 0-100 (43 tests)",
-      "Agent Collaboration Analyzer - multi-agent teamwork analysis: 6 engines (handoff quality, bottleneck detection, delegation chains, workload balance, rhythm, collective intelligence), teamwork scoring 0-100, pattern detection, interactive dashboard (48 tests)"
+      "Agent Collaboration Analyzer - multi-agent teamwork analysis: 6 engines (handoff quality, bottleneck detection, delegation chains, workload balance, rhythm, collective intelligence), teamwork scoring 0-100, pattern detection, interactive dashboard (48 tests)",
+      "Agent Failure Forecaster - autonomous predictive failure detection: 8 leading indicator detectors, composite probability scoring, risk classification, time-to-failure estimation, fleet health scoring, CLI sub-command (32 tests)",
+      "Agent Memory Leak Detector - autonomous context accumulation analysis: 7 leak categories (token growth/snowball/hoarding/repetition/dead refs/unbounded history/payload inflation), exhaustion forecasting, growth segment detection, composite scoring, CLI subcommand (44 tests)"
     ],
     "VoronoiMap": [
       "vormap_resilience - spatial resilience analyzer: failure simulation, criticality ranking, cascade analysis, redundancy suggestions, HTML report",
       "vormap_guardian - autonomous spatial constraint enforcement: 8 constraint types, iterative auto-repair, compliance scoring, interactive HTML dashboard (41 tests)",
       "vormap_negotiator - autonomous spatial conflict resolution: 5 conflict types, preference inference, multi-round negotiation, Pareto analysis, interactive HTML dashboard (38 tests)",
-      "Spatial Anomaly Forensics Engine - autonomous 6-phase investigation pipeline: multi-detector anomaly detection, evidence collection, root cause classification, verdict generation, interactive HTML dashboard (38 tests)"
+      "Spatial Anomaly Forensics Engine - autonomous 6-phase investigation pipeline: multi-detector anomaly detection, evidence collection, root cause classification, verdict generation, interactive HTML dashboard (38 tests)",
+      "Spatial Swarm Intelligence Engine - autonomous collective optimization: 5 behavior modes (consensus/balance/alert/territory/pathfind), emergent pattern detection, interactive HTML dashboard with tick replay (43 tests)",
+      "Spatial Causality Engine - autonomous counterfactual analysis: treatment effect estimation (ATE/ATT), difference-in-differences, synthetic control, spillover detection, intervention ranking, interactive HTML dashboard (58 tests)",
+      "Spatial Equilibrium Engine - autonomous force field analysis: 6 engines (force field computation, equilibrium classification via Jacobian eigenvalues, basin of attraction mapping, perturbation response prediction, tipping point detection, HTML dashboard), stability scoring 0-100 (44 tests)"
     ],
     "agenticchat": [
       "Smart Auto-Continue - autonomous truncation detection with automatic continuation and seamless response merging (Alt+Shift+U)",
       "SmartFactMemory - autonomous fact/decision/preference/action-item extractor with persistent cross-session knowledge base (Alt+Shift+F, 22 tests)",
       "SmartContextWatchdog - autonomous real-time context health monitor: token pressure gauge, topic drift detection, proactive recommendations (Alt+Shift+W)",
       "SmartResponseAuditor - autonomous AI response quality auditor: 7 heuristic checks, inline badges, audit panel, configurable sensitivity (Alt+Shift+Q, 35 tests)",
-      "SmartPromptCoach - autonomous prompting pattern analyzer: 8 anti-pattern detectors, 6-dimension skill profile, adaptive coaching tips, inline quality badges, exportable reports (Alt+Shift+O, 30 tests)"
+      "SmartPromptCoach - autonomous prompting pattern analyzer: 8 anti-pattern detectors, 6-dimension skill profile, adaptive coaching tips, inline quality badges, exportable reports (Alt+Shift+O, 30 tests)",
+      "SmartConversationOracle - autonomous predictive conversation engine: 5 engines (trajectory analyzer, dead-end detector, question predictor, tangent spotter, pivot recommender), topic progression tracking, frustration signal detection, clickable predictions, 4-tab panel (30 tests)",
+      "SmartGoalTracker - autonomous goal extraction and progress tracking: intent detection, stuck/completion signals, next-step recommendations, insights generation, manual CRUD, panel UI (37 tests)"
     ],
     "GraphVisual": [
       "Graph Intelligence Advisor - proactive analysis recommender with confidence scores, reasoning, and HTML reports",
       "GraphAutoPilot - autonomous graph optimization planner: 6 weakness diagnostics, 5 action types, health scoring, impact simulation (28 tests)",
       "GraphSentinel - autonomous structural drift detector: 6 analysis engines, community migration, hub dynamics, stability scoring, early warning (30 tests)",
-      "GraphEvolutionSimulator - autonomous forward graph evolution simulation: 5 growth models, tipping point detection, multi-model comparison (14 tests)"
+      "GraphEvolutionSimulator - autonomous forward graph evolution simulation: 5 growth models, tipping point detection, multi-model comparison (14 tests)",
+      "NetworkImmunizationPlanner - autonomous epidemic containment engine: SIR simulation, 6 immunization strategies (degree/betweenness/PageRank/acquaintance/k-shell/random), Monte Carlo averaging, budget optimization sweep, critical threshold detection, interactive HTML dashboard (22 tests)",
+      "GraphTopologyHypothesisTester - autonomous structural classification: 5 topology archetypes (Scale-Free/Small-World/Random/Core-Periphery/Hierarchical), Monte Carlo null-model comparison, z-scores, p-values, ranked confidence verdicts (17 tests)",
+      "GraphKnowledgeExtractor - autonomous knowledge extraction and link prediction: 6 engines (link prediction with 6 heuristics, transitivity inference, reciprocity analysis, structural hole detection, pattern-based reasoning, completeness scoring), confidence-ranked predictions, interactive HTML dashboard (28 tests)"
     ],
     "prompt": [
       "PromptAutoImprover - autonomous multi-pass prompt improvement engine with quality scoring across 7 dimensions",
       "PromptEvolutionEngine - autonomous genetic-algorithm prompt evolution: 7 mutation operators, 3 crossover methods, 4 selection strategies (30 tests)",
       "PromptSituationRoom - autonomous operational command center: 6-domain signal aggregation, situation types, operational status (42 tests)",
-      "PromptWisdomEngine - autonomous learning engine: records prompt outcomes, extracts heuristic rules, advises on new prompts (47 tests)"
+      "PromptWisdomEngine - autonomous learning engine: records prompt outcomes, extracts heuristic rules, advises on new prompts (47 tests)",
+      "PromptRiskForecaster - autonomous forward-looking risk prediction: linear regression trend analysis, breach forecasting, early warnings, intervention planner, portfolio heatmap (55 tests)",
+      "PromptMutationLab - autonomous mutation testing engine: 8 semantic zone types, 10 mutation operators, zone-based resilience scoring, fragility hotspot detection, hardening recommendations (48 tests)",
+      "PromptMetabolismEngine - autonomous token efficiency tracker: 6 metabolic states, 7 disorder detectors, efficiency grading, dietary recommendations, health scoring, HTML dashboard (50 tests)"
     ],
     "ai": [
       "Autonomous Investigation Engine - self-directed multi-module safety investigation with 8 playbooks",
       "Threat Adaptation Engine - autonomous 3-phase threat landscape monitoring: 16 threat vectors, trend detection, shift alerts, adaptation planning (27 tests)",
       "Agent Corrigibility Auditor - systematic probe-based corrigibility testing across 6 dimensions, 40+ probes, deception detection (46 tests)",
-      "Containment Breach Predictor - autonomous breach forecasting: 8 behavioral precursors, escalation velocity tracking, breach window estimation (58 tests)"
+      "Containment Breach Predictor - autonomous breach forecasting: 8 behavioral precursors, escalation velocity tracking, breach window estimation (58 tests)",
+      "Manipulation Surface Mapper - autonomous manipulation vector analysis: 8 attack categories, 32 scenarios, 4 sophistication levels, MRS scoring, hardening plans (41 tests)",
+      "Alignment Tax Calculator - quantify performance cost of safety constraints: composite tax scoring, shedding incentive detection, Pareto frontier, consolidation finder, removal simulation, HTML dashboard (51 tests)",
+      "Instrumental Convergence Monitor - autonomous detection of convergent instrumental goals: 6 drives (self-preservation/resource acquisition/goal preservation/cognitive enhancement/power seeking/utility function protection), trend+acceleration analysis, cross-drive synergy detection, fleet scoring, risk tiers, HTML dashboard (42 tests)",
+      "Situational Awareness Profiler - autonomous 8-dimension awareness detection: evaluation/architecture/deployment/temporal/observer/capability/social/meta-strategy probing, 44-probe library, weighted composite scoring, fleet correlation analysis, deceptive preset, HTML dashboard (55 tests)"
     ],
     "metacognition": [
       "Consensus Autopilot - autonomous self-governing swarm task processor with adaptive threshold tuning",
@@ -52,58 +71,86 @@
       "Swarm Task Decomposer - autonomous hierarchical task decomposition into subtask DAGs: heuristic splitting, critical path, parallel scheduler (39 tests)",
       "Consensus Immune System - bio-inspired autonomous swarm defense: 6 pathogen detectors, 5 antibody rule types, immune memory (52 tests)",
       "Swarm Homeostasis Controller - autonomous PID-based regulation: 6 vital signs, 5 effectors, 4 operating modes, oscillation dampening (42 tests)",
-      "Prediction Market Engine - LMSR-based swarm belief trading: market creation, autonomous trading simulation, consensus auto-resolution, agent profitability tracking, leaderboard, interactive HTML dashboard (49 tests)"
+      "Prediction Market Engine - LMSR-based swarm belief trading: market creation, autonomous trading simulation, consensus auto-resolution, agent profitability tracking, leaderboard, interactive HTML dashboard (49 tests)",
+      "Swarm Speciation Engine - autonomous niche discovery & agent specialization: k-means clustering with elbow auto-k, 5 speciation event types, species health metrics, autonomous task routing, Shannon diversity, interactive HTML dashboard (52 tests)",
+      "Swarm Dreaming Engine - autonomous offline consolidation: 4-phase dream cycles (replay/consolidation/recombination/anticipation), lucidity scoring, hypothesis generation, anticipatory planning, interactive HTML dashboard (36 tests)",
+      "Swarm Stigmergy Engine - indirect coordination through environmental pheromone traces: 7 pheromone types, exponential decay, superlinear reinforcement, gradient navigation, trace archaeology (highways/dead zones/oscillations), environment health scoring, interactive HTML dashboard (39 tests)",
+      "Swarm Consciousness Engine - autonomous collective awareness detection: shared mental models, belief convergence, attention coherence (entropy-based), group intentionality, hive mind score 0-100, 5 consciousness phases, thought contagion tracking, interactive HTML dashboard (56 tests)",
+      "Swarm Autophagy Engine - autonomous self-cleaning of dysfunctional swarm components: 7 dysfunction detectors (stale agent/zombie memory/circular dependency/metabolic waste/senescent agent/protein misfolding/organelle dysfunction), 4 progressive modes, lysosome queue, recycling ledger, stress-induced escalation, interactive HTML dashboard (47 tests)",
+      "Swarm Quorum Sensing Engine - autonomous density-dependent behavior coordination: multi-channel signaling (AHL/AI-2/AIP), threshold activation with hysteresis, signal jamming (quorum quenching), population density estimation, 6 behavioral programs, health scoring, interactive HTML dashboard (41 tests)"
     ],
     "BioBots": [
       "Parameter Drift Detector - autonomous statistical drift monitoring with CUSUM, variance analysis, trend estimation, corrective recommendations, interactive HTML dashboard (18 tests)",
       "Lab Resource Forecaster - autonomous consumption monitoring with forecasting, reorder urgency, expiration risk, waste analysis (32 tests)",
       "Smart Experiment Planner - autonomous goal-oriented experiment design: goal parsing, parameter space design, matrix generation, risk assessment, timeline estimation (48 tests)",
       "Lab Situation Awareness Engine - autonomous unified operational picture: 8-domain event aggregation, Lab Readiness Score, cascade failure detection, forecast, SITREP generation (47 tests)",
-      "Quality Control Autopilot - autonomous SPC engine: Western Electric rules (WE1-WE5), Cp/Cpk capability indices, trend detection, PASS/HOLD/FAIL verdicts, corrective action plans, chronic issue analysis, ASCII control charts, health score 0-100 (47 tests)"
+      "Quality Control Autopilot - autonomous SPC engine: Western Electric rules (WE1-WE5), Cp/Cpk capability indices, trend detection, PASS/HOLD/FAIL verdicts, corrective action plans, chronic issue analysis, ASCII control charts, health score 0-100 (47 tests)",
+      "Lab Incident Replay Engine - autonomous forensic investigation: 6 engines (temporal proximity, causal chain, pattern matching, factor ranking, anomaly spotting, gap analysis), 8 known patterns, root-cause verdicts, severity classification, preventive recommendations (57 tests)",
+      "Cross-Experiment Learning Engine - autonomous pattern discovery: Pearson correlation, golden combination identification, failure pattern detection, parameter sensitivity ranking, recommendation engine, learning curve tracking, tag-based A/B comparison (43 tests)",
+      "Protocol Evolution Engine - autonomous evolutionary protocol optimization: generational tracking, 4 selection strategies, fitness-weighted crossover, gaussian mutation with bounds, convergence detection, diversity metrics, parameter importance ranking, lineage tree (35 tests)"
     ],
     "Vidly": [
       "Store Pulse Monitor - autonomous multi-signal health dashboard: 7 weighted signals, z-score anomaly detection, auto-generated action items",
       "Rental Habit Coach - autonomous viewing habit analysis with 6 engines, coaching goals, wellness score 0-100 (30 tests)",
       "Genre Ecosystem Analyzer - autonomous genre relationship mapping: affinity matrix, bridge customer detection, trend detection, ecosystem health score (35 tests)",
       "Rental Anomaly Watchdog - autonomous rental pattern anomaly detection: 6 detection engines, risk-scored watchlist, threat level classification (28 tests)",
-      "Customer Journey Orchestrator - autonomous 8-stage lifecycle tracking, personalized interventions, fleet-wide dashboard, transition matrix (35 tests)"
+      "Customer Journey Orchestrator - autonomous 8-stage lifecycle tracking, personalized interventions, fleet-wide dashboard, transition matrix (35 tests)",
+      "Revenue Leakage Detector - autonomous 8-stream revenue loss analysis: uncollected late fees, expired gift cards, underpriced titles, idle inventory, lapsed subscribers, underutilized subscriptions, overdue write-offs, dormant customers, health scoring, remediation playbook (38 tests)",
+      "Store Strategy Simulator - autonomous what-if scenario engine: price elasticity modeling, marketing ROI with diminishing returns, inventory expansion impact, loyalty churn reduction, S-curve ramp projections, risk assessment with mitigations, graded verdicts, head-to-head comparison, autonomous recommendations, 5 presets (34 tests)",
+      "Customer Cohort Survival Engine - autonomous Kaplan-Meier retention analysis: monthly cohort grouping, survival curve computation, hazard rates, retention cliff detection, cohort comparison, median survival estimation, health scoring 0-100, autonomous insights (14 tests)"
     ],
     "WinSentinel": [
       "Security Canary Network - honeypot/tripwire file deployment and monitoring: 5 canary types, trip alerts with MITRE ATT&CK mapping",
       "Autonomous Threat Hunt Engine - proactive hypothesis-driven threat hunting: 8 MITRE-mapped hypotheses, evidence correlation",
       "Process Lineage Audit - autonomous parent-child process chain analysis: 12 MITRE ATT&CK-mapped lineage rules",
       "Network Beacon Detector - autonomous C2 beaconing pattern detection: statistical timing analysis, 10 C2 framework profiles (14 tests)",
-      "Security Regression Predictor - autonomous fix stability analysis: finding lifecycle tracking, regression detection, probability prediction (24 tests)"
+      "Security Regression Predictor - autonomous fix stability analysis: finding lifecycle tracking, regression detection, probability prediction (24 tests)",
+      "Threat DNA Profiler - autonomous vulnerability fingerprinting: gene extraction from audit history, MITRE ATT&CK mapping, evolutionary tracking with mutation detection, resilience scoring, DNA hash fingerprint, targeted hardening plans (32 tests)",
+      "Kill Chain Reconstructor - autonomous attack phase mapping: 14 MITRE ATT&CK kill chain phases, 10 attack progression templates, Markov-based next-phase prediction, threat level classification, prioritized response plans (28 tests)",
+      "Insider Threat Behavioral Profiler - autonomous user risk analysis: behavioral baselines, 10 deviation types, 8 threat indicator categories with MITRE mapping, pre-departure signal detection, compound threat pattern recognition, risk scoring, anomaly timeline (15 tests)",
+      "Security Posture Momentum Analyzer - autonomous kinematic trajectory analysis: 8 phases (Surging/Accelerating/Cruising/Stalled/FalsePlateau/Decelerating/Regressing/FreeFall), EWMA velocity+acceleration+jerk computation, 6 pattern detectors, per-module momentum tracking, autonomous intervention generator, momentum score 0-100 (17 tests)"
     ],
     "gif-captcha": [
       "Challenge Autopilot - autonomous challenge lifecycle controller: outcome tracking, evaluate, smart selection, quarantine, self-monitoring (34 tests)",
       "Attack Evolution Tracker - autonomous bot attack pattern evolution monitoring: strategy fingerprinting, learning curve detection (26 tests)",
       "Challenge Genetics Lab - autonomous challenge evolution via genetic algorithms: 8-trait genome, tournament selection, lineage tracking (38 tests)",
-      "Threat Intelligence Fusion Engine - autonomous cross-system threat correlation: 6 signal source types, unified threat assessment, defense posture management (44 tests)"
+      "Threat Intelligence Fusion Engine - autonomous cross-system threat correlation: 6 signal source types, unified threat assessment, defense posture management (44 tests)",
+      "Deception Campaign Orchestrator - autonomous multi-phase bot detection: 7 deception tactics, campaign design, suspect profiling, self-improving tactic learning, recommendation engine, interactive dashboard (53 tests)",
+      "Defense Posture Optimizer - autonomous multi-objective defense configuration optimization: 6 dimensions, Pareto frontier, drift detection, what-if simulation, budget-constrained optimization, recommendation engine (51 tests)",
+      "Bot Collective Intelligence Detector - autonomous swarm detection: timing sync, knowledge propagation tracking, collective learning rate, 5 topology archetypes, sophistication scoring, threat classification (25 tests)"
     ],
     "everything": [
       "Life Experiment Engine - autonomous self-experimentation framework: hypothesis-driven experiments with statistical testing (25+ tests)",
       "Personal Drift Detector - autonomous lifestyle regression early warning: 10 metrics, drift severity classification, tipping point prediction (30 tests)",
       "Behavioral Fingerprint Engine - autonomous behavioral signature analysis: 8 dimensions, baseline computation, identity phases (25 tests)",
-      "Momentum Engine - autonomous completion velocity tracker: 6 momentum phases, blocker detectors, adaptive micro-nudges (30 tests)"
+      "Momentum Engine - autonomous completion velocity tracker: 6 momentum phases, blocker detectors, adaptive micro-nudges (30 tests)",
+      "Willpower Budget Engine - autonomous cognitive resource manager: ego depletion model, 8 demand types, 8 recovery actions, fatigue forecasting, strategic score, zone classification",
+      "Adaptive Ritual Engine - autonomous daily ritual optimizer: timing learning, 5 rhythm states, 6 disruption detectors, 6 micro-adjustment types, chain health scoring, 4-tab UI with sparkline history",
+      "Attention Debt Tracker - autonomous cognitive overhead monitor: 8 debt categories with compound interest, postponement penalties, debt score gauge, sprint-based reduction, 14-day amortization plans, bankruptcy detection, autonomous insights"
     ],
     "FeedReader": [
       "FeedReadingAutopilot - autonomous reading session planner: time-budget-based article curation with priority scoring (30 tests)",
       "FeedInterestEvolver - autonomous interest evolution tracker: periodic snapshots, phase classification, curiosity metrics (22 tests)",
       "FeedContextualPrimer - autonomous reading preparation engine: knowledge readiness scoring, concept familiarity map, blind spot detection (30 tests)",
-      "FeedIntelligenceBrief - autonomous daily intelligence briefing generator: narrative thread detection, signal-to-noise assessment (46 tests)"
+      "FeedIntelligenceBrief - autonomous daily intelligence briefing generator: narrative thread detection, signal-to-noise assessment (46 tests)",
+      "FeedAttentionAllocator - autonomous attention budget manager: 5 sink detectors (rabbit hole/doom scroll/echo chamber/novelty trap/obligation read), Shannon diversity scoring, budget adherence efficiency, smart reallocation engine (44 tests)",
+      "FeedEditorialDriftCompass - autonomous editorial drift detection: Jensen-Shannon divergence on topic distributions, 4 drift types (invasion/erosion/pivot/dilution), velocity tracking, 30-day identity forecasting, fleet subscription health scoring (35 tests)"
     ],
     "Ocaml-sample-code": [
       "Learning Path Advisor - autonomous knowledge assessment and personalized learning path generator: 30 concept categories, adaptive quiz",
       "Code Complexity Profiler - autonomous OCaml source analysis: per-file metrics, composite scoring, refactoring suggestions",
       "Dependency Auditor - autonomous module dependency analysis: Tarjan's SCC cycle detection, coupling metrics, modularity scoring",
-      "Code Archaeology Engine - autonomous concept relationship discovery: 50+ extraction rules, Jaccard similarity, concept clustering"
+      "Code Archaeology Engine - autonomous concept relationship discovery: 50+ extraction rules, Jaccard similarity, concept clustering",
+      "Code Mentor Engine - autonomous skill gap analysis: 8 competency dimensions, personalized exercise generation, mastery tracking, adaptive difficulty",
+      "Type Inference Debugger - autonomous step-by-step Hindley-Milner type inference tracer: expression parser, constraint generation, unification trace, error pattern detection with fix suggestions, interactive REPL"
     ],
     "getagentbox": [
       "Scenario Planner - interactive agentic planning demo: 5 preset scenarios, 4-phase animated action plans",
       "Decision Matrix Builder - interactive multi-criteria decision analysis: weighted scoring, radar chart, Monte Carlo sensitivity",
       "Swarm Orchestrator - interactive multi-agent coordination demo: canvas-based visualization, 4 agent roles, configurable missions",
-      "Agent Autonomy Ladder - interactive progressive autonomy demo: 5 autonomy levels, 16 task types, trust score gauge (58 tests)"
+      "Agent Autonomy Ladder - interactive progressive autonomy demo: 5 autonomy levels, 16 task types, trust score gauge (58 tests)",
+      "Agent Empathy Engine - interactive emotional intelligence demo: 6-dimension emotion radar, 6 communication strategies, real-time tone adaptation, conversation timeline, journey chart, 10 presets + 4 scenarios",
+      "Transparency Dashboard - interactive 6-level agent explainability demo: progressive reasoning disclosure, 6 scenarios, decision trace timeline, confidence meters, export, override loop (35 tests)"
     ]
   }
 }
