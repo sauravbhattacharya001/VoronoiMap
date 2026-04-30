@@ -12,7 +12,7 @@
     <a href="https://codecov.io/gh/sauravbhattacharya001/VoronoiMap"><img src="https://codecov.io/gh/sauravbhattacharya001/VoronoiMap/graph/badge.svg" alt="codecov"></a>
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/releases/latest"><img src="https://img.shields.io/github/v/release/sauravbhattacharya001/VoronoiMap?logo=github&color=green" alt="GitHub Release"></a>
     <a href="LICENSE"><img src="https://img.shields.io/github/license/sauravbhattacharya001/VoronoiMap?color=blue" alt="License"></a>
-    <img src="https://img.shields.io/badge/python-3.6%2B-3776ab?logo=python&logoColor=white" alt="Python 3.6+">
+    <img src="https://img.shields.io/badge/python-3.9%2B-3776ab?logo=python&logoColor=white" alt="Python 3.9+">
     <a href="https://sauravbhattacharya001.github.io/VoronoiMap/"><img src="https://img.shields.io/badge/demo-live-brightgreen?logo=github-pages&logoColor=white" alt="Live Demo"></a>
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/pkgs/container/voronoimap"><img src="https://img.shields.io/badge/ghcr.io-container-blue?logo=docker&logoColor=white" alt="GHCR"></a>
     <a href="https://github.com/sauravbhattacharya001/VoronoiMap/stargazers"><img src="https://img.shields.io/github/stars/sauravbhattacharya001/VoronoiMap?style=flat&logo=github" alt="Stars"></a>
@@ -53,9 +53,9 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
 
-## Module Catalog (129 Modules)
+## Module Catalog (133 Modules)
 
-VoronoiMap has grown into a comprehensive spatial analysis toolkit with **129 modules** spanning core algorithms, visualization, spatial statistics, simulation, planning, artistic rendering, and autonomous analysis. Every module is listed below by category.
+VoronoiMap has grown into a comprehensive spatial analysis toolkit with **133 modules** spanning core algorithms, visualization, spatial statistics, simulation, planning, artistic rendering, and autonomous analysis. Every module is listed below by category.
 
 ### Core
 
@@ -211,6 +211,11 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit with **129 mo
 | `vormap_dream` | Autonomous spatial dreamer: generate synthetic distributions from learned patterns |
 | `vormap_terraform` | Autonomous terrain sculptor |
 | `vormap_architect` | Autonomous spatial layout architect |
+| `vormap_causality` | Spatial causality engine: counterfactual analysis for Voronoi interventions |
+| `vormap_equilibrium` | Spatial equilibrium engine: force field analysis and stability classification |
+| `vormap_forensics` | Spatial forensics: distribution provenance analysis and anomaly attribution |
+| `vormap_guardian` | Autonomous spatial guardian: integrity monitoring and constraint enforcement |
+| `vormap_negotiator` | Autonomous spatial negotiator: multi-objective territory resolution |
 
 ### Artistic Rendering
 
@@ -269,7 +274,7 @@ pip install -e ".[dev]"
 
 | Package | Required | Purpose |
 |---------|----------|---------|
-| Python 3.6+ | ✅ | Runtime |
+| Python 3.9+ | ✅ | Runtime |
 | NumPy ≥ 1.20 | Optional | Array operations for KDTree |
 | SciPy ≥ 1.7 | Optional | KDTree for fast NN lookups |
 | pytest ≥ 7.0 | Dev only | Test runner |
@@ -513,7 +518,7 @@ vormap_viz.generate_graph("datauni5.txt", "graph.json", fmt="json")
 
 ## 📚 API Reference
 
-> **Full API documentation:** See [docs/API.md](docs/API.md) for complete reference of all 129 modules and their functions.
+> **Full API documentation:** See [docs/API.md](docs/API.md) for complete reference of all 133 modules and their functions.
 
 ### Core Functions
 
@@ -751,11 +756,35 @@ Contributions are welcome! See the **[Contributing Guide](CONTRIBUTING.md)** for
 
 ## 📝 Tech Stack
 
-- **Language:** Python 3.6+
+- **Language:** Python 3.9+
 - **Algorithms:** Voronoi partitioning, binary search, nearest-neighbor oracle, Shoelace formula
 - **Performance:** SciPy KDTree for O(log n) lookups
 - **Testing:** pytest + pytest-cov + Codecov
 - **CI/CD:** GitHub Actions (lint, test, coverage, Pages deployment)
+
+## 🐳 Docker
+
+Run VoronoiMap without installing anything locally:
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/sauravbhattacharya001/voronoimap:latest
+
+# Run with a local data file mounted
+docker run --rm -v "$(pwd)/data:/app/data" ghcr.io/sauravbhattacharya001/voronoimap datauni5.txt 5
+
+# Generate SVG output
+docker run --rm -v "$(pwd):/output" ghcr.io/sauravbhattacharya001/voronoimap \
+  datauni5.txt 5 --visualize /output/diagram.svg
+
+# Interactive HTML with all modules available
+docker run --rm -v "$(pwd):/output" ghcr.io/sauravbhattacharya001/voronoimap \
+  datauni5.txt 5 --interactive /output/diagram.html
+
+# Build locally
+docker build -t voronoimap .
+docker run --rm voronoimap --help
+```
 
 ## 📄 License
 
