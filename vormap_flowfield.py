@@ -33,9 +33,7 @@ CLI
 import argparse
 import json
 import math
-import os
 import random as _rand
-import sys
 
 import vormap
 

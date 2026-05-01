@@ -27,7 +27,6 @@ import os
 import random
 import struct
 import zlib
-from collections import defaultdict
 from typing import List, Tuple, Optional, Dict
 
 import vormap

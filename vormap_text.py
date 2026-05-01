@@ -44,9 +44,8 @@ import argparse
 import html as _html_mod
 import math
 import random
-import sys
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 # ---------------------------------------------------------------------------

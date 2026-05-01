@@ -14,7 +14,6 @@ Usage:
 """
 
 import argparse, csv, hashlib, json, math, os, sys, time
-from collections import defaultdict
 
 from vormap_utils import euclidean as _dist
 

@@ -41,8 +41,6 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import os
-import random
 from typing import Any, Dict, List, Optional, Tuple
 
 from vormap_utils import bounding_box as _bounding_box, euclidean as _dist, polygon_centroid_mean as _centroid

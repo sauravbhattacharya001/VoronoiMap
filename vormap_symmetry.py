@@ -36,8 +36,7 @@ import argparse
 import json
 import math
 import os
-import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 import vormap

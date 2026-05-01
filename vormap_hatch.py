@@ -34,7 +34,6 @@ import json
 import math
 import os
 import random as _random
-from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 import vormap

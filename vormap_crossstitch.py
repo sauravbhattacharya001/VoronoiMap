@@ -36,12 +36,11 @@ Programmatic usage
 """
 
 import argparse
-import math
 import os
 import random
 import struct
 import zlib
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 from vormap_utils import assign_cells_grid

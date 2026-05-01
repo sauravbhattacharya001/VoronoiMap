@@ -30,7 +30,6 @@ import argparse
 import json
 import math
 import os
-import sys
 
 # Golden ratio
 PHI = (1 + math.sqrt(5)) / 2

@@ -33,7 +33,6 @@ import html as _html_mod
 import json
 import math
 import os
-import sys
 
 # Golden angle in radians ≈ 137.508°
 GOLDEN_ANGLE = math.pi * (3 - math.sqrt(5))

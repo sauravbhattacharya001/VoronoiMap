@@ -32,7 +32,6 @@ import colorsys
 import math
 import random
 import struct
-import sys
 import zlib
 from typing import List, Optional, Tuple
 

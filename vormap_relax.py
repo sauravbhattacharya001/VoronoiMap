@@ -31,7 +31,6 @@ Requires scipy (``pip install scipy``).
 
 import argparse
 import json
-import math
 import os
 import sys
 

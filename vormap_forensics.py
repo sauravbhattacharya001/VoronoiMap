@@ -60,7 +60,7 @@ import math
 import random
 import statistics
 import sys
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import datetime
 from html import escape as _esc
 from typing import Any, Dict, List, Optional, Sequence, Tuple

@@ -39,7 +39,6 @@ import json
 import math
 import random
 import sys
-from collections import namedtuple
 
 import vormap
 from vormap_utils import bounding_box, compute_nn_distances

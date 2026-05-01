@@ -44,7 +44,6 @@ import hashlib
 import math
 import os
 import random
-import struct
 import sys
 
 from vormap_geometry import polygon_area as _polygon_area, polygon_centroid as _polygon_centroid

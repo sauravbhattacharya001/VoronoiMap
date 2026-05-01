@@ -49,7 +49,7 @@ CLI::
 import json
 import math
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional, Tuple, Dict, Any
 
 from vormap import validate_output_path

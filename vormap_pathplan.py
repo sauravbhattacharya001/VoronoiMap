@@ -43,7 +43,6 @@ import argparse
 import heapq
 import json
 import math
-import sys
 import xml.etree.ElementTree as ET
 
 import vormap

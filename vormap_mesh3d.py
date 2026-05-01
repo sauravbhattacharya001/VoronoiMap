@@ -20,8 +20,6 @@ import argparse
 import math
 import os
 import struct
-import sys
-import warnings
 
 import vormap
 from vormap_utils import polygon_centroid_mean as _polygon_centroid

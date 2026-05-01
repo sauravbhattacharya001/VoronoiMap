@@ -39,7 +39,6 @@ CLI::
 """
 
 import json
-import math
 import xml.etree.ElementTree as ET
 from collections import deque
 from dataclasses import dataclass, field

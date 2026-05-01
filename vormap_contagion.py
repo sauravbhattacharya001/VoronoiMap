@@ -40,7 +40,6 @@ from __future__ import annotations
 import argparse
 import html as _html
 import json
-import math
 import os
 import random
 from typing import Any, Dict, List, Optional, Tuple
