@@ -75,6 +75,7 @@ nav:
   - User Guide:
     - CLI Reference: guide/cli.md
     - Python API: guide/api.md
+    - Tutorials: guide/tutorials.md
     - Extension Modules: guide/extensions.md
     - Module Catalog: guide/module-catalog.md
     - Benchmarking & Performance: guide/benchmarking.md
