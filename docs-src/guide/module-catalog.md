@@ -1,6 +1,6 @@
 # Module Catalog
 
-Complete reference of all 131 VoronoiMap modules organized by functional area.
+Complete reference of all 138 VoronoiMap modules organized by functional area.
 For detailed API documentation of core extension modules, see [Extension Modules API](extensions.md).
 
 ---
@@ -53,6 +53,9 @@ For detailed API documentation of core extension modules, see [Extension Modules
 | `vormap_fractal` | Fractal dimension analysis for Voronoi seed point patterns |
 | `vormap_stability` | Measure diagram sensitivity to point perturbation |
 | `vormap_crossval` | Leave-one-out cross-validation for spatial interpolation methods |
+| `vormap_causality` | Spatial causality engine — counterfactual analysis, treatment effects, difference-in-differences, and synthetic control |
+| `vormap_attention` | Spatial attention engine — autonomous analytical focus allocation via information density, change velocity, and surprise detection |
+| `vormap_auction` | Spatial auction engine — sealed-bid, Vickrey, combinatorial, and ascending auction mechanisms for resource allocation |
 
 ---
 
@@ -118,6 +121,10 @@ For detailed API documentation of core extension modules, see [Extension Modules
 | `vormap_fracture` | Fracture simulator — realistic material fracture patterns |
 | `vormap_watershed` | Watershed and flow analysis |
 | `vormap_resilience` | Resilience analyzer — simulate failures and identify critical infrastructure |
+| `vormap_equilibrium` | Spatial equilibrium engine — force fields, stability classification, basin mapping, and tipping point detection |
+| `vormap_metabolism` | Spatial metabolism engine — resource production, consumption, trade flows, and bottleneck detection |
+| `vormap_nervous` | Spatial nervous system — neural signal propagation, reflex arcs, rhythm analysis, and Hebbian plasticity |
+| `vormap_maze` | Voronoi maze generator — DFS, Kruskal, and Prim algorithms with SVG export and BFS solver |
 
 ---
 
