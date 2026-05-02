@@ -28,6 +28,28 @@
 - **Mon-Fri 7 PM PST:** LeetCode pattern drops
 - **Sat-Sun 10 AM PST:** SD component deep dives
 
+## The 11 Triggers (Master Pattern Map)
+
+Memorize these — they cover 95%+ of LC problems. See trigger → output technique.
+
+| # | Trigger (what you SEE) | Technique (what you DO) |
+|---|---|---|
+| 1 | "Find min/max value where condition holds" | Binary search on answer |
+| 2 | Sorted array + looking for pair/combo with target property | Two pointers (opposing) |
+| 3 | "Longest/shortest contiguous subarray/substring where..." | Sliding window |
+| 4 | Choices are independent, locally best = globally best | Greedy |
+| 5 | Choices interact, answer depends on combinations of earlier choices | DP |
+| 6 | "For each element, find next/previous greater/smaller" | Monotonic stack |
+| 7 | Hierarchical/branching exploration (paths, permutations, subsets) | DFS/BFS/Backtracking |
+| 8 | "Find if X exists in sorted space" | Binary search (classic) |
+| 9 | Dependencies between tasks/events | Topological sort |
+| 10 | "Group things" / "Are these connected?" | Union-Find |
+| 11 | Prefix lookups / word-by-word matching | Trie |
+
+**Meta-principle:** Every optimization is brute force with dead candidates removed. Dead = "proven it can never be the answer." The trigger tells you the SHAPE of the proof.
+
+**Derived May 1, 2026** through deep discussion on monotonicity, brute force waste, and solution-space search.
+
 ## Covered Topics
 
 ### LeetCode Patterns

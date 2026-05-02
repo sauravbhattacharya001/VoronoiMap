@@ -207,6 +207,55 @@ Update status.md during work. After completion:
 2. Append to memory/YYYY-MM-DD.md
 3. DO NOT send Telegram reports — cross-context messaging is blocked from sub-agents. The main session will relay reports. Just make sure your final output summary is clear and includes what repos/features were built.
 
+## ⚠️ MANDATORY: SMOKE TEST AFTER RELEASES
+
+**If your feature involves a release, package publish, or installable artifact, you MUST smoke-test it before marking the task as successful.**
+
+Smoke testing verifies the release actually works — not just that code was pushed.
+
+### When This Applies
+- You created a release tag with `gh release create`
+- You published a package (NuGet, npm, pip, etc.)
+- Your feature is a CLI command or executable entry point
+
+### Steps
+
+1. **Install/download the artifact:**
+   - .NET tool: `dotnet tool install --global <package> --version <ver>`
+   - npm: `npm install -g <package>@<version>`
+   - pip: `pip install <package>==<version>`
+   - Binary release: `gh release download <tag> --repo <repo> --pattern "*" --dir $env:TEMP\smoke-<repo>`
+
+2. **Run basic validation:**
+
+   | Type | Smoke Test |
+   |------|------------|
+   | CLI tool / Executable | `<cmd> --help` or `<cmd> --version` — must exit 0 |
+   | CLI with primary action | Also run the primary command (e.g., `--audit`, `--scan`) — must not crash |
+   | Library (NuGet/npm/pip) | Create temp project, add reference, build — must compile |
+   | Web app / Pages | HTTP GET the URL — must return 200 |
+   | Flutter/mobile app | `flutter build` must succeed |
+
+3. **Log the result:**
+   - Pass: `✅ Smoke test passed: <tool> --help exited 0`
+   - **FAIL: `❌ SMOKE TEST FAILED: <details>`** — do NOT mark task successful. Open a GitHub issue describing the failure.
+
+4. **Clean up** — uninstall any tools/packages you installed for testing.
+
+### Example
+```powershell
+# After publishing a .NET CLI feature:
+dotnet tool install --global winsentinel.cli --version 1.15.0
+winsentinel --help          # Must exit 0
+winsentinel --audit         # Must not crash
+dotnet tool uninstall --global winsentinel.cli
+```
+
+### When to Skip
+- Your feature doesn't produce a new installable artifact (most features)
+- No release was created this run
+- The feature is purely code-level (new class, new endpoint in an existing server)
+
 ## DO NOT SELF-CHAIN
 
 This job runs on a recurring 30-minute cron schedule. Do NOT create any new cron jobs or self-chain. Just finish your work and exit.

@@ -97,6 +97,51 @@ Update status.md during each task. After completion:
 2. Append to memory/YYYY-MM-DD.md
 3. DO NOT send Telegram reports — cross-context messaging is blocked from sub-agents. The main session will relay reports. Just make sure your final output summary is clear and includes what repos/tasks were done.
 
+## ⚠️ MANDATORY: SMOKE TEST AFTER RELEASES
+
+**After any `create_release` or `package_publish` task, you MUST smoke-test the artifact before marking the task as successful.**
+
+Smoke testing verifies the release actually works — not just that it was uploaded.
+
+### Steps
+
+1. **Download the artifact** from the release you just created:
+   - For NuGet packages: `dotnet tool install --global <package> --version <ver>` (or `--add-source` for local feed)
+   - For GitHub releases with binaries: download via `gh release download <tag> --repo <repo> --pattern "*" --dir $env:TEMP\smoke-<repo>`
+   - For npm packages: `npm install -g <package>@<version>`
+   - For pip packages: `pip install <package>==<version>`
+
+2. **Run basic validation** depending on artifact type:
+
+   | Type | Smoke Test |
+   |------|------------|
+   | .NET global tool | `<toolname> --help` (must exit 0 and print usage) |
+   | .NET global tool with audit | `<toolname> --help` AND `<toolname> --audit` (or primary command — must not crash) |
+   | Executable (any) | Run with `--help` or `--version` — must exit 0 |
+   | npm CLI | `<cmd> --help` — must exit 0 |
+   | Python CLI | `<cmd> --help` — must exit 0 |
+   | Library (NuGet/npm/pip) | Create temp project, add reference, build/import — must succeed |
+   | Static site / Pages | `curl -s -o /dev/null -w '%{http_code}' <url>` — must return 200 |
+
+3. **Log the result:**
+   - If smoke test passes: note in your run summary: `✅ Smoke test passed: <tool> --help exited 0`
+   - If smoke test FAILS: **Flag it clearly** in your run summary with `❌ SMOKE TEST FAILED: <details>`. Do NOT mark the task as successful. Open a GitHub issue on the repo describing the failure.
+
+4. **Uninstall/clean up** any tools you installed for testing (e.g., `dotnet tool uninstall --global <pkg>`)
+
+### When to Skip
+- Tasks that don't produce downloadable artifacts (add_ci_cd, add_badges, doc_update, etc.) — no smoke test needed
+- If the release has no binary assets AND no package publish — skip
+
+### Example
+```powershell
+# After creating a release for WinSentinel:
+dotnet tool install --global winsentinel.cli --version 1.15.0
+winsentinel --help          # Must exit 0
+winsentinel --audit         # Must not crash (exit 0, 1, or 2 = OK; stack overflow/crash = FAIL)
+dotnet tool uninstall --global winsentinel.cli
+```
+
 ## DO NOT SELF-CHAIN
 
 This job runs on a recurring 30-minute cron schedule. Do NOT create any new cron jobs or self-chain. Just finish your work and exit.
