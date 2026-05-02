@@ -275,7 +275,7 @@ class ContagionSimulator:
         avg_growth = sum(growth_rates) / len(growth_rates)
         # R0 ≈ avg_growth / gamma  (rough)
         if self.gamma > 0:
-            return round(avg_growth / (1.0 - self.gamma + self.gamma), 2)
+            return round(avg_growth / self.gamma, 2)
         return avg_growth
 
 
