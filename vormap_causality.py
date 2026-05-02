@@ -390,20 +390,47 @@ def _apply_intervention(points: List[Point],
     if intervention.type == "add":
         pts.extend(intervention.points)
     elif intervention.type == "remove":
+        # Compute bounding-box diagonal for distance threshold (fixes #186).
+        if pts:
+            xs = [p[0] for p in pts]
+            ys = [p[1] for p in pts]
+            diag = math.sqrt((max(xs) - min(xs)) ** 2
+                             + (max(ys) - min(ys)) ** 2)
+            fuzzy_threshold = max(diag * 0.01, 1e-6)
+        else:
+            fuzzy_threshold = 1e-6
+
+        # Deduplicate removal targets so that repeated coordinates
+        # don't accidentally remove distinct nearby points.
+        seen_targets: set = set()
+        unique_removals: List[Point] = []
         for rp in intervention.points:
-            # Remove closest match
+            key = (round(rp[0], 9), round(rp[1], 9))
+            if key not in seen_targets:
+                seen_targets.add(key)
+                unique_removals.append(rp)
+
+        # Collect removal indices in one pass, then remove in reverse
+        # order so that popping earlier entries does not shift later ones.
+        remove_indices: List[int] = []
+        claimed: set = set()  # source indices already matched
+        for rp in unique_removals:
             best_idx = -1
             best_d = float("inf")
             for k, p in enumerate(pts):
+                if k in claimed:
+                    continue
                 d = _dist(p, rp)
                 if d < best_d:
                     best_d = d
                     best_idx = k
-            if best_idx >= 0 and best_d < 1e-6:
-                pts.pop(best_idx)
-            elif best_idx >= 0:
-                # Allow fuzzy match within 1% of extent
-                pts.pop(best_idx)
+            if best_idx >= 0 and best_d <= fuzzy_threshold:
+                remove_indices.append(best_idx)
+                claimed.add(best_idx)
+            # If best_d > fuzzy_threshold the target has no close match;
+            # skip silently rather than removing an unrelated point.
+        for idx in sorted(remove_indices, reverse=True):
+            pts.pop(idx)
     elif intervention.type == "relocate":
         targets = intervention.targets or []
         for rp, tp in zip(intervention.points, targets):
