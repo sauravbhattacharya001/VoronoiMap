@@ -3,6 +3,9 @@
 VoronoiMap ships with 16 extension modules beyond the core `vormap` module.
 Each adds specialized spatial analysis, visualization, or export capability.
 
+For simulation engines, autonomous analysis, and governance modules, see
+[Advanced Modules](advanced-modules.md).
+
 ---
 
 ## Visualization — `vormap_viz`

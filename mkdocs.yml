@@ -77,6 +77,7 @@ nav:
     - Python API: guide/api.md
     - Tutorials: guide/tutorials.md
     - Extension Modules: guide/extensions.md
+    - Advanced Modules: guide/advanced-modules.md
     - Module Catalog: guide/module-catalog.md
     - Benchmarking & Performance: guide/benchmarking.md
     - Data Format: guide/data-format.md
