@@ -278,17 +278,33 @@ class EcosystemSimulator:
                     growth = sp.growth * pop * (1.0 - (total / (sp.capacity * 1.5))) - competition
                     new_pops[ci][s] = max(0.0, pop + growth)
 
-            # Migration
+            # Migration — compute all deltas first, then apply.
+            # Previous code modified new_pops in-place while iterating,
+            # making migration amounts depend on cell processing order:
+            # cells processed earlier could drain population before later
+            # cells had a chance to migrate (CWE-682 ordering bias).
+            migration_delta = [[0.0] * self.n_species for _ in range(self.n_points)]
             for ci in range(self.n_points):
                 for ni in self.adj[ci]:
+                    if ni <= ci:
+                        continue  # process each edge once (ci < ni)
                     for s in range(self.n_species):
                         sp = self.species[s]
-                        gradient = self.populations[ci][s] - self.populations[ni][s]
+                        gradient = new_pops[ci][s] - new_pops[ni][s]
+                        if abs(gradient) < 1e-12:
+                            continue
                         if gradient > 0:
-                            flow = gradient * sp.mobility * 0.1
-                            flow = min(flow, new_pops[ci][s] * 0.3)
-                            new_pops[ci][s] -= flow
-                            new_pops[ni][s] += flow
+                            src, dst = ci, ni
+                        else:
+                            src, dst = ni, ci
+                            gradient = -gradient
+                        flow = gradient * sp.mobility * 0.1
+                        flow = min(flow, new_pops[src][s] * 0.3)
+                        migration_delta[src][s] -= flow
+                        migration_delta[dst][s] += flow
+            for ci in range(self.n_points):
+                for s in range(self.n_species):
+                    new_pops[ci][s] = max(0.0, new_pops[ci][s] + migration_delta[ci][s])
 
             self.populations = new_pops
 
