@@ -283,9 +283,15 @@ class GeneticsEngine:
 
     def _apply_migration(self, cells: List[CellGenetics]) -> List[MigrationFlow]:
         flows: List[MigrationFlow] = []
-        new_freqs: Dict[int, Dict[str, float]] = {
-            i: dict(cells[i].allele_freqs) for i in range(self.n)
-        }
+
+        # Pre-compute per-cell migration rates and weighted allele contributions
+        # so that ALL neighbours accumulate correctly (island-model migration).
+        # Previous code overwrote new_freqs[i] per-neighbour pair, keeping only
+        # the last neighbour's migration effect — a CWE-682 incorrect-calculation.
+        m_total: Dict[int, float] = {i: 0.0 for i in range(self.n)}  # Σm for each cell
+        m_contrib: Dict[int, Dict[str, float]] = {
+            i: {l: 0.0 for l in self.loci} for i in range(self.n)
+        }  # Σ(m_j * p_j) for each cell
 
         for i in range(self.n):
             for j in self.adj[i]:
@@ -305,16 +311,27 @@ class GeneticsEngine:
 
                 flows.append(MigrationFlow(source=i, target=j, rate=m, genetic_distance=gen_dist))
 
-                # Exchange alleles
+                # Accumulate migration contributions for both directions
+                m_total[i] += m
+                m_total[j] += m
                 for locus in self.loci:
                     pi = cells[i].allele_freqs.get(locus, 0.5)
                     pj = cells[j].allele_freqs.get(locus, 0.5)
-                    new_freqs[i][locus] = (1 - m) * pi + m * pj
-                    new_freqs[j][locus] = (1 - m) * pj + m * pi
+                    m_contrib[i][locus] += m * pj
+                    m_contrib[j][locus] += m * pi
 
+        # Apply accumulated migration: p_new = p*(1-Σm) + Σ(m_j*p_j)
         for i in range(self.n):
+            mt = min(m_total[i], 0.95)  # cap total migration to keep resident fraction
             for locus in self.loci:
-                cells[i].allele_freqs[locus] = max(0.0, min(1.0, new_freqs[i][locus]))
+                p_orig = cells[i].allele_freqs.get(locus, 0.5)
+                if m_total[i] > 0:
+                    # Normalize contributions if total exceeds cap
+                    scale = mt / m_total[i]
+                    p_new = p_orig * (1 - mt) + m_contrib[i][locus] * scale
+                else:
+                    p_new = p_orig
+                cells[i].allele_freqs[locus] = max(0.0, min(1.0, p_new))
 
         return flows
 
@@ -686,12 +703,14 @@ def _main() -> None:
     if args.demo:
         result = genetics_demo(seed=args.seed or 42)
         if args.html_path:
-            engine = GeneticsEngine(
-                points=[(random.Random(args.seed or 42).uniform(0, 100),
-                          random.Random(args.seed or 42).uniform(0, 100))
-                         for _ in range(25)],
-                seed=args.seed or 42,
-            )
+            # Re-create the same point set with a single RNG instance.
+            # The previous code constructed a *new* random.Random(seed)
+            # for every coordinate, so every call returned the same value
+            # and all 25 points collapsed to a single identical position.
+            demo_rng = random.Random(args.seed or 42)
+            demo_points = [(demo_rng.uniform(0, 100), demo_rng.uniform(0, 100))
+                           for _ in range(25)]
+            engine = GeneticsEngine(points=demo_points, seed=args.seed or 42)
             engine.analyze()
             engine.to_html(args.html_path)
             print(f"\nDashboard: {args.html_path}")
