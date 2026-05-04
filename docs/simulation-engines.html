@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation Engines — VoronoiMap Documentation</title>
+    <meta name="description" content="VoronoiMap's autonomous simulation engines: ecosystem dynamics, population genetics, hydrology, metabolism, nervous systems, tectonics, weather, equilibrium, contagion, erosion, evolution, auctions, governance, attention, and swarm intelligence on Voronoi tessellations.">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent2: #3fb950;
+            --accent3: #d2a8ff;
+            --code-bg: #1c2128;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            padding: 60px 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .page-header p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .breadcrumb {
+            padding: 16px 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 32px 0;
+        }
+        .toc h3 { font-size: 1rem; margin-bottom: 12px; color: var(--text); }
+        .toc ul { list-style: none; columns: 2; column-gap: 32px; }
+        .toc li { padding: 3px 0; }
+        .toc code { font-size: 0.8rem; color: var(--accent3); }
+
+        /* Sections */
+        section { padding: 40px 0; border-bottom: 1px solid var(--border); }
+        section:last-child { border-bottom: none; }
+        section h2 { font-size: 1.6rem; margin-bottom: 12px; }
+        section h3 { font-size: 1.15rem; margin: 20px 0 8px; color: var(--accent2); }
+        .module-meta {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        th { background: var(--surface); color: var(--accent); font-weight: 600; }
+        td code { color: var(--accent3); font-size: 0.85rem; }
+
+        /* Code */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 12px 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        code { font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace; }
+        p code, li code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            color: var(--accent3);
+        }
+
+        /* Cards */
+        .engine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .engine-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .engine-card h4 { font-size: 1rem; margin-bottom: 6px; }
+        .engine-card .lines { font-size: 0.8rem; color: var(--text-muted); }
+        .engine-card p { font-size: 0.88rem; color: var(--text-muted); margin-top: 8px; }
+
+        ul { margin: 8px 0 8px 24px; }
+        li { margin: 4px 0; }
+
+        /* Back link */
+        .back-link { display: inline-block; margin: 24px 0; }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="breadcrumb">
+        <a href="index.html">VoronoiMap</a> &rarr; Simulation Engines
+    </div>
+
+    <header class="page-header">
+        <h1>🧬 Simulation Engines</h1>
+        <p>
+            VoronoiMap includes 15 autonomous simulation engines that transform Voronoi tessellations
+            into living scientific models — from ecosystems and plate tectonics to neural networks,
+            auctions, and democratic governance. Each engine runs fully offline with autonomous insight
+            generation and health scoring.
+        </p>
+    </header>
+
+    <div class="toc">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#overview">Overview &amp; Architecture</a></li>
+            <li><a href="#ecosystem">Ecosystem Simulator</a> — <code>vormap_ecosystem</code></li>
+            <li><a href="#genetics">Population Genetics</a> — <code>vormap_genetics</code></li>
+            <li><a href="#hydrology">Hydrology Engine</a> — <code>vormap_hydrology</code></li>
+            <li><a href="#metabolism">Metabolism Engine</a> — <code>vormap_metabolism</code></li>
+            <li><a href="#nervous">Nervous System</a> — <code>vormap_nervous</code></li>
+            <li><a href="#tectonics">Tectonics Engine</a> — <code>vormap_tectonics</code></li>
+            <li><a href="#weather">Weather Engine</a> — <code>vormap_weather</code></li>
+            <li><a href="#equilibrium">Equilibrium Analysis</a> — <code>vormap_equilibrium</code></li>
+            <li><a href="#contagion">Contagion Simulator</a> — <code>vormap_contagion</code></li>
+            <li><a href="#erosion">Erosion Simulation</a> — <code>vormap_erosion</code></li>
+            <li><a href="#evolve">Evolutionary Optimizer</a> — <code>vormap_evolve</code></li>
+            <li><a href="#auction">Auction Engine</a> — <code>vormap_auction</code></li>
+            <li><a href="#governance">Governance Engine</a> — <code>vormap_governance</code></li>
+            <li><a href="#attention">Attention Engine</a> — <code>vormap_attention</code></li>
+            <li><a href="#swarm">Swarm Intelligence</a> — <code>vormap_swarm</code></li>
+        </ul>
+    </div>
+
+    <!-- Overview -->
+    <section id="overview">
+        <h2>📊 Overview &amp; Architecture</h2>
+        <p>
+            These 15 engines form VoronoiMap's <strong>Simulation Layer</strong> — turning static
+            spatial tessellations into dynamic scientific models. Each engine treats Voronoi cells
+            as autonomous spatial units (territories, demes, neurons, weather stations, tectonic plates)
+            and simulates complex dynamics across them.
+        </p>
+        <p>
+            All engines share a common architecture: they accept point sets (or load from files),
+            compute Voronoi tessellations internally, run multi-step simulations, generate autonomous
+            insights with natural-language explanations, compute health scores (0-100), and export
+            results as interactive HTML dashboards, JSON, or CSV.
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Engine</th>
+                    <th>Lines</th>
+                    <th>Domain</th>
+                    <th>Key Model</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>vormap_ecosystem</code></td><td>636</td><td>Ecology</td><td>Lotka-Volterra species competition &amp; migration</td></tr>
+                <tr><td><code>vormap_genetics</code></td><td>740</td><td>Population Genetics</td><td>Selection, drift, migration, mutation, Hardy-Weinberg</td></tr>
+                <tr><td><code>vormap_hydrology</code></td><td>1,145</td><td>Hydrology</td><td>Drainage networks, flow accumulation, flood risk</td></tr>
+                <tr><td><code>vormap_metabolism</code></td><td>794</td><td>Spatial Economics</td><td>Resource production, consumption, trade flows</td></tr>
+                <tr><td><code>vormap_nervous</code></td><td>997</td><td>Neuroscience</td><td>Leaky integrate-and-fire, Hebbian plasticity</td></tr>
+                <tr><td><code>vormap_tectonics</code></td><td>1,039</td><td>Geology</td><td>Plate drift, collision, seismic/volcanic activity</td></tr>
+                <tr><td><code>vormap_weather</code></td><td>1,084</td><td>Meteorology</td><td>Temperature, pressure, wind, precipitation, storms</td></tr>
+                <tr><td><code>vormap_equilibrium</code></td><td>954</td><td>Physics</td><td>Force fields, stability classification, tipping points</td></tr>
+                <tr><td><code>vormap_contagion</code></td><td>531</td><td>Epidemiology</td><td>SIR epidemic spread with auto-quarantine</td></tr>
+                <tr><td><code>vormap_erosion</code></td><td>394</td><td>Geomorphology</td><td>Hydraulic &amp; thermal erosion over time</td></tr>
+                <tr><td><code>vormap_evolve</code></td><td>427</td><td>Optimization</td><td>Genetic algorithm for point placement</td></tr>
+                <tr><td><code>vormap_auction</code></td><td>1,203</td><td>Economics</td><td>Sealed-bid, Vickrey, combinatorial, ascending auctions</td></tr>
+                <tr><td><code>vormap_governance</code></td><td>1,379</td><td>Political Science</td><td>Voting theory, power indices, coalition analysis</td></tr>
+                <tr><td><code>vormap_attention</code></td><td>819</td><td>AI / Cognition</td><td>Information density, change velocity, surprise detection</td></tr>
+                <tr><td><code>vormap_swarm</code></td><td>1,006</td><td>Swarm Intelligence</td><td>Consensus, balance, alert, territory, pathfinding</td></tr>
+            </tbody>
+        </table>
+        <p><strong>Total:</strong> 13,148 lines of simulation code across 15 engines.</p>
+    </section>
+
+    <!-- Ecosystem -->
+    <section id="ecosystem">
+        <h2>🌿 Ecosystem Simulator</h2>
+        <p class="module-meta"><code>vormap_ecosystem</code> — 636 lines</p>
+        <p>
+            Simulates an ecosystem where each Voronoi cell is a territory occupied by competing species.
+            Species interact via Lotka-Volterra dynamics (competition, predator-prey, mutualism) and
+            migrate across cell boundaries.
+        </p>
+
+        <h3>Autonomous Features</h3>
+        <ul>
+            <li><strong>Extinction Early Warning</strong> — alerts when a species drops below critical population across all cells</li>
+            <li><strong>Invasive Species Alert</strong> — detects when one species dominates &gt;70% of cells</li>
+            <li><strong>Biodiversity Index</strong> — Shannon diversity per tick with decline alerts</li>
+            <li><strong>Auto-Intervention</strong> (<code>--autopilot</code>) — corrective measures to maintain biodiversity (predator boosts, habitat restoration)</li>
+            <li><strong>Ecosystem Health Score</strong> — composite 0-100 from diversity, stability, evenness</li>
+        </ul>
+
+        <h3>Usage</h3>
+<pre>from vormap_ecosystem import EcosystemSimulator, export_html
+
+sim = EcosystemSimulator(n_points=30, n_species=4, ticks=100)
+result = sim.run()
+export_html(result, "ecosystem.html")
+</pre>
+
+        <h3>CLI</h3>
+<pre>python vormap_ecosystem.py --points 30 --species 4 --ticks 100 --output eco.html
+python vormap_ecosystem.py --preset rainforest --autopilot --output result.html
+</pre>
+    </section>
+
+    <!-- Genetics -->
+    <section id="genetics">
+        <h2>🧬 Population Genetics</h2>
+        <p class="module-meta"><code>vormap_genetics</code> — 740 lines</p>
+        <p>
+            Models evolutionary dynamics across Voronoi cells where each cell acts as a local population
+            (deme) with its own gene pool. Simulates selection, migration (gene flow), genetic drift,
+            and mutation over generations.
+        </p>
+
+        <h3>Seven Analysis Engines</h3>
+        <table>
+            <thead><tr><th>Engine</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td>Gene Pool Initializer</td><td>Assigns allele frequencies per cell using spatial clines plus random noise</td></tr>
+                <tr><td>Selection Pressure</td><td>Applies fitness differentials based on spatial environment zones (tropical/temperate/polar)</td></tr>
+                <tr><td>Migration Engine</td><td>Gene flow between adjacent cells inversely proportional to geographic distance</td></tr>
+                <tr><td>Genetic Drift</td><td>Stochastic sampling via binomial draws in finite populations scaled by cell area</td></tr>
+                <tr><td>Mutation Engine</td><td>Forward/reverse mutation at configurable rate, tracking mutation-selection balance</td></tr>
+                <tr><td>Hardy-Weinberg Tester</td><td>Chi-squared test for HW equilibrium deviation per cell per locus</td></tr>
+                <tr><td>Insight Generator</td><td>Detects clines, isolation by distance, fixation events, speciation signals (F<sub>ST</sub>), health score 0-100</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_genetics import GeneticsEngine, genetics_analyze
+
+result = genetics_analyze("points.txt")
+print(f"Health: {result.health_score:.1f}/100")
+
+engine = GeneticsEngine(points=[(0,0),(10,0),(5,8),(3,6),(7,2)])
+result = engine.analyze(generations=100)
+engine.to_html("genetics.html")
+</pre>
+    </section>
+
+    <!-- Hydrology -->
+    <section id="hydrology">
+        <h2>💧 Hydrology Engine</h2>
+        <p class="module-meta"><code>vormap_hydrology</code> — 1,145 lines</p>
+        <p>
+            The largest simulation engine. Models hydrological systems across Voronoi cells: elevation-driven
+            terrain, drainage networks, precipitation collection, flow accumulation, flood risk, and
+            groundwater recharge.
+        </p>
+
+        <h3>Seven Analysis Engines</h3>
+        <table>
+            <thead><tr><th>Engine</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td>Elevation Field</td><td>Position-based terrain generation with peak/ridge/slope/valley/basin classification</td></tr>
+                <tr><td>Drainage Network</td><td>Steepest-descent flow direction, directed drainage graph, basin delineation, Strahler stream order</td></tr>
+                <tr><td>Precipitation Collector</td><td>Orographic precipitation with runoff coefficients per terrain type</td></tr>
+                <tr><td>Flow Accumulation</td><td>Downstream water tracing — each cell accumulates own runoff plus all upstream contributions</td></tr>
+                <tr><td>Flood Risk</td><td>0-100 risk score from accumulation, elevation, upstream count, convergence; safe/watch/warning/danger/critical</td></tr>
+                <tr><td>Aquifer Recharge</td><td>Groundwater recharge from permeability, precipitation, slope, vegetation; excellent/good/moderate/poor/negligible</td></tr>
+                <tr><td>Insight Generator</td><td>Composite hydrology health 0-100 (drainage efficiency, flood risk, aquifer coverage, flow connectivity)</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_hydrology import HydrologyEngine, hydrology_analyze
+
+result = hydrology_analyze("points.txt")
+print(f"Health: {result.health_score:.1f}/100")
+
+engine = HydrologyEngine(points=[(0,0),(10,0),(5,8),(3,6),(7,2)])
+result = engine.analyze()
+engine.to_html("hydrology.html")
+</pre>
+    </section>
+
+    <!-- Metabolism -->
+    <section id="metabolism">
+        <h2>🔄 Metabolism Engine</h2>
+        <p class="module-meta"><code>vormap_metabolism</code> — 794 lines</p>
+        <p>
+            Models abstract resource production, consumption, and trade across Voronoi cells.
+            Enables spatial economic analysis: which cells are producers vs consumers, where bottlenecks
+            constrain flow, and how efficiently the system moves resources from surplus to deficit areas.
+        </p>
+
+        <h3>Seven Analysis Engines</h3>
+        <ul>
+            <li><strong>Production Estimator</strong> — capacity from cell area × connectivity</li>
+            <li><strong>Consumption Modeler</strong> — demand by proximity to spatial centroid</li>
+            <li><strong>Trade Flow Computer</strong> — surplus routing to deficit neighbors (inverse distance weighting)</li>
+            <li><strong>Bottleneck Detector</strong> — high pass-through, low self-sufficiency, critical bridging cells</li>
+            <li><strong>Efficiency Analyzer</strong> — per-cell and system-wide resource utilization ratios</li>
+            <li><strong>Metabolic Rate Calculator</strong> — throughput per unit area</li>
+            <li><strong>Insight Generator</strong> — Gini coefficient of surplus, actionable recommendations</li>
+        </ul>
+
+        <h3>Usage</h3>
+<pre>from vormap_metabolism import MetabolismEngine, metabolism_analyze
+
+result = metabolism_analyze("points.txt")
+print(f"Health: {result.health_score:.1f}/100")
+
+engine = MetabolismEngine(points=[(0,0),(10,0),(5,8),(3,6),(7,2)])
+result = engine.analyze()
+engine.to_html("metabolism.html")
+</pre>
+    </section>
+
+    <!-- Nervous System -->
+    <section id="nervous">
+        <h2>🧠 Nervous System Engine</h2>
+        <p class="module-meta"><code>vormap_nervous</code> — 997 lines</p>
+        <p>
+            Models Voronoi cells as neurons in a spatial nervous system with signal propagation,
+            reflex arcs, rhythm detection, and Hebbian plasticity. Treats geometry as neural architecture.
+        </p>
+
+        <h3>Seven Analysis Engines</h3>
+        <table>
+            <thead><tr><th>Engine</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td>Neuron Classifier</td><td>Assigns neuron types (sensory/motor/interneuron/inhibitory/excitatory) based on spatial position</td></tr>
+                <tr><td>Synapse Mapper</td><td>Weighted directed synaptic connections with excitatory/inhibitory classification and plasticity scores</td></tr>
+                <tr><td>Signal Propagator</td><td>Leaky integrate-and-fire simulation: inject stimulus, propagate activation, record spike trains</td></tr>
+                <tr><td>Reflex Arc Detector</td><td>BFS from sensory to motor neurons, ranking paths by latency, identifying critical relay neurons</td></tr>
+                <tr><td>Neural Rhythm Analyzer</td><td>Multiple stimulus rounds, oscillatory firing classification (alpha/beta/gamma)</td></tr>
+                <tr><td>Plasticity Engine</td><td>Hebbian learning: strengthen co-active synapses, weaken rarely co-active ones</td></tr>
+                <tr><td>Insight Generator</td><td>Connectivity analysis and composite health score 0-100</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_nervous import NervousSystemEngine, nervous_analyze
+
+result = nervous_analyze("points.txt")
+print(f"Health: {result.health_score:.1f}/100")
+
+engine = NervousSystemEngine(points=[(0,0),(10,0),(5,8),(3,6),(7,2)])
+result = engine.analyze()
+engine.to_html("nervous.html")
+</pre>
+    </section>
+
+    <!-- Tectonics -->
+    <section id="tectonics">
+        <h2>🌋 Tectonics Engine</h2>
+        <p class="module-meta"><code>vormap_tectonics</code> — 1,039 lines</p>
+        <p>
+            Simulates plate tectonics where each cell belongs to a tectonic plate with drift dynamics.
+            Models plate boundaries, collision zones, subduction, seismic activity, and volcanic zones.
+        </p>
+
+        <h3>Seven Analysis Engines</h3>
+        <table>
+            <thead><tr><th>Engine</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td>Plate Assigner</td><td>Groups cells into tectonic plates via seed-based flood fill; assigns type (continental/oceanic), density, thickness</td></tr>
+                <tr><td>Drift Vector</td><td>Per-plate drift velocity vectors (direction + speed); per-cell absolute motion</td></tr>
+                <tr><td>Boundary Classifier</td><td>Convergent (collision), divergent (rift), or transform (sliding) via relative-velocity dot products</td></tr>
+                <tr><td>Collision Engine</td><td>Subduction, mountain building, trench formation at convergent boundaries; stress accumulation</td></tr>
+                <tr><td>Seismic Activity</td><td>Earthquake probability per cell from boundary proximity, stress, boundary type; magnitude and depth estimates</td></tr>
+                <tr><td>Volcanic Activity</td><td>Subduction/hotspot/rift volcanism; eruption probability and magma type classification</td></tr>
+                <tr><td>Insight Generator</td><td>Tectonic health 0-100, regime classification, natural-language insights</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_tectonics import TectonicsEngine, tectonics_analyze
+
+result = tectonics_analyze("points.txt")
+print(f"Health: {result.health_score:.1f}/100")
+
+engine = TectonicsEngine(points=[(0,0),(10,0),(5,8),(3,6),(7,2)])
+result = engine.analyze()
+engine.to_html("tectonics.html")
+</pre>
+    </section>
+
+    <!-- Weather -->
+    <section id="weather">
+        <h2>⛈️ Weather Engine</h2>
+        <p class="module-meta"><code>vormap_weather</code> — 1,084 lines</p>
+        <p>
+            Models weather phenomena across Voronoi cells: temperature fields, pressure systems,
+            wind flows, precipitation, storms, and weather fronts. Each cell acts as a weather station
+            with full atmospheric properties.
+        </p>
+
+        <h3>Seven Analysis Engines</h3>
+        <table>
+            <thead><tr><th>Engine</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td>Temperature Field</td><td>Latitude-like gradient + elevation proxy + neighbor smoothing → continuous thermal field</td></tr>
+                <tr><td>Pressure System Detector</td><td>Atmospheric pressure from inverse temperature; High/Low/neutral classification; local extrema</td></tr>
+                <tr><td>Wind Flow Computer</td><td>Wind vectors from pressure gradients; speed ~ ΔP / distance; convergence/divergence zones</td></tr>
+                <tr><td>Humidity &amp; Precipitation</td><td>Humidity from boundary distance (coastal proxy) × temperature; orographic precipitation triggers</td></tr>
+                <tr><td>Storm Detector</td><td>Clusters low-pressure, high-wind, high-precip cells; severity: mild/moderate/severe/extreme</td></tr>
+                <tr><td>Front Detector</td><td>Large temperature differences at cell boundaries; warm vs cold front classification</td></tr>
+                <tr><td>Insight Generator</td><td>Climate zones (tropical/temperate/arid/polar), health score 0-100</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_weather import WeatherEngine, weather_analyze
+
+result = weather_analyze("points.txt")
+print(f"Health: {result.health_score:.1f}/100")
+
+engine = WeatherEngine(points=[(0,0),(10,0),(5,8),(3,6),(7,2)])
+result = engine.analyze()
+engine.to_html("weather.html")
+</pre>
+    </section>
+
+    <!-- Equilibrium -->
+    <section id="equilibrium">
+        <h2>⚖️ Equilibrium Analysis</h2>
+        <p class="module-meta"><code>vormap_equilibrium</code> — 954 lines</p>
+        <p>
+            Treats Voronoi cells as a physical system where each cell exerts spatial pressure on neighbors
+            based on area imbalance, compactness difference, and centroid distance. Finds equilibrium states,
+            classifies stability, maps basins of attraction, and detects tipping points.
+        </p>
+
+        <h3>Six Analysis Engines</h3>
+        <ul>
+            <li><strong>Force Field Computation</strong> — net spatial force vectors per cell based on area-pressure from neighbors</li>
+            <li><strong>Equilibrium Classification</strong> — identifies low-force cells; stable/unstable/saddle via local Jacobian eigenvalue analysis</li>
+            <li><strong>Basin of Attraction Mapping</strong> — assigns each cell to an equilibrium via gradient-following trajectories</li>
+            <li><strong>Perturbation Response Predictor</strong> — forecasts displacement propagation depth, affected cells, energy change, time-to-restabilize</li>
+            <li><strong>Tipping Point Detection</strong> — finds cells near basin boundaries where small perturbations cause regime shifts</li>
+            <li><strong>Interactive HTML Dashboard</strong> — 4-tab self-contained visualization</li>
+        </ul>
+
+        <h3>Usage</h3>
+<pre>from vormap_equilibrium import analyze_equilibrium
+
+points = [(100, 200), (400, 300), (700, 500), (200, 700), (600, 100)]
+bounds = (0, 1000, 0, 1000)
+
+report = analyze_equilibrium(points, bounds=bounds)
+print(report.summary())
+report.to_json("equilibrium.json")
+report.to_html("equilibrium.html")
+</pre>
+    </section>
+
+    <!-- Contagion -->
+    <section id="contagion">
+        <h2>🦠 Contagion Simulator</h2>
+        <p class="module-meta"><code>vormap_contagion</code> — 531 lines</p>
+        <p>
+            Models SIR (Susceptible → Infected → Recovered) epidemic and information spread across
+            Voronoi cells. Infection propagates through spatial adjacency with configurable transmission
+            and recovery rates.
+        </p>
+
+        <h3>Autonomous Features</h3>
+        <ul>
+            <li><strong>Outbreak Detection</strong> — alerts when global infection rate crosses 25%</li>
+            <li><strong>Hotspot Tracker</strong> — identifies cells with highest infection each tick</li>
+            <li><strong>R₀ Estimator</strong> — estimates effective reproduction number from simulation data</li>
+            <li><strong>Auto-Quarantine</strong> (<code>--autopilot</code>) — isolates cells exceeding 50% infection by cutting migration 80%</li>
+            <li><strong>Vaccination Campaign</strong> (<code>--autopilot</code>) — proactive S→R conversion in highest-risk neighbors after outbreak</li>
+            <li><strong>Epidemic Health Score</strong> — composite 0-100 from recovery, containment, R₀</li>
+        </ul>
+
+        <h3>Presets</h3>
+        <table>
+            <thead><tr><th>Preset</th><th>β</th><th>γ</th><th>Points</th><th>Character</th></tr></thead>
+            <tbody>
+                <tr><td><code>flu</code></td><td>0.3</td><td>0.1</td><td>30</td><td>Fast classic spread</td></tr>
+                <tr><td><code>zombie</code></td><td>0.6</td><td>0.02</td><td>20</td><td>Hard to recover</td></tr>
+                <tr><td><code>rumor</code></td><td>0.4</td><td>0.3</td><td>40</td><td>Fast but loses interest</td></tr>
+                <tr><td><code>pandemic</code></td><td>0.25</td><td>0.05</td><td>50</td><td>Slow burn</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_contagion import ContagionSimulator, export_html
+
+sim = ContagionSimulator(n_points=30, ticks=100, beta=0.3, gamma=0.1)
+result = sim.run()
+export_html(result, "contagion.html")
+</pre>
+    </section>
+
+    <!-- Erosion -->
+    <section id="erosion">
+        <h2>🏔️ Erosion Simulation</h2>
+        <p class="module-meta"><code>vormap_erosion</code> — 394 lines</p>
+        <p>
+            Simulates hydraulic and thermal erosion on Voronoi tessellations where each cell has an
+            elevation. Produces time-series of per-cell elevations exportable as JSON, CSV, or animated SVG.
+        </p>
+
+        <h3>Two Erosion Models</h3>
+        <table>
+            <thead><tr><th>Model</th><th>Mechanism</th><th>Real-World Analog</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Hydraulic</strong></td><td>Material removed proportional to slope to neighbors, carried downhill</td><td>River valley formation, rainfall erosion</td></tr>
+                <tr><td><strong>Thermal</strong></td><td>Material collapses when slope exceeds talus angle threshold</td><td>Rockfall, scree slope formation</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_erosion import hydraulic_erosion, thermal_erosion, export_erosion_svg
+
+# Hydraulic erosion over 50 steps
+frames = hydraulic_erosion(adjacency, elevations, steps=50, rate=0.05)
+
+# Thermal erosion
+frames = thermal_erosion(adjacency, elevations, steps=30, angle=35.0)
+
+# Export as animated SVG
+export_erosion_svg(frames, regions, "erosion.svg")
+</pre>
+    </section>
+
+    <!-- Evolve -->
+    <section id="evolve">
+        <h2>🧪 Evolutionary Optimizer</h2>
+        <p class="module-meta"><code>vormap_evolve</code> — 427 lines</p>
+        <p>
+            Uses a genetic algorithm to autonomously evolve point configurations toward user-specified
+            spatial objectives. The optimizer acts as an intelligent agent: given a goal, it breeds,
+            mutates, and selects configurations over generations.
+        </p>
+
+        <h3>Optimization Objectives</h3>
+        <table>
+            <thead><tr><th>Objective</th><th>Fitness Target</th></tr></thead>
+            <tbody>
+                <tr><td><code>uniform</code></td><td>Minimize coefficient of variation of cell areas</td></tr>
+                <tr><td><code>clustered</code></td><td>Maximize nearest-neighbor distance variance (tight groups)</td></tr>
+                <tr><td><code>coverage</code></td><td>Maximize convex hull area relative to bounding box</td></tr>
+                <tr><td><code>spread</code></td><td>Maximize minimum nearest-neighbor distance</td></tr>
+                <tr><td><code>balanced</code></td><td>Minimize max-minus-min cell area (equitable partitioning)</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_evolve import evolve
+
+best = evolve(n_points=30, width=500, height=500,
+              objective="uniform", generations=200)
+print(f"Fitness: {best['fitness']:.4f}")
+# best["points"] is a list of (x, y)
+</pre>
+    </section>
+
+    <!-- Auction -->
+    <section id="auction">
+        <h2>🏛️ Auction Engine</h2>
+        <p class="module-meta"><code>vormap_auction</code> — 1,203 lines</p>
+        <p>
+            Models Voronoi cells as autonomous bidding agents competing for shared spatial resources.
+            Implements four auction mechanisms and evaluates allocation fairness.
+        </p>
+
+        <h3>Seven Analysis Engines</h3>
+        <table>
+            <thead><tr><th>Engine</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td>Demand Assessor</td><td>Per-cell resource demand from area, neighbor count, centrality</td></tr>
+                <tr><td>Budget Calculator</td><td>Bidding budgets from urgency, utilization history, priority tiers</td></tr>
+                <tr><td>Sealed-Bid Auction</td><td>First-price: highest bidder wins, pays own bid; tracks revenue/surplus/efficiency</td></tr>
+                <tr><td>Vickrey Auction</td><td>Second-price: winner pays second-highest bid; measures incentive compatibility</td></tr>
+                <tr><td>Combinatorial Auction</td><td>Cells bid on bundles; greedy allocation with conflict resolution and complementarity</td></tr>
+                <tr><td>Iterative Ascending</td><td>English-style price discovery with round-by-round escalation until market clears</td></tr>
+                <tr><td>Fairness Analyzer</td><td>Gini coefficient, envy-freeness, Pareto efficiency, utilitarian vs egalitarian welfare</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_auction import run_auction
+
+points = [(100, 200), (400, 300), (700, 500), (200, 700), (600, 100)]
+report = run_auction(points, bounds=(0, 1000, 0, 1000))
+print(report.summary_text())
+report.to_html("auction.html")
+</pre>
+    </section>
+
+    <!-- Governance -->
+    <section id="governance">
+        <h2>🗳️ Governance Engine</h2>
+        <p class="module-meta"><code>vormap_governance</code> — 1,379 lines</p>
+        <p>
+            The second-largest simulation engine. Models Voronoi cells as political actors in a spatial
+            legislature using voting theory, power index computation, and coalition analysis.
+        </p>
+
+        <h3>Seven Analysis Engines</h3>
+        <table>
+            <thead><tr><th>Engine</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td>Weight Assigner</td><td>Voting weights from area, population proxy, strategic position (neighbor count, centrality)</td></tr>
+                <tr><td>Power Index Calculator</td><td>Banzhaf and Shapley-Shubik power indices — true influence vs nominal weight</td></tr>
+                <tr><td>Voting System Simulator</td><td>Elections under 4 systems: plurality, Borda count, approval voting, ranked-choice (IRV)</td></tr>
+                <tr><td>Coalition Analyzer</td><td>Winning/blocking coalitions, veto players, coalition fragility measurement</td></tr>
+                <tr><td>Constitutional Designer</td><td>Optimal quotas, dictator/dummy detection, voting rule modification recommendations</td></tr>
+                <tr><td>Democratic Health Scorer</td><td>Composite 0-100 across representation equality, power dispersion, coalition stability, constitutional soundness</td></tr>
+                <tr><td>Insight Generator</td><td>Autonomous pattern detection and actionable governance recommendations</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_governance import run_governance
+
+points = [(100, 200), (400, 300), (700, 500), (200, 700), (600, 100)]
+report = run_governance(points, bounds=(0, 1000, 0, 1000))
+print(report.summary_text())
+report.to_html("governance.html")
+</pre>
+    </section>
+
+    <!-- Attention -->
+    <section id="attention">
+        <h2>👁️ Attention Engine</h2>
+        <p class="module-meta"><code>vormap_attention</code> — 819 lines</p>
+        <p>
+            Decides <em>where is interesting</em> in a Voronoi diagram without being told. Allocates
+            analytical focus across cells based on information density, change velocity, strategic
+            importance, and surprise — making the diagram self-aware about which areas deserve deeper analysis.
+        </p>
+
+        <h3>Seven Attention Engines</h3>
+        <ul>
+            <li><strong>Information Density</strong> — area variance vs neighbors, neighbor count deviation, local clustering coefficient</li>
+            <li><strong>Change Velocity</strong> — displacement tracking and area flux across snapshots</li>
+            <li><strong>Strategic Importance</strong> — cells at topological chokepoints: bridges between clusters, high-betweenness nodes</li>
+            <li><strong>Surprise Detector</strong> — cells violating expected spatial autocorrelation (local Moran-like statistic)</li>
+            <li><strong>Convergence Zones</strong> — areas where multiple attention signals overlap</li>
+            <li><strong>Attention Decay</strong> — temporal inhibition-of-return: recently-attended areas suppressed, forcing exploration</li>
+            <li><strong>Autonomous Scheduler</strong> — weighted priority queue producing an ordered attention schedule</li>
+        </ul>
+
+        <h3>Usage</h3>
+<pre>from vormap_attention import AttentionEngine, attention_analyze
+
+result = attention_analyze("points.txt")
+print(f"Health: {result.health_score:.1f}/100")
+
+engine = AttentionEngine(points=[(0,0),(10,0),(5,8)])
+result = engine.analyze()
+engine.to_html("attention.html")
+</pre>
+    </section>
+
+    <!-- Swarm -->
+    <section id="swarm">
+        <h2>🐝 Swarm Intelligence</h2>
+        <p class="module-meta"><code>vormap_swarm</code> — 1,006 lines</p>
+        <p>
+            Treats Voronoi cells as intelligent swarm agents that sense neighbors, propagate signals,
+            and collectively solve spatial problems through emergent behavior. Five behavior modes
+            simulate distinct collective-intelligence phenomena.
+        </p>
+
+        <h3>Behavior Modes</h3>
+        <table>
+            <thead><tr><th>Mode</th><th>Mechanism</th><th>Emergent Behavior</th></tr></thead>
+            <tbody>
+                <tr><td><code>consensus</code></td><td>Cells vote on spatial classifications and converge toward agreement</td><td>Faction boundaries at opinion frontiers</td></tr>
+                <tr><td><code>balance</code></td><td>Cells redistribute energy to minimize variance</td><td>Stubborn hotspots where balancing stalls</td></tr>
+                <tr><td><code>alert</code></td><td>Anomaly cells broadcast alert signals that propagate with decay</td><td>Relay bottleneck identification</td></tr>
+                <tr><td><code>territory</code></td><td>Weighted cells negotiate influence zones</td><td>Stable borders and contested zones</td></tr>
+                <tr><td><code>pathfind</code></td><td>Stigmergic pheromone signals discover optimal routes</td><td>Highway corridors through the network</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+<pre>from vormap_swarm import SwarmEngine, swarm_simulate
+
+result = swarm_simulate("points.txt", behavior="consensus")
+print(f"Converged: {result.convergence_history[-1]:.1%} in {result.ticks_run} ticks")
+
+engine = SwarmEngine(points=[(0,0),(10,0),(5,8)], behavior="territory")
+result = engine.simulate(ticks=100)
+engine.to_html("swarm.html")
+</pre>
+    </section>
+
+    <a class="back-link" href="index.html">&larr; Back to VoronoiMap Home</a>
+
+</div>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2024–2026 VoronoiMap &middot; <a href="https://github.com/sauravbhattacharya001/VoronoiMap">GitHub</a></p>
+    </div>
+</footer>
+</body>
+</html>
