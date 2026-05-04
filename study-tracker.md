@@ -60,6 +60,7 @@ Memorize these — they cover 95%+ of LC problems. See trigger → output techni
 ### System Design Components
 - 2026-04-26 — Rate Limiter (mentioned only, not deep-dived)
 - 2026-04-27 — Rate Limiter ✅ — four algorithms (fixed window, sliding window counter, token bucket, leaky bucket), burst handling (window = volume control, bucket = spike control), distributed (Redis single-region default, local counters + sync for multi-region), placement (API gateway / middleware / sidecar), fail-open vs fail-closed, 429 response headers (Retry-After, Remaining, Reset)
+- 2026-05-03 — Load Balancer ⚠️ PENDING DELIVERY (saved to sd-blurb-pending.md, Telegram channel not configured) — algorithms (round robin → least connections → IP hash), L4 vs L7, SPOF (active-passive VIP), two-tier DNS+LB, session affinity tradeoff, health checks, connection to service discovery/CDN/consistent hashing
 
 ## Completed Patterns
 - **Sliding Window** ✅ GROKKED
@@ -76,7 +77,7 @@ Memorize these — they cover 95%+ of LC problems. See trigger → output techni
   - 429 + headers: Retry-After, X-RateLimit-Remaining, X-RateLimit-Reset
 
 ## SD Components to Cover (grouped for efficiency)
-1. Load Balancer
+1. ~~Load Balancer~~ (pending delivery)
 2. Consistent Hashing + Sharding/Partitioning
 3. Caching (layers, eviction, invalidation)
 4. Message Queues + Pub/Sub
