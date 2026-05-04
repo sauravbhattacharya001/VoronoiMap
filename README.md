@@ -53,9 +53,9 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
 
-## Module Catalog (133 Modules)
+## Module Catalog (142 Modules)
 
-VoronoiMap has grown into a comprehensive spatial analysis toolkit with **133 modules** spanning core algorithms, visualization, spatial statistics, simulation, planning, artistic rendering, and autonomous analysis. Every module is listed below by category.
+VoronoiMap has grown into a comprehensive spatial analysis toolkit with **142 modules** spanning core algorithms, visualization, spatial statistics, simulation, planning, artistic rendering, and autonomous analysis. Every module is listed below by category.
 
 ### Core
 
@@ -169,6 +169,9 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit with **133 mo
 | `vormap_crystal` | Voronoi crystal growth simulator: anisotropic nucleation & growth |
 | `vormap_ecosystem` | Autonomous spatial ecosystem simulator on Voronoi tessellations |
 | `vormap_contagion` | Contagion simulator: SIR epidemic spread with auto-quarantine |
+| `vormap_hydrology` | Spatial hydrology engine: water flow, drainage basins, precipitation, flood risk, and groundwater simulation |
+| `vormap_tectonics` | Spatial tectonics engine: plate drift, collision zones, subduction, seismic activity, and volcanic zone simulation |
+| `vormap_weather` | Spatial weather engine: atmospheric simulation with temperature fields, pressure systems, wind, precipitation, and storms |
 | `vormap_evolve` | Evolutionary point placement optimizer for Voronoi diagrams |
 | `vormap_swarm` | Autonomous particle swarm optimizer for Voronoi point layouts |
 | `vormap_morph` | Smooth animated interpolation between point configurations |
@@ -216,6 +219,12 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit with **133 mo
 | `vormap_forensics` | Spatial forensics: distribution provenance analysis and anomaly attribution |
 | `vormap_guardian` | Autonomous spatial guardian: integrity monitoring and constraint enforcement |
 | `vormap_negotiator` | Autonomous spatial negotiator: multi-objective territory resolution |
+| `vormap_attention` | Spatial attention engine: autonomous analytical focus allocation across cells based on information density, change velocity, and surprise |
+| `vormap_auction` | Spatial auction engine: autonomous auction-based resource allocation using sealed-bid, Vickrey, combinatorial, and ascending mechanisms |
+| `vormap_genetics` | Spatial genetics engine: population genetics simulation with selection, migration, drift, mutation, and Hardy-Weinberg testing |
+| `vormap_governance` | Spatial governance engine: democratic decision-making with voting theory, power indices (Banzhaf/Shapley-Shubik), and coalition analysis |
+| `vormap_metabolism` | Spatial metabolism engine: autonomous resource flow analysis with production, consumption, trade routing, and bottleneck detection |
+| `vormap_nervous` | Spatial nervous system engine: neural signal propagation, reflex arcs, rhythm detection, and Hebbian plasticity on tessellations |
 
 ### Artistic Rendering
 
@@ -615,7 +624,7 @@ vormap_viz.generate_graph("datauni5.txt", "graph.json", fmt="json")
 VoronoiMap/
 ├── vormap.py                    # Core algorithm implementation
 ├── vormap_viz.py                # SVG + interactive HTML visualization
-├── vormap_*.py (128 modules)    # Spatial analysis toolkit (see catalog above)
+├── vormap_*.py (142 modules)    # Spatial analysis toolkit (see catalog above)
 ├── tests/                       # Unit & integration tests
 ├── requirements.txt             # Optional dependencies
 ├── pyproject.toml               # Package configuration
