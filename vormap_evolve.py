@@ -210,6 +210,8 @@ def evolve(n_points=30, width=500, height=500, objective="uniform",
     -------
     dict  with keys: points, fitness, objective, generations_run, history
     """
+    if seed is not None:
+        rng = random.Random(seed)
     # Local RNG — avoids polluting global state.  Fixes #183.
     _rng = random.Random(seed)
     import vormap_evolve as _self

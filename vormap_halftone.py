@@ -219,7 +219,11 @@ def _edge_map(pixels: List[Tuple[int, int, int]], w: int, h: int) -> List[float]
 
 def _place_seeds(w: int, h: int, num_seeds: int,
                  edge_bias: float,
-                 edges: List[float]) -> List[Tuple[int, int]]:
+                 edges: List[float],
+                 rng=None) -> List[Tuple[int, int]]:
+    if rng is None:
+        rng = random.Random()
+
     """Place seeds with bias towards high-edge areas."""
     seeds: List[Tuple[int, int]] = []
     n_edge = int(num_seeds * edge_bias)
@@ -236,7 +240,7 @@ def _place_seeds(w: int, h: int, num_seeds: int,
             cum.append(s)
 
         for _ in range(n_edge):
-            r = random.random()
+            r = rng.random()
             lo, hi = 0, len(cum) - 1
             while lo < hi:
                 mid = (lo + hi) // 2
@@ -250,7 +254,7 @@ def _place_seeds(w: int, h: int, num_seeds: int,
 
     # Uniform random seeds
     for _ in range(n_rand):
-        seeds.append((random.randint(0, w - 1), random.randint(0, h - 1)))
+        seeds.append((rng.randint(0, w - 1), rng.randint(0, h - 1)))
 
     return seeds
 
@@ -452,13 +456,15 @@ def render(input_path: str, *,
         Random seed for reproducibility.
     """
     if seed is not None:
-        random.seed(seed)
+        rng = random.Random(seed)
+    else:
+        rng = random.Random()
 
     w, h, pixels = _read_png(input_path)
     return render_from_pixels(pixels, w, h,
                               num_dots=num_dots, edge_bias=edge_bias,
                               min_radius=min_radius, max_radius=max_radius,
-                              bg=bg, fg=fg, invert=invert, cmyk=cmyk)
+                              bg=bg, fg=fg, invert=invert, cmyk=cmyk, rng=rng)
 
 
 def render_from_pixels(pixels: List[Tuple[int, int, int]],
@@ -470,7 +476,8 @@ def render_from_pixels(pixels: List[Tuple[int, int, int]],
                        bg: Tuple[int, int, int] = (255, 255, 255),
                        fg: Tuple[int, int, int] = (0, 0, 0),
                        invert: bool = False,
-                       cmyk: bool = False) -> HalftoneResult:
+                       cmyk: bool = False,
+                       rng=None) -> HalftoneResult:
     """Render halftone from raw pixel data."""
     # Auto max_radius based on image dimensions and dot count
     if max_radius <= 0:
@@ -478,7 +485,7 @@ def render_from_pixels(pixels: List[Tuple[int, int, int]],
         max_radius = math.sqrt(avg_cell_area / math.pi) * 1.1
 
     edges = _edge_map(pixels, w, h)
-    seeds = _place_seeds(w, h, num_dots, edge_bias, edges)
+    seeds = _place_seeds(w, h, num_dots, edge_bias, edges, rng=rng)
     assignment = _assign_voronoi(w, h, seeds)
     stats = _cell_stats(pixels, assignment, len(seeds), w, h)
 

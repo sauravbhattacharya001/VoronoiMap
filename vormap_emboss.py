@@ -165,7 +165,7 @@ def generate(
         Random seed for reproducibility.
     """
     if seed is not None:
-        random.seed(seed)
+        rng = random.Random(seed)
 
     mat = MATERIALS.get(material, MATERIALS["stone"])
 
