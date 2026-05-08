@@ -48,7 +48,6 @@ import argparse
 import csv as _csv
 import heapq
 import json
-import math
 import sys
 import xml.etree.ElementTree as ET
 from vormap_utils import euclidean_xy as _euclidean

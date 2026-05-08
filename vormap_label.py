@@ -50,6 +50,7 @@ CLI::
     voronoimap datauni5.txt 5 --labels --label-field name
 """
 
+import html as _html_mod
 import json
 import math
 import xml.etree.ElementTree as ET
@@ -476,12 +477,14 @@ def export_labeled_html(
         for l in labels
     ]
 
+    _esc_title = _html_mod.escape(title)
+
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{title}</title>
+<title>{_esc_title}</title>
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 body {{ background: #1a1a2e; font-family: system-ui, sans-serif; display: flex;
@@ -496,7 +499,7 @@ canvas {{ border: 1px solid #444; border-radius: 8px; cursor: crosshair; backgro
 </style>
 </head>
 <body>
-<h1>{title}</h1>
+<h1>{_esc_title}</h1>
 <div class="controls">
   <label><input type="checkbox" id="showLabels" checked> Labels</label>
   <label><input type="checkbox" id="showSeeds" checked> Seeds</label>

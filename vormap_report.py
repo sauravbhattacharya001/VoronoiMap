@@ -29,6 +29,7 @@ from vormap_geometry import (
     polygon_perimeter,
     std as _std,
 )
+from vormap_utils import build_vertex_adjacency
 
 
 def _escape_html(text):
@@ -130,21 +131,8 @@ class VoronoiReport:
         return stats
 
     def _compute_adjacency(self):
-        adj = {i: set() for i in range(len(self.regions))}
-        vertex_map = {}
-        for i, region in enumerate(self.regions):
-            for v in region:
-                key = (round(v[0], 4), round(v[1], 4))
-                if key not in vertex_map:
-                    vertex_map[key] = set()
-                vertex_map[key].add(i)
-        for region_ids in vertex_map.values():
-            rlist = list(region_ids)
-            for a in range(len(rlist)):
-                for b in range(a + 1, len(rlist)):
-                    adj[rlist[a]].add(rlist[b])
-                    adj[rlist[b]].add(rlist[a])
-        return adj
+        """Build adjacency via shared vertex hash (delegated to vormap_utils)."""
+        return build_vertex_adjacency(self.regions, tol=1e-4)
 
     def _summary_stats(self):
         stats = self._compute_stats()

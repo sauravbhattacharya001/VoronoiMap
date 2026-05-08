@@ -14,9 +14,9 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
@@ -37,15 +37,21 @@ jobs:
           flake8 vormap.py vormap_pattern.py --count --exit-zero --max-complexity=15 --max-line-length=120 --statistics
 
   test:
-    name: Test (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    name: Test (Python ${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.11", "3.12"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.9", "3.12", "3.13"]
+        exclude:
+          # macOS ARM runners don't ship Python 3.9
+          - os: macos-latest
+            python-version: "3.9"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -55,6 +61,7 @@ jobs:
 
       - name: Create test data directory
         run: mkdir -p data
+        shell: bash
 
       - name: Create test data file
         run: |
@@ -65,13 +72,14 @@ jobs:
           700.0 800.0
           150.0 750.0
           EOF
+        shell: bash
 
       - name: Run tests with coverage
-        run: python -m pytest tests/ -v --tb=short --cov=vormap --cov-report=xml --cov-report=term-missing
+        run: python -m pytest tests/ -v --tb=short --cov=vormap --cov-report=xml --cov-report=term-missing -x -q
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.12'
-        uses: codecov/codecov-action@v6
+        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v5
         with:
           file: coverage.xml
           flags: unittests
@@ -83,13 +91,13 @@ jobs:
     name: Import Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Verify module imports cleanly
+      - name: Verify module imports cleanly (no deps)
         run: |
           python -c "import vormap; print('Module imported successfully')"
           python -c "import vormap_pattern; print('Pattern module imported successfully')"
@@ -107,9 +115,9 @@ jobs:
     name: Dependency Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
@@ -122,3 +130,28 @@ jobs:
 
       - name: Audit dependencies for known vulnerabilities
         run: pip-audit --strict --desc on
+
+  package-build:
+    name: Package Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install build tools
+        run: pip install build twine
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Validate package metadata
+        run: twine check dist/*
+
+      - name: Verify wheel installs cleanly
+        run: |
+          pip install dist/*.whl
+          python -c "import vormap; print(f'Installed voronoimap {vormap.__version__}' if hasattr(vormap, '__version__') else 'Installed voronoimap')"

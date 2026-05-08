@@ -432,28 +432,35 @@ def _compute_market_areas(
     locations: List[Location],
     prob_matrix: List[List[float]],
 ) -> List[MarketArea]:
-    """Compute Huff market areas from probability matrix."""
+    """Compute Huff market areas from probability matrix (vectorised).
+
+    Uses NumPy argmax and column sums to replace O(n²) Python loops
+    with O(n²) vectorised ops — typically 10-50× faster for large n.
+    """
     n = len(locations)
-    areas: List[MarketArea] = []
+    if n == 0:
+        return []
 
-    # For each destination, find which origins it primarily attracts
+    pm = np.array(prob_matrix, dtype=np.float64)
+
+    # For each origin row, find the destination with highest probability.
+    best_dest = pm.argmax(axis=1)          # shape (n,)
+    # Column sums give total probability attracted by each destination.
+    col_totals = pm.sum(axis=0)            # shape (n,)
+
+    # Build primary-origin lists: group origins by their best destination.
     primary: Dict[int, List[int]] = {j: [] for j in range(n)}
-    for i in range(n):
-        best_j = -1
-        best_p = 0.0
-        for j in range(n):
-            if prob_matrix[i][j] > best_p:
-                best_p = prob_matrix[i][j]
-                best_j = j
-        if best_j >= 0:
-            primary[best_j].append(i)
+    for i, j in enumerate(best_dest.tolist()):
+        # Only count if the row actually had a positive probability.
+        if pm[i, j] > 0:
+            primary[j].append(i)
 
+    areas: List[MarketArea] = []
     for j in range(n):
-        total_prob = sum(prob_matrix[i][j] for i in range(n))
         areas.append(MarketArea(
             destination=j,
             label=locations[j].label,
-            total_probability=total_prob,
+            total_probability=float(col_totals[j]),
             primary_origins=primary[j],
             market_share=len(primary[j]) / max(1, n),
         ))
@@ -465,13 +472,10 @@ def _compute_accessibility(
     locations: List[Location],
     flow_matrix: List[List[float]],
 ) -> List[AccessibilityScore]:
-    """Compute Hansen accessibility scores from flow contributions."""
+    """Compute Hansen accessibility scores from flow contributions (vectorised)."""
     n = len(locations)
-    scores = []
-    for i in range(n):
-        total = sum(flow_matrix[i])
-        scores.append((i, total))
-
+    row_sums = np.array(flow_matrix, dtype=np.float64).sum(axis=1)
+    scores = [(i, float(row_sums[i])) for i in range(n)]
     scores.sort(key=lambda x: x[1], reverse=True)
     result: List[AccessibilityScore] = []
     for rank, (idx, score) in enumerate(scores, 1):
@@ -489,21 +493,18 @@ def _compute_dominance(
     locations: List[Location],
     flow_matrix: List[List[float]],
 ) -> Dict[int, float]:
-    """Compute flow dominance index for each destination.
+    """Compute flow dominance index for each destination (vectorised).
 
     Dominance is the share of total inflow that a destination captures
     relative to the maximum possible (if it captured everything).
     """
-    n = len(locations)
-    total_all = sum(flow_matrix[i][j] for i in range(n) for j in range(n))
+    fm_np = np.array(flow_matrix, dtype=np.float64)
+    total_all = float(fm_np.sum())
     if total_all <= 0:
-        return {i: 0.0 for i in range(n)}
+        return {i: 0.0 for i in range(len(locations))}
 
-    dominance: Dict[int, float] = {}
-    for j in range(n):
-        inflow = sum(flow_matrix[i][j] for i in range(n))
-        dominance[j] = inflow / total_all
-    return dominance
+    col_sums = fm_np.sum(axis=0)
+    return {j: float(col_sums[j]) / total_all for j in range(len(locations))}
 
 
 # ── Main analysis entry point ────────────────────────────────────────
@@ -568,42 +569,56 @@ def gravity_analysis(
     else:
         raise ValueError(f"Unknown model: {config.model}")
 
-    # Build flow list — single pass to find max and collect flows.
+    # Build flow list — vectorised filtering + top-k extraction.
     n = len(locations)
-    all_flows: List[Flow] = []
-    max_flow = 0.0
     min_flow = config.min_flow
 
-    # First pass: find max flow for categorisation.
-    for i in range(n):
-        fm_i = flow_matrix[i]
-        for j in range(n):
-            if i == j and not config.self_interaction:
-                continue
-            val = fm_i[j]
-            if val > max_flow:
-                max_flow = val
+    fm_np = np.array(flow_matrix, dtype=np.float64)
+    dm_np = np.array(dist_matrix, dtype=np.float64)
+    if not config.self_interaction:
+        np.fill_diagonal(fm_np, 0.0)
+    max_flow = float(fm_np.max()) if fm_np.size > 0 else 0.0
 
-    # Second pass: build Flow objects (categorisation needs max_flow).
-    for i in range(n):
-        fm_i = flow_matrix[i]
-        for j in range(n):
-            if i == j and not config.self_interaction:
-                continue
-            val = fm_i[j]
-            if val < min_flow:
-                continue
-            all_flows.append(Flow(
-                origin=i,
-                destination=j,
-                flow=val,
-                distance=dist_matrix[i][j],
-                category=_categorise_flow(val, max_flow),
-            ))
+    # Use NumPy to find qualifying (i, j) pairs above min_flow threshold
+    # instead of iterating all n² pairs in Python.
+    mask = fm_np >= min_flow
+    if not config.self_interaction:
+        np.fill_diagonal(mask, False)
+    oi, oj = np.nonzero(mask)
+    flow_vals = fm_np[oi, oj]
+    dist_vals = dm_np[oi, oj]
 
-    total_flow = sum(f.flow for f in all_flows)
+    # Categorise flows vectorised via ratio thresholds.
+    if max_flow > 0:
+        ratios = flow_vals / max_flow
+    else:
+        ratios = np.zeros_like(flow_vals)
+    cats = np.where(ratios >= 0.75, 4,
+           np.where(ratios >= 0.5,  3,
+           np.where(ratios >= 0.25, 2,
+           np.where(ratios >= 0.05, 1, 0))))
+    _CAT_LOOKUP = [
+        FlowCategory.NEGLIGIBLE, FlowCategory.WEAK,
+        FlowCategory.MODERATE, FlowCategory.STRONG, FlowCategory.DOMINANT,
+    ]
+
+    all_flows: List[Flow] = [
+        Flow(origin=int(oi[k]), destination=int(oj[k]),
+             flow=float(flow_vals[k]), distance=float(dist_vals[k]),
+             category=_CAT_LOOKUP[int(cats[k])])
+        for k in range(len(oi))
+    ]
+
+    total_flow = float(flow_vals.sum())
     avg_flow = total_flow / max(1, len(all_flows))
-    top_flows = sorted(all_flows, key=lambda f: f.flow, reverse=True)[:10]
+
+    # Top-10 flows via partial argsort (O(n) average) instead of full sort.
+    if len(flow_vals) > 10:
+        top_k_idx = np.argpartition(flow_vals, -10)[-10:]
+        top_k_idx = top_k_idx[np.argsort(flow_vals[top_k_idx])[::-1]]
+        top_flows = [all_flows[int(k)] for k in top_k_idx]
+    else:
+        top_flows = sorted(all_flows, key=lambda f: f.flow, reverse=True)[:10]
 
     # Compute market areas (Huff probabilities)
     if config.model == GravityModel.HUFF:

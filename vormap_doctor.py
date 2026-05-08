@@ -45,6 +45,8 @@ import math
 import sys
 from collections import namedtuple
 
+from vormap_utils import bounding_box as _bounding_box, euclidean as _dist
+
 # ---------------------------------------------------------------------------
 # Data structures
 
@@ -141,29 +143,11 @@ pre{{background:#16213e;padding:1em;border-radius:8px;overflow-x:auto}}
 # ---------------------------------------------------------------------------
 # Point loading
 
-def _load_points(path):
-    """Load 2D points from whitespace-delimited text file."""
-    points = []
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            parts = line.split()
-            if len(parts) >= 2:
-                try:
-                    points.append((float(parts[0]), float(parts[1])))
-                except ValueError:
-                    continue
-    return points
+from vormap_utils import load_points as _load_points
 
 
 # ---------------------------------------------------------------------------
 # Helper math
-
-def _dist(a, b):
-    return math.hypot(a[0] - b[0], a[1] - b[1])
-
 
 def _mean(vals):
     return sum(vals) / len(vals) if vals else 0
@@ -176,10 +160,7 @@ def _stddev(vals):
     return math.sqrt(sum((v - m) ** 2 for v in vals) / (len(vals) - 1))
 
 
-def _bounding_box(points):
-    xs = [p[0] for p in points]
-    ys = [p[1] for p in points]
-    return min(xs), min(ys), max(xs), max(ys)
+# _bounding_box is now imported from vormap_utils (single-pass, memory-efficient)
 
 
 def _nn_distances(points):

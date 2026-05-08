@@ -303,6 +303,49 @@ def compute_nn_distances(points):
     return nn_dists
 
 
+def build_distance_adjacency(points, threshold_factor=2.0):
+    """Build spatial adjacency based on average nearest-neighbor distance.
+
+    Two points are neighbours if their Euclidean distance is at most
+    ``threshold_factor * avg_nn_distance``.  Uses :func:`compute_nn_distances`
+    for the nearest-neighbour computation (O(n log n) with scipy, O(n²)
+    fallback).
+
+    Parameters
+    ----------
+    points : list of (x, y)
+        Point coordinates.
+    threshold_factor : float, default 2.0
+        Multiplier on the average nearest-neighbour distance to determine
+        the neighbourhood radius.
+
+    Returns
+    -------
+    dict[int, list[int]]
+        Adjacency mapping: index → list of neighbor indices.
+    """
+    n = len(points)
+    if n <= 1:
+        return {i: [] for i in range(n)}
+    if n == 2:
+        return {0: [1], 1: [0]}
+
+    nn_dists = compute_nn_distances(points)
+    avg_nn = sum(nn_dists) / len(nn_dists)
+    threshold = avg_nn * threshold_factor
+
+    adj = {i: [] for i in range(n)}
+    for i in range(n):
+        xi, yi = points[i]
+        for j in range(i + 1, n):
+            dx = xi - points[j][0]
+            dy = yi - points[j][1]
+            if math.sqrt(dx * dx + dy * dy) <= threshold:
+                adj[i].append(j)
+                adj[j].append(i)
+    return adj
+
+
 def point_to_segment_distance(px: float, py: float,
                               ax: float, ay: float,
                               bx: float, by: float) -> float:
@@ -505,3 +548,182 @@ def mat_invert(A):
         e = [1.0 if i == col else 0.0 for i in range(n)]
         inv.append(lu_solve(L, U, perm, e))
     return mat_transpose(inv)
+
+
+# ── Sutherland-Hodgman polygon clipping ─────────────────────────────
+
+def clip_polygon_to_rect(poly, xmin, ymin, xmax, ymax):
+    """Clip a polygon to an axis-aligned rectangle (Sutherland-Hodgman).
+
+    Parameters
+    ----------
+    poly : list of (float, float)
+        Input polygon vertices.
+    xmin, ymin, xmax, ymax : float
+        Bounding rectangle.
+
+    Returns
+    -------
+    list of (float, float)
+        Clipped polygon vertices.  Empty list if fully outside.
+    """
+    def _clip_edge(pts, inside_fn, intersect_fn):
+        if not pts:
+            return []
+        out = []
+        prev = pts[-1]
+        prev_in = inside_fn(prev)
+        for curr in pts:
+            curr_in = inside_fn(curr)
+            if curr_in:
+                if not prev_in:
+                    out.append(intersect_fn(prev, curr))
+                out.append(curr)
+            elif prev_in:
+                out.append(intersect_fn(prev, curr))
+            prev = curr
+            prev_in = curr_in
+        return out
+
+    def _lerp_x(a, b, x):
+        dx = b[0] - a[0]
+        if abs(dx) < 1e-12:
+            return (x, a[1])
+        t = (x - a[0]) / dx
+        return (x, a[1] + t * (b[1] - a[1]))
+
+    def _lerp_y(a, b, y):
+        dy = b[1] - a[1]
+        if abs(dy) < 1e-12:
+            return (a[0], y)
+        t = (y - a[1]) / dy
+        return (a[0] + t * (b[0] - a[0]), y)
+
+    poly = _clip_edge(poly, lambda p: p[0] >= xmin, lambda a, b: _lerp_x(a, b, xmin))
+    poly = _clip_edge(poly, lambda p: p[0] <= xmax, lambda a, b: _lerp_x(a, b, xmax))
+    poly = _clip_edge(poly, lambda p: p[1] >= ymin, lambda a, b: _lerp_y(a, b, ymin))
+    poly = _clip_edge(poly, lambda p: p[1] <= ymax, lambda a, b: _lerp_y(a, b, ymax))
+    return poly
+
+
+# ── shared numeric helpers ──────────────────────────────────────────
+
+def clamp(v, lo=0, hi=255):
+    """Clamp *v* to the range [*lo*, *hi*]."""
+    return max(lo, min(hi, v))
+
+
+def lerp(a: float, b: float, t: float) -> float:
+    """Linearly interpolate between *a* and *b* at fraction *t*."""
+    return a + (b - a) * t
+
+
+def load_points(filepath: str) -> List[Tuple[float, float]]:
+    """Load 2-D points from a whitespace- or comma-delimited text file.
+
+    Lines starting with ``#`` and blank lines are skipped.  Each data
+    line must contain at least two numeric tokens (x, y); extra columns
+    are ignored.  Both ``x y`` and ``x,y`` formats are accepted.
+
+    Returns a list of ``(x, y)`` tuples.
+    """
+    points: List[Tuple[float, float]] = []
+    with open(filepath, "r", encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.replace(",", " ").split()
+            if len(parts) >= 2:
+                try:
+                    points.append((float(parts[0]), float(parts[1])))
+                except ValueError:
+                    continue
+    return points
+
+
+def lerp_color(
+    c1: Tuple[int, int, int],
+    c2: Tuple[int, int, int],
+    t: float,
+) -> Tuple[int, int, int]:
+    """Linearly interpolate between two RGB colours.  *t* is clamped to [0, 1]."""
+    t = max(0.0, min(1.0, t))
+    return (
+        int(c1[0] + (c2[0] - c1[0]) * t),
+        int(c1[1] + (c2[1] - c1[1]) * t),
+        int(c1[2] + (c2[2] - c1[2]) * t),
+    )
+
+
+def build_vertex_adjacency(
+    polygons: list,
+    *,
+    tol: float = 1e-6,
+    min_shared: int = 1,
+) -> dict:
+    """Build region adjacency from shared polygon vertices.
+
+    Uses a spatial vertex hash (O(n·V) average-case) to detect which
+    polygons share vertices.  This is the standard queen-contiguity
+    adjacency computation used by hotspot detection, network analysis,
+    and report generation.
+
+    Parameters
+    ----------
+    polygons : list of list of (float, float)
+        Each element is a list of vertex (x, y) tuples for one polygon.
+    tol : float
+        Coordinate rounding tolerance for vertex matching (default 1e-6).
+    min_shared : int
+        Minimum number of shared vertices to consider two polygons
+        adjacent (1 = queen contiguity, 2 = rook/edge contiguity).
+
+    Returns
+    -------
+    dict[int, set[int]]
+        Maps polygon index to set of adjacent polygon indices.
+    """
+    n = len(polygons)
+    vertex_map: dict = {}  # rounded (x, y) -> set of polygon indices
+    inv_tol = 1.0 / tol if tol > 0 else 1.0
+
+    for i, verts in enumerate(polygons):
+        for vx, vy in verts:
+            key = (round(vx * inv_tol), round(vy * inv_tol))
+            bucket = vertex_map.get(key)
+            if bucket is None:
+                vertex_map[key] = {i}
+            else:
+                bucket.add(i)
+
+    if min_shared <= 1:
+        # Fast path: any shared vertex means adjacency
+        adj: dict = {i: set() for i in range(n)}
+        for region_indices in vertex_map.values():
+            if len(region_indices) < 2:
+                continue
+            idx_list = list(region_indices)
+            for a in range(len(idx_list)):
+                for b in range(a + 1, len(idx_list)):
+                    adj[idx_list[a]].add(idx_list[b])
+                    adj[idx_list[b]].add(idx_list[a])
+        return adj
+
+    # General path: count shared vertices per pair
+    pair_counts: dict = {}
+    for region_indices in vertex_map.values():
+        if len(region_indices) < 2:
+            continue
+        idx_list = list(region_indices)
+        for a in range(len(idx_list)):
+            for b in range(a + 1, len(idx_list)):
+                pair = (idx_list[a], idx_list[b])
+                pair_counts[pair] = pair_counts.get(pair, 0) + 1
+
+    adj = {i: set() for i in range(n)}
+    for (i, j), count in pair_counts.items():
+        if count >= min_shared:
+            adj[i].add(j)
+            adj[j].add(i)
+    return adj

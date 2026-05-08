@@ -52,12 +52,8 @@ def _dist(ax, ay, bx, by):
     return math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
 
 
-def _clamp(v, lo, hi):
-    return max(lo, min(hi, v))
 
 
-def _lerp(a, b, t):
-    return a + (b - a) * t
 
 
 # ---------------------------------------------------------------------------

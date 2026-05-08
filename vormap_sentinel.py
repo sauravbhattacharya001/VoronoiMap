@@ -186,22 +186,13 @@ f'<table><tr><th>Severity</th><th>Channel</th><th>Message</th><th>Value</th><th>
 # Sentinel engine
 # ---------------------------------------------------------------------------
 
+from vormap_utils import load_points as _load_points_file
+
+
 def _load_points(source):
     """Load points from file path or list of (x, y) tuples."""
     if isinstance(source, str):
-        pts = []
-        with open(source, "r") as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                parts = line.replace(",", " ").split()
-                if len(parts) >= 2:
-                    try:
-                        pts.append((float(parts[0]), float(parts[1])))
-                    except ValueError:
-                        continue
-        return pts
+        return _load_points_file(source)
     return list(source)
 
 

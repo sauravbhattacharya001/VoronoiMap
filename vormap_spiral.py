@@ -29,10 +29,10 @@ CLI usage
 """
 
 import argparse
+import html as _html_mod
 import json
 import math
 import os
-import sys
 
 # Golden angle in radians ≈ 137.508°
 GOLDEN_ANGLE = math.pi * (3 - math.sqrt(5))
@@ -202,7 +202,7 @@ def to_svg(points, size: int = 800, colormap: str = "viridis",
     if title:
         parts.append(
             f'<text x="{size // 2}" y="30" text-anchor="middle" '
-            f'fill="#cccccc" font-size="18" font-family="sans-serif">{title}</text>'
+            f'fill="#cccccc" font-size="18" font-family="sans-serif">{_html_mod.escape(title)}</text>'
         )
 
     n = len(points)

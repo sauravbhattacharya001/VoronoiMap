@@ -1,0 +1,27 @@
+name: "VoronoiMap CodeQL Config"
+
+# Broader query coverage: security + quality/maintainability
+queries:
+  - uses: security-and-quality
+
+# Python-specific: detect issues with remote and local threat models
+threat-models:
+  - remote-sources
+  - local-sources
+
+# Paths to scan (include everything under the main package)
+paths:
+  - vormap
+  - tests
+
+# Exclude generated / vendored files from analysis
+paths-ignore:
+  - "**/__pycache__/**"
+  - "**/node_modules/**"
+  - "docs/**"
+  - "*.md"
+
+# Query filters — suppress low-severity informational notes
+query-filters:
+  - exclude:
+      problem.severity: recommendation

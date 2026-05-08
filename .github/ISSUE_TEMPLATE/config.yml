@@ -6,3 +6,6 @@ contact_links:
   - name: 📖 Documentation
     url: https://sauravbhattacharya001.github.io/VoronoiMap/
     about: Check the documentation before opening an issue
+  - name: 📦 PyPI Package
+    url: https://pypi.org/project/voronoimap/
+    about: Check the latest release on PyPI

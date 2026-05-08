@@ -36,6 +36,11 @@ import random
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
+# Module-level RNG instance — replaced with a local Random(seed) in
+# simulate_competition() so callers get reproducible results without
+# polluting the global random state.  Fixes #183.
+_rng: random.Random = random.Random()
+
 # ── Geometry helpers ────────────────────────────────────────────────
 
 def _distance(a: Tuple[float, float], b: Tuple[float, float]) -> float:
@@ -46,14 +51,14 @@ def _random_points(n: int, w: float, h: float,
                    min_sep: float = 0.0) -> List[Tuple[float, float]]:
     pts: List[Tuple[float, float]] = []
     for _ in range(n * 50):
-        p = (random.uniform(0, w), random.uniform(0, h))
+        p = (_rng.uniform(0, w), _rng.uniform(0, h))
         if min_sep > 0 and any(_distance(p, q) < min_sep for q in pts):
             continue
         pts.append(p)
         if len(pts) == n:
             break
     while len(pts) < n:
-        pts.append((random.uniform(0, w), random.uniform(0, h)))
+        pts.append((_rng.uniform(0, w), _rng.uniform(0, h)))
     return pts
 
 
@@ -128,7 +133,7 @@ def _build_cells(points: List[Tuple[float, float]],
 
     cells = []
     for i, p in enumerate(points):
-        res = random.uniform(1.0, 5.0)
+        res = _rng.uniform(1.0, 5.0)
         c = Cell(i, p, res)
         c.neighbors = sorted(adj.get(i, set()))
         cells.append(c)
@@ -208,7 +213,7 @@ def _pick_action_indexed(cells: List[Cell], owned_idxs: set,
         pool += [("attack", t) for t in targets_enemy]
         pool += [("fortify", c.idx) for c in border_own]
         if pool:
-            random.shuffle(pool)
+            _rng.shuffle(pool)
             actions = pool[:2]
 
     return actions
@@ -245,11 +250,17 @@ def simulate_competition(
     """Run a full territorial competition and return results."""
     if seed is not None:
         rng = random.Random(seed)
+    _rng = random.Random(seed)  # local RNG; None seed ⇒ OS entropy
+    # Inject into module-level so helper functions see it without
+    # signature changes.  Still thread-safe per-call because each
+    # simulate_competition invocation creates its own Random.
+    import vormap_compete as _self
+    _self._rng = _rng
 
     if strategies is None:
         strategies = list(STRATEGIES[:n_competitors])
     while len(strategies) < n_competitors:
-        strategies.append(random.choice(STRATEGIES))
+        strategies.append(_rng.choice(STRATEGIES))
     strategies = strategies[:n_competitors]
 
     points = _random_points(n_points, width, height,
@@ -259,7 +270,7 @@ def simulate_competition(
     # assign starting cells — pick spread-out points
     starts = []
     remaining = list(range(len(cells)))
-    random.shuffle(remaining)
+    _rng.shuffle(remaining)
     for ci in range(n_competitors):
         if not remaining:
             break
@@ -315,7 +326,7 @@ def simulate_competition(
 
         # each competitor acts
         order = list(alive)
-        random.shuffle(order)
+        _rng.shuffle(order)
         for ci in order:
             acts = _pick_action_indexed(cells, owned_sets[ci], ci,
                                         strategies[ci])

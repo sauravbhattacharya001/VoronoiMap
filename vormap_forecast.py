@@ -161,7 +161,48 @@ class ForecastModel:
         result = ForecastResult(grid_res=res)
         result.steps = steps
 
-        # Compute bounds across all snapshots
+        bounds = self._compute_bounds()
+        result.bounds = bounds
+        xmin, ymin, xmax, ymax = bounds
+
+        grids = self._build_density_grids(bounds)
+        n = len(grids)
+
+        # Channel 1: Density Trend — linear extrapolation per cell
+        predicted, cell_slopes, cell_intercepts = self._density_trend(
+            grids, steps)
+        result.density_grid = predicted
+
+        # Channel 2: Centroid Trajectory
+        centroids = self._centroid_trajectory(result, n, steps)
+
+        # Channel 3: Spread Forecast
+        self._spread_forecast(result, centroids, n, steps)
+
+        # Determine trend
+        xspan = (xmax - xmin) or 1.0
+        yspan = (ymax - ymin) or 1.0
+        result.trend = self._determine_trend(
+            result, centroids, xspan, yspan)
+
+        # Channel 4 & 5: Hotspot Emergence + Void Prediction
+        if n >= 3:
+            result.hotspots = self._detect_hotspots(
+                cell_slopes, predicted, bounds)
+            result.voids = self._detect_voids(
+                cell_slopes, grids[-1], bounds)
+
+        # Confidence scoring
+        result.confidence = self._compute_confidence(
+            grids, cell_slopes, cell_intercepts)
+
+        result.recommendations = _generate_recommendations(result)
+        return result
+
+    # -- private forecast channels ------------------------------------------
+
+    def _compute_bounds(self):
+        """Compute padded bounding box across all snapshots."""
         all_pts = [p for snap in self._snapshots for p in snap]
         if not all_pts:
             raise ValueError("No points in snapshots")
@@ -172,13 +213,13 @@ class ForecastModel:
         ymin, ymax = min(ys), max(ys)
         xspan = xmax - xmin or 1.0
         yspan = ymax - ymin or 1.0
-        xmin -= xspan * margin
-        xmax += xspan * margin
-        ymin -= yspan * margin
-        ymax += yspan * margin
-        result.bounds = (xmin, ymin, xmax, ymax)
+        return (xmin - xspan * margin, ymin - yspan * margin,
+                xmax + xspan * margin, ymax + yspan * margin)
 
-        # Build density grids per snapshot
+    def _build_density_grids(self, bounds):
+        """Build normalized density grids per snapshot."""
+        xmin, ymin, xmax, ymax = bounds
+        res = self.grid_res
         grids = []
         for snap in self._snapshots:
             grid = [[0.0] * res for _ in range(res)]
@@ -188,26 +229,35 @@ class ForecastModel:
                 ci = max(0, min(res - 1, ci))
                 ri = max(0, min(res - 1, ri))
                 grid[ri][ci] += 1.0
-            # Normalize
             total = sum(sum(row) for row in grid) or 1.0
             grid = [[c / total for c in row] for row in grid]
             grids.append(grid)
+        return grids
 
-        # Channel 1: Density Trend — linear extrapolation per cell
-        predicted = [[0.0] * res for _ in range(res)]
+    def _density_trend(self, grids, steps):
+        """Channel 1: Linear extrapolation per cell.
+
+        Returns (predicted_grid, cell_slopes, cell_intercepts).
+        """
+        res = self.grid_res
         n = len(grids)
+        predicted = [[0.0] * res for _ in range(res)]
+        cell_slopes = [[0.0] * res for _ in range(res)]
+        cell_intercepts = [[0.0] * res for _ in range(res)]
         for r in range(res):
             for c in range(res):
                 series = [grids[t][r][c] for t in range(n)]
                 slope, intercept = _linear_fit(series)
-                val = intercept + slope * (n - 1 + steps)
-                predicted[r][c] = max(0.0, val)
+                cell_slopes[r][c] = slope
+                cell_intercepts[r][c] = intercept
+                predicted[r][c] = max(0.0, intercept + slope * (n - 1 + steps))
         # Renormalize
         total_pred = sum(sum(row) for row in predicted) or 1.0
         predicted = [[c / total_pred for c in row] for row in predicted]
-        result.density_grid = predicted
+        return predicted, cell_slopes, cell_intercepts
 
-        # Channel 2: Centroid Trajectory
+    def _centroid_trajectory(self, result, n, steps):
+        """Channel 2: Track centroid movement and predict next position."""
         centroids = []
         for snap in self._snapshots:
             if snap:
@@ -218,15 +268,15 @@ class ForecastModel:
             centroids.append((cx, cy))
         result.centroid_history = centroids
         if len(centroids) >= 2:
-            cx_series = [c[0] for c in centroids]
-            cy_series = [c[1] for c in centroids]
-            sx, ix = _linear_fit(cx_series)
-            sy, iy = _linear_fit(cy_series)
-            pred_cx = ix + sx * (n - 1 + steps)
-            pred_cy = iy + sy * (n - 1 + steps)
-            result.centroid_predicted = (pred_cx, pred_cy)
+            sx, ix = _linear_fit([c[0] for c in centroids])
+            sy, iy = _linear_fit([c[1] for c in centroids])
+            result.centroid_predicted = (
+                ix + sx * (n - 1 + steps),
+                iy + sy * (n - 1 + steps))
+        return centroids
 
-        # Channel 3: Spread Forecast
+    def _spread_forecast(self, result, centroids, n, steps):
+        """Channel 3: Track standard distance and predict expansion/contraction."""
         spreads = []
         for i, snap in enumerate(self._snapshots):
             cx, cy = centroids[i]
@@ -240,104 +290,92 @@ class ForecastModel:
         ss, si = _linear_fit(spreads)
         result.spread_predicted = max(0.0, si + ss * (n - 1 + steps))
 
-        # Determine trend
-        spread_change = result.spread_predicted - spreads[-1] if spreads else 0.0
+    @staticmethod
+    def _determine_trend(result, centroids, xspan, yspan):
+        """Classify the overall spatial trend."""
+        spreads = result.spread_history
+        spread_change = (result.spread_predicted - spreads[-1]) if spreads else 0.0
         last_c = centroids[-1] if centroids else (0.0, 0.0)
         pred_c = result.centroid_predicted
         shift_dist = math.sqrt((pred_c[0] - last_c[0]) ** 2 +
                                (pred_c[1] - last_c[1]) ** 2)
         diag = math.sqrt(xspan ** 2 + yspan ** 2)
         rel_shift = shift_dist / diag if diag > 0 else 0.0
-        rel_spread = spread_change / (spreads[-1] if spreads and spreads[-1] > 0 else 1.0)
+        rel_spread = spread_change / (
+            spreads[-1] if spreads and spreads[-1] > 0 else 1.0)
 
         if rel_spread > 0.1:
-            result.trend = "expanding"
-        elif rel_spread < -0.1:
-            result.trend = "contracting"
-        elif rel_shift > 0.05:
-            # Determine direction
+            return "expanding"
+        if rel_spread < -0.1:
+            return "contracting"
+        if rel_shift > 0.05:
             dx = pred_c[0] - last_c[0]
             dy = pred_c[1] - last_c[1]
             angle = math.atan2(dy, dx) * 180 / math.pi
             if -45 <= angle < 45:
-                result.trend = "shifting_E"
-            elif 45 <= angle < 135:
-                result.trend = "shifting_N"
-            elif -135 <= angle < -45:
-                result.trend = "shifting_S"
-            else:
-                result.trend = "shifting_W"
-        else:
-            result.trend = "stable"
+                return "shifting_E"
+            if 45 <= angle < 135:
+                return "shifting_N"
+            if -135 <= angle < -45:
+                return "shifting_S"
+            return "shifting_W"
+        return "stable"
 
-        # Channel 4: Hotspot Emergence
-        if n >= 3:
-            for r in range(res):
-                for c in range(res):
-                    series = [grids[t][r][c] for t in range(n)]
-                    slope, _ = _linear_fit(series)
-                    if slope > 0.005 and predicted[r][c] > 1.5 / (res * res):
-                        hx = xmin + (c + 0.5) / res * (xmax - xmin)
-                        hy = ymin + (r + 0.5) / res * (ymax - ymin)
-                        result.hotspots.append(Hotspot(hx, hy, slope))
-            result.hotspots.sort(key=lambda h: h.intensity, reverse=True)
-            result.hotspots = result.hotspots[:10]
+    def _detect_hotspots(self, cell_slopes, predicted, bounds):
+        """Channel 4: Identify cells with accelerating density."""
+        res = self.grid_res
+        xmin, ymin, xmax, ymax = bounds
+        hotspots = []
+        threshold = 1.5 / (res * res)
+        for r in range(res):
+            for c in range(res):
+                slope = cell_slopes[r][c]
+                if slope > 0.005 and predicted[r][c] > threshold:
+                    hx = xmin + (c + 0.5) / res * (xmax - xmin)
+                    hy = ymin + (r + 0.5) / res * (ymax - ymin)
+                    hotspots.append(Hotspot(hx, hy, slope))
+        hotspots.sort(key=lambda h: h.intensity, reverse=True)
+        return hotspots[:10]
 
-        # Channel 5: Void Prediction
-        if n >= 3:
-            for r in range(res):
-                for c in range(res):
-                    series = [grids[t][r][c] for t in range(n)]
-                    slope, _ = _linear_fit(series)
-                    if slope < -0.003 and grids[-1][r][c] > 0.001:
-                        vx = xmin + (c + 0.5) / res * (xmax - xmin)
-                        vy = ymin + (r + 0.5) / res * (ymax - ymin)
-                        result.voids.append(VoidZone(vx, vy, abs(slope)))
-            result.voids.sort(key=lambda v: v.loss_rate, reverse=True)
-            result.voids = result.voids[:10]
+    def _detect_voids(self, cell_slopes, last_grid, bounds):
+        """Channel 5: Identify cells losing density."""
+        res = self.grid_res
+        xmin, ymin, xmax, ymax = bounds
+        voids = []
+        for r in range(res):
+            for c in range(res):
+                slope = cell_slopes[r][c]
+                if slope < -0.003 and last_grid[r][c] > 0.001:
+                    vx = xmin + (c + 0.5) / res * (xmax - xmin)
+                    vy = ymin + (r + 0.5) / res * (ymax - ymin)
+                    voids.append(VoidZone(vx, vy, abs(slope)))
+        voids.sort(key=lambda v: v.loss_rate, reverse=True)
+        return voids[:10]
 
-        # Confidence scoring
-        # Higher with more snapshots, lower with high variance in fits
+    @staticmethod
+    def _compute_confidence(grids, cell_slopes, cell_intercepts):
+        """Score forecast confidence from snapshot count and fit residuals."""
+        n = len(grids)
+        res = len(grids[0])
         snapshot_factor = min(1.0, (n - 1) / 5.0)
-        # Check density prediction consistency
-        residuals = []
-        for t in range(n):
-            for r in range(res):
-                for c in range(res):
-                    series = [grids[i][r][c] for i in range(n)]
-                    slope, intercept = _linear_fit(series)
-                    fitted = intercept + slope * t
-                    residuals.append(abs(fitted - series[t]))
-        mean_residual = sum(residuals) / len(residuals) if residuals else 0.0
+        total_residual = 0.0
+        cell_count = res * res
+        for r in range(res):
+            for c in range(res):
+                slope = cell_slopes[r][c]
+                intercept = cell_intercepts[r][c]
+                for t in range(n):
+                    total_residual += abs(intercept + slope * t - grids[t][r][c])
+        mean_residual = total_residual / (cell_count * n) if cell_count * n else 0.0
         fit_factor = max(0.0, 1.0 - mean_residual * 50)
-        result.confidence = round(snapshot_factor * 0.4 + fit_factor * 0.6, 4)
-
-        # Recommendations
-        result.recommendations = _generate_recommendations(result)
-
-        return result
+        return round(snapshot_factor * 0.4 + fit_factor * 0.6, 4)
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _load_points(filepath):
-    """Load points from whitespace-separated text file."""
-    points = []
-    with open(filepath, "r") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            parts = line.split()
-            if len(parts) >= 2:
-                try:
-                    x, y = float(parts[0]), float(parts[1])
-                    points.append((x, y))
-                except ValueError:
-                    continue
-    return points
+from vormap_utils import load_points as _load_points
 
 
 def _linear_fit(series):

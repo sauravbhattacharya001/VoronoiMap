@@ -145,6 +145,426 @@ def set_bounds(south, north, west, east):
     IND_S, IND_N, IND_W, IND_E = south, north, west, east
 
 
+class VoronoiEstimator:
+    """Encapsulated Voronoi estimator with per-instance bounds and cache.
+
+    Solves the global mutable state problem (issue #172) by giving each
+    estimator its own search boundaries, file cache, and KDTree index.
+    Multiple instances can process different datasets concurrently without
+    interfering with each other.
+
+    The module-level functions (``load_data``, ``set_bounds``, ``get_NN``,
+    ``find_area``, ``get_sum``) remain as thin wrappers around a default
+    global instance (``vormap._default``) for full backward compatibility.
+
+    Usage
+    -----
+    >>> est = VoronoiEstimator(bounds=(0, 1000, 0, 2000))
+    >>> data = est.load_data('points.txt')
+    >>> est.get_NN(data, 50.0, 50.0)
+    (42.3, 55.1)
+    >>> est.get_sum('points.txt', 100)
+    (98, 6, 4.2)
+    """
+
+    __slots__ = ('bounds', '_file_cache', '_tree_by_data_id')
+
+    def __init__(self, bounds=None):
+        """Create a new estimator.
+
+        Parameters
+        ----------
+        bounds : tuple of (south, north, west, east), optional
+            Initial search space boundaries.  Defaults to (0, 1000, 0, 2000).
+        """
+        if bounds is None:
+            bounds = (0.0, 1000.0, 0.0, 2000.0)
+        self.bounds = bounds
+        self._file_cache = {}  # filename -> {'points': list, 'tree': KDTree|None}
+        self._tree_by_data_id = {}  # id(points) -> KDTree
+
+    @property
+    def south(self):
+        """South boundary."""
+        return self.bounds[0]
+
+    @property
+    def north(self):
+        """North boundary."""
+        return self.bounds[1]
+
+    @property
+    def west(self):
+        """West boundary."""
+        return self.bounds[2]
+
+    @property
+    def east(self):
+        """East boundary."""
+        return self.bounds[3]
+
+    def set_bounds(self, south, north, west, east):
+        """Set the search space boundaries for this estimator."""
+        self.bounds = (south, north, west, east)
+
+    def clear_cache(self):
+        """Flush all cached data and KDTrees."""
+        self._file_cache.clear()
+        self._tree_by_data_id.clear()
+
+    def load_data(self, filename, auto_bounds=True):
+        """Load point data from a file, caching it per-instance.
+
+        See module-level :func:`load_data` for full documentation.
+        """
+        if filename in self._file_cache:
+            return self._file_cache[filename]['points']
+
+        clean_name = filename
+        for prefix in ("data/", "data\\"):
+            if clean_name.startswith(prefix):
+                clean_name = clean_name[len(prefix):]
+                break
+
+        resolved = validate_input_path(clean_name, base_dir="data")
+
+        file_size = os.path.getsize(resolved)
+        if file_size > MAX_INPUT_FILE_SIZE:
+            raise ValueError(
+                "Input file '%s' is %.1f MB, exceeding the %d MB limit."
+                % (filename, file_size / (1024 * 1024),
+                   MAX_INPUT_FILE_SIZE // (1024 * 1024))
+            )
+
+        fmt = _detect_format(resolved)
+        if fmt == 'csv':
+            points = _parse_points_csv(resolved)
+        elif fmt == 'json':
+            points = _parse_points_json(resolved)
+        elif fmt == 'geojson':
+            points = _parse_points_geojson(resolved)
+        else:
+            points = _parse_points_txt(resolved)
+
+        if not points:
+            raise ValueError("No valid points found in '%s'" % filename)
+
+        _check_point_limit(points, filename)
+
+        s, n, w, e = self.bounds
+        out_of_bounds = [
+            (lng, lat) for lng, lat in points
+            if lng < w or lng > e or lat < s or lat > n
+        ]
+        if out_of_bounds:
+            warnings.warn(
+                "%d of %d points in '%s' fall outside the current search "
+                "bounds [%.1f, %.1f] x [%.1f, %.1f]. %s"
+                % (len(out_of_bounds), len(points), filename,
+                   w, e, s, n,
+                   "Auto-adjusting bounds." if auto_bounds
+                   else "Results may be incorrect.")
+            )
+
+        if auto_bounds:
+            self.bounds = compute_bounds(points)
+
+        tree = None
+        if _HAS_SCIPY:
+            import numpy as _np
+            tree = KDTree(_np.array(points))
+
+        self._file_cache[filename] = {'points': points, 'tree': tree}
+        if tree is not None:
+            self._tree_by_data_id[id(points)] = tree
+
+        return points
+
+    def _get_kdtree(self, data):
+        """Retrieve the cached KDTree for a data list, or None."""
+        tree = self._tree_by_data_id.get(id(data))
+        if tree is None:
+            for entry in self._file_cache.values():
+                if entry['points'] is data:
+                    tree = entry['tree']
+                    break
+        return tree
+
+    def get_NN(self, data, lng, lat):
+        """Return the nearest neighbor from data (excluding exact matches).
+
+        See module-level :func:`get_NN` for full documentation.
+        """
+        Oracle.calls += 1
+
+        if _HAS_SCIPY:
+            tree = self._get_kdtree(data)
+            if tree is None and len(data) >= 20:
+                import numpy as _np
+                tree = KDTree(_np.array(data) if not isinstance(data, _np.ndarray) else data)
+                self._tree_by_data_id[id(data)] = tree
+
+            if tree is not None:
+                k = min(2, len(data))
+                dists, idxs = tree.query([lng, lat], k=k)
+                if k == 1:
+                    dists = [dists]
+                    idxs = [idxs]
+                for d, idx in zip(dists, idxs):
+                    if d > 0:
+                        return data[idx]
+                raise ValueError(
+                    "No valid nearest neighbor found for query (%s, %s)"
+                    % (lng, lat)
+                )
+
+        mindist_sq = math.inf
+        minlng = None
+        minlat = None
+        for slng, slat in data:
+            _dx = slng - lng
+            _dy = slat - lat
+            dsq = _dx * _dx + _dy * _dy
+            if dsq > 0 and dsq <= mindist_sq:
+                mindist_sq = dsq
+                minlat = slat
+                minlng = slng
+
+        if minlng is None or minlat is None:
+            raise ValueError(
+                "No valid nearest neighbor found for query (%s, %s)"
+                % (lng, lat)
+            )
+        return minlng, minlat
+
+    def isect_B(self, alng, alat, dirn):
+        """Find boundary intersection points using this instance's bounds.
+
+        See module-level :func:`isect_B` for full documentation.
+        """
+        s, n, w, e = self.bounds
+
+        if math.isinf(dirn):
+            return [alng, n, alng, s]
+        if dirn == 0:
+            return [w, alat, e, alat]
+
+        xt = float(n - alat) / dirn + alng
+        xb = float(s - alat) / dirn + alng
+        yr = dirn * (e - alng) + alat
+        yl = dirn * (w - alng) + alat
+
+        count = 0
+        r0x = r0y = r1x = r1y = r2x = r2y = r3x = r3y = 0.0
+
+        if w <= xt <= e:
+            r0x, r0y = xt, n
+            count += 1
+        if w <= xb <= e:
+            if count == 0:
+                r0x, r0y = xb, s
+            elif count == 1:
+                r1x, r1y = xb, s
+            else:
+                r2x, r2y = xb, s
+            count += 1
+        if s <= yl <= n:
+            if count == 0:
+                r0x, r0y = w, yl
+            elif count == 1:
+                r1x, r1y = w, yl
+            elif count == 2:
+                r2x, r2y = w, yl
+            else:
+                r3x, r3y = w, yl
+            count += 1
+        if s <= yr <= n:
+            if count == 0:
+                r0x, r0y = e, yr
+            elif count == 1:
+                r1x, r1y = e, yr
+            elif count == 2:
+                r2x, r2y = e, yr
+            else:
+                r3x, r3y = e, yr
+            count += 1
+
+        if count == 2:
+            return [r0x, r0y, r1x, r1y]
+        if count == 1:
+            return [r0x, r0y, r0x, r0y]
+        if count >= 3:
+            candidates = [(r0x, r0y), (r1x, r1y), (r2x, r2y)]
+            if count >= 4:
+                candidates.append((r3x, r3y))
+            seen = set()
+            ret = []
+            for pt in candidates:
+                key = (round(pt[0], 10), round(pt[1], 10))
+                if key not in seen:
+                    seen.add(key)
+                    ret.extend(pt)
+            if len(ret) == 4:
+                return ret
+            if len(ret) == 2:
+                return ret + ret
+
+        raise RuntimeError(
+            "Line from (%s, %s) with slope %s does not intersect search "
+            "boundary [%s,%s]x[%s,%s]"
+            % (alng, alat, dirn, w, e, s, n)
+        )
+
+    def find_area(self, data, dlng, dlat):
+        """Compute area and vertex count of a Voronoi region.
+
+        Uses this instance's bounds for boundary intersections.
+        See module-level :func:`find_area` for full documentation.
+        """
+        elng, elat = self.get_NN(data, dlng, dlat)
+        alng_, alat_ = mid_point(dlng, dlat, elng, elat)
+        dirn = perp_dir(elng, elat, dlng, dlat)
+
+        ag = [alng_]
+        at = [alat_]
+        i = 0
+        while True:
+            B = self.isect_B(ag[i], at[i], dirn)
+            if (ag[i], at[i]) == (B[0], B[1]):
+                Bx, By = B[2], B[3]
+            elif (ag[i], at[i]) == (B[2], B[3]):
+                Bx, By = B[0], B[1]
+            else:
+                Bx, By = find_BXY(B, dlng, dlat)
+            a_g, a_t = bin_search(data, Bx, By, ag[i], at[i], dlng, dlat)
+
+            if self.get_NN(data, a_g, a_t) == (dlng, dlat):
+                ag.append(a_g)
+                at.append(a_t)
+            else:
+                raise RuntimeError(
+                    "Voronoi vertex (%s, %s) does not map back to data "
+                    "point (%s, %s)" % (a_g, a_t, dlng, dlat)
+                )
+
+            dirn1 = new_dir(data,
+                ag[i], at[i], ag[i + 1], at[i + 1], dlng, dlat)
+
+            if i > 2:
+                if _slopes_equal(dirn, dirn1):
+                    break
+                fin_isect = isect(
+                    ag[i + 1], at[i + 1], ag[i], at[i], elng, elat,
+                    dlng, dlat)
+                if fin_isect != (-1, -1):
+                    break
+                if i >= MAX_VERTICES:
+                    warnings.warn(
+                        "Voronoi region for point (%s, %s) exceeded %d "
+                        "vertices; polygon may be incomplete"
+                        % (dlng, dlat, MAX_VERTICES)
+                    )
+                    break
+
+            dirn = dirn1
+            i += 1
+
+        area = polygon_area(ag, at)
+        return area, len(ag)
+
+    def get_sum(self, filename, N1):
+        """Estimate the number of Voronoi regions by random sampling.
+
+        Uses this instance's bounds and cache.
+        See module-level :func:`get_sum` for full documentation.
+        """
+        data = self.load_data(filename)
+        s, n, w, e = self.bounds
+        total_area = (n - s) * (e - w)
+
+        best_estimate = None
+        best_distance = float('inf')
+        _area_cache = {}
+
+        for attempt in range(MAX_RETRIES):
+            Oracle.calls = 0
+            max_edges = 0
+            sum_edges = 0
+            sum_estimates = 0.0
+            valid_count = 0
+
+            if _HAS_SCIPY:
+                tree = self._get_kdtree(data)
+                if tree is not None:
+                    import numpy as _np
+                    sample_pts = _np.column_stack([
+                        _np.random.uniform(w, e, N1),
+                        _np.random.uniform(s, n, N1),
+                    ])
+                    dists, idxs = tree.query(sample_pts, k=2)
+                    data_arr = _np.asarray(data)
+                    use_second = dists[:, 0] == 0
+                    chosen_idx = _np.where(use_second, idxs[:, 1], idxs[:, 0])
+                    nn_coords = data_arr[chosen_idx]
+                    Oracle.calls += N1
+                else:
+                    nn_coords = None
+            else:
+                nn_coords = None
+
+            for i in range(N1):
+                if nn_coords is not None:
+                    row = nn_coords[i]
+                    dlng, dlat = float(row[0]), float(row[1])
+                else:
+                    plng = random.uniform(w, e)
+                    plat = random.uniform(s, n)
+                    dlng, dlat = self.get_NN(data, plng, plat)
+
+                cache_key = (dlng, dlat)
+                if cache_key in _area_cache:
+                    area, v_edges = _area_cache[cache_key]
+                else:
+                    area, v_edges = self.find_area(data, dlng, dlat)
+                    _area_cache[cache_key] = (area, v_edges)
+
+                if area > 0:
+                    sum_estimates += total_area / area
+                    valid_count += 1
+                    sum_edges += v_edges
+                    if v_edges > max_edges:
+                        max_edges = v_edges
+
+            if valid_count > 0:
+                Sum = sum_estimates / valid_count
+                avg_edges = sum_edges / valid_count
+            else:
+                Sum = 0
+                avg_edges = 0
+
+            dist = abs(Sum - N1)
+            if dist < best_distance:
+                best_distance = dist
+                best_estimate = (Sum, max_edges, avg_edges)
+
+            lo_factor = max(0.2, 0.5 - 0.05 * attempt)
+            hi_factor = min(3.0, 1.5 + 0.05 * attempt)
+
+            if (N1 * lo_factor <= Sum <= N1 * hi_factor):
+                if (Sum <= N1):
+                    return int(Sum) + 1, max_edges, avg_edges
+                else:
+                    return int(Sum), max_edges, avg_edges
+
+        est_sum, est_max_e, est_avg_e = best_estimate
+        result = int(est_sum) + (1 if est_sum <= N1 else 0)
+        return result, est_max_e, est_avg_e
+
+
+# ── Default global instance for backward compatibility ─────────────────────
+_default = VoronoiEstimator()
+
+
 import re as _re
 
 _CSS_VALUE_RE = _re.compile(r'^[a-zA-Z0-9#_.,() /%+-]+$')
@@ -2913,6 +3333,10 @@ def _build_parser():
     from vormap_sentinel import add_sentinel_args
     add_sentinel_args(parser)
 
+    # ── Spatial Resilience ───────────────────────────────────────
+    from vormap_resilience import add_resilience_args
+    add_resilience_args(parser)
+
     return parser
 
 
@@ -3166,6 +3590,17 @@ def main():
     if sentinel_requested:
         from vormap_sentinel import run_sentinel_cli
         run_sentinel_cli(args, args.datafile)
+
+    # Spatial Resilience
+    resilience_requested = any([
+        getattr(args, 'resilience', False),
+        getattr(args, 'resilience_json', None),
+        getattr(args, 'resilience_html', None),
+        getattr(args, 'resilience_what_if', None),
+    ])
+    if resilience_requested:
+        from vormap_resilience import run_resilience_cli
+        run_resilience_cli(args, args.datafile)
 
 
 if __name__ == '__main__':

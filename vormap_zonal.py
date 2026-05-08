@@ -37,7 +37,6 @@ import math
 import os
 import json
 import argparse
-import sys
 
 import vormap
 

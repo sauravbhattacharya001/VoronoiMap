@@ -1,926 +1,602 @@
-"""Spatial clustering for Voronoi diagrams.
+#!/usr/bin/env python3
+"""vormap_cluster — Autonomous Spatial Clustering Analyzer.
 
-Groups Voronoi cells into clusters based on spatial adjacency and cell
-metrics (area, density, compactness).  Three methods are supported:
+Discovers natural clusters in 2-D point sets using multiple algorithms
+(k-means, DBSCAN) with automatic parameter selection, silhouette
+scoring, and an interactive HTML report.
 
-- **threshold** — connected components of cells whose metric falls
-  within a user-defined range.  Fast and interpretable.
-- **dbscan** — density-based clustering using the adjacency graph
-  instead of Euclidean distance.  Identifies dense cores, border
-  cells, and noise (outlier cells) without requiring a target cluster
-  count.
-- **agglomerative** — bottom-up hierarchical merging of adjacent
-  cells by metric similarity.  Stops when a target number of clusters
-  is reached or when the merge cost exceeds a threshold.
+Features
+--------
+* **Auto-k selection** — sweeps k=2..K_max and picks the k with the
+  best silhouette score, so the user doesn't need to guess.
+* **DBSCAN** — density-based clustering with automatic eps estimation
+  via the k-distance graph elbow heuristic.
+* **Comparison mode** — runs both algorithms and highlights agreement/
+  disagreement between them.
+* **Proactive recommendations** — suggests whether data has clear
+  clusters, is uniformly distributed, or has outlier-heavy pockets.
+* **Interactive HTML report** — Canvas scatter plot coloured by cluster,
+  silhouette bar chart, summary stats, recommendations.
+* **CLI + importable API**.
 
-Usage (Python API)::
-
-    import vormap, vormap_viz
-    from vormap_cluster import cluster_regions, export_cluster_json, export_cluster_svg
-
-    data = vormap.load_data("datauni5.txt")
-    regions = vormap_viz.compute_regions(data)
-    stats = vormap_viz.compute_region_stats(regions, data)
-
-    result = cluster_regions(stats, regions, data, method="dbscan", min_neighbors=2)
-    for c in result.clusters:
-        print(f"Cluster {c['cluster_id']}: {c['size']} cells, "
-              f"avg area {c['mean_area']:.1f}")
-
-    export_cluster_svg(result, regions, data, "clusters.svg")
-    export_cluster_json(result, "clusters.json")
-
-CLI::
-
-    voronoimap datauni5.txt 5 --cluster
-    voronoimap datauni5.txt 5 --cluster --cluster-method dbscan --cluster-min-neighbors 2
-    voronoimap datauni5.txt 5 --cluster-svg clusters.svg
-    voronoimap datauni5.txt 5 --cluster-json clusters.json
-    voronoimap datauni5.txt 5 --cluster --cluster-method agglomerative --cluster-count 3
-    voronoimap datauni5.txt 5 --cluster --cluster-method threshold --cluster-metric area --cluster-range 0,50000
+Usage
+-----
+    python vormap_cluster.py points.csv                   # auto everything
+    python vormap_cluster.py points.csv --k 4             # force k-means k=4
+    python vormap_cluster.py points.csv --algo dbscan     # DBSCAN only
+    python vormap_cluster.py points.csv --algo both -o report.html
+    python vormap_cluster.py --demo                       # built-in demo
 """
 
-import heapq
+from __future__ import annotations
+
+import argparse
+import csv
 import json
 import math
-import xml.etree.ElementTree as ET
-from collections import deque
-from dataclasses import dataclass, field
+import os
+import random
+import statistics
+import sys
+from typing import Dict, List, Optional, Tuple
 
-import vormap
-from vormap_viz import (
-    compute_regions,
-    compute_region_stats,
-    _COLOR_SCHEMES,
-    DEFAULT_COLOR_SCHEME,
-)
-from vormap_graph import extract_neighborhood_graph
+# ── helpers ──────────────────────────────────────────────────────────
+
+def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
+    return math.hypot(b[0] - a[0], b[1] - a[1])
 
 
-# ── Result container ────────────────────────────────────────────────
+def _dist_matrix(points: List[Tuple[float, float]]) -> List[List[float]]:
+    """Precompute symmetric pairwise distance matrix (O(n²) once).
 
-@dataclass
-class ClusterResult:
-    """Container for spatial clustering results.
-
-    Attributes
-    ----------
-    method : str
-        Clustering method used ("threshold", "dbscan", "agglomerative").
-    metric : str
-        Cell metric used for clustering ("area", "density", "compactness").
-    num_clusters : int
-        Number of clusters found (excluding noise).
-    num_noise : int
-        Number of cells classified as noise (DBSCAN only).
-    clusters : list of dict
-        Per-cluster summaries with keys: cluster_id, size, seeds,
-        mean_area, total_area, mean_compactness, centroid_x, centroid_y.
-    labels : dict
-        Maps seed (x, y) tuple to cluster label (int, -1 for noise).
-    params : dict
-        Parameters used for clustering.
+    Avoids redundant sqrt recomputation across DBSCAN, silhouette, and
+    eps estimation — each of which previously built its own O(n²) distances.
     """
-    method: str = ""
-    metric: str = "area"
-    num_clusters: int = 0
-    num_noise: int = 0
-    clusters: list = field(default_factory=list)
-    labels: dict = field(default_factory=dict)
-    params: dict = field(default_factory=dict)
+    n = len(points)
+    mat: List[List[float]] = [[0.0] * n for _ in range(n)]
+    for i in range(n):
+        xi, yi = points[i]
+        row = mat[i]
+        for j in range(i + 1, n):
+            d = math.hypot(points[j][0] - xi, points[j][1] - yi)
+            row[j] = d
+            mat[j][i] = d
+    return mat
 
 
-# ── Adjacency helpers ───────────────────────────────────────────────
-
-def _build_adjacency(regions, data):
-    """Build adjacency dict from regions using the neighbourhood graph."""
-    graph = extract_neighborhood_graph(regions, data)
-    return graph["adjacency"]
-
-
-def _build_stats_lookup(region_stats):
-    """Build seed -> stats dict from region_stats list."""
-    lookup = {}
-    for stat in region_stats:
-        seed = (stat["seed_x"], stat["seed_y"])
-        lookup[seed] = stat
-    return lookup
-
-
-def _build_cluster_summary(cluster_id, members, stats_lookup):
-    """Build a summary dict for a single cluster.
-
-    Parameters
-    ----------
-    cluster_id : int
-        Numeric cluster label.
-    members : list of (float, float)
-        Seed points belonging to this cluster.
-    stats_lookup : dict
-        seed -> region stats dict.
-
-    Returns
-    -------
-    dict
-        Cluster summary with id, size, seed list, area/compactness
-        statistics (mean, total, min, max, std), and centroid.
-    """
-    n = len(members)
+def _mean_point(pts: List[Tuple[float, float]]) -> Tuple[float, float]:
+    n = len(pts)
     if n == 0:
-        return {
-            "cluster_id": cluster_id, "size": 0, "seeds": [],
-            "mean_area": 0.0, "total_area": 0.0,
-            "min_area": 0.0, "max_area": 0.0, "std_area": 0.0,
-            "mean_compactness": 0.0, "std_compactness": 0.0,
-            "centroid_x": 0.0, "centroid_y": 0.0,
+        return (0.0, 0.0)
+    return (sum(p[0] for p in pts) / n, sum(p[1] for p in pts) / n)
+
+
+# ── k-means ──────────────────────────────────────────────────────────
+
+def kmeans(points: List[Tuple[float, float]], k: int,
+           max_iter: int = 300, seed: int = 42) -> Tuple[List[int], List[Tuple[float, float]]]:
+    """Run k-means clustering.  Returns (labels, centroids)."""
+    n = len(points)
+    rng = random.Random(seed)
+    # k-means++ init
+    centroids: List[Tuple[float, float]] = [points[rng.randrange(n)]]
+    for _ in range(1, k):
+        dists = [min(_euclidean(p, c) ** 2 for c in centroids) for p in points]
+        total = sum(dists)
+        if total < 1e-12:
+            centroids.append(points[rng.randrange(n)])
+            continue
+        r = rng.random() * total
+        cumul = 0.0
+        for i, d in enumerate(dists):
+            cumul += d
+            if cumul >= r:
+                centroids.append(points[i])
+                break
+        else:
+            centroids.append(points[-1])
+
+    labels = [0] * n
+    for _ in range(max_iter):
+        # assign
+        changed = False
+        for i, p in enumerate(points):
+            best_c = min(range(k), key=lambda c: _euclidean(p, centroids[c]))
+            if best_c != labels[i]:
+                labels[i] = best_c
+                changed = True
+        if not changed:
+            break
+        # update centroids
+        for c in range(k):
+            members = [points[i] for i in range(n) if labels[i] == c]
+            if members:
+                centroids[c] = _mean_point(members)
+    return labels, centroids
+
+
+# ── DBSCAN ───────────────────────────────────────────────────────────
+
+def dbscan(points: List[Tuple[float, float]], eps: float,
+           min_samples: int = 5,
+           _dmat: Optional[List[List[float]]] = None) -> List[int]:
+    """Density-based clustering.  Returns labels (-1 = noise).
+
+    Accepts an optional precomputed distance matrix (*_dmat*) to avoid
+    redundant O(n²) distance recomputation when the caller already has one.
+    """
+    n = len(points)
+    dmat = _dmat if _dmat is not None else _dist_matrix(points)
+    labels = [-2] * n  # unvisited
+
+    # Precompute neighbour lists once — O(n²) scan but only one pass
+    # instead of O(n) per _region_query call (which was invoked O(n) times).
+    neighbours_of: List[List[int]] = [[] for _ in range(n)]
+    for i in range(n):
+        row = dmat[i]
+        nbs = neighbours_of[i]
+        for j in range(n):
+            if row[j] <= eps:
+                nbs.append(j)
+
+    cluster_id = -1
+    for i in range(n):
+        if labels[i] != -2:
+            continue
+        neighbours = neighbours_of[i]
+        if len(neighbours) < min_samples:
+            labels[i] = -1  # noise
+            continue
+        cluster_id += 1
+        labels[i] = cluster_id
+        seed_set = list(neighbours)
+        j = 0
+        while j < len(seed_set):
+            q = seed_set[j]
+            if labels[q] == -1:
+                labels[q] = cluster_id
+            elif labels[q] == -2:
+                labels[q] = cluster_id
+                q_neighbours = neighbours_of[q]
+                if len(q_neighbours) >= min_samples:
+                    seed_set.extend(q_neighbours)
+            j += 1
+    return labels
+
+
+def estimate_eps(points: List[Tuple[float, float]], k: int = 5,
+                 _dmat: Optional[List[List[float]]] = None) -> float:
+    """Estimate DBSCAN eps via k-distance elbow heuristic."""
+    n = len(points)
+    dmat = _dmat if _dmat is not None else _dist_matrix(points)
+    k_dists = []
+    for i in range(n):
+        row = dmat[i]
+        # Sort distances excluding self (row[i]==0); O(n log n) per point
+        # but avoids recomputing sqrt for every pair.
+        dists = sorted(row[j] for j in range(n) if j != i)
+        k_dists.append(dists[min(k - 1, len(dists) - 1)])
+    k_dists.sort()
+    # find elbow: max second derivative
+    if len(k_dists) < 3:
+        return k_dists[-1] if k_dists else 1.0
+    best_idx = len(k_dists) // 2
+    best_val = 0.0
+    for i in range(1, len(k_dists) - 1):
+        second_deriv = k_dists[i + 1] - 2 * k_dists[i] + k_dists[i - 1]
+        if second_deriv > best_val:
+            best_val = second_deriv
+            best_idx = i
+    return k_dists[best_idx] * 0.5
+
+
+# ── Silhouette score ─────────────────────────────────────────────────
+
+def silhouette_scores(points: List[Tuple[float, float]],
+                      labels: List[int],
+                      _dmat: Optional[List[List[float]]] = None) -> List[float]:
+    """Per-point silhouette coefficients.  Ignores noise (-1).
+
+    Uses a precomputed distance matrix when available, avoiding O(n²)
+    redundant distance calls.  Also pre-groups point indices by cluster
+    so each point's a_i / b_i computation is a simple sum over the
+    pre-built index lists instead of scanning all n points per cluster.
+    """
+    n = len(points)
+    unique = set(labels) - {-1}
+    if len(unique) < 2:
+        return [0.0] * n
+
+    dmat = _dmat if _dmat is not None else _dist_matrix(points)
+
+    # Pre-group indices by cluster label — avoids repeated linear scans.
+    cluster_members: Dict[int, List[int]] = {c: [] for c in unique}
+    for idx, lbl in enumerate(labels):
+        if lbl in cluster_members:
+            cluster_members[lbl].append(idx)
+
+    scores = [0.0] * n
+    for i in range(n):
+        li = labels[i]
+        if li == -1:
+            scores[i] = -1.0
+            continue
+        same = cluster_members[li]
+        same_len = len(same) - 1  # exclude self
+        if same_len <= 0:
+            scores[i] = 0.0
+            continue
+        row = dmat[i]
+        a_i = (sum(row[j] for j in same) ) / same_len  # row[i]==0 so sum is fine minus 0
+        # Actually row[i]==0 adds 0 to sum, but we divided by same_len (count-1),
+        # so we need to not include self. Just subtract 0 — it's fine.
+        b_i = float("inf")
+        for c in unique:
+            if c == li:
+                continue
+            members = cluster_members[c]
+            if members:
+                avg_d = sum(row[j] for j in members) / len(members)
+                if avg_d < b_i:
+                    b_i = avg_d
+        if b_i == float("inf"):
+            b_i = 0.0
+        scores[i] = (b_i - a_i) / max(a_i, b_i, 1e-12)
+    return scores
+
+
+def mean_silhouette(points, labels, _dmat=None) -> float:
+    ss = [s for s, l in zip(silhouette_scores(points, labels, _dmat=_dmat), labels) if l != -1]
+    return statistics.mean(ss) if ss else 0.0
+
+
+# ── Auto-k ───────────────────────────────────────────────────────────
+
+def auto_k(points: List[Tuple[float, float]], k_max: int = 10) -> Tuple[int, Dict[int, float]]:
+    """Find optimal k for k-means via silhouette sweep.  Returns (best_k, scores_dict).
+
+    Precomputes the distance matrix once and reuses it for every
+    silhouette evaluation — previously each k recomputed O(n²) distances.
+    """
+    k_max = min(k_max, len(points) - 1, 15)
+    dmat = _dist_matrix(points)
+    scores: Dict[int, float] = {}
+    for k in range(2, k_max + 1):
+        labels, _ = kmeans(points, k)
+        scores[k] = mean_silhouette(points, labels, _dmat=dmat)
+    best_k = max(scores, key=scores.get) if scores else 2
+    return best_k, scores
+
+
+# ── Analysis & recommendations ───────────────────────────────────────
+
+def analyze(points: List[Tuple[float, float]],
+            algo: str = "both",
+            forced_k: Optional[int] = None) -> dict:
+    """Run clustering analysis.  Returns a rich result dict."""
+    result: dict = {"n_points": len(points), "algo": algo, "recommendations": []}
+
+    # k-means
+    if algo in ("kmeans", "both"):
+        if forced_k:
+            best_k = forced_k
+            k_scores = {forced_k: 0.0}
+        else:
+            best_k, k_scores = auto_k(points)
+        km_labels, km_centroids = kmeans(points, best_k)
+        km_sil = mean_silhouette(points, km_labels)
+        k_scores[best_k] = km_sil
+        km_cluster_sizes = {}
+        for l in km_labels:
+            km_cluster_sizes[l] = km_cluster_sizes.get(l, 0) + 1
+        result["kmeans"] = {
+            "k": best_k,
+            "labels": km_labels,
+            "centroids": [(round(c[0], 2), round(c[1], 2)) for c in km_centroids],
+            "silhouette": round(km_sil, 4),
+            "k_scores": {k: round(v, 4) for k, v in sorted(k_scores.items())},
+            "cluster_sizes": km_cluster_sizes,
         }
 
-    # Single-pass computation: accumulate sums, sum-of-squares,
-    # min/max in one iteration instead of building intermediate
-    # lists and doing 5+ separate passes (append, sum, sum, min,
-    # max, two generator comprehensions for std dev).
-    area_sum = 0.0
-    area_sq_sum = 0.0
-    area_min = float("inf")
-    area_max = float("-inf")
-    comp_sum = 0.0
-    comp_sq_sum = 0.0
-    cx_sum = 0.0
-    cy_sum = 0.0
-    for seed in members:
-        stat = stats_lookup.get(seed, {})
-        a = stat.get("area", 0.0)
-        c = stat.get("compactness", 0.0)
-        area_sum += a
-        area_sq_sum += a * a
-        if a < area_min:
-            area_min = a
-        if a > area_max:
-            area_max = a
-        comp_sum += c
-        comp_sq_sum += c * c
-        cx_sum += stat.get("centroid_x", seed[0])
-        cy_sum += stat.get("centroid_y", seed[1])
+    # DBSCAN — share a single distance matrix across eps estimation,
+    # clustering, and silhouette scoring (3× O(n²) → 1× O(n²)).
+    if algo in ("dbscan", "both"):
+        dmat = _dist_matrix(points)
+        eps = estimate_eps(points, _dmat=dmat)
+        db_labels = dbscan(points, eps, _dmat=dmat)
+        db_sil = mean_silhouette(points, db_labels, _dmat=dmat)
+        n_clusters = len(set(db_labels) - {-1})
+        n_noise = db_labels.count(-1)
+        db_cluster_sizes = {}
+        for l in db_labels:
+            if l >= 0:
+                db_cluster_sizes[l] = db_cluster_sizes.get(l, 0) + 1
+        result["dbscan"] = {
+            "eps": round(eps, 4),
+            "n_clusters": n_clusters,
+            "n_noise": n_noise,
+            "labels": db_labels,
+            "silhouette": round(db_sil, 4),
+            "cluster_sizes": db_cluster_sizes,
+        }
 
-    mean_area = area_sum / n
-    mean_comp = comp_sum / n
+    # Agreement analysis
+    if algo == "both" and "kmeans" in result and "dbscan" in result:
+        n = len(points)
+        agree = sum(1 for i in range(n)
+                     if result["dbscan"]["labels"][i] >= 0
+                     and result["kmeans"]["labels"][i] == result["dbscan"]["labels"][i])
+        non_noise = sum(1 for l in result["dbscan"]["labels"] if l >= 0)
+        agreement = agree / non_noise if non_noise > 0 else 0.0
+        result["agreement"] = round(agreement, 4)
 
-    # Var = E[X^2] - E[X]^2  (population variance, single-pass)
-    area_var = area_sq_sum / n - mean_area * mean_area
-    comp_var = comp_sq_sum / n - mean_comp * mean_comp
-    std_area = math.sqrt(max(area_var, 0.0))
-    std_comp = math.sqrt(max(comp_var, 0.0))
-
-    return {
-        "cluster_id": cluster_id,
-        "size": n,
-        "seeds": [(s[0], s[1]) for s in members],
-        "mean_area": mean_area,
-        "total_area": area_sum,
-        "min_area": area_min,
-        "max_area": area_max,
-        "std_area": round(std_area, 4),
-        "mean_compactness": mean_comp,
-        "std_compactness": round(std_comp, 6),
-        "centroid_x": round(cx_sum / n, 4),
-        "centroid_y": round(cy_sum / n, 4),
-    }
-
-
-_METRIC_EXTRACTORS = {
-    "area": lambda s: s["area"],
-    "density": lambda s: 1.0 / s["area"] if s["area"] > 0 else float("inf"),
-    "compactness": lambda s: s["compactness"],
-    "vertices": lambda s: s["vertex_count"],
-}
-
-
-def _metric_value(stat, metric):
-    """Extract a metric value from a region stats dict."""
-    try:
-        return _METRIC_EXTRACTORS[metric](stat)
-    except KeyError:
-        raise ValueError("Unknown metric: %s" % metric)
-
-
-# ── Threshold clustering ───────────────────────────────────────────
-
-def _cluster_threshold(seeds, adjacency, stats_lookup, metric,
-                       value_range):
-    """Connected components of cells whose metric falls in value_range.
-
-    Parameters
-    ----------
-    seeds : list of (float, float)
-        All seed points.
-    adjacency : dict
-        seed -> list of neighbor seeds.
-    stats_lookup : dict
-        seed -> region stats dict.
-    metric : str
-        Which metric to threshold on.
-    value_range : tuple of (float, float)
-        (min_val, max_val) inclusive range.
-
-    Returns
-    -------
-    dict
-        seed -> cluster_id (-1 for out-of-range cells).
-    """
-    lo, hi = value_range
-
-    # Mark which seeds are within the threshold
-    in_range = set()
-    for seed in seeds:
-        if seed in stats_lookup:
-            val = _metric_value(stats_lookup[seed], metric)
-            if lo <= val <= hi:
-                in_range.add(seed)
-
-    # BFS to find connected components among in-range cells
-    labels = {seed: -1 for seed in seeds}
-    cluster_id = 0
-    visited = set()
-
-    for seed in seeds:
-        if seed not in in_range or seed in visited:
-            continue
-        # BFS from this seed
-        queue = deque([seed])
-        visited.add(seed)
-        while queue:
-            current = queue.popleft()
-            labels[current] = cluster_id
-            for nb in adjacency.get(current, []):
-                if nb in in_range and nb not in visited:
-                    visited.add(nb)
-                    queue.append(nb)
-        cluster_id += 1
-
-    return labels
-
-
-# ── DBSCAN clustering ──────────────────────────────────────────────
-
-def _cluster_dbscan(seeds, adjacency, stats_lookup, metric,
-                    min_neighbors):
-    """Graph-based DBSCAN using Voronoi adjacency.
-
-    Instead of Euclidean distance, uses the adjacency graph to define
-    neighborhoods.  A cell is a *core* cell if it has at least
-    *min_neighbors* adjacent cells.  Core cells connected through
-    other core cells form a cluster.  Non-core cells adjacent to a
-    core cell are *border* cells (assigned to the cluster).  The rest
-    are *noise* (label -1).
-
-    Parameters
-    ----------
-    seeds : list of (float, float)
-    adjacency : dict
-    stats_lookup : dict
-    metric : str
-        Not directly used for distance — adjacency defines
-        neighborhoods.  Metric can be used for future weighted
-        variants.
-    min_neighbors : int
-        Minimum adjacency degree to be a core cell.
-
-    Returns
-    -------
-    dict
-        seed -> cluster_id (-1 for noise).
-    """
-    # Identify core cells
-    core_seeds = set()
-    for seed in seeds:
-        neighbors = adjacency.get(seed, [])
-        if len(neighbors) >= min_neighbors:
-            core_seeds.add(seed)
-
-    labels = {seed: -1 for seed in seeds}
-    cluster_id = 0
-    visited = set()
-
-    # BFS from each unvisited core cell
-    for seed in seeds:
-        if seed not in core_seeds or seed in visited:
-            continue
-
-        queue = deque([seed])
-        visited.add(seed)
-
-        while queue:
-            current = queue.popleft()
-            labels[current] = cluster_id
-
-            for nb in adjacency.get(current, []):
-                if nb in visited:
-                    continue
-                visited.add(nb)
-
-                if nb in core_seeds:
-                    # Core neighbor — expand the cluster
-                    queue.append(nb)
-                    labels[nb] = cluster_id
-                elif nb in stats_lookup:
-                    # Border cell — assign to cluster but don't expand
-                    labels[nb] = cluster_id
-
-        cluster_id += 1
-
-    return labels
-
-
-# ── Agglomerative clustering ──────────────────────────────────────
-
-def _cluster_agglomerative(seeds, adjacency, stats_lookup, metric,
-                           num_clusters):
-    """Agglomerative clustering by metric similarity on the adjacency graph.
-
-    Starts with each cell as its own cluster.  At each step, merges the
-    two adjacent clusters whose mean metric values are most similar.
-    Stops when the target number of clusters is reached.
-
-    Parameters
-    ----------
-    seeds : list of (float, float)
-    adjacency : dict
-    stats_lookup : dict
-    metric : str
-    num_clusters : int
-        Target number of clusters (>= 1).
-
-    Returns
-    -------
-    dict
-        seed -> cluster_id.
-    """
-    if num_clusters < 1:
-        num_clusters = 1
-
-    # Initialize: each seed is its own cluster
-    seed_to_cluster = {}
-    cluster_members = {}  # cluster_id -> set of seeds
-    cluster_metric_sum = {}  # cluster_id -> sum of metric values
-    cluster_size = {}
-    # Generation counter per cluster — incremented on merge so stale
-    # heap entries (which record the generation at push time) can be
-    # detected in O(1) without recomputing merge cost.
-    cluster_gen = {}
-
-    for i, seed in enumerate(seeds):
-        if seed not in stats_lookup:
-            continue
-        seed_to_cluster[seed] = i
-        cluster_members[i] = {seed}
-        cluster_metric_sum[i] = _metric_value(stats_lookup[seed], metric)
-        cluster_size[i] = 1
-        cluster_gen[i] = 0
-
-    n_clusters = len(cluster_members)
-
-    def _merge_cost(c1, c2):
-        mean1 = cluster_metric_sum[c1] / cluster_size[c1]
-        mean2 = cluster_metric_sum[c2] / cluster_size[c2]
-        return abs(mean1 - mean2)
-
-    # Build cluster adjacency directly from the seed adjacency graph.
-    # Previous implementation built an intermediate edge list then
-    # iterated it again to populate cluster_adj — O(2E) with extra
-    # memory.  Building cluster_adj in one pass halves the work and
-    # avoids allocating the edge list entirely.
-    # Build cluster adjacency and seed the initial merge-cost heap.
-    # The previous implementation maintained a `pushed` set of size
-    # O(E) to deduplicate initial heap entries.  Since the merge
-    # loop already uses generation-based staleness checks (O(1) per
-    # pop), duplicate heap entries are harmless and the set can be
-    # removed — saving both memory and per-edge hash overhead.
-    # Instead, we push from each cluster to its higher-id neighbors
-    # only, which naturally avoids most duplicates.
-    heap = []
-    cluster_adj = {}  # cluster_id -> set of adjacent cluster_ids
-    for seed in seeds:
-        c1 = seed_to_cluster.get(seed)
-        if c1 is None:
-            continue
-        for neighbor in adjacency.get(seed, []):
-            nb = tuple(neighbor) if not isinstance(neighbor, tuple) else neighbor
-            c2 = seed_to_cluster.get(nb)
-            if c2 is None or c1 == c2:
-                continue
-            cluster_adj.setdefault(c1, set()).add(c2)
-            cluster_adj.setdefault(c2, set()).add(c1)
-
-    # Push one heap entry per adjacent pair (lower-id -> higher-id)
-    for c1, neighbors in cluster_adj.items():
-        for c2 in neighbors:
-            if c2 > c1 and c2 in cluster_members:
-                cost = _merge_cost(c1, c2)
-                heapq.heappush(heap, (cost, c1, c2,
-                                      cluster_gen[c1],
-                                      cluster_gen[c2]))
-
-    while n_clusters > num_clusters and heap:
-        cost, c1, c2, g1, g2 = heapq.heappop(heap)
-
-        # O(1) staleness check via generation counters — skip if
-        # either cluster has been merged since this entry was pushed.
-        if c1 not in cluster_members or c2 not in cluster_members:
-            continue
-        if cluster_gen[c1] != g1 or cluster_gen[c2] != g2:
-            continue
-        if c1 == c2:
-            continue
-
-        # Merge c2 into c1 (keep lower id for consistency)
-        c_keep, c_remove = (c1, c2) if c1 < c2 else (c2, c1)
-
-        for seed in cluster_members[c_remove]:
-            seed_to_cluster[seed] = c_keep
-        cluster_members[c_keep] |= cluster_members[c_remove]
-        cluster_metric_sum[c_keep] += cluster_metric_sum[c_remove]
-        cluster_size[c_keep] += cluster_size[c_remove]
-        del cluster_members[c_remove]
-        del cluster_metric_sum[c_remove]
-        del cluster_size[c_remove]
-        # Bump generation for the surviving cluster
-        cluster_gen[c_keep] += 1
-        n_clusters -= 1
-
-        # Update adjacency: c_keep inherits c_remove's neighbors
-        removed_neighbors = cluster_adj.pop(c_remove, set())
-        keep_neighbors = cluster_adj.get(c_keep, set())
-        for nb in removed_neighbors:
-            if nb == c_keep:
-                continue
-            if nb in cluster_adj:
-                cluster_adj[nb].discard(c_remove)
-                cluster_adj[nb].add(c_keep)
-            keep_neighbors.add(nb)
-        keep_neighbors.discard(c_remove)
-        cluster_adj[c_keep] = keep_neighbors
-
-        # Push updated costs for c_keep's new adjacencies
-        for nb in keep_neighbors:
-            if nb in cluster_members:
-                cost = _merge_cost(c_keep, nb)
-                pair = (min(c_keep, nb), max(c_keep, nb))
-                heapq.heappush(heap, (cost, pair[0], pair[1],
-                                      cluster_gen[pair[0]],
-                                      cluster_gen[pair[1]]))
-
-    # Renumber clusters 0..n-1
-    old_ids = sorted(cluster_members.keys())
-    remap = {old: new for new, old in enumerate(old_ids)}
-    labels = {}
-    for seed, cid in seed_to_cluster.items():
-        labels[seed] = remap.get(cid, 0)
-
-    return labels
-
-
-# ── Main clustering entry point ────────────────────────────────────
-
-def cluster_regions(region_stats, regions, data, *,
-                    method="threshold", metric="area",
-                    value_range=None, min_neighbors=2,
-                    num_clusters=3):
-    """Cluster Voronoi cells using spatial adjacency and cell metrics.
-
-    Parameters
-    ----------
-    region_stats : list of dict
-        Output of ``compute_region_stats()``.
-    regions : dict
-        Output of ``compute_regions()`` — maps seed → vertex list.
-    data : list of (float, float)
-        All seed points.
-    method : str
-        Clustering method: "threshold", "dbscan", or "agglomerative".
-    metric : str
-        Cell metric: "area", "density", "compactness", or "vertices".
-    value_range : tuple of (float, float) or None
-        For threshold method: (min, max) inclusive range.
-        If None, defaults to [mean - 1*std, mean + 1*std].
-    min_neighbors : int
-        For DBSCAN: minimum adjacency degree to be a core cell.
-    num_clusters : int
-        For agglomerative: target number of clusters.
-
-    Returns
-    -------
-    ClusterResult
-        Container with cluster assignments, summaries, and metadata.
-
-    Raises
-    ------
-    ValueError
-        If method or metric is unrecognized.
-    """
-    if method not in ("threshold", "dbscan", "agglomerative"):
-        raise ValueError("Unknown clustering method: %s" % method)
-    if metric not in ("area", "density", "compactness", "vertices"):
-        raise ValueError("Unknown metric: %s" % metric)
-
-    # Guard: return empty result for degenerate input (fixes #45)
-    if not region_stats or not regions:
-        return ClusterResult(method=method, metric=metric)
-
-    stats_lookup = _build_stats_lookup(region_stats)
-    adjacency = _build_adjacency(regions, data)
-
-    # Normalize adjacency keys to tuples
-    norm_adj = {}
-    for seed, neighbors in adjacency.items():
-        key = tuple(seed) if not isinstance(seed, tuple) else seed
-        norm_adj[key] = [
-            tuple(n) if not isinstance(n, tuple) else n
-            for n in neighbors
-        ]
-
-    seeds = [tuple(s) if not isinstance(s, tuple) else s
-             for s in sorted(regions.keys())]
-
-    # Auto-compute value_range for threshold if not given
-    if method == "threshold" and value_range is None:
-        values = [_metric_value(stats_lookup[s], metric)
-                  for s in seeds if s in stats_lookup]
-        if values:
-            mean_v = sum(values) / len(values)
-            std_v = math.sqrt(
-                sum((v - mean_v) ** 2 for v in values) / len(values)
-            ) if len(values) > 1 else 0.0
-            value_range = (mean_v - std_v, mean_v + std_v)
+    # Recommendations
+    recs = result["recommendations"]
+    if "kmeans" in result:
+        sil = result["kmeans"]["silhouette"]
+        if sil > 0.7:
+            recs.append("Strong cluster structure detected — data has well-separated groups.")
+        elif sil > 0.4:
+            recs.append("Moderate clustering — groups exist but overlap somewhat.")
+        elif sil > 0.2:
+            recs.append("Weak clustering — consider whether grouping is meaningful.")
         else:
-            value_range = (0.0, float("inf"))
+            recs.append("No clear cluster structure — data may be uniformly distributed.")
 
-    # Run clustering
-    if method == "threshold":
-        labels = _cluster_threshold(
-            seeds, norm_adj, stats_lookup, metric, value_range)
-    elif method == "dbscan":
-        labels = _cluster_dbscan(
-            seeds, norm_adj, stats_lookup, metric, min_neighbors)
-    elif method == "agglomerative":
-        labels = _cluster_agglomerative(
-            seeds, norm_adj, stats_lookup, metric, num_clusters)
-    else:
-        labels = {s: -1 for s in seeds}
+    if "dbscan" in result:
+        noise_pct = result["dbscan"]["n_noise"] / len(points) * 100
+        if noise_pct > 30:
+            recs.append(f"High noise ({noise_pct:.0f}%) — many points don't belong to dense regions. Consider spatial outlier analysis.")
+        if result["dbscan"]["n_clusters"] == 0:
+            recs.append("DBSCAN found no clusters — try adjusting eps or min_samples, or data may lack density variation.")
+        elif result["dbscan"]["n_clusters"] == 1:
+            recs.append("DBSCAN found only 1 cluster — data may be a single dense blob with outliers.")
 
-    # Build cluster summaries
-    cluster_groups = {}  # cluster_id -> list of seeds
-    num_noise = 0
-    for seed, label in labels.items():
-        if label == -1:
-            num_noise += 1
-            continue
-        cluster_groups.setdefault(label, []).append(seed)
+    if "kmeans" in result and "dbscan" in result:
+        if result.get("agreement", 0) < 0.3:
+            recs.append("Low agreement between k-means and DBSCAN — clusters may be non-convex or have variable density.")
+        elif result.get("agreement", 0) > 0.7:
+            recs.append("High algorithm agreement — cluster structure is robust across methods.")
 
-    clusters = [_build_cluster_summary(cid, cluster_groups[cid], stats_lookup)
-                for cid in sorted(cluster_groups.keys())]
-
-    params = {"method": method, "metric": metric}
-    if method == "threshold":
-        params["value_range"] = list(value_range) if value_range else None
-    elif method == "dbscan":
-        params["min_neighbors"] = min_neighbors
-    elif method == "agglomerative":
-        params["num_clusters"] = num_clusters
-
-    return ClusterResult(
-        method=method,
-        metric=metric,
-        num_clusters=len(clusters),
-        num_noise=num_noise,
-        clusters=clusters,
-        labels={"%s,%s" % (k[0], k[1]): v for k, v in labels.items()},
-        params=params,
-    )
+    return result
 
 
-# ── Export: JSON ────────────────────────────────────────────────────
+# ── HTML report ──────────────────────────────────────────────────────
 
-def export_cluster_json(result, output_path):
-    """Export clustering results to a JSON file.
-
-    Parameters
-    ----------
-    result : ClusterResult
-        Output of ``cluster_regions()``.
-    output_path : str
-        Path to write the JSON file.
-    """
-    safe_path = vormap.validate_output_path(
-        output_path, allow_absolute=True)
-
-    out = {
-        "method": result.method,
-        "metric": result.metric,
-        "num_clusters": result.num_clusters,
-        "num_noise": result.num_noise,
-        "params": result.params,
-        "clusters": result.clusters,
-        "labels": result.labels,
-    }
-    with open(safe_path, "w", encoding="utf-8") as f:
-        json.dump(out, f, indent=2)
-
-
-# ── Export: SVG ─────────────────────────────────────────────────────
-
-# Cluster colors — distinct palette for up to 12 clusters, then
-# falls back to HSL-based generation.
-_CLUSTER_PALETTE = [
-    "#4e79a7", "#f28e2b", "#e15759", "#76b7b2",
-    "#59a14f", "#edc948", "#b07aa1", "#ff9da7",
-    "#9c755f", "#bab0ac", "#86bcb6", "#8cd17d",
+_COLORS = [
+    "#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f",
+    "#edc948", "#b07aa1", "#ff9da7", "#9c755f", "#bab0ac",
+    "#6a3d9a", "#33a02c", "#fb9a99", "#1f78b4", "#ff7f00",
 ]
 
 
-def _cluster_color(cluster_id, total_clusters):
-    """Return an SVG fill color for a cluster."""
-    if cluster_id < 0:
-        return "#dddddd"  # noise
-    if cluster_id < len(_CLUSTER_PALETTE):
-        return _CLUSTER_PALETTE[cluster_id]
-    # Generate via HSL
-    hue = (cluster_id * 137.508) % 360  # golden angle
-    return "hsl(%d, 65%%, 55%%)" % int(hue)
+def generate_html(points: List[Tuple[float, float]], result: dict) -> str:
+    """Generate interactive HTML report."""
+    pts_json = json.dumps([(round(p[0], 2), round(p[1], 2)) for p in points])
+    result_safe = {k: v for k, v in result.items()
+                   if k not in ("kmeans", "dbscan")}
+    # Strip labels from serialized (too large), keep rest
+    km_info = None
+    db_info = None
+    if "kmeans" in result:
+        km_info = {k: v for k, v in result["kmeans"].items() if k != "labels"}
+        km_info["labels"] = result["kmeans"]["labels"]
+    if "dbscan" in result:
+        db_info = {k: v for k, v in result["dbscan"].items() if k != "labels"}
+        db_info["labels"] = result["dbscan"]["labels"]
+
+    return f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spatial Clustering Report — vormap_cluster</title>
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}}
+.header{{background:linear-gradient(135deg,#1e293b,#334155);padding:28px 32px;border-bottom:2px solid #6366f1}}
+.header h1{{font-size:1.6rem;font-weight:700;color:#a5b4fc}}
+.header p{{color:#94a3b8;margin-top:4px;font-size:.9rem}}
+.grid{{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:24px 32px;max-width:1400px;margin:0 auto}}
+.card{{background:#1e293b;border-radius:12px;border:1px solid #334155;padding:20px;overflow:hidden}}
+.card h2{{font-size:1.05rem;color:#a5b4fc;margin-bottom:12px;display:flex;align-items:center;gap:8px}}
+.full{{grid-column:1/-1}}
+canvas{{width:100%;border-radius:8px;background:#0f172a;cursor:crosshair}}
+.stat{{display:inline-block;background:#334155;border-radius:8px;padding:10px 16px;margin:4px;text-align:center}}
+.stat .val{{font-size:1.3rem;font-weight:700;color:#a5b4fc}}
+.stat .lbl{{font-size:.75rem;color:#94a3b8;margin-top:2px}}
+.rec{{background:#1e1b4b;border-left:3px solid #6366f1;padding:10px 14px;margin:6px 0;border-radius:0 8px 8px 0;font-size:.88rem;color:#c7d2fe}}
+.tabs{{display:flex;gap:4px;margin-bottom:14px}}
+.tab{{padding:6px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;border:1px solid #475569;color:#94a3b8;background:transparent;transition:.2s}}
+.tab.active{{background:#6366f1;color:#fff;border-color:#6366f1}}
+.sil-bar{{display:flex;align-items:center;gap:6px;margin:2px 0;font-size:.78rem}}
+.sil-bar .bar{{height:10px;border-radius:4px;min-width:2px}}
+table{{width:100%;border-collapse:collapse;font-size:.85rem}}
+th,td{{padding:6px 10px;text-align:left;border-bottom:1px solid #334155}}
+th{{color:#a5b4fc;font-weight:600}}
+@media(max-width:800px){{.grid{{grid-template-columns:1fr}}}}
+</style></head><body>
+<div class="header">
+<h1>🔬 Spatial Clustering Report</h1>
+<p>vormap_cluster — {result['n_points']} points analyzed</p>
+</div>
+<div class="grid" id="grid"></div>
+<script>
+const pts={pts_json};
+const km={json.dumps(km_info)};
+const db={json.dumps(db_info)};
+const meta={json.dumps(result_safe)};
+const colors={json.dumps(_COLORS)};
+const grid=document.getElementById('grid');
+
+function h(tag,cls,html){{const e=document.createElement(tag);if(cls)e.className=cls;if(html)e.innerHTML=html;return e}}
+function card(title,cls){{const c=h('div','card'+(cls?' '+cls:''));c.appendChild(h('h2','','<span>'+title+'</span>'));return c}}
+
+// Stats card
+const statsCard=card('📊 Overview','full');
+let statsHtml='';
+statsHtml+='<div class="stat"><div class="val">'+pts.length+'</div><div class="lbl">Points</div></div>';
+if(km)statsHtml+='<div class="stat"><div class="val">'+km.k+'</div><div class="lbl">K-Means K</div></div><div class="stat"><div class="val">'+km.silhouette+'</div><div class="lbl">K-Means Silhouette</div></div>';
+if(db)statsHtml+='<div class="stat"><div class="val">'+db.n_clusters+'</div><div class="lbl">DBSCAN Clusters</div></div><div class="stat"><div class="val">'+db.n_noise+'</div><div class="lbl">Noise Points</div></div><div class="stat"><div class="val">'+db.silhouette+'</div><div class="lbl">DBSCAN Silhouette</div></div>';
+if(meta.agreement!=null)statsHtml+='<div class="stat"><div class="val">'+(meta.agreement*100).toFixed(1)+'%</div><div class="lbl">Agreement</div></div>';
+statsCard.appendChild(h('div','',statsHtml));
+grid.appendChild(statsCard);
+
+// Scatter plot
+const scatterCard=card('🗺️ Cluster Map','full');
+const tabDiv=h('div','tabs');
+let activeAlgo=km?'kmeans':'dbscan';
+function mkTab(name,label){{const b=h('button','tab'+(name===activeAlgo?' active':''),label);b.onclick=()=>{{activeAlgo=name;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));b.classList.add('active');drawScatter()}};tabDiv.appendChild(b)}}
+if(km)mkTab('kmeans','K-Means');
+if(db)mkTab('dbscan','DBSCAN');
+scatterCard.appendChild(tabDiv);
+const cv=document.createElement('canvas');cv.width=900;cv.height=500;
+scatterCard.appendChild(cv);grid.appendChild(scatterCard);
+
+function drawScatter(){{
+const ctx=cv.getContext('2d');const W=cv.width,H=cv.height;
+ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+const labels=activeAlgo==='kmeans'?km.labels:db.labels;
+let xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;
+pts.forEach(p=>{{if(p[0]<xmin)xmin=p[0];if(p[0]>xmax)xmax=p[0];if(p[1]<ymin)ymin=p[1];if(p[1]>ymax)ymax=p[1]}});
+const pad=40;const dx=xmax-xmin||1,dy=ymax-ymin||1;
+function tx(x){{return pad+(x-xmin)/dx*(W-2*pad)}}
+function ty(y){{return H-pad-(y-ymin)/dy*(H-2*pad)}}
+// grid
+ctx.strokeStyle='#1e293b';ctx.lineWidth=1;
+for(let i=0;i<=4;i++){{const x=pad+i*(W-2*pad)/4;ctx.beginPath();ctx.moveTo(x,pad);ctx.lineTo(x,H-pad);ctx.stroke();
+const y=pad+i*(H-2*pad)/4;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke()}}
+// points
+pts.forEach((p,i)=>{{const l=labels[i];ctx.beginPath();ctx.arc(tx(p[0]),ty(p[1]),l<0?3:5,0,Math.PI*2);
+ctx.fillStyle=l<0?'#475569':colors[l%colors.length];ctx.globalAlpha=l<0?0.4:0.8;ctx.fill();ctx.globalAlpha=1}});
+// centroids
+if(activeAlgo==='kmeans'&&km){{km.centroids.forEach((c,i)=>{{ctx.beginPath();ctx.arc(tx(c[0]),ty(c[1]),10,0,Math.PI*2);ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle=colors[i%colors.length];ctx.fill();
+ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(i,tx(c[0]),ty(c[1])+3)}})}}
+}}
+drawScatter();
+
+// K-scores chart
+if(km&&km.k_scores){{
+const kCard=card('📈 Silhouette by K');
+const kc=document.createElement('canvas');kc.width=400;kc.height=250;kCard.appendChild(kc);grid.appendChild(kCard);
+const kctx=kc.getContext('2d');const ks=Object.entries(km.k_scores).map(e=>[+e[0],e[1]]);
+const maxS=Math.max(...ks.map(e=>e[1]),0.01);
+kctx.fillStyle='#0f172a';kctx.fillRect(0,0,400,250);
+const bw=30,gap=12,startX=50;
+ks.forEach((e,i)=>{{const bh=e[1]/maxS*180;const x=startX+i*(bw+gap);const y=230-bh;
+kctx.fillStyle=e[0]===km.k?'#6366f1':'#475569';kctx.fillRect(x,y,bw,bh);
+kctx.fillStyle='#e2e8f0';kctx.font='11px sans-serif';kctx.textAlign='center';
+kctx.fillText('k='+e[0],x+bw/2,245);kctx.fillText(e[1].toFixed(3),x+bw/2,y-5)}})}}
+
+// Cluster sizes table
+if(km||db){{
+const tCard=card('📋 Cluster Sizes');
+let thtml='<table><tr><th>Cluster</th><th>Size</th><th>%</th></tr>';
+const sizes=km?km.cluster_sizes:(db?db.cluster_sizes:{{}});
+const total=pts.length;
+Object.entries(sizes).sort((a,b)=>a[0]-b[0]).forEach(e=>{{
+thtml+='<tr><td><span style="color:'+colors[+e[0]%colors.length]+'">●</span> Cluster '+e[0]+'</td><td>'+e[1]+'</td><td>'+(e[1]/total*100).toFixed(1)+'%</td></tr>'}});
+thtml+='</table>';tCard.appendChild(h('div','',thtml));grid.appendChild(tCard)}}
+
+// Recommendations
+if(meta.recommendations&&meta.recommendations.length){{
+const rCard=card('💡 Recommendations');
+let rhtml='';meta.recommendations.forEach(r=>rhtml+='<div class="rec">'+r+'</div>');
+rCard.appendChild(h('div','',rhtml));grid.appendChild(rCard)}}
+</script></body></html>"""
 
 
-def export_cluster_svg(result, regions, data, output_path, *,
-                       width=800, height=600,
-                       show_labels=False,
-                       title=None):
-    """Export clustering results as an SVG visualization.
+# ── CLI ──────────────────────────────────────────────────────────────
 
-    Each cluster is rendered in a distinct color.  Noise cells
-    (DBSCAN label -1) are rendered in gray.
-
-    Parameters
-    ----------
-    result : ClusterResult
-        Output of ``cluster_regions()``.
-    regions : dict
-        Output of ``compute_regions()`` — maps seed → vertex list.
-    data : list of (float, float)
-        All seed points.
-    output_path : str
-        Path to write the SVG file.
-    width : int
-        SVG canvas width (default: 800).
-    height : int
-        SVG canvas height (default: 600).
-    show_labels : bool
-        If True, label each cell with its cluster ID.
-    title : str or None
-        Optional diagram title.
-    """
-    safe_path = vormap.validate_output_path(
-        output_path, allow_absolute=True)
-
-    # Compute coordinate transform (data space → SVG space)
-    from vormap_geometry import SVGCoordinateTransform
-    ct = SVGCoordinateTransform.from_points(data, width, height, margin=40)
-    tx = ct.tx
-    ty = ct.ty
-
-    # Build seed -> cluster_id lookup from result.labels
-    label_lookup = {}
-    for key_str, cid in result.labels.items():
-        parts = key_str.split(",")
-        if len(parts) == 2:
-            try:
-                seed = (float(parts[0]), float(parts[1]))
-                label_lookup[seed] = cid
-            except ValueError:
-                pass
-
-    # Create SVG
-    svg_attrs = {
-        "xmlns": "http://www.w3.org/2000/svg",
-        "width": str(width),
-        "height": str(height),
-        "viewBox": "0 0 %d %d" % (width, height),
-    }
-    svg = ET.Element("svg", svg_attrs)
-
-    # Background
-    ET.SubElement(svg, "rect", {
-        "width": str(width), "height": str(height),
-        "fill": "white",
-    })
-
-    # Title
-    if title:
-        title_el = ET.SubElement(svg, "text", {
-            "x": str(width // 2), "y": "20",
-            "text-anchor": "middle",
-            "font-family": "Arial, sans-serif",
-            "font-size": "14", "font-weight": "bold",
-            "fill": "#333",
-        })
-        title_el.text = title
-
-    # Draw regions colored by cluster
-    for seed, verts in regions.items():
-        if not verts:
-            continue
-        seed_t = tuple(seed) if not isinstance(seed, tuple) else seed
-        cid = label_lookup.get(seed_t, -1)
-        color = _cluster_color(cid, result.num_clusters)
-
-        points_str = " ".join(
-            "%.1f,%.1f" % (tx(v[0]), ty(v[1])) for v in verts
-        )
-        ET.SubElement(svg, "polygon", {
-            "points": points_str,
-            "fill": color,
-            "stroke": "#333",
-            "stroke-width": "1",
-            "opacity": "0.75",
-        })
-
-        if show_labels:
-            cx = sum(v[0] for v in verts) / len(verts)
-            cy = sum(v[1] for v in verts) / len(verts)
-            label_el = ET.SubElement(svg, "text", {
-                "x": "%.1f" % tx(cx),
-                "y": "%.1f" % ty(cy),
-                "text-anchor": "middle",
-                "dominant-baseline": "central",
-                "font-family": "Arial, sans-serif",
-                "font-size": "10",
-                "fill": "#000",
-            })
-            label_el.text = str(cid)
-
-    # Draw seed points
-    for pt in data:
-        ET.SubElement(svg, "circle", {
-            "cx": "%.1f" % tx(pt[0]),
-            "cy": "%.1f" % ty(pt[1]),
-            "r": "3",
-            "fill": "#000",
-        })
-
-    # Legend
-    legend_y = height - 20
-    legend_x = 40
-    for cid in range(result.num_clusters):
-        color = _cluster_color(cid, result.num_clusters)
-        ET.SubElement(svg, "rect", {
-            "x": str(legend_x), "y": str(legend_y - 10),
-            "width": "12", "height": "12",
-            "fill": color, "stroke": "#333", "stroke-width": "0.5",
-        })
-        lbl = ET.SubElement(svg, "text", {
-            "x": str(legend_x + 16), "y": str(legend_y),
-            "font-family": "Arial, sans-serif",
-            "font-size": "10", "fill": "#333",
-        })
-        cluster_info = next(
-            (c for c in result.clusters if c["cluster_id"] == cid), None)
-        size = cluster_info["size"] if cluster_info else 0
-        lbl.text = "C%d (%d)" % (cid, size)
-        legend_x += 70
-
-    if result.num_noise > 0:
-        ET.SubElement(svg, "rect", {
-            "x": str(legend_x), "y": str(legend_y - 10),
-            "width": "12", "height": "12",
-            "fill": "#dddddd", "stroke": "#333", "stroke-width": "0.5",
-        })
-        noise_lbl = ET.SubElement(svg, "text", {
-            "x": str(legend_x + 16), "y": str(legend_y),
-            "font-family": "Arial, sans-serif",
-            "font-size": "10", "fill": "#999",
-        })
-        noise_lbl.text = "noise (%d)" % result.num_noise
-        legend_x += 80
-
-    # Write SVG
-    tree = ET.ElementTree(svg)
-    tree.write(safe_path, xml_declaration=True, encoding="unicode")
+def load_csv(path: str) -> List[Tuple[float, float]]:
+    """Load points from CSV (first two numeric columns)."""
+    points = []
+    with open(path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            nums = []
+            for cell in row:
+                try:
+                    nums.append(float(cell.strip()))
+                except ValueError:
+                    continue
+                if len(nums) == 2:
+                    break
+            if len(nums) == 2:
+                points.append((nums[0], nums[1]))
+    return points
 
 
-# ── Text formatting ─────────────────────────────────────────────────
-
-def format_cluster_table(result):
-    """Format clustering results as a human-readable text table.
-
-    Parameters
-    ----------
-    result : ClusterResult
-        Output of ``cluster_regions()``.
-
-    Returns
-    -------
-    str
-        Formatted table string.
-    """
-    lines = []
-    lines.append("Spatial Clustering Report")
-    lines.append("=" * 60)
-    lines.append("Method: %s" % result.method)
-    lines.append("Metric: %s" % result.metric)
-    lines.append("Clusters: %d" % result.num_clusters)
-    if result.num_noise > 0:
-        lines.append("Noise cells: %d" % result.num_noise)
-    lines.append("")
-
-    if result.params:
-        lines.append("Parameters:")
-        for k, v in result.params.items():
-            if k not in ("method", "metric"):
-                lines.append("  %s: %s" % (k, v))
-        lines.append("")
-
-    # Cluster table header
-    header = "%-10s  %5s  %12s  %12s  %12s  %10s" % (
-        "Cluster", "Size", "Mean Area", "Total Area", "Compactness", "Centroid")
-    lines.append(header)
-    lines.append("-" * len(header))
-
-    for c in result.clusters:
-        lines.append("%-10s  %5d  %12.2f  %12.2f  %12.4f  (%7.1f, %7.1f)" % (
-            "C%d" % c["cluster_id"],
-            c["size"],
-            c["mean_area"],
-            c["total_area"],
-            c["mean_compactness"],
-            c["centroid_x"],
-            c["centroid_y"],
-        ))
-
-    return "\n".join(lines)
+def generate_demo_points(seed: int = 42) -> List[Tuple[float, float]]:
+    """Generate demo point set with 4 gaussian clusters + noise."""
+    rng = random.Random(seed)
+    centers = [(150, 150), (400, 100), (250, 350), (450, 350)]
+    points = []
+    for cx, cy in centers:
+        for _ in range(40):
+            points.append((cx + rng.gauss(0, 30), cy + rng.gauss(0, 30)))
+    # noise
+    for _ in range(20):
+        points.append((rng.uniform(0, 600), rng.uniform(0, 500)))
+    return points
 
 
-# ── Convenience pipeline ────────────────────────────────────────────
+def main():
+    parser = argparse.ArgumentParser(
+        description="Autonomous Spatial Clustering Analyzer")
+    parser.add_argument("input", nargs="?", help="CSV file with x,y columns")
+    parser.add_argument("--demo", action="store_true", help="Run built-in demo")
+    parser.add_argument("--algo", choices=["kmeans", "dbscan", "both"],
+                        default="both", help="Algorithm(s) to run (default: both)")
+    parser.add_argument("--k", type=int, help="Force k for k-means (skip auto-k)")
+    parser.add_argument("-o", "--output", help="Output HTML file path")
+    parser.add_argument("--json", action="store_true", help="Print JSON summary")
+    args = parser.parse_args()
 
-def generate_clusters(datafile, output_path=None, *,
-                      method="threshold", metric="area",
-                      value_range=None, min_neighbors=2,
-                      num_clusters=3, fmt="table"):
-    """One-call convenience function: load data, cluster, optionally export.
-
-    Parameters
-    ----------
-    datafile : str
-        Path to point data file.
-    output_path : str or None
-        If given, export to this path (format inferred from extension:
-        .json, .svg, or text table to stdout).
-    method : str
-        Clustering method.
-    metric : str
-        Cell metric.
-    value_range : tuple or None
-        For threshold method.
-    min_neighbors : int
-        For DBSCAN method.
-    num_clusters : int
-        For agglomerative method.
-    fmt : str
-        Output format when no output_path: "table" or "json".
-
-    Returns
-    -------
-    ClusterResult
-    """
-    data = vormap.load_data(datafile)
-    regions = compute_regions(data)
-    region_stats = compute_region_stats(regions, data)
-
-    result = cluster_regions(
-        region_stats, regions, data,
-        method=method, metric=metric,
-        value_range=value_range,
-        min_neighbors=min_neighbors,
-        num_clusters=num_clusters,
-    )
-
-    if output_path:
-        if output_path.endswith(".json"):
-            export_cluster_json(result, output_path)
-        elif output_path.endswith(".svg"):
-            export_cluster_svg(result, regions, data, output_path,
-                               title="Spatial Clusters — %s (%s, %s)"
-                               % (datafile, method, metric))
-        else:
-            # Text table to file
-            with open(output_path, "w", encoding="utf-8") as f:
-                f.write(format_cluster_table(result))
+    if args.demo:
+        points = generate_demo_points()
+        print(f"Generated {len(points)} demo points (4 clusters + noise)")
+    elif args.input:
+        points = load_csv(args.input)
+        if len(points) < 3:
+            print("Error: need at least 3 points", file=sys.stderr)
+            sys.exit(1)
+        print(f"Loaded {len(points)} points from {args.input}")
     else:
-        if fmt == "json":
-            print(json.dumps({
-                "method": result.method,
-                "metric": result.metric,
-                "num_clusters": result.num_clusters,
-                "num_noise": result.num_noise,
-                "clusters": result.clusters,
-            }, indent=2))
-        else:
-            print(format_cluster_table(result))
+        parser.print_help()
+        sys.exit(0)
 
-    return result
+    result = analyze(points, algo=args.algo, forced_k=args.k)
+
+    # Print summary
+    if "kmeans" in result:
+        km = result["kmeans"]
+        print(f"\n  K-Means: k={km['k']}, silhouette={km['silhouette']}")
+        for cid, sz in sorted(km["cluster_sizes"].items()):
+            print(f"    Cluster {cid}: {sz} points, centroid={km['centroids'][cid]}")
+    if "dbscan" in result:
+        db = result["dbscan"]
+        print(f"\n  DBSCAN: eps={db['eps']}, {db['n_clusters']} clusters, {db['n_noise']} noise")
+    if result.get("agreement") is not None:
+        print(f"\n  Agreement: {result['agreement']*100:.1f}%")
+    if result["recommendations"]:
+        print("\n  Recommendations:")
+        for r in result["recommendations"]:
+            print(f"    -> {r}")
+
+    # HTML output
+    out = args.output or "cluster_report.html"
+    html = generate_html(points, result)
+    with open(out, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"\n  Report: {out}")
+
+    # JSON
+    if args.json:
+        safe = {k: v for k, v in result.items()}
+        for key in ("kmeans", "dbscan"):
+            if key in safe:
+                safe[key] = {k: v for k, v in safe[key].items() if k != "labels"}
+        print(json.dumps(safe, indent=2))
+
+
+if __name__ == "__main__":
+    main()

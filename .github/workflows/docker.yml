@@ -6,6 +6,9 @@ on:
     tags: ['v*']
   pull_request:
     branches: [master]
+  schedule:
+    # Rebuild weekly to pick up base-image security patches
+    - cron: '15 4 * * 1'
 
 env:
   REGISTRY: ghcr.io
@@ -17,6 +20,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+      # Required for SBOM attestation upload
+      attestations: write
+      id-token: write
 
     steps:
       - name: Checkout
@@ -43,8 +49,10 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=
+            type=schedule,pattern={{date}}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -54,9 +62,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
+          sbom: true
+          provenance: mode=max
 
+      # Load single-platform image for local scanning (push & PR)
       - name: Build image for scanning
-        if: github.event_name == 'pull_request'
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -65,11 +75,43 @@ jobs:
           cache-from: type=gha
 
       - name: Run Trivy vulnerability scanner
-        if: github.event_name == 'pull_request'
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:scan
           format: table
           exit-code: '1'
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+
+      - name: Trivy SARIF report
+        if: always()
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:scan
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH,MEDIUM
+          ignore-unfixed: true
+
+      - name: Upload Trivy SARIF to GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-container
+
+      - name: Generate SBOM
+        if: github.event_name != 'pull_request'
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:scan
+          artifact-name: sbom-voronoiMap.spdx.json
+          output-file: sbom.spdx.json
+
+      - name: Attest SBOM
+        if: github.event_name != 'pull_request' && steps.build.outputs.digest != ''
+        uses: actions/attest-sbom@v4
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          sbom-path: sbom.spdx.json

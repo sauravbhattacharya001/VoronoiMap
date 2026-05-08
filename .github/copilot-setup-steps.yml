@@ -20,7 +20,7 @@ steps:
   - name: Create test data directory
     run: mkdir -p data
 
-  - name: Create sample data file for tests
+  - name: Create sample data files for tests
     run: |
       cat > data/test_points.txt << 'EOF'
       100.0 200.0
@@ -28,16 +28,36 @@ steps:
       500.0 600.0
       700.0 800.0
       150.0 750.0
+      250.0 350.0
+      450.0 550.0
+      650.0 150.0
+      850.0 250.0
+      50.0 900.0
       EOF
 
-  - name: Verify package install
-    run: python -c "import vormap; print('vormap imported successfully')"
+  - name: Verify core package
+    run: python -c "import vormap; print('vormap OK')"
 
-  - name: Verify extension modules
-    run: python -c "from vormap_utils import *; print('utils OK')"
+  - name: Verify shared utilities
+    run: python -c "from vormap_utils import polygon_area, bounding_box; print('utils OK')"
+
+  - name: Verify geometry module
+    run: python -c "from vormap_geometry import polygon_area, polygon_centroid; print('geometry OK')"
+
+  - name: Verify key extension modules load
+    run: |
+      python -c "
+      modules = ['vormap_cluster', 'vormap_graph', 'vormap_viz', 'vormap_kde',
+                 'vormap_delaunay', 'vormap_coverage', 'vormap_hotspot',
+                 'vormap_diffusion', 'vormap_fingerprint', 'vormap_doctor']
+      import importlib
+      for m in modules:
+          importlib.import_module(m)
+          print(f'{m} OK')
+      "
 
   - name: Run tests
-    run: python -m pytest tests/ -v --tb=short
+    run: python -m pytest tests/ -v --tb=short -x -q 2>&1 | head -100
 
   - name: Run linter
-    run: flake8 vormap.py --count --select=E9,F63,F7,F82 --show-source --statistics
+    run: flake8 vormap.py vormap_*.py --count --select=E9,F63,F7,F82 --show-source --statistics

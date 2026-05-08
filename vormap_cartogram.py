@@ -29,6 +29,7 @@ Requires scipy (``pip install scipy``).
 """
 
 import argparse
+import html as _html_mod
 import json
 import math
 import os
@@ -128,6 +129,38 @@ def _compute_regions(seeds, bounds):
     return regions
 
 
+# ── Helpers ──────────────────────────────────────────────────────────
+
+def _auto_bounds(seeds):
+    """Compute a bounding box with 10% margin around seed coordinates."""
+    xs = [s[0] for s in seeds]
+    ys = [s[1] for s in seeds]
+    margin_x = (max(xs) - min(xs)) * 0.1 + 1
+    margin_y = (max(ys) - min(ys)) * 0.1 + 1
+    return (min(xs) - margin_x, min(ys) - margin_y,
+            max(xs) + margin_x, max(ys) + margin_y)
+
+
+def _step_seeds(seeds, regions, areas, target_areas, bounds, damping):
+    """Apply one cartogram iteration step: scale each seed toward/away from
+    its region centroid proportional to the area ratio.
+
+    Mutates *seeds* in place.
+    """
+    for i in range(len(seeds)):
+        if not regions[i] or areas[i] < 1e-12:
+            continue
+        ratio = target_areas[i] / areas[i]
+        scale = 1.0 + damping * (math.sqrt(ratio) - 1.0)
+        centroid = _polygon_centroid(regions[i])
+        new_x = centroid[0] + (seeds[i][0] - centroid[0]) * scale
+        new_y = centroid[1] + (seeds[i][1] - centroid[1]) * scale
+        # Clamp to bounds
+        new_x = max(bounds[0] + 1, min(bounds[2] - 1, new_x))
+        new_y = max(bounds[1] + 1, min(bounds[3] - 1, new_y))
+        seeds[i] = [new_x, new_y]
+
+
 # ── Cartogram Core ───────────────────────────────────────────────────
 
 def cartogram(points, values, iterations=50, tolerance=0.01, bounds=None,
@@ -174,12 +207,7 @@ def cartogram(points, values, iterations=50, tolerance=0.01, bounds=None,
 
     # Auto bounds
     if bounds is None:
-        xs = [s[0] for s in seeds]
-        ys = [s[1] for s in seeds]
-        margin_x = (max(xs) - min(xs)) * 0.1 + 1
-        margin_y = (max(ys) - min(ys)) * 0.1 + 1
-        bounds = (min(xs) - margin_x, min(ys) - margin_y,
-                  max(xs) + margin_x, max(ys) + margin_y)
+        bounds = _auto_bounds(seeds)
 
     total_area = (bounds[2] - bounds[0]) * (bounds[3] - bounds[1])
     target_areas = [(v / total_val) * total_area for v in vals]
@@ -203,23 +231,8 @@ def cartogram(points, values, iterations=50, tolerance=0.01, bounds=None,
         if max_error < tolerance:
             break
 
-        # Compute centroids and scale seeds
-        cx_all = (bounds[0] + bounds[2]) / 2
-        cy_all = (bounds[1] + bounds[3]) / 2
-
-        for i in range(n):
-            if not regions[i] or areas[i] < 1e-12:
-                continue
-            ratio = target_areas[i] / areas[i]
-            # Damped scaling: move seed away from/toward centroid
-            scale = 1.0 + damping * (math.sqrt(ratio) - 1.0)
-            centroid = _polygon_centroid(regions[i])
-            new_x = centroid[0] + (seeds[i][0] - centroid[0]) * scale
-            new_y = centroid[1] + (seeds[i][1] - centroid[1]) * scale
-            # Clamp to bounds
-            new_x = max(bounds[0] + 1, min(bounds[2] - 1, new_x))
-            new_y = max(bounds[1] + 1, min(bounds[3] - 1, new_y))
-            seeds[i] = [new_x, new_y]
+        # Scale seeds toward target areas
+        _step_seeds(seeds, regions, areas, target_areas, bounds, damping)
 
     # Final regions
     regions = _compute_regions(seeds, bounds)
@@ -304,7 +317,7 @@ def export_svg(result, output_path, width=800, height=600,
 
     if title:
         lines.append(f'<text x="{width//2}" y="15" text-anchor="middle" '
-                      f'font-size="14" font-family="sans-serif">{title}</text>')
+                      f'font-size="14" font-family="sans-serif">{_html_mod.escape(title)}</text>')
 
     # Determine color values
     if color_by == "error":
@@ -462,17 +475,10 @@ def _cli():
         base, ext = os.path.splitext(args.svg)
         # Re-run with frame capture
         frame_seeds = [list(p) for p in seeds]
-        frame_vals = vals
-        bounds = None
-        xs = [s[0] for s in seeds]
-        ys = [s[1] for s in seeds]
-        margin_x = (max(xs) - min(xs)) * 0.1 + 1
-        margin_y = (max(ys) - min(ys)) * 0.1 + 1
-        bounds = (min(xs) - margin_x, min(ys) - margin_y,
-                  max(xs) + margin_x, max(ys) + margin_y)
+        bounds = _auto_bounds(seeds)
         total_area = (bounds[2] - bounds[0]) * (bounds[3] - bounds[1])
-        total_val = sum(frame_vals)
-        target = [(v / total_val) * total_area for v in frame_vals]
+        total_val = sum(vals)
+        target = [(v / total_val) * total_area for v in vals]
 
         for frame in range(min(args.iterations, result['iterations'])):
             regions = _compute_regions(frame_seeds, bounds)
@@ -490,18 +496,8 @@ def _cli():
             export_svg(frame_result, frame_path, values=vals,
                        title=f"Iteration {frame}")
 
-            # Step
-            for i in range(len(frame_seeds)):
-                if not regions[i] or areas[i] < 1e-12:
-                    continue
-                ratio = target[i] / areas[i]
-                scale = 1.0 + args.damping * (math.sqrt(ratio) - 1.0)
-                centroid = _polygon_centroid(regions[i])
-                new_x = centroid[0] + (frame_seeds[i][0] - centroid[0]) * scale
-                new_y = centroid[1] + (frame_seeds[i][1] - centroid[1]) * scale
-                new_x = max(bounds[0] + 1, min(bounds[2] - 1, new_x))
-                new_y = max(bounds[1] + 1, min(bounds[3] - 1, new_y))
-                frame_seeds[i] = [new_x, new_y]
+            _step_seeds(frame_seeds, regions, areas, target, bounds,
+                        args.damping)
 
         print(f"Animation frames saved: {base}_frame*{ext}")
 

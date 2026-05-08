@@ -29,7 +29,6 @@ Requires: numpy, scipy, Pillow (``pip install numpy scipy Pillow``).
 
 import argparse
 import json
-import math
 import os
 import sys
 

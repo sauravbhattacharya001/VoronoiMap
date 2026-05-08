@@ -53,6 +53,7 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
 from vormap_geometry import edge_length as _dist
+from vormap_utils import clamp as _clamp
 
 
 

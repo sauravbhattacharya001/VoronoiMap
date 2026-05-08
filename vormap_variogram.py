@@ -56,6 +56,7 @@ Usage::
 
 
 import csv
+import html as _html_mod
 import json
 import math
 from dataclasses import dataclass
@@ -764,7 +765,7 @@ def export_variogram_svg(
         direction_info = f" [Direction: {ev.direction:.0f}°]"
     svg_parts.append(
         f'<text x="{width / 2}" y="30" text-anchor="middle" '
-        f'fill="#e6edf3" font-size="16" font-weight="600">{title}{direction_info}</text>'
+        f'fill="#e6edf3" font-size="16" font-weight="600">{_html_mod.escape(title)}{_html_mod.escape(direction_info)}</text>'
     )
 
     # Legend
