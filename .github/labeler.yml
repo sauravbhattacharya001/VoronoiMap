@@ -1,5 +1,16 @@
-# Auto-label PRs based on file paths
-# https://github.com/actions/labeler
+# Auto-label PRs based on changed file paths.
+# Docs: https://github.com/actions/labeler
+#
+# Design rules:
+#   * Use ONLY labels that exist in the repo (see `gh label list`).
+#   * Prefer descriptive labels (testing, ci/cd, visualization, …) over
+#     status labels (bug, enhancement) — those belong on issues, not PRs.
+#   * Keep each section narrow enough to convey signal. A label that lights
+#     up on every PR carries no information.
+
+# ---------------------------------------------------------------------------
+# Cross-cutting categories
+# ---------------------------------------------------------------------------
 
 documentation:
   - changed-files:
@@ -9,57 +20,52 @@ documentation:
           - '*.md'
           - 'mkdocs.yml'
           - '.github/copilot-instructions.md'
+          - '.github/ISSUE_TEMPLATE/**'
+          - '.github/PULL_REQUEST_TEMPLATE.md'
 
 ci/cd:
   - changed-files:
       - any-glob-to-any-file:
           - '.github/workflows/**'
-          - '.github/dependabot.yml'
           - '.github/labeler.yml'
+          - '.github/issue-labeler.yml'
           - '.github/copilot-setup-steps.yml'
+          - '.coveragerc'
+          - 'codecov.yml'
+
+infrastructure:
+  - changed-files:
+      - any-glob-to-any-file:
           - 'Dockerfile'
           - '.dockerignore'
+          - '.gitignore'
+          - 'MANIFEST.in'
+          - 'pyproject.toml'
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'requirements.txt'
+          - 'requirements-*.txt'
+          - 'pyproject.toml'
+          - '.github/dependabot.yml'
 
 testing:
   - changed-files:
       - any-glob-to-any-file:
           - 'tests/**'
           - 'test_*.py'
+          - '*_test.py'
+          - 'conftest.py'
           - '.coveragerc'
+          - 'sdk/tests/**'
 
-dependencies:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'requirements.txt'
-          - 'pyproject.toml'
-          - 'MANIFEST.in'
+# ---------------------------------------------------------------------------
+# Domain categories (modules that affect a specific concern)
+# ---------------------------------------------------------------------------
 
-# Core Voronoi engine — changes here have broad impact
-bug:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'vormap.py'
-          - 'vormap_generate.py'
-          - 'vormap_seeds.py'
-          - 'vormap_merge.py'
-          - 'vormap_clip.py'
-          - 'vormap_query.py'
-          - 'vormap_relax.py'
-
-# Feature additions and extensions
-enhancement:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'vormap_*.py'
-
-# Visualization and rendering modules
-refactor:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'vormap_pipeline.py'
-          - 'vormap_report.py'
-
-# Performance-sensitive modules (spatial computation, simulation, interpolation)
+# Tag PRs that touch performance-sensitive numerical / simulation kernels.
+# Reviewers should think about complexity and benchmark deltas here.
 performance:
   - changed-files:
       - any-glob-to-any-file:
@@ -76,8 +82,14 @@ performance:
           - 'vormap_landscape.py'
           - 'vormap_power.py'
           - 'vormap_variogram.py'
+          - 'vormap_benchmark.py'
+          - 'vormap_swarm.py'
+          - 'vormap_automata.py'
+          - 'vormap_ecosystem.py'
+          - 'vormap_diffusion.py'
 
-# Security-relevant modules (file I/O, export, external data)
+# Tag PRs that touch I/O surfaces or external-data ingestion. These deserve
+# extra scrutiny for path traversal, XML/JSON parsing, and untrusted input.
 security:
   - changed-files:
       - any-glob-to-any-file:
@@ -87,8 +99,11 @@ security:
           - 'vormap_report.py'
           - 'vormap_pipeline.py'
           - 'vormap_gallery.py'
+          - 'vormap_access.py'
+          - 'vormap_privacy.py'
+          - 'vormap_guardian.py'
+          - 'vormap_sentinel.py'
 
-# Visualization and rendering modules
 visualization:
   - changed-files:
       - any-glob-to-any-file:
@@ -113,8 +128,11 @@ visualization:
           - 'vormap_hatch.py'
           - 'vormap_crossstitch.py'
           - 'vormap_stringart.py'
+          - 'vormap_cvd.py'
+          - 'vormap_label.py'
+          - 'vormap_mesh3d.py'
+          - 'vormap_texture.py'
 
-# Spatial analysis modules
 spatial-analysis:
   - changed-files:
       - any-glob-to-any-file:
@@ -131,9 +149,14 @@ spatial-analysis:
           - 'vormap_crossval.py'
           - 'vormap_montecarlo.py'
           - 'vormap_mapalgebra.py'
+          - 'vormap_classify.py'
+          - 'vormap_forecast.py'
+          - 'vormap_trend.py'
+          - 'vormap_temporal.py'
+          - 'vormap_causality.py'
 
-# Core geometry and generation
-core:
+# Geometry primitives, core Voronoi/Delaunay, and the foundational engine.
+spatial:
   - changed-files:
       - any-glob-to-any-file:
           - 'vormap.py'
@@ -147,3 +170,19 @@ core:
           - 'vormap_query.py'
           - 'vormap_relax.py'
           - 'vormap_hull.py'
+          - 'vormap_voronoi3d.py'
+          - 'vormap_buffer.py'
+          - 'vormap_centroid.py'
+          - 'vormap_edge.py'
+          - 'vormap_shape.py'
+          - 'vormap_symmetry.py'
+          - 'vormap_smooth.py'
+          - 'vormap_displacement.py'
+          - 'vormap_morph.py'
+          - 'vormap_hull.py'
+          - 'vormap_isochrone.py'
+          - 'vormap_transect.py'
+          - 'vormap_cartogram.py'
+          - 'vormap_circlepack.py'
+          - 'vormap_treemap.py'
+          - 'vormap_tile.py'

@@ -1,29 +1,52 @@
-# Issue labeler configuration — matches issue title and body text
-# Used by github/issue-labeler action
+# Issue auto-labeler configuration for github/issue-labeler@v3.
+# Matches against the issue title + body. Regex syntax (case-insensitive).
+#
+# Only labels that already exist in the repo are referenced here. If you
+# add new ones, mirror them in `gh label create` first.
 
 bug:
-  - '(crash|exception|error|traceback|broken|fail|segfault|corrupt|regression|wrong result)'
+  - '(?i)\b(crash|crashes|crashed|exception|traceback|stack ?trace|broken|breaks|segfault|core ?dump|hangs?|freezes?|deadlock|infinite ?loop|regression|wrong (result|output|answer)|incorrect (result|output)|throws? (?:an? )?error|nan(?: values)?|corrupt(?:ed)?)\b'
+
 performance:
-  - '(slow|performance|speed|latency|memory|OOM|out of memory|optimization|bottleneck|profil)'
+  - '(?i)\b(slow|sluggish|laggy|performance|speed ?up|latency|throughput|memory ?leak|OOM|out ?of ?memory|optimi[sz]ation|bottleneck|profil(?:e|ing|er)|hot ?path|O\([nm]\^?\d*\)|too long to run)\b'
+
 enhancement:
-  - '(feature|request|enhancement|add support|new option|proposal|suggest|would be nice|idea)'
+  - '(?i)\b(feature ?request|enhancement|add(ing)? support for|new option|new flag|proposal|RFC|suggest(ion)?|would be (nice|great|cool)|wishlist|consider adding|extend(ing)? .* to|new (?:module|module idea))\b'
+
 documentation:
-  - '(doc|documentation|readme|typo|example|tutorial|clarif|explain|usage)'
+  - '(?i)\b(docs?|documentation|readme|typo|spelling|grammar|broken link|dead link|example|tutorial|walkthrough|how[- ]to|clarif(?:y|ication)|explain|usage example|doc(?:string)?s?|mkdocs)\b'
+
 security:
-  - '(security|vulnerability|CVE|injection|XSS|SSRF|path traversal|unsafe|sanitiz)'
+  - '(?i)\b(security|vulnerabilit(?:y|ies)|CVE-?\d|injection|XSS|CSRF|SSRF|path ?traversal|directory ?traversal|XXE|RCE|unsafe (?:deserialization|eval|input)|sanitiz|hardcoded (?:secret|password|token)|leak(?:ed|s)? (?:secret|token|key))\b'
+
 testing:
-  - '(test|coverage|assertion|fixture|mock|pytest|unittest|flaky)'
+  - '(?i)\b(test|tests|test ?case|test ?suite|coverage|assertion|fixture|mock(?:ed|ing)?|pytest|unittest|flaky|intermittent|hypothesis|parametri[sz]e)\b'
+
 ci/cd:
-  - '(CI|workflow|action|build failure|pipeline|deploy|release|docker)'
+  - '\bCI\b'
+  - '(?i)\b(github ?actions?|workflow|build (?:failure|broken|red)|pipeline|deploy(?:ment)?|release pipeline|docker (?:build|image|push)|publish workflow)\b'
+
 dependencies:
-  - '(dependency|dependabot|upgrade|update|version|incompatib|import error|ModuleNotFoundError)'
+  - '(?i)\b(dependenc(?:y|ies)|dependabot|upgrade .* to|pin (?:numpy|scipy|matplotlib)|version conflict|incompatib(?:le|ility)|import ?error|ModuleNotFoundError|requirements\.txt|pyproject\.toml)\b'
+
 question:
-  - '(question|how to|how do|help|confused|unclear|what does|is it possible)'
+  - '(?i)\b(question|how (?:do|to|can) I|how does|why does|help me|i''?m confused|unclear|what does .* mean|is it possible (?:to|for)|can (?:vormap|VoronoiMap) (?:do|handle))\b'
+  - '\?'
+
 visualization:
-  - '(plot|render|display|color|animate|heatmap|contour|viz|visual|draw|map output)'
+  - '(?i)\b(plot|render(?:ing)?|display|colou?r ?map|colou?r ?scheme|colormap|cmap|animat(?:e|ion)|heatmap|contour|viz|visual(?:i[sz]ation)?|draw|figure|svg output|png output|matplotlib)\b'
+
 spatial:
-  - '(voronoi|delaunay|polygon|geometry|coordinate|CRS|projection|GeoJSON|KML|shapefile|spatial)'
+  - '(?i)\b(voronoi|delaunay|polygon|polyline|geometr(?:y|ic)|coordinate|CRS|projection|GeoJSON|KML|GPX|shapefile|spatial|bounding ?box|KDTree|nearest ?neighbou?r|convex ?hull|tessell?ation)\b'
+
 infrastructure:
-  - '(refactor|cleanup|dead code|unused|deprecat|migrate|restructur|reorganiz)'
+  - '(?i)\b(refactor(?:ing)?|cleanup|clean ?up|dead ?code|unused (?:import|function|variable)|deprecat(?:ed?|ion)|migrate|migration|restructur|reorgani[sz]|tech(?:nical)? debt|module split)\b'
+
+spatial-analysis:
+  - '(?i)\b(clustering|hot ?spot|KDE|kernel density|interpolat(?:e|ion)|kriging|autocorrelation|Moran''?s I|variogram|zonal stat|regression analysis|outlier detection|monte ?carlo|cross[- ]validat)\b'
+
 good first issue:
-  - '(beginner|easy|starter|straightforward|simple fix|low.hanging|good first)'
+  - '(?i)\b(beginner|newcomer|easy|starter|straightforward|simple fix|low.hanging|good first issue|first[- ]time contributor|onboarding)\b'
+
+help wanted:
+  - '(?i)\b(help wanted|need(?:s|ed)? help|looking for (?:help|contributor)|maintainer (?:needed|wanted))\b'
