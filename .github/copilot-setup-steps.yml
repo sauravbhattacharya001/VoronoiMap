@@ -1,28 +1,53 @@
 # copilot-setup-steps.yml
-# Sets up the environment for GitHub Copilot coding agents (Claude, Codex)
-# to autonomously work on issues and PRs in this repository.
+#
+# Environment setup for GitHub Copilot coding agents (Claude, Codex, etc.)
+# that work autonomously on issues and PRs in this repository.
+#
+# Goals:
+#   1. Install everything an agent needs to build, lint, and test VoronoiMap.
+#   2. Fail loudly on the first real problem so the agent gets a clear signal.
+#   3. Keep verification fast — only smoke-test a representative slice of the
+#      130+ extension modules; the full test suite is the source of truth.
+#
+# Reference: https://docs.github.com/en/copilot/customizing-copilot/customizing-the-development-environment-for-copilot-coding-agent
 
 steps:
   - name: Set up Python
-    uses: actions/setup-python@v5
+    # Pin to the version the CI workflow exercises most heavily so the agent
+    # sees the same import behaviour and library versions as PR CI.
+    uses: actions/setup-python@v6
     with:
       python-version: "3.12"
       cache: "pip"
 
-  - name: Install dependencies
-    run: |
-      pip install -r requirements.txt
-      pip install -e .
+  - name: Show Python version
+    run: python --version
 
-  - name: Install dev tools
-    run: pip install flake8 pytest pytest-cov
+  - name: Upgrade pip / wheel / setuptools
+    run: python -m pip install --upgrade pip wheel setuptools
+
+  - name: Install runtime dependencies
+    run: pip install -r requirements.txt
+
+  - name: Install project in editable mode
+    # Editable install so `import vormap` works from anywhere in the workspace.
+    run: pip install -e .
+
+  - name: Install developer tools
+    # ruff is fast and the workflow uses it; pytest-cov powers coverage runs.
+    run: pip install flake8 ruff pytest pytest-cov
 
   - name: Create test data directory
+    # Several tests and the CLI itself read from ./data; ensure it exists
+    # before any test imports vormap.load_data().
     run: mkdir -p data
 
   - name: Create sample data files for tests
+    # Note: we use `<<-EOF` would strip *tabs* only. The simplest reliable
+    # approach is `cat > FILE <<EOF` with the body left-aligned to column 0
+    # so no leading whitespace leaks into the file contents.
     run: |
-      cat > data/test_points.txt << 'EOF'
+      cat > data/test_points.txt <<'EOF'
       100.0 200.0
       300.0 400.0
       500.0 600.0
@@ -34,30 +59,70 @@ steps:
       850.0 250.0
       50.0 900.0
       EOF
+      # The leading spaces above are an artifact of YAML's block scalar
+      # indentation — vormap.load_data() splits on whitespace, so they are
+      # harmless. If you change the parser, regenerate this file with no
+      # leading whitespace.
 
-  - name: Verify core package
-    run: python -c "import vormap; print('vormap OK')"
+  - name: Verify core package imports
+    run: python -c "import vormap; print('vormap', getattr(vormap, '__version__', 'dev'), 'OK')"
 
   - name: Verify shared utilities
-    run: python -c "from vormap_utils import polygon_area, bounding_box; print('utils OK')"
-
-  - name: Verify geometry module
-    run: python -c "from vormap_geometry import polygon_area, polygon_centroid; print('geometry OK')"
-
-  - name: Verify key extension modules load
     run: |
-      python -c "
-      modules = ['vormap_cluster', 'vormap_graph', 'vormap_viz', 'vormap_kde',
-                 'vormap_delaunay', 'vormap_coverage', 'vormap_hotspot',
-                 'vormap_diffusion', 'vormap_fingerprint', 'vormap_doctor']
-      import importlib
+      python - <<'PY'
+      from vormap_utils import (
+          polygon_area, bounding_box, validate_points, euclidean,
+      )
+      from vormap_geometry import polygon_area as geom_area, polygon_centroid
+      assert polygon_area([(0, 0), (1, 0), (1, 1), (0, 1)]) == 1.0
+      assert bounding_box([(0, 0), (10, 5)]) == (0, 10, 0, 5)
+      print('utils + geometry OK')
+      PY
+
+  - name: Smoke-import representative extension modules
+    # Touches one module from each major category. If any of these fail to
+    # import, the agent should investigate before doing anything else —
+    # something is fundamentally wrong with the environment.
+    run: |
+      python - <<'PY'
+      import importlib, sys
+      modules = [
+          # Spatial analysis
+          'vormap_cluster', 'vormap_hotspot', 'vormap_kde', 'vormap_autocorr',
+          # Geometry & topology
+          'vormap_delaunay', 'vormap_hull', 'vormap_graph', 'vormap_clip',
+          # Visualization
+          'vormap_viz', 'vormap_heatmap', 'vormap_contour',
+          # Simulation
+          'vormap_diffusion', 'vormap_ecosystem', 'vormap_automata',
+          # I/O
+          'vormap_geojson', 'vormap_kml', 'vormap_gpx',
+          # Agents
+          'vormap_doctor', 'vormap_guardian', 'vormap_fingerprint',
+      ]
+      failed = []
       for m in modules:
-          importlib.import_module(m)
-          print(f'{m} OK')
-      "
+          try:
+              importlib.import_module(m)
+              print(f'  {m} OK')
+          except Exception as exc:
+              failed.append((m, exc))
+              print(f'  {m} FAIL: {exc!r}')
+      if failed:
+          print(f'\n{len(failed)} module(s) failed to import.', file=sys.stderr)
+          sys.exit(1)
+      PY
 
-  - name: Run tests
-    run: python -m pytest tests/ -v --tb=short -x -q 2>&1 | head -100
-
-  - name: Run linter
+  - name: Run fatal-only lint (syntax errors and undefined names)
+    # E9 = syntax errors, F63/F7/F82 = real bugs. Anything matching here is a
+    # build-breaker and must be fixed before tests are meaningful.
     run: flake8 vormap.py vormap_*.py --count --select=E9,F63,F7,F82 --show-source --statistics
+
+  - name: Run the test suite
+    # `-x` stops at the first failure so the agent sees the smallest reproducer.
+    # `--tb=short` keeps tracebacks readable in log output.
+    run: python -m pytest tests/ -v --tb=short -x -q
+
+  - name: Report final status
+    if: always()
+    run: echo "Copilot setup complete (or failed above — read the log)."

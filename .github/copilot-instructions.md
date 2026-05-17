@@ -105,3 +105,44 @@ flake8 vormap.py vormap_*.py --max-complexity=15 --max-line-length=120
 3. Add `tests/test_{name}.py` with comprehensive pytest coverage
 4. Ensure `python -m py_compile vormap_{name}.py` passes
 5. Keep the module self-contained; minimize cross-module coupling
+
+## Working in this Repo as a Copilot Agent
+
+Fast feedback loop (in priority order):
+
+1. **Syntax check the file you changed**
+   `python -m py_compile vormap_<name>.py` — must pass before anything else.
+2. **Run that module's tests, not the whole suite**
+   `python -m pytest tests/test_<name>.py -x --tb=short` — usually <2s.
+3. **Run fatal-only lint**
+   `flake8 vormap.py vormap_*.py --select=E9,F63,F7,F82` — catches real bugs
+   (undefined names, unused imports of `*`, syntax errors). Style warnings
+   are advisory and the CI workflow already runs them with `--exit-zero`.
+4. **Only then run the full suite**
+   `python -m pytest tests/ -x --tb=short -q`
+
+When modifying code:
+
+- Check `vormap_geometry.py` and `vormap_utils.py` first — there is almost
+  certainly already a helper for what you need (`polygon_area`,
+  `bounding_box`, `validate_points`, `point_in_polygon`,
+  `clip_polygon_to_rect`, `lerp`, …). Duplicating these is a review red flag.
+- Respect optional dependencies. Modules that need numpy/scipy must guard
+  imports and degrade gracefully — mirror the `_HAS_SCIPY` / `_HAS_NUMPY`
+  pattern in `vormap.py`.
+- Keep `(lng, lat)` ordering everywhere. Inverting it silently breaks
+  every export module (`vormap_geojson`, `vormap_kml`, `vormap_gpx`).
+- For tests that touch `vormap.load_data()`, clear `_data_cache` in a
+  fixture and restore global bounds (`IND_S`, `IND_N`, `IND_W`, `IND_E`)
+  on teardown — otherwise you will see flaky failures in unrelated tests.
+
+What to avoid:
+
+- Do **not** add top-level circular imports between `vormap_utils`,
+  `vormap_geometry`, and `vormap.py`. Use lazy / function-local imports.
+- Do **not** introduce a heavy new dependency (e.g. shapely, geopandas)
+  without explicit discussion in the PR description — the project's value
+  proposition is "no external frameworks beyond numpy/scipy".
+- Do **not** rewrite a passing test to make a new behaviour pass. Add a
+  new test instead and explain in the commit why the old assumption no
+  longer holds.
