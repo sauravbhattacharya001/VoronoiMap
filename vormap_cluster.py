@@ -74,43 +74,93 @@ def _mean_point(pts: List[Tuple[float, float]]) -> Tuple[float, float]:
 
 def kmeans(points: List[Tuple[float, float]], k: int,
            max_iter: int = 300, seed: int = 42) -> Tuple[List[int], List[Tuple[float, float]]]:
-    """Run k-means clustering.  Returns (labels, centroids)."""
+    """Run k-means clustering.  Returns (labels, centroids).
+
+    Performance notes
+    -----------------
+    The inner assignment loop and k-means++ initialisation both compare
+    nearest centroids, where the *ranking* by distance is identical to the
+    ranking by squared distance.  We therefore work in squared-distance
+    space throughout, which eliminates one ``math.sqrt`` per point per
+    centroid per iteration (the dominant cost on small/medium point sets).
+
+    The assignment step also avoids ``min(range(k), key=lambda ...)``,
+    which constructs a fresh closure per point; an inline loop with local
+    variable lookups is materially faster in CPython.  Finally, centroid
+    updates accumulate coordinate sums and member counts during the
+    assignment pass rather than rebuilding a per-cluster members list with
+    an O(n·k) post-pass.
+    """
     n = len(points)
     rng = random.Random(seed)
-    # k-means++ init
+
+    # ── k-means++ initialisation (squared-distance only) ───────────────
     centroids: List[Tuple[float, float]] = [points[rng.randrange(n)]]
+    # Maintain D²(x) = min squared distance from each point to any chosen
+    # centroid, and update incrementally as new centroids are picked.
+    cx0, cy0 = centroids[0]
+    d2 = [((p[0] - cx0) * (p[0] - cx0) + (p[1] - cy0) * (p[1] - cy0))
+          for p in points]
     for _ in range(1, k):
-        dists = [min(_euclidean(p, c) ** 2 for c in centroids) for p in points]
-        total = sum(dists)
+        total = 0.0
+        for v in d2:
+            total += v
         if total < 1e-12:
-            centroids.append(points[rng.randrange(n)])
-            continue
-        r = rng.random() * total
-        cumul = 0.0
-        for i, d in enumerate(dists):
-            cumul += d
-            if cumul >= r:
-                centroids.append(points[i])
-                break
+            new_c = points[rng.randrange(n)]
         else:
-            centroids.append(points[-1])
+            r = rng.random() * total
+            cumul = 0.0
+            new_c = points[-1]
+            for i, v in enumerate(d2):
+                cumul += v
+                if cumul >= r:
+                    new_c = points[i]
+                    break
+        centroids.append(new_c)
+        # Update D² with the freshly chosen centroid.
+        ncx, ncy = new_c
+        for i, p in enumerate(points):
+            dx = p[0] - ncx
+            dy = p[1] - ncy
+            cand = dx * dx + dy * dy
+            if cand < d2[i]:
+                d2[i] = cand
 
     labels = [0] * n
     for _ in range(max_iter):
-        # assign
+        # ── Assignment + centroid accumulators in a single pass ────────
+        sums_x = [0.0] * k
+        sums_y = [0.0] * k
+        counts = [0] * k
         changed = False
         for i, p in enumerate(points):
-            best_c = min(range(k), key=lambda c: _euclidean(p, centroids[c]))
+            px = p[0]
+            py = p[1]
+            # Inline argmin over squared distances (faster than
+            # min(range(k), key=lambda ...) which builds a closure per i).
+            best_c = 0
+            best_d = float("inf")
+            for c in range(k):
+                cx, cy = centroids[c]
+                dx = px - cx
+                dy = py - cy
+                d = dx * dx + dy * dy
+                if d < best_d:
+                    best_d = d
+                    best_c = c
             if best_c != labels[i]:
                 labels[i] = best_c
                 changed = True
+            sums_x[best_c] += px
+            sums_y[best_c] += py
+            counts[best_c] += 1
         if not changed:
             break
-        # update centroids
+        # Centroid update — skip empty clusters (keep prior centroid).
         for c in range(k):
-            members = [points[i] for i in range(n) if labels[i] == c]
-            if members:
-                centroids[c] = _mean_point(members)
+            cnt = counts[c]
+            if cnt:
+                centroids[c] = (sums_x[c] / cnt, sums_y[c] / cnt)
     return labels, centroids
 
 
