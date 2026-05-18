@@ -1,7 +1,6 @@
 """Tests for vormap_cluster — spatial clustering of Voronoi diagrams."""
 
 import json
-import math
 import os
 import sys
 import tempfile
@@ -12,7 +11,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import vormap
 import vormap_viz
-import vormap_cluster
 from vormap_cluster import (
     ClusterResult,
     cluster_regions,

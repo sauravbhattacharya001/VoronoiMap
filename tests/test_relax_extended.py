@@ -18,7 +18,6 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import vormap_relax
 from vormap_relax import (
     _polygon_centroid,
     _clip_polygon_to_box,

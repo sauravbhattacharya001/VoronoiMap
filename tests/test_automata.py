@@ -1,14 +1,11 @@
 """Tests for vormap_automata — Cellular Automata on Voronoi Tessellations."""
 
 import json
-import math
 import os
 import unittest
-from collections import Counter
 
 from vormap_automata import (
     AutomatonResult,
-    StepSnapshot,
     build_automaton,
     export_automata_csv,
     export_automata_json,
@@ -403,7 +400,7 @@ class TestExportJSON(unittest.TestCase):
         states = build_automaton(adj, rule="game_of_life", seed=42)
         result = run(states, adj, rule="game_of_life", steps=5, seed=42)
 
-        path = f"_test_output_1.json"
+        path = "_test_output_1.json"
 
         try:
             export_automata_json(result, path)
@@ -423,7 +420,7 @@ class TestExportJSON(unittest.TestCase):
         states = build_automaton(adj, rule="majority", num_states=2, seed=42)
         result = run(states, adj, rule="majority", steps=3, seed=42, num_states=2)
 
-        path = f"_test_output_2.json"
+        path = "_test_output_2.json"
 
         try:
             export_automata_json(result, path)
@@ -444,7 +441,7 @@ class TestExportCSV(unittest.TestCase):
         states = build_automaton(adj, rule="game_of_life", seed=42)
         result = run(states, adj, rule="game_of_life", steps=5, seed=42)
 
-        path = f"_test_output_3.csv"
+        path = "_test_output_3.csv"
 
         try:
             export_automata_csv(result, path)
@@ -468,7 +465,7 @@ class TestExportSVG(unittest.TestCase):
         states = build_automaton(adj, rule="game_of_life", seed=42)
         result = run(states, adj, rule="game_of_life", steps=5, seed=42)
 
-        path = f"_test_output_4.svg"
+        path = "_test_output_4.svg"
 
         try:
             export_automata_svg(result, regions, data, path)
@@ -486,7 +483,7 @@ class TestExportSVG(unittest.TestCase):
         states = build_automaton(adj, rule="forest_fire", seed=42)
         result = run(states, adj, rule="forest_fire", steps=3, seed=42)
 
-        path = f"_test_output_5.svg"
+        path = "_test_output_5.svg"
 
         try:
             export_automata_svg(result, regions, data, path, show_seeds=True)
@@ -504,7 +501,7 @@ class TestExportSVG(unittest.TestCase):
         result = run(states, adj, rule="game_of_life", steps=5,
                      seed=42, stop_on_convergence=False)
 
-        path = f"_test_output_6.svg"
+        path = "_test_output_6.svg"
 
         try:
             export_automata_svg(result, regions, data, path, step_index=0)

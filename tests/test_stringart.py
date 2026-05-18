@@ -1,7 +1,6 @@
 """Tests for vormap_stringart — Voronoi String Art Generator."""
 
 import json
-import math
 import os
 import tempfile
 

@@ -1,7 +1,5 @@
 """Tests for vormap_contagion — SIR spatial contagion simulator."""
 
-import json
-import math
 import os
 import random
 import sys
@@ -365,7 +363,7 @@ class TestExportHtml(unittest.TestCase):
         try:
             export_html(result, path)
             self.assertTrue(os.path.exists(path))
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
             self.assertIn("<!DOCTYPE html>", content)
             self.assertIn("Spatial Contagion Simulator", content)
@@ -380,7 +378,7 @@ class TestExportHtml(unittest.TestCase):
             path = f.name
         try:
             export_html(result, path)
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
             self.assertIn("Health Score", content)
             self.assertIn("R₀ Estimate", content)
@@ -395,7 +393,7 @@ class TestExportHtml(unittest.TestCase):
             path = f.name
         try:
             export_html(result, path)
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
             self.assertIn("Autopilot ON", content)
         finally:

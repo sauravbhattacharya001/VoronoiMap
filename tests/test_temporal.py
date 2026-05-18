@@ -1,9 +1,7 @@
 """Tests for vormap_temporal -- Voronoi temporal dynamics analysis."""
 
 import json
-import math
 import os
-import tempfile
 
 import pytest
 
@@ -20,7 +18,6 @@ from vormap_temporal import (
     temporal_analysis,
 )
 from vormap_geometry import polygon_area as _polygon_area
-from vormap_viz import compute_regions
 
 
 # -- Test helpers -----------------------------------------------------

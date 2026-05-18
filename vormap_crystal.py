@@ -53,8 +53,15 @@ except ImportError:
 
 class Crystal:
     """A single crystal grain."""
-    __slots__ = ("cx", "cy", "birth_step", "orientation", "anisotropy",
-                 "color", "id")
+    __slots__ = (
+        "anisotropy",
+        "birth_step",
+        "color",
+        "cx",
+        "cy",
+        "id",
+        "orientation",
+    )
 
     def __init__(self, cx: float, cy: float, birth_step: int,
                  orientation: float = 0.0, anisotropy: float = 1.0,
@@ -71,9 +78,18 @@ class Crystal:
 
 class CrystalConfig:
     """Configuration for a crystal growth simulation."""
-    __slots__ = ("width", "height", "initial_seeds", "nucleation_rate",
-                 "anisotropy", "total_steps", "temp_gradient",
-                 "border_color", "bg_color", "seed")
+    __slots__ = (
+        "anisotropy",
+        "bg_color",
+        "border_color",
+        "height",
+        "initial_seeds",
+        "nucleation_rate",
+        "seed",
+        "temp_gradient",
+        "total_steps",
+        "width",
+    )
 
     def __init__(self, *, width: int = 512, height: int = 512,
                  initial_seeds: int = 20, nucleation_rate: float = 0.0,

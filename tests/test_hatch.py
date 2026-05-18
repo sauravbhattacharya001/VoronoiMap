@@ -1,7 +1,6 @@
 """Tests for vormap_hatch — Voronoi Hatch Pattern Generator."""
 
 import json
-import math
 import os
 import sys
 import tempfile

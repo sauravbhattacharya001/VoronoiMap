@@ -79,7 +79,7 @@ class TestGenerateBrief(unittest.TestCase):
         out = tempfile.mktemp(suffix=".html")
         try:
             brief.to_html(out)
-            with open(out, "r", encoding="utf-8") as f:
+            with open(out, encoding="utf-8") as f:
                 html = f.read()
             self.assertIn("<html", html)
             self.assertIn(str(brief.health_score), html)
@@ -177,7 +177,7 @@ class TestCLI(unittest.TestCase):
                                           "--output", out])
             self.assertEqual(code, 0)
             self.assertTrue(os.path.exists(out))
-            with open(out, "r", encoding="utf-8") as f:
+            with open(out, encoding="utf-8") as f:
                 self.assertIn("<html", f.read())
         finally:
             try:

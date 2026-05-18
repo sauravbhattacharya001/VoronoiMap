@@ -55,10 +55,8 @@ import argparse
 import collections
 import json
 import math
-import os
 import random
 import textwrap
-from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from vormap_utils import build_distance_adjacency as _build_distance_adjacency
 
@@ -616,7 +614,7 @@ class SwarmEngine:
                     recs.append(f"{len(p.involved_cells)} unreached cells — "
                                 "add relay infrastructure in shadowed regions.")
                 if p.pattern_type == "relay_bottleneck":
-                    recs.append(f"Critical bottleneck relays found — "
+                    recs.append("Critical bottleneck relays found — "
                                 "add redundant paths to avoid single-point failure.")
 
         elif self.behavior == "territory":
@@ -927,7 +925,7 @@ def swarm_demo():
         print(f"    Patterns: {len(result.emergent_patterns)}")
         for p in result.emergent_patterns:
             print(f"      • {p.pattern_type}: {p.description}")
-        print(f"    Recommendations:")
+        print("    Recommendations:")
         for r in result.recommendations:
             print(f"      → {r}")
 
@@ -989,7 +987,7 @@ def main(argv=None):
     print(f"  Patterns:    {len(result.emergent_patterns)}")
     for p in result.emergent_patterns:
         print(f"    [{p.pattern_type}] {p.description} (confidence {p.confidence:.0%})")
-    print(f"  Recommendations:")
+    print("  Recommendations:")
     for r in result.recommendations:
         print(f"    • {r}")
     print(f"{'=' * 60}\n")

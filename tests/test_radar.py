@@ -10,7 +10,6 @@ from __future__ import annotations
 import json
 import math
 import os
-import tempfile
 from pathlib import Path
 
 import pytest

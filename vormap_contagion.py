@@ -40,11 +40,10 @@ from __future__ import annotations
 import argparse
 import html as _html
 import json
-import os
 import random
 from typing import Any, Dict, List, Optional, Tuple
 
-from vormap_utils import build_distance_adjacency, euclidean as _dist
+from vormap_utils import build_distance_adjacency
 
 # ── Geometry helpers ────────────────────────────────────────────────
 

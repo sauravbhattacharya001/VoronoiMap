@@ -1,10 +1,8 @@
 """Tests for vormap_trend — Trend Surface Analysis."""
 
 import json
-import math
 import os
 import sys
-import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -17,13 +15,11 @@ from vormap_trend import (
     export_trend_csv,
     export_trend_json,
     TrendResult,
-    TrendComparison,
     _design_row,
     _term_labels,
     _transpose,
     _mat_mul,
     _invert,
-    _ols_fit,
 )
 
 

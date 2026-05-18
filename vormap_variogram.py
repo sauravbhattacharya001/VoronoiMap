@@ -970,7 +970,7 @@ def variogram_summary(
             lines.append("     Try other model types or check for anisotropy")
 
         lines.append(f"  →  Spatial autocorrelation extends ~{model.range_param:.0f} units")
-        lines.append(f"     Samples beyond this are effectively independent")
+        lines.append("     Samples beyond this are effectively independent")
 
     lines.append("=" * 55)
     return "\n".join(lines)

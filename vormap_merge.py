@@ -350,7 +350,7 @@ def merge_summary(result):
     str
     """
     lines = [
-        f"Region Merge Summary",
+        "Region Merge Summary",
         f"{'=' * 50}",
         f"Original regions: {result.original_count}",
         f"Merged zones:     {result.merged_count}",

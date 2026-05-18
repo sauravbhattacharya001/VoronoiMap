@@ -38,7 +38,6 @@ import json
 import math
 import os
 import random
-import sys
 
 import vormap
 
@@ -55,7 +54,7 @@ except ImportError:
 class TreemapCell:
     """A single cell in the Voronoi treemap."""
 
-    __slots__ = ("name", "weight", "depth", "polygon", "centroid", "area", "children")
+    __slots__ = ("area", "centroid", "children", "depth", "name", "polygon", "weight")
 
     def __init__(self, name, weight, depth, polygon, centroid, area, children=None):
         self.name = name
@@ -69,7 +68,7 @@ class TreemapCell:
 
 # ── Geometry Helpers ──────────────────────────────────────────────────
 
-from vormap_utils import polygon_area as _polygon_area, point_in_polygon as _point_in_polygon
+from vormap_utils import polygon_area as _polygon_area
 from vormap_utils import polygon_centroid as _polygon_centroid
 from vormap_utils import clip_polygon_to_rect as _clip_polygon_to_rect
 
@@ -359,7 +358,7 @@ def export_treemap_svg(root, filepath, width=None, height=None):
         pts_str = " ".join(f"{x:.1f},{y:.1f}" for x, y in cell.polygon)
         color = _depth_color(cell.depth, max_depth)
         cx, cy = cell.centroid
-        parts.append(f'<g>')
+        parts.append('<g>')
         parts.append(f'  <title>{cell.name} (weight: {cell.weight:.1f}, area: {cell.area:.1f})</title>')
         parts.append(f'  <polygon points="{pts_str}" fill="{color}" />')
         # Only label if cell is large enough

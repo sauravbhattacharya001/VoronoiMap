@@ -4,7 +4,6 @@ import json
 import math
 import os
 import tempfile
-import pytest
 
 from vormap_regularity import (
     polygon_distribution,

@@ -46,7 +46,7 @@ import math
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 
-from vormap import eudist_pts, validate_output_path
+from vormap import validate_output_path
 from vormap_utils import point_in_polygon as _point_in_polygon
 
 

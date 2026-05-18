@@ -11,14 +11,9 @@ import pytest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from vormap_transect import (
-    Transect,
-    TransectCrossing,
-    TransectPoint,
-    TransectResult,
     _find_region_for_point,
     _point_in_polygon,
     _segments_intersect,
-    _transect_region_intersections,
     analyse_transect,
     create_transect,
     export_transect_csv,

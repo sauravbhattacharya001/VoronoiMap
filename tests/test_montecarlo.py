@@ -1,7 +1,6 @@
 """Tests for vormap_montecarlo — Monte Carlo spatial simulation."""
 
 import json
-import math
 import os
 import random
 

@@ -58,7 +58,7 @@ import sys
 from collections import namedtuple
 
 import vormap
-from vormap_utils import bounding_box as _bounding_box, euclidean as _dist
+from vormap_utils import euclidean as _dist
 
 # ---------------------------------------------------------------------------
 # Data structures
@@ -74,14 +74,14 @@ class GuardianReport:
     """Result of a guardian validation or auto-repair run."""
 
     __slots__ = (
-        "violations",
         "compliance_score",
-        "points_modified",
+        "constraints_checked",
+        "final_count",
         "iterations",
         "original_count",
-        "final_count",
-        "constraints_checked",
         "points",
+        "points_modified",
+        "violations",
     )
 
     def __init__(self):

@@ -38,8 +38,16 @@ import vormap
 class OperationTiming:
     """Timing result for a single operation at a given point count."""
 
-    __slots__ = ("operation", "point_count", "times", "mean", "median",
-                 "std_dev", "min_time", "max_time")
+    __slots__ = (
+        "max_time",
+        "mean",
+        "median",
+        "min_time",
+        "operation",
+        "point_count",
+        "std_dev",
+        "times",
+    )
 
     def __init__(self, operation, point_count, times):
         self.operation = operation
@@ -78,8 +86,15 @@ class OperationTiming:
 class BenchmarkReport:
     """Full benchmark report across multiple sizes and operations."""
 
-    __slots__ = ("timings", "sizes", "trials", "seed", "has_scipy",
-                 "python_version", "total_time")
+    __slots__ = (
+        "has_scipy",
+        "python_version",
+        "seed",
+        "sizes",
+        "timings",
+        "total_time",
+        "trials",
+    )
 
     def __init__(self, timings, sizes, trials, seed, has_scipy,
                  python_version, total_time):

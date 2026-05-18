@@ -328,7 +328,6 @@ def _render_svg(
     if report.radii:
         colors = ["#3498db", "#2ecc71", "#f39c12", "#e74c3c", "#9b59b6"]
         # We only draw rings for first few points to avoid clutter
-        from vormap_buffer import _dummy_points_attr
         for ri, r in enumerate(reversed(report.radii)):
             color = colors[ri % len(colors)]
             sr = r * scale
@@ -387,7 +386,7 @@ def _render_svg(
     ET.indent(tree, space="  ")
     with open(path, "wb") as fh:
         tree.write(fh, xml_declaration=True, encoding="utf-8")
-    with open(path, "r", encoding="utf-8") as fh:
+    with open(path, encoding="utf-8") as fh:
         return fh.read()
 
 

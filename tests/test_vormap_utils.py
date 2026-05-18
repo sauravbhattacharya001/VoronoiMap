@@ -1,6 +1,5 @@
 """Tests for vormap_utils — shared utility functions."""
 
-import math
 import pytest
 import sys
 import os

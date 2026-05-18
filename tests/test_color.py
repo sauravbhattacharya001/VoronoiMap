@@ -1,13 +1,10 @@
 """Tests for vormap_color — map coloring module."""
 
-import json
 import os
 import random
-import tempfile
 
 import pytest
 
-import vormap
 import vormap_color
 import vormap_viz
 

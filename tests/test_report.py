@@ -2,7 +2,6 @@
 
 import os
 import tempfile
-import math
 
 from vormap_report import (
     VoronoiReport, generate_report,

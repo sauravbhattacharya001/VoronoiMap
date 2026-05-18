@@ -61,10 +61,22 @@ VoidZone = namedtuple("VoidZone", ["x", "y", "loss_rate"])
 class ForecastResult:
     """Container for forecast output."""
 
-    __slots__ = ("timestamp", "density_grid", "hotspots", "voids", "trend",
-                 "confidence", "recommendations", "centroid_predicted",
-                 "centroid_history", "spread_predicted", "spread_history",
-                 "grid_res", "bounds", "steps")
+    __slots__ = (
+        "bounds",
+        "centroid_history",
+        "centroid_predicted",
+        "confidence",
+        "density_grid",
+        "grid_res",
+        "hotspots",
+        "recommendations",
+        "spread_history",
+        "spread_predicted",
+        "steps",
+        "timestamp",
+        "trend",
+        "voids",
+    )
 
     def __init__(self, grid_res=12):
         self.timestamp = datetime.utcnow().isoformat() + "Z"
@@ -127,7 +139,7 @@ class ForecastResult:
 class ForecastModel:
     """Time-series spatial forecaster."""
 
-    __slots__ = ("grid_res", "_snapshots", "_labels")
+    __slots__ = ("_labels", "_snapshots", "grid_res")
 
     def __init__(self, grid_res=12):
         self.grid_res = grid_res

@@ -51,7 +51,6 @@ purely for speed but is never required.
 from __future__ import annotations
 
 import argparse
-import copy
 import csv
 import json
 import math
@@ -859,7 +858,7 @@ def _read_csv(path: str,
     pts: List[Tuple[float, float]] = []
     costs: Optional[List[float]] = [] if costs_col else None
     values: Optional[List[float]] = [] if values_col else None
-    with open(path, "r", newline="", encoding="utf-8") as fh:
+    with open(path, newline="", encoding="utf-8") as fh:
         reader = csv.DictReader(fh)
         if not reader.fieldnames:
             raise ValueError(f"{path}: no header row")

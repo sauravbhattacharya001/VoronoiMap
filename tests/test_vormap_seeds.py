@@ -1,6 +1,5 @@
 """Tests for vormap_seeds — seed point generators for Voronoi diagrams."""
 
-import math
 import os
 import tempfile
 import unittest

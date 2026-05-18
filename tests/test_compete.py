@@ -6,7 +6,6 @@ edge-case scenarios with deterministic seeds for reproducibility.
 """
 
 import json
-import math
 import os
 import tempfile
 import unittest
@@ -393,7 +392,6 @@ class TestExportHtml(unittest.TestCase):
         try:
             # On Windows the default encoding may not handle emoji;
             # monkey-patch open inside the module to force UTF-8.
-            import vormap_compete as _mod
             import builtins
             _real_open = builtins.open
             def _utf8_open(p, mode="r", **kw):

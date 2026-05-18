@@ -1,7 +1,6 @@
 """Tests for vormap_cartogram — Voronoi Cartogram module."""
 
 import json
-import math
 import os
 import sys
 import tempfile

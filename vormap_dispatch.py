@@ -16,7 +16,6 @@ Usage:
 import argparse
 import csv
 import json
-import os
 import random
 import sys
 from collections import defaultdict
@@ -26,7 +25,6 @@ from vormap_utils import euclidean as _dist
 # ---------------------------------------------------------------------------
 # Geometry helpers
 # ---------------------------------------------------------------------------
-from vormap_utils import polygon_area
 
 
 def _cross(o, a, b):
@@ -549,7 +547,7 @@ def main():
             print(f"Detected {len(overloaded)} overloaded facilities")
             print(f"Suggested {len(suggestions)} new facility locations")
 
-    print(f"\nMetrics:")
+    print("\nMetrics:")
     print(f"  Avg distance:    {metrics['avg_distance']}")
     print(f"  P95 distance:    {metrics['p95_distance']}")
     print(f"  Max distance:    {metrics['max_distance']}")

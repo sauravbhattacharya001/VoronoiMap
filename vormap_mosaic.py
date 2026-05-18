@@ -24,7 +24,6 @@ CLI usage
 
 import argparse
 import math
-import os
 import random
 import struct
 import zlib
@@ -656,9 +655,18 @@ class MosaicResult:
     """Immutable result of a mosaic generation."""
 
     __slots__ = (
-        "width", "height", "pixels", "seeds", "assignment",
-        "region_colors", "n_regions", "avg_region_size",
-        "min_region_size", "max_region_size", "placement", "color_mode",
+        "assignment",
+        "avg_region_size",
+        "color_mode",
+        "height",
+        "max_region_size",
+        "min_region_size",
+        "n_regions",
+        "pixels",
+        "placement",
+        "region_colors",
+        "seeds",
+        "width",
     )
 
     def __init__(self, **kwargs):

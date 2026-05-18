@@ -16,8 +16,6 @@ import json
 import math
 import random
 import sys
-import os
-from collections import OrderedDict
 
 try:
     import numpy as np

@@ -33,7 +33,6 @@ CLI::
 
 import argparse
 import json
-import os
 import random
 from collections import deque
 

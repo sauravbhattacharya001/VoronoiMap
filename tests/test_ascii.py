@@ -1,9 +1,6 @@
 """Tests for vormap_ascii — terminal rendering of Voronoi diagrams."""
 
 import io
-import math
-import sys
-import pytest
 
 import vormap_ascii
 

@@ -58,7 +58,6 @@ import argparse
 import json
 import math
 import random
-import statistics
 import xml.etree.ElementTree as ET
 from collections import Counter
 from dataclasses import dataclass, field
@@ -123,12 +122,12 @@ class AutomatonResult:
         if self.converged:
             lines.append(f"  Converged at:   step {self.convergence_step}")
         else:
-            lines.append(f"  Converged:      no")
+            lines.append("  Converged:      no")
 
         if self.history:
             final = self.history[-1]
             lines.append(f"  Final entropy:  {final.entropy:.4f}")
-            lines.append(f"  Final distribution:")
+            lines.append("  Final distribution:")
             for state in sorted(final.state_counts):
                 count = final.state_counts[state]
                 pct = count / self.num_cells * 100 if self.num_cells else 0
@@ -136,7 +135,7 @@ class AutomatonResult:
                 lines.append(f"    {label}: {count} ({pct:.1f}%)")
 
         if self.params:
-            lines.append(f"  Parameters:")
+            lines.append("  Parameters:")
             for k, v in sorted(self.params.items()):
                 lines.append(f"    {k}: {v}")
 

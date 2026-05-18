@@ -771,7 +771,7 @@ def _demo():
 
 def load_csv(path: str) -> List[Tuple[float, float]]:
     pts = []
-    with open(path, 'r') as f:
+    with open(path) as f:
         reader = csv.reader(f)
         for row in reader:
             if len(row) >= 2:

@@ -1,7 +1,6 @@
 """Tests for vormap_gravity — spatial interaction / gravity model."""
 
 import json
-import math
 import os
 import tempfile
 import unittest
@@ -10,11 +9,8 @@ from vormap_gravity import (
     FlowCategory,
     GravityConfig,
     GravityModel,
-    GravityResult,
     Location,
     Flow,
-    MarketArea,
-    AccessibilityScore,
     gravity_analysis,
     gravity_analysis_from_stats,
     export_gravity_svg,
@@ -24,13 +20,6 @@ from vormap_gravity import (
     _euclidean,
     _build_distance_matrix,
     _categorise_flow,
-    _classic_model,
-    _huff_model,
-    _hansen_model,
-    _doubly_constrained_model,
-    _compute_market_areas,
-    _compute_accessibility,
-    _compute_dominance,
     _parse_locations,
 )
 

@@ -5,7 +5,6 @@ import math
 import os
 import pytest
 import sys
-import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -16,7 +15,6 @@ from vormap_merge import (
     export_merge_json,
     export_merge_csv,
     MergeZone,
-    MergeResult,
 )
 
 

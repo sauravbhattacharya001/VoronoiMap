@@ -64,12 +64,9 @@ from __future__ import annotations
 
 import argparse
 import collections
-import html as html_mod
 import json
 import math
-import os
 import random
-import sys
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Optional, Tuple
 
@@ -118,7 +115,7 @@ def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
 def _load_points(path: str) -> List[Tuple[float, float]]:
     """Load points from a whitespace-separated text file."""
     pts: List[Tuple[float, float]] = []
-    with open(path, "r") as fh:
+    with open(path) as fh:
         for line in fh:
             line = line.strip()
             if not line or line.startswith("#"):
@@ -746,7 +743,7 @@ def attention_demo():
     print("=" * 60)
     print(f"\n  Points: {len(points)}")
     print(f"  Health Score: {result.health_score:.1f}/100")
-    print(f"\n  Top-5 Priority Cells:")
+    print("\n  Top-5 Priority Cells:")
     for cid in result.top_k:
         c = result.cells[cid]
         print(f"    #{cid:2d} ({c.x:.1f}, {c.y:.1f}) "
@@ -755,7 +752,7 @@ def attention_demo():
               f"surprise={c.surprise:.2f}]")
     print(f"\n  Convergence Zones: {len(result.convergence_zones)}")
     print(f"  Neglected Cells: {len(result.neglected)}")
-    print(f"\n  Engine Contributions:")
+    print("\n  Engine Contributions:")
     for eng, val in result.engine_contributions.items():
         print(f"    {eng:25s}: {val:.3f}")
 

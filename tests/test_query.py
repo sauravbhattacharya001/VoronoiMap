@@ -2,16 +2,12 @@
 
 import json
 import math
-import os
-import tempfile
 
 import pytest
 
 from vormap_query import (
     VoronoiIndex,
     QueryResult,
-    QueryStats,
-    CoverageResult,
     query_stats,
     coverage_analysis,
     export_query_json,

@@ -4,14 +4,12 @@ import json
 import math
 import os
 import sys
-import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
 
 from vormap_buffer import (
     analyze_buffers,
-    BufferReport,
     BufferOverlap,
     BufferContainment,
     _dist,

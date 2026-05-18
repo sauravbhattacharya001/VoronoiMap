@@ -44,7 +44,6 @@ Programmatic usage
 
 import argparse
 import math
-import os
 import random
 import struct
 import zlib

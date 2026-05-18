@@ -117,7 +117,7 @@ class _CoordinateTransform:
     and keeps ``export_svg`` focused on SVG construction.
     """
 
-    __slots__ = ("_min_x", "_max_y", "_scale", "_offset_x", "_offset_y")
+    __slots__ = ("_max_y", "_min_x", "_offset_x", "_offset_y", "_scale")
 
     def __init__(self, regions, data, *, width, height, margin):
         all_xs = [pt[0] for pt in data]

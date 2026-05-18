@@ -1,7 +1,6 @@
 """Tests for vormap_hotspot — Getis-Ord Gi* hotspot detection."""
 
 import json
-import math
 import os
 import sys
 import tempfile

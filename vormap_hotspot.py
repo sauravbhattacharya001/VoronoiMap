@@ -49,8 +49,6 @@ from vormap_geometry import (
     mean as _mean,
     std as _std,
     normal_cdf as _normal_cdf,
-    polygon_centroid,
-    polygon_area,
     edge_length as _distance,
     SVGCoordinateTransform,
 )

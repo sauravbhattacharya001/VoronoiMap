@@ -34,7 +34,6 @@ import argparse
 import io
 import json
 import math
-import os
 import random
 import sys
 import html as html_mod
@@ -613,7 +612,7 @@ def main():
         erosion_steps = p["erosion_steps"]
         thermal_steps = p["thermal_steps"]
 
-    print(f"🏔️  VoronoiMap Terraform — Autonomous Terrain Sculptor")
+    print("🏔️  VoronoiMap Terraform — Autonomous Terrain Sculptor")
     print(f"   Grid: {width}×{height} | Plates: {n_points} | Preset: {preset_name}")
 
     # Generate plate seeds and movement vectors

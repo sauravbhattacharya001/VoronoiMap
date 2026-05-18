@@ -15,7 +15,6 @@ from vormap_power import (
     WeightedSeed, PowerDiagramResult,
     _power_distance, _multiplicative_distance, _additive_distance,
     _polygon_area, _polygon_centroid, _polygon_perimeter, _convex_hull,
-    _ordered_boundary,
 )
 
 

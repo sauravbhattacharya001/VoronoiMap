@@ -47,7 +47,6 @@ import argparse
 import html as _html_mod
 import json
 import math
-import os
 import sys
 import xml.etree.ElementTree as ET
 

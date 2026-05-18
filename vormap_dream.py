@@ -48,7 +48,6 @@ import argparse
 import json
 import math
 import random
-import sys
 from collections import defaultdict
 
 from vormap_utils import load_points, compute_nn_distances, euclidean, polygon_centroid_mean as _centroid
@@ -447,7 +446,7 @@ circle:hover{{r:4;fill:#6dd5ed !important}}
     if all_pts:
         bbox = _bounding_box(all_pts)
 
-    html += f'<div class="card"><h3>Original</h3>'
+    html += '<div class="card"><h3>Original</h3>'
     html += f'<div class="meta">{len(original_pts)} points</div>'
     html += _svg(original_pts, "#6dd5ed", bbox)
     html += '</div>'

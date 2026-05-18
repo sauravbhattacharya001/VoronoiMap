@@ -1,11 +1,9 @@
 """Tests for vormap_displacement — Voronoi displacement & normal-map generator."""
 
-import math
 import os
 import struct
 import tempfile
 import unittest
-import zlib
 
 import vormap_displacement as vd
 

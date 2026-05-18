@@ -58,9 +58,7 @@ import collections
 import html as html_mod
 import json
 import math
-import os
 import random
-import sys
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Optional, Tuple
 
@@ -135,7 +133,7 @@ def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
 
 def _load_points(path: str) -> List[Tuple[float, float]]:
     pts: List[Tuple[float, float]] = []
-    with open(path, "r") as fh:
+    with open(path) as fh:
         for line in fh:
             line = line.strip()
             if not line or line.startswith("#"):
@@ -866,7 +864,7 @@ class NervousSystemEngine:
             return "<svg></svg>"
 
         cx, cy, r = 100, 100, 80
-        svg = f'<svg width="200" height="200" viewBox="0 0 200 200">'
+        svg = '<svg width="200" height="200" viewBox="0 0 200 200">'
 
         if len(type_counts) == 1:
             t = list(type_counts.keys())[0]

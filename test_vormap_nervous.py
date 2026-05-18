@@ -5,7 +5,6 @@ import json
 import math
 import os
 import sys
-import tempfile
 
 import pytest
 
@@ -14,10 +13,6 @@ sys.path.insert(0, os.path.dirname(__file__))
 from vormap_nervous import (
     NervousSystemEngine,
     NervousSystemResult,
-    NeuronCell,
-    Synapse,
-    SpikeEvent,
-    ReflexArc,
     nervous_analyze,
     nervous_demo,
     main,

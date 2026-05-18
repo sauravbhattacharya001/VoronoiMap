@@ -35,9 +35,8 @@ CLI::
 import argparse
 import json
 import math
-import os
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import vormap
 from vormap_utils import polygon_centroid_mean

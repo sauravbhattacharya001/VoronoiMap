@@ -36,7 +36,6 @@ from __future__ import annotations
 import math
 from collections import namedtuple
 
-from vormap import eudist_pts
 from vormap_geometry import cross_product_2d as _cross, normal_cdf as _normal_cdf
 
 
@@ -569,7 +568,7 @@ def format_pattern_report(summary):
     elif rip.peak_clustering_l < 0:
         lines.append(f"  -> Dispersion at scale {rip.peak_clustering_r:.2f}")
     else:
-        lines.append(f"  -> Consistent with CSR")
+        lines.append("  -> Consistent with CSR")
     lines.append("")
 
     # L(r) table (compact)

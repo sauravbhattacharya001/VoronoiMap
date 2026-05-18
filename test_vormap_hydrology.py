@@ -2,7 +2,6 @@
 """Tests for Spatial Hydrology Engine."""
 
 import json
-import math
 import os
 import random
 import sys
@@ -12,9 +11,6 @@ import unittest
 sys.path.insert(0, os.path.dirname(__file__))
 
 from vormap_hydrology import (
-    CellHydrology,
-    DrainageBasin,
-    FlowCorridor,
     HydrologyEngine,
     HydrologyResult,
     hydrology_analyze,
@@ -29,11 +25,6 @@ from vormap_hydrology import (
     _delineate_basins,
     _compute_strahler,
     _compute_precipitation,
-    _compute_flow_accumulation,
-    _compute_flood_risk,
-    _compute_recharge,
-    _generate_insights,
-    _compute_health_score,
 )
 
 

@@ -1,7 +1,6 @@
 """Tests for vormap_governance — Spatial Governance Engine."""
 
 import json
-import math
 import os
 import sys
 import tempfile
@@ -31,7 +30,6 @@ from vormap_governance import (
     _polygon_area,
     _generate_proposals,
     _cell_preference,
-    WEIGHT_METHODS,
 )
 import random
 

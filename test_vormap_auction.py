@@ -1,7 +1,6 @@
 """Tests for vormap_auction — Spatial Auction Engine."""
 
 import json
-import math
 import os
 import sys
 import tempfile
@@ -20,7 +19,6 @@ from vormap_auction import (
     CellBidder,
     ResourceBundle,
     AuctionReport,
-    FairnessMetrics,
     _generate_resources,
     _voronoi_cells_simple,
     _euclidean,

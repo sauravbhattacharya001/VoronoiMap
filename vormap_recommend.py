@@ -32,7 +32,6 @@ CLI::
 import json
 import math
 import random
-import sys
 from collections import namedtuple
 
 import vormap

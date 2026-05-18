@@ -39,7 +39,7 @@ import os
 import random
 from typing import Any, Dict, List, Optional, Tuple
 
-from vormap_utils import build_distance_adjacency, euclidean as _dist
+from vormap_utils import build_distance_adjacency
 
 # ── Geometry helpers ────────────────────────────────────────────────
 
@@ -58,7 +58,7 @@ def _build_adjacency(pts: List[Tuple[float, float]], threshold_factor: float = 2
 # ── Species & Presets ───────────────────────────────────────────────
 
 class Species:
-    __slots__ = ("name", "color", "growth", "capacity", "mobility", "defense")
+    __slots__ = ("capacity", "color", "defense", "growth", "mobility", "name")
 
     def __init__(self, name: str, color: str, growth: float = 0.1,
                  capacity: float = 100.0, mobility: float = 0.05,

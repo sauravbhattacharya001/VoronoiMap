@@ -39,7 +39,7 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
 import vormap
-from vormap_geometry import polygon_area, edge_length, edge_length as _euclidean
+from vormap_geometry import polygon_area, edge_length as _euclidean
 from vormap_viz import compute_regions
 
 

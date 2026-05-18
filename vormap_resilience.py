@@ -59,12 +59,10 @@ import argparse
 import html as _html
 import json
 import math
-import os
 import random
-import sys
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from vormap_utils import (
     bounding_box as _bounding_box,
@@ -79,7 +77,6 @@ from vormap_utils import (
 
 
 # _cross, _convex_hull removed — dead code duplicating vormap_utils.
-from vormap_utils import polygon_area as _polygon_area  # backward compat for tests
 
 
 def _build_adjacency(points):

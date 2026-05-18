@@ -3,12 +3,10 @@
 import json
 import math
 import os
-import tempfile
 import unittest
 
 from vormap_centroid import (
     analyze_centers,
-    CenterReport,
     _mean_center,
     _weighted_mean_center,
     _median_center,

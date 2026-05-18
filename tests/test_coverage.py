@@ -1,7 +1,6 @@
 """Tests for vormap_coverage — service area coverage analysis."""
 
 import json
-import math
 import os
 import sys
 import pytest
@@ -17,10 +16,6 @@ from vormap_coverage import (
     export_csv,
     export_heatmap_svg,
     render,
-    Gap,
-    SiteCoverage,
-    SiteSuggestion,
-    CoverageResult,
 )
 
 

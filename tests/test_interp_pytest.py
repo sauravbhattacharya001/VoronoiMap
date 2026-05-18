@@ -5,7 +5,6 @@ adds edge-case coverage for _value_to_color, export_surface_svg,
 export_surface_csv, and grid_interpolate boundary conditions.
 """
 
-import math
 import os
 import tempfile
 

@@ -36,13 +36,12 @@ CLI::
 import json
 import math
 import random
-import sys
 from copy import deepcopy
 
 # Module-level RNG — replaced per-call in run_evolution().  Fixes #183.
 _rng: random.Random = random.Random()
 
-from vormap_utils import compute_nn_distances, euclidean
+from vormap_utils import compute_nn_distances
 from vormap_hull import convex_hull
 from vormap_geometry import polygon_area as _polygon_area
 

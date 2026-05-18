@@ -1,6 +1,5 @@
 """Tests for vormap_circlepack module."""
 
-import math
 import sys
 import os
 
@@ -93,7 +92,7 @@ def test_export_html(tmp_path):
 if __name__ == "__main__":
     import tempfile
     tmp = tempfile.mkdtemp()
-    
+
     test_polygon_area_square()
     test_polygon_area_triangle()
     test_polygon_centroid_square()
@@ -102,11 +101,11 @@ if __name__ == "__main__":
     test_circle_pack()
     test_packing_stats()
     test_packing_stats_empty()
-    
+
     class TmpPath:
         def __truediv__(self, name):
             return os.path.join(tmp, name)
-    
+
     test_export_svg(TmpPath())
     test_export_html(TmpPath())
     print("All tests passed!")

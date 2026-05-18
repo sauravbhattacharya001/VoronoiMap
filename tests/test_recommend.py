@@ -1,7 +1,5 @@
 """Tests for vormap_recommend — spatial analysis recommender."""
 
-import json
-import math
 import os
 import random
 import sys

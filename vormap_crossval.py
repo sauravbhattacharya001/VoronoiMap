@@ -559,7 +559,7 @@ def run_crossval_cli(args, data) -> None:
     from vormap import validate_input_path
 
     interp_path = validate_input_path(args.interp_values, allow_absolute=True)
-    with open(interp_path, 'r', encoding='utf-8') as f:
+    with open(interp_path, encoding='utf-8') as f:
         raw = [line.strip() for line in f if line.strip()]
     values = [float(v) for v in raw]
 

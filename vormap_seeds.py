@@ -454,7 +454,7 @@ def load_seeds(filename):
     resolved = validate_input_path(filename, allow_absolute=True)
 
     points = []
-    with open(resolved, 'r', encoding="utf-8") as f:
+    with open(resolved, encoding="utf-8") as f:
         for line in f:
             parts = line.strip().split()
             if len(parts) == 2:

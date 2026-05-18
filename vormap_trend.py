@@ -58,7 +58,6 @@ from vormap_geometry import (
     mean as _mean,
     std as _std,
     polygon_centroid,
-    polygon_area,
 )
 from vormap_utils import (
     mat_transpose as _transpose,

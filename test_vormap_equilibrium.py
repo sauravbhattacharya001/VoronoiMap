@@ -3,7 +3,6 @@
 import json
 import math
 import os
-import tempfile
 import pytest
 
 from vormap_equilibrium import (

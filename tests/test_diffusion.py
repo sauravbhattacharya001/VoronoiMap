@@ -1,14 +1,11 @@
 """Tests for vormap_diffusion — spatial diffusion simulation."""
 
 import json
-import math
 import os
 import tempfile
 import unittest
 
 from vormap_diffusion import (
-    DiffusionFrame,
-    DiffusionResult,
     heat_diffusion,
     sir_simulation,
     threshold_diffusion,

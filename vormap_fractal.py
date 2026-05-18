@@ -788,7 +788,7 @@ def _cli():
 
 def _load_points_file(path):
     """Load points from a CSV or JSON file."""
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         content = f.read().strip()
 
     # Try JSON

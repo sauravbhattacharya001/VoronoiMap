@@ -300,7 +300,7 @@ def profile_points(points):
         f"  NE={q_ne}  NW={q_nw}  SE={q_se}  SW={q_sw}  "
         f"(balance={quadrants['balance']:.3f})",
         "",
-        f"  ── Density ──",
+        "  ── Density ──",
         f"  {density['points_per_unit_area']:.6f} points/unit²",
         "",
         f"  Spatial outliers: {outliers['count']}",

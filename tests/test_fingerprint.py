@@ -1,7 +1,6 @@
 """Tests for vormap_fingerprint — spatial distribution fingerprinting."""
 
 import math
-import json
 import os
 import sys
 import tempfile
@@ -26,7 +25,6 @@ from vormap_fingerprint import (
     _hopkins,
     _clark_evans,
     _angular_entropy,
-    _ripley_k_deviation,
     _hull_efficiency,
     _lacunarity,
     _fractal_dimension,

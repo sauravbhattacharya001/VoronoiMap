@@ -1,12 +1,9 @@
 """Unit tests for vormap_curator."""
 
 import json
-import math
 import os
 import sys
-import tempfile
 
-import pytest
 
 # Ensure repo root is on sys.path
 HERE = os.path.dirname(os.path.abspath(__file__))

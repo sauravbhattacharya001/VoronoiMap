@@ -34,12 +34,10 @@ Usage (CLI)::
 from __future__ import annotations
 
 import argparse
-import html as _html
 import json
 import math
 import os
 import random
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Sequence, Tuple

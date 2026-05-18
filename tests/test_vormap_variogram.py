@@ -1,13 +1,11 @@
 """Tests for vormap_variogram — variogram analysis module."""
 
-import math
 import os
 import tempfile
 import unittest
 
 from vormap_variogram import (
     ExperimentalVariogram,
-    LagBin,
     VariogramModel,
     auto_fit,
     evaluate_model,

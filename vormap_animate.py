@@ -38,7 +38,6 @@ import json
 import math
 import os
 import re
-import sys
 
 from vormap import validate_input_path, validate_output_path
 
@@ -303,7 +302,7 @@ def _load_points(filepath):
     """
     filepath = validate_input_path(filepath, allow_absolute=True)
     points = []
-    with open(filepath, 'r', encoding='utf-8') as fh:
+    with open(filepath, encoding='utf-8') as fh:
         for line in fh:
             line = line.strip()
             if not line or line.startswith('#'):

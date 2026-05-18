@@ -5,7 +5,6 @@ import math
 import os
 import tempfile
 
-import pytest
 
 import vormap
 import vormap_viz

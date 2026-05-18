@@ -50,7 +50,6 @@ from vormap_geometry import (
     polygon_area,
     polygon_centroid,
     polygon_perimeter,
-    edge_length,
     edge_length as _dist,
 )
 

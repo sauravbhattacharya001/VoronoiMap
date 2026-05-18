@@ -69,8 +69,14 @@ Alert = namedtuple("Alert", ["channel", "severity", "value", "threshold", "messa
 class SentinelReport:
     """Result of monitoring a snapshot against the baseline."""
 
-    __slots__ = ("timestamp", "health_score", "alerts", "metrics",
-                 "point_count", "source_file")
+    __slots__ = (
+        "alerts",
+        "health_score",
+        "metrics",
+        "point_count",
+        "source_file",
+        "timestamp",
+    )
 
     def __init__(self, *, source_file="", point_count=0):
         self.timestamp = datetime.utcnow().isoformat() + "Z"
@@ -557,7 +563,7 @@ class Sentinel:
     @classmethod
     def load_baseline(cls, path):
         """Load a saved baseline and return a ready Sentinel."""
-        with open(path, "r") as f:
+        with open(path) as f:
             data = json.load(f)
         s = cls(
             grid_res=data.get("grid_res", 10),

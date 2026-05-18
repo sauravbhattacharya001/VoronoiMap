@@ -62,7 +62,7 @@ except ImportError:
 class RoadmapNode:
     """A node in the Voronoi roadmap (a Voronoi vertex)."""
 
-    __slots__ = ('x', 'y', 'clearance', 'index')
+    __slots__ = ('clearance', 'index', 'x', 'y')
 
     def __init__(self, x, y, clearance, index):
         self.x = x
@@ -77,7 +77,7 @@ class RoadmapNode:
 class RoadmapEdge:
     """An edge in the Voronoi roadmap connecting two vertices."""
 
-    __slots__ = ('node_a', 'node_b', 'length', 'min_clearance')
+    __slots__ = ('length', 'min_clearance', 'node_a', 'node_b')
 
     def __init__(self, node_a, node_b, length, min_clearance):
         self.node_a = node_a
@@ -89,7 +89,7 @@ class RoadmapEdge:
 class Roadmap:
     """The full Voronoi-edge navigation roadmap."""
 
-    __slots__ = ('nodes', 'edges', 'adjacency', 'bounds', 'obstacle_points')
+    __slots__ = ('adjacency', 'bounds', 'edges', 'nodes', 'obstacle_points')
 
     def __init__(self):
         self.nodes = []           # list of RoadmapNode
@@ -102,9 +102,19 @@ class Roadmap:
 class PathResult:
     """Result of a pathfinding query."""
 
-    __slots__ = ('waypoints', 'node_indices', 'total_distance',
-                 'min_clearance', 'avg_clearance', 'found', 'mode',
-                 'start', 'goal', 'start_node', 'goal_node')
+    __slots__ = (
+        'avg_clearance',
+        'found',
+        'goal',
+        'goal_node',
+        'min_clearance',
+        'mode',
+        'node_indices',
+        'start',
+        'start_node',
+        'total_distance',
+        'waypoints',
+    )
 
     def __init__(self):
         self.waypoints = []       # [(x, y), ...]

@@ -1,6 +1,5 @@
 """Tests for vormap_halftone — Voronoi Halftone Renderer."""
 
-import math
 import os
 import struct
 import tempfile

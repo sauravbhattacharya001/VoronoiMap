@@ -1,6 +1,5 @@
 """Tests for vormap_flowfield module."""
 import json
-import math
 import os
 import sys
 import tempfile

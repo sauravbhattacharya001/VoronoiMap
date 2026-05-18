@@ -1,7 +1,6 @@
 """Tests for vormap_network — spatial network analysis."""
 
 import json
-import math
 import os
 import sys
 import tempfile

@@ -306,9 +306,19 @@ class SVGCoordinateTransform:
         for the stretch pattern where modules typically pad by 5%.
     """
 
-    __slots__ = ("_min_x", "_max_y", "_scale", "_scale_x", "_scale_y",
-                 "_offset_x", "_offset_y", "_mode", "_width", "_height",
-                 "_margin")
+    __slots__ = (
+        "_height",
+        "_margin",
+        "_max_y",
+        "_min_x",
+        "_mode",
+        "_offset_x",
+        "_offset_y",
+        "_scale",
+        "_scale_x",
+        "_scale_y",
+        "_width",
+    )
 
     def __init__(self, x_bounds, y_bounds, width, height, *,
                  margin=40, mode="uniform", pad_fraction=0.0):

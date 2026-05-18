@@ -51,12 +51,10 @@ All functions are pure and depend only on the Python standard library
 
 import json
 import math
-import os
 from vormap_utils import euclidean as _edge_length
 import statistics
 import vormap
 
-from vormap_utils import euclidean as _edge_length
 
 __all__ = [
     "delaunay_triangulate",

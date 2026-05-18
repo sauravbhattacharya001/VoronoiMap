@@ -31,10 +31,8 @@ import argparse
 import html as _html
 import json
 import math
-import os
 import statistics
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from vormap import validate_output_path

@@ -55,7 +55,6 @@ import argparse
 import html as html_mod
 import json
 import math
-import os
 import random
 import sys
 from collections import deque
@@ -155,7 +154,7 @@ def _euclidean(a: Tuple[float, float], b: Tuple[float, float]) -> float:
 
 def _load_points(path: str) -> List[Tuple[float, float]]:
     pts: List[Tuple[float, float]] = []
-    with open(path, "r") as fh:
+    with open(path) as fh:
         for line in fh:
             line = line.strip()
             if not line or line.startswith("#"):
@@ -977,7 +976,7 @@ def tectonics_demo() -> TectonicsResult:
     print(f"Seismic events: {len(result.seismic_events)}")
     print(f"Volcanic zones: {len(result.volcanic_zones)}")
     print(f"Health score: {result.health_score:.1f}/100")
-    print(f"\nInsights:")
+    print("\nInsights:")
     for ins in result.insights:
         print(f"  • {ins}")
 

@@ -1,7 +1,6 @@
 """Tests for vormap_negotiator — Spatial Conflict Negotiator."""
 
 import json
-import math
 import os
 import sys
 import tempfile
@@ -10,11 +9,8 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from vormap_negotiator import (
-    Conflict,
-    CompromiseEntry,
     Negotiator,
     NegotiationResult,
-    Preference,
     RoundSnapshot,
     detect_conflicts,
     infer_preferences,
@@ -26,8 +22,6 @@ from vormap_negotiator import (
     _neighbors,
     _convex_hull,
     _is_pareto_optimal,
-    _satisfaction,
-    _build_compromises,
 )
 
 

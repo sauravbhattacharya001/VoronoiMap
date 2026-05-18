@@ -167,7 +167,7 @@ class VoronoiEstimator:
     (98, 6, 4.2)
     """
 
-    __slots__ = ('bounds', '_file_cache', '_tree_by_data_id')
+    __slots__ = ('_file_cache', '_tree_by_data_id', 'bounds')
 
     def __init__(self, bounds=None):
         """Create a new estimator.
@@ -794,7 +794,7 @@ def _detect_format(filepath):
     if ext == '.json':
         # Peek at content to distinguish JSON array from GeoJSON
         try:
-            with open(filepath, 'r', encoding="utf-8") as f:
+            with open(filepath, encoding="utf-8") as f:
                 # Read first non-whitespace chars to detect GeoJSON
                 content = f.read(2048)
                 content_stripped = content.lstrip()
@@ -827,7 +827,7 @@ def _parse_points_txt(filepath):
     _float = float
     _isfinite = math.isfinite
     _append = points.append
-    with open(filepath, 'r', encoding="utf-8") as objf:
+    with open(filepath, encoding="utf-8") as objf:
         for line in objf:
             coord = line.split(None, 2)
             if len(coord) < 2:
@@ -862,7 +862,7 @@ def _parse_points_csv(filepath):
     ]
 
     points = []
-    with open(filepath, 'r', newline='', encoding="utf-8") as f:
+    with open(filepath, newline='', encoding="utf-8") as f:
         # Sniff the dialect once from a sample, then rewind
         sample = f.read(4096)
         f.seek(0)
@@ -933,7 +933,7 @@ def _parse_points_json(filepath):
     """
     import json
 
-    with open(filepath, 'r', encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         data = json.load(f)
 
     if not isinstance(data, list):
@@ -1000,7 +1000,7 @@ def _parse_points_geojson(filepath):
     """Parse GeoJSON FeatureCollection or array of Features with Point geometry."""
     import json
 
-    with open(filepath, 'r', encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         data = json.load(f)
 
     if not isinstance(data, dict):

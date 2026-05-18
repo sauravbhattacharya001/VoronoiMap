@@ -1,7 +1,6 @@
 """Tests for vormap_fractal — fractal dimension analysis."""
 
 import json
-import math
 import os
 import random
 import sys
@@ -330,7 +329,7 @@ class TestReporting:
             path = f.name
         try:
             export_json(result, path)
-            with open(path, "r") as f:
+            with open(path) as f:
                 loaded = json.load(f)
             assert "summary" in loaded
             assert "box_counting" in loaded

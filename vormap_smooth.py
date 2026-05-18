@@ -32,9 +32,8 @@ import argparse
 import csv
 import json
 import math
-import os
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import vormap
 from vormap_utils import euclidean as _compute_distance
@@ -437,7 +436,7 @@ def smooth_from_file(filename, value_file=None, config=None, value_column=0):
             value_file, base_dir="data", allow_absolute=True
         )
         values = {}
-        with open(resolved, "r", encoding="utf-8") as f:
+        with open(resolved, encoding="utf-8") as f:
             reader = csv.reader(f)
             header = next(reader, None)
             for row in reader:

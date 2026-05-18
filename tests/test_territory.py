@@ -1,7 +1,6 @@
 """Tests for vormap_territory — Territorial Analysis."""
 
 import json
-import math
 import os
 import tempfile
 

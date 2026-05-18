@@ -40,7 +40,6 @@ Usage (as module):
 import argparse
 import math
 import re
-import sys
 from dataclasses import dataclass, field
 
 import vormap
@@ -211,7 +210,7 @@ def simulate_svg(svg_path: str, cvd_type: str, output_path: str) -> str:
     """Read an SVG, simulate CVD on all colors, write the result."""
     safe_in = vormap.validate_input_path(svg_path, allow_absolute=True)
     safe_out = vormap.validate_output_path(output_path, allow_absolute=True)
-    with open(safe_in, "r", encoding="utf-8") as f:
+    with open(safe_in, encoding="utf-8") as f:
         content = f.read()
     with open(safe_out, "w", encoding="utf-8") as f:
         f.write(_transform_color_in_str(content, cvd_type))
@@ -221,7 +220,7 @@ def simulate_svg(svg_path: str, cvd_type: str, output_path: str) -> str:
 def generate_comparison_html(svg_path: str, output_path: str) -> str:
     """Generate HTML showing original SVG alongside all CVD simulations."""
     safe_in = vormap.validate_input_path(svg_path, allow_absolute=True)
-    with open(safe_in, "r", encoding="utf-8") as f:
+    with open(safe_in, encoding="utf-8") as f:
         original = f.read()
 
     descs = {

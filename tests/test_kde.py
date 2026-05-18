@@ -1,9 +1,7 @@
 """Tests for vormap_kde — Kernel Density Estimation."""
 
 import json
-import math
 import os
-import tempfile
 
 import pytest
 

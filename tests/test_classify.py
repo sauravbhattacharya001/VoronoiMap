@@ -1,7 +1,6 @@
 """Tests for vormap_classify module."""
 
 import csv
-import json
 import os
 import tempfile
 import unittest

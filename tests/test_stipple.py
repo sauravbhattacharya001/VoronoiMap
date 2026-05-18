@@ -1,10 +1,8 @@
 """Tests for vormap_stipple — Voronoi Stippling module."""
 
 import json
-import math
 import os
 import sys
-import tempfile
 
 import pytest
 
@@ -15,7 +13,6 @@ from vormap_stipple import (
     _load_image_density,
     _sample_initial_points,
     _points_in_polygon,
-    _weighted_lloyd_step,
     stipple_image,
     points_to_svg,
     points_to_json,

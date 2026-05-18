@@ -560,7 +560,6 @@ def main():
             f.write(html)
         print(f"HTML report written to {args.html}")
 
-    import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
     if args.format == "json":
         print(json.dumps(result, indent=2, ensure_ascii=False))

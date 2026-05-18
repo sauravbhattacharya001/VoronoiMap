@@ -2,7 +2,6 @@
 """Tests for vormap_genetics — Spatial Genetics Engine."""
 
 import json
-import math
 import os
 import sys
 import tempfile
@@ -11,7 +10,6 @@ import unittest
 sys.path.insert(0, os.path.dirname(__file__))
 
 from vormap_genetics import (
-    CellGenetics,
     FixationEvent,
     GeneticsEngine,
     GeneticsResult,

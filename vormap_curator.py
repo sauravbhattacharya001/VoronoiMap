@@ -659,7 +659,7 @@ def format_json(report: CurationReport, *, indent: int = 2) -> str:
 def _load_points_from_file(path: str) -> List[Tuple[float, float]]:
     """Tiny loader that accepts CSV-ish ``x,y`` or whitespace-separated."""
     pts: List[Tuple[float, float]] = []
-    with open(path, "r", encoding="utf-8") as fh:
+    with open(path, encoding="utf-8") as fh:
         # sniff: if the first non-empty line has a comma, treat as CSV
         sample = fh.read(2048)
         fh.seek(0)

@@ -1,7 +1,6 @@
 """Tests for vormap_playground module."""
 import os
 import tempfile
-import json
 
 import vormap_playground
 

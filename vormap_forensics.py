@@ -58,12 +58,10 @@ import collections
 import json
 import math
 import random
-import statistics
-import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from html import escape as _esc
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from vormap_utils import (
     bounding_box as _bounding_box,
@@ -1083,7 +1081,7 @@ def forensics_demo():
     verdict = engine.investigate()
 
     print(f"\n{'='*60}")
-    print(f"  SPATIAL FORENSICS DEMO REPORT")
+    print("  SPATIAL FORENSICS DEMO REPORT")
     print(f"{'='*60}")
     print(f"  Points analyzed: {len(pts)}")
     print(f"  Integrity score: {verdict.integrity_score:.1f}/100")
@@ -1096,11 +1094,11 @@ def forensics_demo():
               f"{a.root_cause} (confidence {a.cause_confidence:.0%}), "
               f"{len(a.affected_indices)} points")
     if verdict.causal_chains:
-        print(f"\n  Causal Chains:")
+        print("\n  Causal Chains:")
         for ch in verdict.causal_chains:
             print(f"    Chain #{ch.chain_id}: {ch.mechanism} "
                   f"(confidence {ch.confidence:.0%})")
-    print(f"\n  Remediation:")
+    print("\n  Remediation:")
     for r in verdict.remediation:
         print(f"    • {r}")
     print(f"{'='*60}\n")
@@ -1153,7 +1151,7 @@ def main(argv=None):
     verdict = engine.investigate()
 
     print(f"\n{'='*60}")
-    print(f"  SPATIAL FORENSICS REPORT")
+    print("  SPATIAL FORENSICS REPORT")
     print(f"{'='*60}")
     print(f"  Integrity score: {verdict.integrity_score:.1f}/100")
     print(f"  Risk level:      {verdict.risk_level.upper()}")
@@ -1163,10 +1161,10 @@ def main(argv=None):
         print(f"    [{a.severity:>8}] #{a.anomaly_id} {a.anomaly_type}: "
               f"{a.root_cause} ({a.cause_confidence:.0%})")
     if verdict.causal_chains:
-        print(f"  Causal chains:")
+        print("  Causal chains:")
         for ch in verdict.causal_chains:
             print(f"    #{ch.chain_id}: {ch.mechanism}")
-    print(f"  Remediation:")
+    print("  Remediation:")
     for r in verdict.remediation:
         print(f"    • {r}")
     print(f"{'='*60}\n")

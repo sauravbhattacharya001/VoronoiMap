@@ -54,8 +54,8 @@ import html as _html_mod
 import json
 import math
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import List, Optional, Tuple
 
 from vormap import validate_output_path
 from vormap_geometry import polygon_area as _polygon_area, polygon_centroid as _polygon_centroid

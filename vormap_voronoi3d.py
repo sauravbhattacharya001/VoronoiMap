@@ -577,7 +577,7 @@ animate();
 def load_points_csv(path: str) -> List[Tuple[float, float, float]]:
     """Load 3-D points from CSV (x,y,z per row)."""
     pts = []
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         reader = csv.reader(f)
         for row in reader:
             if not row or row[0].strip().lower().startswith(("x", "#", "//")):

@@ -1,11 +1,9 @@
 """Tests for vormap_swarm — Spatial Swarm Intelligence Engine."""
 
 import json
-import math
 import os
 import random
 import sys
-import tempfile
 
 import pytest
 

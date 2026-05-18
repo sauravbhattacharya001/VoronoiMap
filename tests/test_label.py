@@ -1,15 +1,12 @@
 """Tests for vormap_label — Automatic Label Placement."""
 
 import json
-import math
 import os
-import tempfile
 import unittest
 
 from vormap_label import (
     place_labels,
     LabelConfig,
-    PlacedLabel,
     export_labeled_svg,
     export_labeled_html,
     export_labels_json,
@@ -18,7 +15,6 @@ from vormap_label import (
     _polygon_centroid,
     _point_in_polygon,
     _pole_of_inaccessibility,
-    _dist_to_polygon_edge,
 )
 
 

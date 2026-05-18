@@ -150,7 +150,6 @@ from vormap_geometry import polygon_area as _polygon_area
 
 def _voronoi_cell_areas(points_array):
     """Compute finite Voronoi cell areas using scipy."""
-    import numpy as np
     vor = ScipyVoronoi(points_array)
     areas = {}
     for idx, region_idx in enumerate(vor.point_region):
@@ -488,7 +487,7 @@ def export_surface_csv(grid_result, output_path):
 def run_interp_cli(args, data):
     """Execute interpolation commands from CLI args."""
     interp_path = validate_input_path(args.interp_values, allow_absolute=True)
-    with open(interp_path, 'r', encoding="utf-8") as f:
+    with open(interp_path, encoding="utf-8") as f:
         raw = [line.strip() for line in f if line.strip()]
     values = [float(v) for v in raw]
     if len(values) != len(data):

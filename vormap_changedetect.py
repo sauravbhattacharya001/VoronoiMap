@@ -50,7 +50,7 @@ import json
 import math
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any
 
 from vormap import validate_output_path
 from vormap_geometry import edge_length as _dist

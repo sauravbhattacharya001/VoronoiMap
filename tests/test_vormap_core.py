@@ -7,7 +7,6 @@ Covers: isect, isect_B, find_CXY, find_BXY, bin_search, find_area,
 import math
 import os
 import sys
-import tempfile
 import unittest.mock as mock
 
 import pytest

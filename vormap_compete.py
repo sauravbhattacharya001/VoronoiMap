@@ -34,7 +34,7 @@ import math
 import os
 import random
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 # Module-level RNG instance — replaced with a local Random(seed) in
 # simulate_competition() so callers get reproducible results without
@@ -66,8 +66,14 @@ def _random_points(n: int, w: float, h: float,
 
 class Cell:
     """One Voronoi region in the competition grid."""
-    __slots__ = ("idx", "center", "owner", "strength", "resource",
-                 "neighbors")
+    __slots__ = (
+        "center",
+        "idx",
+        "neighbors",
+        "owner",
+        "resource",
+        "strength",
+    )
 
     def __init__(self, idx: int, center: Tuple[float, float],
                  resource: float):

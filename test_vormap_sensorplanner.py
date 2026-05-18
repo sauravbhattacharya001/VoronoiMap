@@ -3,12 +3,9 @@ from __future__ import annotations
 
 import json
 import math
-import random
 
-import pytest
 
 from vormap_sensorplanner import (
-    SensorCandidate,
     SensorPlan,
     format_plan,
     plan_sensors,

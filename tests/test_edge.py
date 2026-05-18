@@ -1,7 +1,6 @@
 """Tests for vormap_edge — Voronoi Edge Network extraction and analysis."""
 
 import json
-import math
 import os
 import tempfile
 

@@ -57,8 +57,6 @@ from vormap_utils import (
     mat_mul as _mat_mul,
     mat_vec as _mat_vec,
     mat_identity as _identity,
-    lu_decompose as _lu_decompose,
-    lu_solve as _lu_solve,
     mat_solve as _solve,
     mat_invert as _invert,
 )

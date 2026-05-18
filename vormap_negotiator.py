@@ -60,20 +60,14 @@ import argparse
 import html as _html
 import json
 import math
-import os
 import random
-import sys
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from vormap_utils import (
-    bounding_box as _bounding_box,
-    compute_nn_distances,
     euclidean as _dist,
     load_points as _load_points,
     polygon_area as _polygon_area,
-    polygon_centroid as _polygon_centroid,
-    clip_polygon_to_rect,
 )
 
 # ---------------------------------------------------------------------------

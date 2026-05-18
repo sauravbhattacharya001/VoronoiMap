@@ -1,7 +1,6 @@
 """Tests for vormap_relax — Lloyd's Relaxation."""
 
 import json
-import math
 import os
 import sys
 import tempfile

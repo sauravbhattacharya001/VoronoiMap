@@ -10,10 +10,6 @@ import unittest
 sys.path.insert(0, os.path.dirname(__file__))
 
 from vormap_hull import (
-    BoundingCircleResult,
-    BoundingRectResult,
-    ConvexHullResult,
-    HullAnalysis,
     bounding_circle,
     bounding_rect,
     convex_hull,

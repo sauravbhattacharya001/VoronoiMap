@@ -628,7 +628,7 @@ def load_points(filepath: str) -> List[Tuple[float, float]]:
     Returns a list of ``(x, y)`` tuples.
     """
     points: List[Tuple[float, float]] = []
-    with open(filepath, "r", encoding="utf-8") as fh:
+    with open(filepath, encoding="utf-8") as fh:
         for line in fh:
             line = line.strip()
             if not line or line.startswith("#"):

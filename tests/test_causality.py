@@ -1,10 +1,8 @@
 """Tests for vormap_causality — Spatial Causality Engine."""
 
 import json
-import math
 import os
 import sys
-import tempfile
 
 import pytest
 
@@ -16,7 +14,6 @@ from vormap_causality import (
     DIDResult,
     SyntheticControlResult,
     SpilloverCell,
-    InterventionScore,
     CausalityReport,
     analyze_causality,
     estimate_treatment_effect,

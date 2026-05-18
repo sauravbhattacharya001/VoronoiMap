@@ -42,7 +42,6 @@ Programmatic usage
 import argparse
 import html as _html_mod
 import os
-import sys
 
 
 def generate(*, title="Voronoi Style Gallery", cols=3, cell_size=350, dark=False):

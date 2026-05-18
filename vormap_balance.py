@@ -480,7 +480,7 @@ drawPoints('afterCanvas', finalPts, '#22c55e');
 
 def read_points(path):
     points = []
-    with open(path, 'r') as f:
+    with open(path) as f:
         reader = csv.reader(f)
         for row in reader:
             if not row or row[0].strip().startswith('#'):
@@ -587,7 +587,7 @@ def main():
     es = equity_score(areas)
     ent = shannon_entropy(areas)
 
-    print(f"\n📊 Initial Distribution Analysis:")
+    print("\n📊 Initial Distribution Analysis:")
     print(f"   Gini Coefficient:     {g:.4f}")
     print(f"   Coeff. of Variation:  {cv:.4f}")
     print(f"   Equity Score:         {es:.1f}%")
@@ -599,7 +599,7 @@ def main():
             'equity_score': round(es, 2), 'entropy': round(ent, 4),
             'points': [list(p) for p in points], 'areas': [round(a, 4) for a in areas]
         }])
-        print(f"\n🤖 Recommendations:")
+        print("\n🤖 Recommendations:")
         for r in recs:
             print(f"   [{r['severity']}] {r['message']}")
         return
@@ -618,13 +618,13 @@ def main():
 
         last = history[-1]
         improvement = g - last['gini']
-        print(f"\n✅ Rebalancing complete:")
+        print("\n✅ Rebalancing complete:")
         print(f"   Gini:    {g:.4f} → {last['gini']:.4f} (Δ{improvement:+.4f})")
         print(f"   Equity:  {es:.1f}% → {last['equity_score']:.1f}%")
         print(f"   Iters:   {len(history) - 1}")
 
         recs = generate_recommendations(history)
-        print(f"\n🤖 Recommendations:")
+        print("\n🤖 Recommendations:")
         for r in recs:
             print(f"   [{r['severity']}] {r['message']}")
 

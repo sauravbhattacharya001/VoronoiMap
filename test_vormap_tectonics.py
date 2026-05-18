@@ -2,7 +2,6 @@
 """Tests for Spatial Tectonics Engine."""
 
 import json
-import math
 import os
 import sys
 import tempfile
@@ -13,11 +12,6 @@ sys.path.insert(0, os.path.dirname(__file__))
 from vormap_tectonics import (
     TectonicsEngine,
     TectonicsResult,
-    CellTectonics,
-    PlateBoundary,
-    TectonicPlate,
-    SeismicEvent,
-    VolcanicZone,
     tectonics_analyze,
     tectonics_demo,
     _euclidean,
@@ -26,7 +20,6 @@ from vormap_tectonics import (
     _normalize,
     _assign_plates,
     _compute_drift,
-    _classify_boundaries,
     _gini_coeff,
 )
 

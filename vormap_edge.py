@@ -25,7 +25,6 @@ import xml.etree.ElementTree as ET
 import vormap
 
 
-from vormap_viz import compute_regions
 
 
 # ── Helpers ──────────────────────────────────────────────────────────

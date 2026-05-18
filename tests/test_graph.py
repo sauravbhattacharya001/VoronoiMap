@@ -1,6 +1,5 @@
 """Tests for vormap_graph — neighbourhood graph extraction and analysis."""
 
-import math
 import pytest
 
 import vormap_graph

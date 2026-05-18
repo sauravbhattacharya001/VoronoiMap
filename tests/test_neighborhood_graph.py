@@ -6,7 +6,6 @@ SVG overlay visualization, and the CLI integration.
 
 import csv
 import json
-import math
 import os
 import sys
 import tempfile

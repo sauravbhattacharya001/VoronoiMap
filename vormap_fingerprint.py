@@ -49,7 +49,7 @@ import os
 import random
 import sys
 from collections import Counter
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 from vormap_utils import euclidean as _dist
 
@@ -859,7 +859,7 @@ def main():
         cls = fp["classification"]
         print(f"Fingerprint for {fp['name']} ({fp['n_points']} points)")
         print(f"Classification: {cls['label']} ({cls['confidence']}% confidence)")
-        print(f"\nDimensions:")
+        print("\nDimensions:")
         for k, v in fp["dimensions"].items():
             print(f"  {k:20s}  {v:+.4f}")
 

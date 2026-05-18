@@ -2,7 +2,6 @@
 
 import csv
 import json
-import math
 import os
 import sys
 import unittest
@@ -13,7 +12,6 @@ sys.path.insert(0, os.path.dirname(__file__))
 from vormap_smooth import (
     SmoothConfig,
     SmoothResult,
-    smooth_attributes,
     export_csv,
     export_json,
     _compute_distance,

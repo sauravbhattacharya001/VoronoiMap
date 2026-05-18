@@ -2,7 +2,6 @@
 """Tests for vormap_weather.py — Spatial Weather Engine (55+ tests)."""
 
 import json
-import math
 import os
 import sys
 import tempfile
@@ -14,8 +13,6 @@ from vormap_weather import (
     WeatherEngine,
     WeatherResult,
     CellWeather,
-    WindFlow,
-    WeatherFront,
     StormCell,
     weather_analyze,
     weather_demo,

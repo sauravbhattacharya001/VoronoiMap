@@ -1,6 +1,5 @@
 """Tests for vormap_animate -- Voronoi animation module."""
 
-import json
 import os
 import sys
 import tempfile

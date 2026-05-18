@@ -193,7 +193,7 @@ class _SpatialBins:
     most a 3×3 neighbourhood of bins.
     """
 
-    __slots__ = ("_bins", "_bx", "_by", "_ox", "_oy", "_cell")
+    __slots__ = ("_bins", "_bx", "_by", "_cell", "_ox", "_oy")
 
     def __init__(
         self,

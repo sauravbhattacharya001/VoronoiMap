@@ -668,7 +668,7 @@ class SamplePoint:
         Sampling method that generated this point.
     """
 
-    __slots__ = ('x', 'y', 'region_index', 'region_label', 'sample_id', 'method')
+    __slots__ = ('method', 'region_index', 'region_label', 'sample_id', 'x', 'y')
 
     def __init__(self, x, y, region_index, region_label, sample_id, method):
         self.x = x

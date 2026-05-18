@@ -7,7 +7,6 @@ import tempfile
 import pytest
 
 from vormap_hull import (
-    convex_hull,
     hull_analysis,
     export_svg,
     export_json,

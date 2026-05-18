@@ -1,14 +1,8 @@
 """Tests for vormap_mosaic — Voronoi mosaic image filter."""
 
-import json
 import math
 import os
-import random
-import struct
 import sys
-import tempfile
-import zlib
-from collections import Counter
 
 import pytest
 

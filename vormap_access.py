@@ -60,7 +60,6 @@ import argparse
 import csv
 import json
 import math
-import os
 from dataclasses import dataclass, field
 from vormap_utils import euclidean_xy as _euclidean
 from typing import List, Optional, Tuple
@@ -825,7 +824,7 @@ def _load_supply_csv(filepath: str) -> List[SupplyPoint]:
     """Load supply points from CSV (x,y,capacity or x,y)."""
     safe = vormap.validate_input_path(filepath, allow_absolute=True)
     points = []
-    with open(safe, "r", encoding="utf-8") as f:
+    with open(safe, encoding="utf-8") as f:
         reader = csv.reader(f)
         header = next(reader, None)
         for row in reader:

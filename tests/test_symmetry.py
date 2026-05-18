@@ -1,7 +1,6 @@
 """Tests for vormap_symmetry — symmetry analysis module."""
 
 import math
-import pytest
 import vormap_symmetry as sym
 
 

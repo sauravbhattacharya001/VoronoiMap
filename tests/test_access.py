@@ -4,7 +4,6 @@ import json
 import math
 import os
 import sys
-import tempfile
 
 import pytest
 
@@ -13,7 +12,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from vormap_access import (
     AccessScore,
     SupplyPoint,
-    InequalityResult,
     proximity_scores,
     gravity_scores,
     two_step_fca,

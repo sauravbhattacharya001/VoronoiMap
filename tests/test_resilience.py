@@ -1,9 +1,7 @@
 """Tests for vormap_resilience — Spatial Resilience Analyzer."""
 
 import json
-import math
 import os
-import random
 import sys
 import tempfile
 
@@ -12,9 +10,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from vormap_resilience import (
     ResilienceAnalyzer,
     ResilienceResult,
-    PointImpact,
-    CascadeStep,
-    RedundancySuggestion,
     _gini_coefficient,
     _voronoi_cell_areas,
     _build_adjacency,

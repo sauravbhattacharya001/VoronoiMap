@@ -8,9 +8,6 @@ import tempfile
 import pytest
 
 from vormap_nndist import (
-    ClarkEvansResult,
-    DistanceSummary,
-    GFunctionResult,
     clark_evans,
     distance_summary,
     export_nn_csv,

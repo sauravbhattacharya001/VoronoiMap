@@ -30,7 +30,6 @@ CLI usage
 import argparse
 import json
 import math
-import os
 import random
 
 import vormap
@@ -594,7 +593,7 @@ def main():
         # Print summary to stdout
         print(f"\nCanvas: {meta['width']}×{meta['height']}")
         print(f"Impact: {meta['impact']}")
-        print(f"\nTop 5 largest fragments:")
+        print("\nTop 5 largest fragments:")
         by_area = sorted(result["fragments"], key=lambda f: f["area"], reverse=True)
         for frag in by_area[:5]:
             print(f"  Fragment {frag['id']:3d}: area={frag['area']:8.1f} "

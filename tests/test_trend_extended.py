@@ -9,11 +9,9 @@ Covers functions not tested in test_trend.py:
 - compare_trends with single order
 """
 
-import json
 import math
 import os
 import sys
-import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -23,11 +21,7 @@ from vormap_trend import (
     compare_trends,
     predict_at,
     predict_grid,
-    export_trend_csv,
-    export_trend_json,
     export_trend_svg,
-    TrendResult,
-    TrendComparison,
     _design_row,
     _value_to_color,
 )

@@ -2,7 +2,6 @@
 """Tests for vormap_attention.py — Spatial Attention Engine (45+ tests)."""
 
 import json
-import math
 import os
 import sys
 import tempfile
@@ -13,7 +12,6 @@ sys.path.insert(0, os.path.dirname(__file__))
 from vormap_attention import (
     AttentionEngine,
     AttentionResult,
-    CellAttention,
     attention_analyze,
     attention_demo,
     _euclidean,

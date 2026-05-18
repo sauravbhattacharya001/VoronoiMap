@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from vormap_regress import (
     fit_ols, fit_gwr, parse_formula,
     export_regress_json, export_regress_csv, export_regress_svg,
-    _transpose, _mat_mul, _solve, _invert, _mean, _morans_i,
+    _transpose, _mat_mul, _solve, _invert, _morans_i,
     _build_distance_weights, OLSResult, GWRResult,
 )
 

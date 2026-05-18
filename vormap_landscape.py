@@ -41,13 +41,10 @@ import math
 import os
 from typing import Any, Dict, List, Tuple
 
-import vormap
-import vormap_viz
 
 from vormap_geometry import (
     polygon_area as _polygon_area,
     polygon_perimeter as _polygon_perimeter,
-    polygon_centroid as _polygon_centroid,
     edge_length as _edge_length,
     isoperimetric_quotient as _isoperimetric_quotient,
 )
@@ -105,10 +102,18 @@ class PatchMetrics:
     """Metrics for a single patch (Voronoi region)."""
 
     __slots__ = (
-        "seed", "patch_class", "area", "perimeter", "shape_index",
-        "fractal_dimension", "core_area", "core_area_index",
-        "compactness", "neighbors", "class_neighbors",
+        "area",
+        "class_neighbors",
+        "compactness",
+        "core_area",
+        "core_area_index",
         "edge_contrast",
+        "fractal_dimension",
+        "neighbors",
+        "patch_class",
+        "perimeter",
+        "seed",
+        "shape_index",
     )
 
     def __init__(self) -> None:
@@ -221,12 +226,23 @@ class ClassMetrics:
     """Aggregated metrics for one landscape class."""
 
     __slots__ = (
-        "class_name", "patch_count", "total_area", "percent_landscape",
-        "mean_patch_area", "std_patch_area", "largest_patch_area",
-        "largest_patch_index", "patch_density", "total_edge",
-        "edge_density", "mean_shape_index", "mean_fractal_dim",
-        "total_core_area", "mean_core_area_index",
-        "cohesion", "aggregation_index",
+        "aggregation_index",
+        "class_name",
+        "cohesion",
+        "edge_density",
+        "largest_patch_area",
+        "largest_patch_index",
+        "mean_core_area_index",
+        "mean_fractal_dim",
+        "mean_patch_area",
+        "mean_shape_index",
+        "patch_count",
+        "patch_density",
+        "percent_landscape",
+        "std_patch_area",
+        "total_area",
+        "total_core_area",
+        "total_edge",
     )
 
     def __init__(self) -> None:
@@ -340,12 +356,23 @@ class LandscapeMetrics:
     """Metrics for the entire landscape."""
 
     __slots__ = (
-        "total_area", "num_patches", "num_classes", "patch_richness",
-        "patch_density", "mean_patch_area", "total_edge",
-        "edge_density", "mean_shape_index", "mean_fractal_dim",
-        "shannon_diversity", "simpson_diversity", "dominance",
-        "evenness", "contagion", "total_core_area",
+        "contagion",
+        "dominance",
+        "edge_density",
+        "evenness",
         "mean_core_area_index",
+        "mean_fractal_dim",
+        "mean_patch_area",
+        "mean_shape_index",
+        "num_classes",
+        "num_patches",
+        "patch_density",
+        "patch_richness",
+        "shannon_diversity",
+        "simpson_diversity",
+        "total_area",
+        "total_core_area",
+        "total_edge",
     )
 
     def __init__(self) -> None:
@@ -481,8 +508,10 @@ class LandscapeAnalysis:
     """Container for all landscape analysis results."""
 
     __slots__ = (
-        "patch_metrics", "class_metrics", "landscape_metrics",
+        "class_metrics",
         "fragmentation_summary",
+        "landscape_metrics",
+        "patch_metrics",
     )
 
     def __init__(self) -> None:

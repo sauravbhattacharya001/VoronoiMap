@@ -1,7 +1,6 @@
 """Tests for vormap_ecosystem — Spatial Ecosystem Simulator."""
 
 import math
-import pytest
 from vormap_ecosystem import (
     EcosystemSimulator,
     Species,

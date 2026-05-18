@@ -66,7 +66,6 @@ def _percentile(values: list, p: float) -> float:
     return _percentile_sorted(sorted(values), p) if values else 0.0
 
 
-from vormap_utils import euclidean as _euclidean
 
 
 

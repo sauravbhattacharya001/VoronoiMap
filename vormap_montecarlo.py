@@ -31,18 +31,15 @@ CLI::
 import argparse
 import json
 import math
-import os
 import random
 import sys
 from collections import namedtuple
-from typing import Optional, Tuple
+from typing import Tuple
 
 import vormap
 from vormap_geometry import (
     mean as _mean,
-    median as _median,
     std as _std,
-    percentile as _percentile,
     polygon_area,
 )
 

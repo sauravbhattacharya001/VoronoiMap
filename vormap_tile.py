@@ -42,7 +42,6 @@ Programmatic API
 import argparse
 import hashlib
 import math
-import os
 import random
 import sys
 

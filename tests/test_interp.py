@@ -1,6 +1,5 @@
 """Tests for vormap_interp - Spatial interpolation."""
 
-import math
 import sys
 
 from vormap_interp import (

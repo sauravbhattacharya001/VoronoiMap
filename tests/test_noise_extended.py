@@ -1,6 +1,5 @@
 """Extended tests for vormap_noise — private helpers, edge cases, and PNG export."""
 
-import math
 import os
 import sys
 import tempfile
@@ -216,7 +215,6 @@ def test_cli_tiled_octaves():
 
 
 if __name__ == "__main__":
-    import inspect
     tests = [obj for name, obj in sorted(globals().items())
              if name.startswith("test_") and callable(obj)]
     for t in tests:

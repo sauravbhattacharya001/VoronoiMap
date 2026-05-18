@@ -54,7 +54,6 @@ import json
 import math
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple, Dict, Any
 
 from vormap import validate_output_path
 from vormap_geometry import mean as _mean, median as _median, std as _std
@@ -352,11 +351,11 @@ class QualityReport:
     def summary(self):
         """Return a human-readable summary string."""
         lines = [
-            f"Spatial Data Quality Report",
-            f"==========================",
+            "Spatial Data Quality Report",
+            "==========================",
             f"Points: {self.n_points}",
             f"Score:  {self.score:.0f}/100 ({self.grade})",
-            f"",
+            "",
             f"Spacing:  mean={self.spacing.mean_dist:.2f}  "
             f"std={self.spacing.std_dist:.2f}  CV={self.spacing.cv:.3f}",
             f"Uniformity Index: {self.uniformity_index:.3f}  "
@@ -370,7 +369,7 @@ class QualityReport:
             f"(sparse cells: {self.density.sparse_cells}, "
             f"dense cells: {self.density.dense_cells})",
             f"Isolated points: {self.isolation.isolated_count}",
-            f"",
+            "",
         ]
         if self.recommendations:
             lines.append("Recommendations:")

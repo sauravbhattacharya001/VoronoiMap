@@ -3,10 +3,8 @@
 import json
 import os
 import struct
-import tempfile
 import zlib
 
-import pytest
 
 from vormap_jigsaw import (
     generate_jigsaw,
@@ -14,8 +12,6 @@ from vormap_jigsaw import (
     _place_seeds_grid,
     _assign_voronoi,
     _find_borders,
-    _region_bboxes,
-    _read_png,
 )
 
 

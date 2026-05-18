@@ -1,13 +1,10 @@
 """Tests for vormap_forensics — Spatial Anomaly Forensics Engine."""
 
 import json
-import math
 import os
 import random
 import sys
-import tempfile
 
-import pytest
 
 # Ensure repo root is importable
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))

@@ -1,19 +1,14 @@
 """Tests for vormap_changedetect — Spatial Change Detection module."""
 
 import json
-import math
 import os
 import sys
-import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
 
 from vormap_changedetect import (
     detect_changes,
-    ChangeReport,
-    ShiftedPoint,
-    DensityCell,
     _dist,
     _bearing,
     _compass,

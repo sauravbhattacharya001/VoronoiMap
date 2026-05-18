@@ -40,7 +40,7 @@ import random
 import struct
 import zlib
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import vormap
 from vormap_utils import assign_cells_grid, clamp as _clamp, lerp_color as _lerp_color

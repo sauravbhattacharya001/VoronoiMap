@@ -2,7 +2,6 @@
 """Tests for vormap_metabolism.py — Spatial Metabolism Engine (50+ tests)."""
 
 import json
-import math
 import os
 import sys
 import tempfile

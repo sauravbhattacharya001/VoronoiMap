@@ -7,7 +7,7 @@ import tempfile
 sys.path.insert(0, os.path.dirname(__file__))
 
 from vormap_crystal import (
-    Crystal, CrystalConfig, simulate, extract_boundaries,
+    CrystalConfig, simulate, extract_boundaries,
     grain_stats, render, save_image, main,
 )
 

@@ -279,7 +279,7 @@ class TestExportCSV:
             path = f.name
         try:
             export_crossval_csv(results, path)
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding='utf-8') as f:
                 reader = csv.reader(f)
                 rows = list(reader)
             # Header + 3 method rows
@@ -296,7 +296,7 @@ class TestExportCSV:
             path = f.name
         try:
             export_crossval_csv(results, path, include_residuals=True)
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding='utf-8') as f:
                 content = f.read()
             assert '--- Residuals ---' in content
             # Should have residual rows
@@ -312,7 +312,7 @@ class TestExportCSV:
             path = f.name
         try:
             export_crossval_csv([], path)
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding='utf-8') as f:
                 reader = csv.reader(f)
                 rows = list(reader)
             # Just header row
@@ -355,7 +355,7 @@ class TestExportSVG:
             assert root.get('width') == '800'
             assert root.get('height') == '500'
             # Title should be in the SVG
-            with open(path, 'r') as f:
+            with open(path) as f:
                 content = f.read()
             assert 'Custom Title' in content
         finally:

@@ -10,7 +10,6 @@ import tempfile
 # Ensure repo root is on path
 sys.path.insert(0, os.path.dirname(__file__))
 
-import vormap
 import vormap_mesh3d as m3d
 
 

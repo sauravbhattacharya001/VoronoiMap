@@ -7,7 +7,6 @@ naming, error handling, and edge cases.
 
 import os
 import sys
-import tempfile
 import xml.etree.ElementTree as ET
 
 import pytest

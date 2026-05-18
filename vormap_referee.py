@@ -13,7 +13,7 @@ Usage:
     python vormap_referee.py points.csv -o report.html
 """
 
-import argparse, csv, hashlib, json, math, os, sys, time
+import argparse, csv, hashlib, json, math, sys, time
 
 from vormap_utils import euclidean as _dist
 
@@ -321,7 +321,7 @@ def _fix_section(result):
 
 def load_points(path):
     pts = []
-    with open(path, 'r') as f:
+    with open(path) as f:
         reader = csv.reader(f)
         for row in reader:
             if len(row) >= 2:
@@ -333,7 +333,7 @@ def load_points(path):
 
 def load_weights(path):
     w = []
-    with open(path, 'r') as f:
+    with open(path) as f:
         reader = csv.reader(f)
         for row in reader:
             if row:
@@ -409,7 +409,7 @@ def main():
                 h = _file_hash(args.points)
                 if h != prev_hash:
                     prev_hash = h
-                    print(f'\n🔄 File changed, re-analyzing...')
+                    print('\n🔄 File changed, re-analyzing...')
                     result = run_once()
                     if result["grade"] < prev_grade:
                         print(f'⚠️  ALERT: Fairness degraded! {prev_grade} → {result["grade"]}')

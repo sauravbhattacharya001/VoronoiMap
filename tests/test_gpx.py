@@ -1,6 +1,5 @@
 """Tests for vormap_gpx — GPX import/export module."""
 
-import json
 import os
 import sys
 import tempfile

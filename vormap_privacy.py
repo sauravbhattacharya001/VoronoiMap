@@ -40,7 +40,6 @@ import json
 import math
 import random
 import statistics
-import sys
 from collections import namedtuple
 
 from vormap_utils import bounding_box as _bounding_box, euclidean as _dist, polygon_centroid_mean as _centroid
