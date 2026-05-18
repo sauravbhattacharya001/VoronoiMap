@@ -150,17 +150,15 @@ def _auto_bounds(pts: Sequence[Tuple[float, float]],
     return (w - pad_x, s - pad_y, e + pad_x, n + pad_y)
 
 
+# Percentile is implemented once in vormap_geometry.percentile (sorted input).
+# Local wrapper preserves the unsorted-input contract used by callers.
+from vormap_geometry import percentile as _percentile_sorted  # noqa: E402
+
+
 def _percentile(values: Sequence[float], pct: float) -> float:
     if not values:
         return 0.0
-    sv = sorted(values)
-    k = (len(sv) - 1) * (pct / 100.0)
-    lo = int(math.floor(k))
-    hi = int(math.ceil(k))
-    if lo == hi:
-        return float(sv[lo])
-    frac = k - lo
-    return float(sv[lo] * (1 - frac) + sv[hi] * frac)
+    return float(_percentile_sorted(sorted(values), pct))
 
 
 def _nn_distances(pts: Sequence[Tuple[float, float]]) -> List[float]:

@@ -408,16 +408,11 @@ def mesh_statistics(points, triangles, tri_metrics=None):
     }
 
 
-def _percentile(sorted_vals, pct):
-    """Simple percentile on a pre-sorted list."""
-    if not sorted_vals:
-        return 0.0
-    k = (pct / 100.0) * (len(sorted_vals) - 1)
-    f = math.floor(k)
-    c = math.ceil(k)
-    if f == c:
-        return sorted_vals[int(k)]
-    return sorted_vals[f] * (c - k) + sorted_vals[c] * (k - f)
+# Percentile is shared across modules - delegate to vormap_geometry to avoid
+# a fourth copy of the same linear-interpolation routine.  All call sites in
+# this module pass pre-sorted input, matching the shared implementation's
+# contract.
+from vormap_geometry import percentile as _percentile  # noqa: E402
 
 
 # ═══════════════════════════════════════════════════════════════════

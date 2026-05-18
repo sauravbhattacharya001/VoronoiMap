@@ -273,16 +273,63 @@ def export_edge_svg( network, output_path, *, width=800, height=600, show_vertic
 
 ## vormap_geometry
 
-*Shared geometry helpers used across VoronoiMap extension modules.*
+*Shared geometry and statistics helpers used across VoronoiMap extension modules.*
+
+This module is the single source of truth for routines that were previously
+copy-pasted into 4+ extension modules: the Shoelace polygon helpers, basic
+descriptive statistics (`mean`, `std`, `median`, `percentile`, `normal_cdf`),
+and the SVG coordinate transform used by 14+ visual modules.
+
+### Geometry helpers
 
 | Function | Description |
 |----------|-------------|
-| `polygon_area` | Compute polygon area using the Shoelace formula. Parameters ---------- vertices : list[tuple[float,  |
-| `polygon_perimeter` | Compute the perimeter of a polygon. Parameters ---------- vertices : list[tuple[float, float]] Order |
-| `polygon_centroid` | Centroid of a simple polygon using the Shoelace-weighted formula. Parameters ---------- vertices : l |
-| `isoperimetric_quotient` | Compute the isoperimetric quotient (circularity measure). IQ = 4 * pi * area / perimeter^2 A perfect |
-| `edge_length` | Euclidean distance between two 2D vertices. Parameters ---------- v1, v2 : tuple[float, float] Retur |
-| `build_data_index` | Build a coordinate-to-index lookup for seed point data. Only records the *first* occurrence of each  |
+| `polygon_area(vertices)` | Full-precision Shoelace area of a polygon. Returns `0.0` for fewer than 3 vertices. |
+| `polygon_perimeter(vertices)` | Sum of edge lengths. Returns `0.0` for fewer than 2 vertices. |
+| `polygon_centroid(vertices)` | Shoelace-weighted centroid of a simple polygon (re-exported from `vormap_utils`). |
+| `isoperimetric_quotient(area, perimeter)` | Circularity measure `4·π·area / perimeter²` in `[0, 1]`. A perfect circle scores 1.0. |
+| `edge_length(v1, v2)` | Euclidean distance between two 2-D vertices. |
+| `cross_product_2d(o, a, b)` | 2-D cross product of vectors **OA** and **OB**. Positive = counter-clockwise turn. |
+| `build_data_index(data)` | Build a `coord → first-index` `dict` for O(1) seed-point lookups. |
+
+### Statistics helpers
+
+| Function | Description |
+|----------|-------------|
+| `mean(values)` | Arithmetic mean; returns `0.0` for empty input. |
+| `std(values, population=True, mean_val=None)` | Standard deviation. `population=True` uses the `N` denominator, `False` the sample `N-1` denominator. Pre-computed mean may be supplied to avoid recomputation. Returns `0.0` for fewer than 2 values. |
+| `median(values)` | Median of a list of numbers (handles even/odd lengths); returns `0.0` for empty input. |
+| `percentile(sorted_vals, p)` | The *p*-th percentile (0–100) via linear interpolation. **Input must already be sorted ascending.** |
+| `normal_cdf(x)` | Standard normal CDF Φ(x) via the Abramowitz & Stegun 7.1.26 rational approximation (≈ 1.5 × 10⁻⁷ accuracy). |
+
+### `SVGCoordinateTransform`
+
+Maps data-space `(x, y)` to SVG pixel-space. Replaces ~28 inline closures that
+were previously duplicated across visual modules.
+
+```python
+SVGCoordinateTransform(
+    x_bounds, y_bounds, width, height,
+    *, margin=40, mode="uniform", pad_fraction=0.0,
+)
+```
+
+Parameters:
+
+- `x_bounds`, `y_bounds` — `(min, max)` ranges of the data.
+- `width`, `height` — SVG canvas size in pixels.
+- `margin` — pixel margin around the drawable area (default `40`).
+- `mode` — `"uniform"` preserves aspect ratio and centres the data; `"stretch"` scales x and y independently to fill the canvas.
+- `pad_fraction` — fraction of the data range added as padding on all sides before computing the transform.
+
+Instance methods and properties:
+
+| Member | Description |
+|--------|-------------|
+| `tx(x)` | Transform a data-space *x* to pixel-space *x*. |
+| `ty(y)` | Transform a data-space *y* to pixel-space *y* (Y-flipped for SVG). |
+| `scale` *(property)* | Uniform scale factor. For `mode="stretch"` returns `min(scale_x, scale_y)`, a reasonable approximation for isotropic quantities (radii, etc.). |
+| `SVGCoordinateTransform.from_points(points, width, height, **kwargs)` *(classmethod)* | Convenience constructor that derives `x_bounds`/`y_bounds` from an iterable of `(x, y)` points. Raises `ValueError` on an empty list. |
 
 ### Signatures
 
@@ -292,7 +339,24 @@ def polygon_perimeter(vertices)
 def polygon_centroid(vertices)
 def isoperimetric_quotient(area, perimeter)
 def edge_length(v1, v2)
+def cross_product_2d(o, a, b)
 def build_data_index(data)
+
+def mean(values)
+def std(values, population=True, mean_val=None)
+def median(values)
+def percentile(sorted_vals, p)  # input must be pre-sorted
+def normal_cdf(x)
+
+class SVGCoordinateTransform:
+    def __init__(self, x_bounds, y_bounds, width, height, *,
+                 margin=40, mode="uniform", pad_fraction=0.0): ...
+    def tx(self, x): ...
+    def ty(self, y): ...
+    @classmethod
+    def from_points(cls, points, width, height, **kwargs): ...
+    @property
+    def scale(self): ...
 ```
 
 ## vormap_graph

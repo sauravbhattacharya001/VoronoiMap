@@ -1,4 +1,4 @@
-"""Spatial Data Profiler — comprehensive dataset summary statistics.
+"""Spatial Data Profiler - comprehensive dataset summary statistics.
 
 Like ``pandas.describe()`` but for spatial point datasets.  Generates a
 rich profile including point count, bounding box, centroid, spatial
@@ -45,15 +45,10 @@ except ImportError:
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _percentile(sorted_vals, p):
-    """Compute the *p*-th percentile (0–100) from a sorted list."""
-    if not sorted_vals:
-        return 0.0
-    k = (len(sorted_vals) - 1) * p / 100.0
-    f = int(k)
-    c = f + 1 if f + 1 < len(sorted_vals) else f
-    d = k - f
-    return sorted_vals[f] + d * (sorted_vals[c] - sorted_vals[f])
+# Percentile lives in vormap_geometry as the single source of truth.  All
+# call sites in this module already pre-sort their inputs, matching the
+# shared implementation's contract.
+from vormap_geometry import percentile as _percentile  # noqa: E402
 
 
 def _std(values, mean):
@@ -149,7 +144,7 @@ def profile_points(points):
     # --- Nearest-neighbor distances ---
     nn_dists = []
     if _HAS_SCIPY:
-        # O(n log n) using KDTree — vastly faster than brute-force
+        # O(n log n) using KDTree - vastly faster than brute-force
         arr = np.array(points)
         tree = KDTree(arr)
         # k=2: first neighbour is the point itself at distance 0
@@ -301,7 +296,7 @@ def profile_points(points):
         f"(balance={quadrants['balance']:.3f})",
         "",
         "  ── Density ──",
-        f"  {density['points_per_unit_area']:.6f} points/unit²",
+        f"  {density['points_per_unit_area']:.6f} points/unit2",
         "",
         f"  Spatial outliers: {outliers['count']}",
         "=" * 60,
@@ -446,7 +441,7 @@ def _to_html(report):
     <div class="stat"><span class="label">Area</span>
       <span class="value">{dens.get('area', 0):,.2f}</span></div>
     <div class="stat"><span class="label">Density</span>
-      <span class="value">{dens.get('points_per_unit_area', 0):.6f} pts/unit²</span></div>
+      <span class="value">{dens.get('points_per_unit_area', 0):.6f} pts/unit2</span></div>
     <div class="stat"><span class="label">Spatial Outliers</span>
       <span class="value">{outl.get('count', 0)}</span></div>
   </div>
@@ -546,7 +541,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Spatial Data Profiler — comprehensive dataset summary.",
+        description="Spatial Data Profiler - comprehensive dataset summary.",
         epilog="Example: python vormap_profile.py data/cities.csv --format html -o profile.html",
     )
     parser.add_argument("datafile", help="Point data file (.txt/.csv/.json/.geojson)")

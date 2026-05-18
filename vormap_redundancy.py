@@ -130,17 +130,15 @@ def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
     return math.hypot(a[0] - b[0], a[1] - b[1])
 
 
+# Percentile is implemented once in vormap_geometry.percentile (sorted input).
+# Local wrapper preserves the unsorted-input contract used by callers.
+from vormap_geometry import percentile as _percentile_sorted  # noqa: E402
+
+
 def _percentile(values: Sequence[float], pct: float) -> float:
     if not values:
         return 0.0
-    sv = sorted(values)
-    k = (len(sv) - 1) * (pct / 100.0)
-    lo = int(math.floor(k))
-    hi = int(math.ceil(k))
-    if lo == hi:
-        return float(sv[lo])
-    frac = k - lo
-    return float(sv[lo] * (1 - frac) + sv[hi] * frac)
+    return float(_percentile_sorted(sorted(values), pct))
 
 
 def _nn_table(pts: Sequence[Tuple[float, float]]) -> List[Tuple[float, int]]:
