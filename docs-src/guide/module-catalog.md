@@ -1,6 +1,6 @@
 # Module Catalog
 
-Complete reference of all 138 VoronoiMap modules organized by functional area.
+Complete reference of all 148 VoronoiMap modules organized by functional area.
 For detailed API documentation of core extension modules, see [Extension Modules API](extensions.md).
 
 ---
@@ -11,11 +11,11 @@ For detailed API documentation of core extension modules, see [Extension Modules
 |--------|-------------|
 | `vormap_utils` | Shared utility functions for VoronoiMap modules |
 | `vormap_geometry` | Shared geometry and statistics helpers used across extension modules |
-| `vormap_pipeline` | Batch analysis pipeline — chain multiple VoronoiMap tools together |
+| `vormap_pipeline` | Batch analysis pipeline - chain multiple VoronoiMap tools together |
 | `vormap_benchmark` | Performance benchmark for VoronoiMap operations |
-| `vormap_profile` | Spatial data profiler — comprehensive dataset summary statistics |
+| `vormap_profile` | Spatial data profiler - comprehensive dataset summary statistics |
 | `vormap_quality` | Spatial data quality assessment for Voronoi diagrams |
-| `vormap_doctor` | Diagram diagnostician — autonomous health checker and auto-fix prescriber |
+| `vormap_doctor` | Diagram diagnostician - autonomous health checker and auto-fix prescriber |
 | `vormap_recommend` | Spatial analysis recommender for Voronoi diagrams |
 
 ---
@@ -26,9 +26,9 @@ For detailed API documentation of core extension modules, see [Extension Modules
 |--------|-------------|
 | `vormap_seeds` | Seed point generators: uniform, grid, hexagonal, jittered, Poisson disk, Halton |
 | `vormap_generate` | Synthetic point pattern generator |
-| `vormap_relax` | Lloyd's relaxation — centroidal Voronoi tessellation |
+| `vormap_relax` | Lloyd's relaxation - centroidal Voronoi tessellation |
 | `vormap_evolve` | Evolutionary point placement optimizer |
-| `vormap_merge` | Region merger — merge adjacent regions by attribute similarity |
+| `vormap_merge` | Region merger - merge adjacent regions by attribute similarity |
 | `vormap_clip` | Clip Voronoi regions to arbitrary convex boundary polygons |
 | `vormap_power` | Power diagrams (weighted Voronoi / Laguerre diagrams) |
 | `vormap_penrose` | Penrose tiling generator for Voronoi diagrams |
@@ -46,16 +46,16 @@ For detailed API documentation of core extension modules, see [Extension Modules
 | `vormap_autocorr` | Spatial autocorrelation analysis for Voronoi-partitioned data |
 | `vormap_kde` | Kernel density estimation for spatial point data |
 | `vormap_nndist` | Nearest-neighbor distance analysis for spatial point patterns |
-| `vormap_fingerprint` | Spatial distribution fingerprinting — compact signatures for point patterns |
+| `vormap_fingerprint` | Spatial distribution fingerprinting - compact signatures for point patterns |
 | `vormap_classify` | Spatial data classification for choropleth mapping |
 | `vormap_regularity` | Voronoi entropy and regularity analysis |
 | `vormap_symmetry` | Detect rotational and reflective symmetry in Voronoi diagrams |
 | `vormap_fractal` | Fractal dimension analysis for Voronoi seed point patterns |
 | `vormap_stability` | Measure diagram sensitivity to point perturbation |
 | `vormap_crossval` | Leave-one-out cross-validation for spatial interpolation methods |
-| `vormap_causality` | Spatial causality engine — counterfactual analysis, treatment effects, difference-in-differences, and synthetic control |
-| `vormap_attention` | Spatial attention engine — autonomous analytical focus allocation via information density, change velocity, and surprise detection |
-| `vormap_auction` | Spatial auction engine — sealed-bid, Vickrey, combinatorial, and ascending auction mechanisms for resource allocation |
+| `vormap_causality` | Spatial causality engine - counterfactual analysis, treatment effects, difference-in-differences, and synthetic control |
+| `vormap_attention` | Spatial attention engine - autonomous analytical focus allocation via information density, change velocity, and surprise detection |
+| `vormap_auction` | Spatial auction engine - sealed-bid, Vickrey, combinatorial, and ascending auction mechanisms for resource allocation |
 
 ---
 
@@ -68,10 +68,10 @@ For detailed API documentation of core extension modules, see [Extension Modules
 | `vormap_delaunay` | Delaunay triangulation quality analysis |
 | `vormap_hull` | Convex hull and bounding geometry analysis |
 | `vormap_centroid` | Spatial center analysis for Voronoi point datasets |
-| `vormap_shape` | Cell shape analysis — geometric shape metrics |
+| `vormap_shape` | Cell shape analysis - geometric shape metrics |
 | `vormap_buffer` | Buffer zone analysis for Voronoi point datasets |
 | `vormap_network` | Spatial network analysis via Delaunay triangulation |
-| `vormap_transect` | Transect profiler — cross-section analysis along a line |
+| `vormap_transect` | Transect profiler - cross-section analysis along a line |
 | `vormap_circlepack` | Largest inscribed circles per Voronoi cell |
 
 ---
@@ -87,7 +87,7 @@ For detailed API documentation of core extension modules, see [Extension Modules
 | `vormap_trend` | Trend surface analysis |
 | `vormap_variogram` | Variogram analysis for Voronoi-based spatial data |
 | `vormap_zonal` | Zonal statistics for Voronoi tessellations |
-| `vormap_mapalgebra` | Voronoi map algebra — spatial operations on cell attribute layers |
+| `vormap_mapalgebra` | Voronoi map algebra - spatial operations on cell attribute layers |
 | `vormap_isochrone` | Isochrone (travel-time zone) generator for Voronoi networks |
 
 ---
@@ -114,17 +114,21 @@ For detailed API documentation of core extension modules, see [Extension Modules
 | `vormap_ecosystem` | Spatial ecosystem simulator on Voronoi tessellations |
 | `vormap_compete` | Territorial competition simulator |
 | `vormap_erosion` | Terrain erosion simulation over Voronoi networks |
-| `vormap_crystal` | Crystal growth simulator — anisotropic nucleation and growth |
+| `vormap_crystal` | Crystal growth simulator - anisotropic nucleation and growth |
 | `vormap_montecarlo` | Monte Carlo spatial simulation |
 | `vormap_gravity` | Spatial interaction and gravity model |
-| `vormap_swarm` | Swarm intelligence engine — collective spatial optimization |
-| `vormap_fracture` | Fracture simulator — realistic material fracture patterns |
+| `vormap_swarm` | Swarm intelligence engine - collective spatial optimization |
+| `vormap_fracture` | Fracture simulator - realistic material fracture patterns |
 | `vormap_watershed` | Watershed and flow analysis |
-| `vormap_resilience` | Resilience analyzer — simulate failures and identify critical infrastructure |
-| `vormap_equilibrium` | Spatial equilibrium engine — force fields, stability classification, basin mapping, and tipping point detection |
-| `vormap_metabolism` | Spatial metabolism engine — resource production, consumption, trade flows, and bottleneck detection |
-| `vormap_nervous` | Spatial nervous system — neural signal propagation, reflex arcs, rhythm analysis, and Hebbian plasticity |
-| `vormap_maze` | Voronoi maze generator — DFS, Kruskal, and Prim algorithms with SVG export and BFS solver |
+| `vormap_resilience` | Resilience analyzer - simulate failures and identify critical infrastructure |
+| `vormap_equilibrium` | Spatial equilibrium engine - force fields, stability classification, basin mapping, and tipping point detection |
+| `vormap_metabolism` | Spatial metabolism engine - resource production, consumption, trade flows, and bottleneck detection |
+| `vormap_nervous` | Spatial nervous system - neural signal propagation, reflex arcs, rhythm analysis, and Hebbian plasticity |
+| `vormap_maze` | Voronoi maze generator - DFS, Kruskal, and Prim algorithms with SVG export and BFS solver |
+| `vormap_genetics` | Spatial population genetics simulation on Voronoi tessellations - allele frequencies, drift, migration, and selection |
+| `vormap_hydrology` | Water flow and flood simulation on Voronoi tessellations - drainage networks, accumulation, and stream order |
+| `vormap_tectonics` | Tectonic plate simulation on Voronoi tessellations - plate boundaries, orogenesis, and seismicity |
+| `vormap_weather` | Atmospheric simulation on Voronoi tessellations - pressure fields, wind vectors, precipitation, and storm tracking |
 
 ---
 
@@ -132,12 +136,13 @@ For detailed API documentation of core extension modules, see [Extension Modules
 
 | Module | Description |
 |--------|-------------|
-| `vormap_temporal` | Voronoi temporal dynamics — track diagram evolution over time |
+| `vormap_temporal` | Voronoi temporal dynamics - track diagram evolution over time |
 | `vormap_changedetect` | Spatial change detection for Voronoi point datasets |
-| `vormap_forecast` | Spatial point pattern forecaster — predict future distributions |
+| `vormap_forecast` | Spatial point pattern forecaster - predict future distributions |
 | `vormap_morph` | Smooth animated interpolation between point configurations |
 | `vormap_animate` | Animated HTML visualization of diagram evolution |
 | `vormap_compare` | Compare two Voronoi diagrams for structural and geometric similarity |
+| `vormap_drift` | Agentic temporal drift advisor - detect distribution shifts and recommend rebalancing actions |
 
 ---
 
@@ -145,12 +150,12 @@ For detailed API documentation of core extension modules, see [Extension Modules
 
 | Module | Description |
 |--------|-------------|
-| `vormap_viz` | Primary visualization module — SVG, HTML, GeoJSON, statistics export |
+| `vormap_viz` | Primary visualization module - SVG, HTML, GeoJSON, statistics export |
 | `vormap_heatmap` | Density heatmap generation |
 | `vormap_color` | Four-color map coloring |
 | `vormap_coloring` | Graph coloring for Voronoi diagrams |
 | `vormap_gradient` | Gradient-fill renderer |
-| `vormap_flowfield` | Flow-field visualizer — vector fields and streamlines |
+| `vormap_flowfield` | Flow-field visualizer - vector fields and streamlines |
 | `vormap_label` | Automatic label placement |
 | `vormap_cvd` | Color vision deficiency (CVD) simulator |
 | `vormap_playground` | Interactive HTML Voronoi playground generator |
@@ -165,26 +170,26 @@ For detailed API documentation of core extension modules, see [Extension Modules
 | Module | Description |
 |--------|-------------|
 | `vormap_ascii` | Terminal (ASCII/Unicode) rendering of Voronoi diagrams |
-| `vormap_mosaic` | Mosaic image filter — stained-glass and pixel-art effects |
+| `vormap_mosaic` | Mosaic image filter - stained-glass and pixel-art effects |
 | `vormap_stainedglass` | Stained-glass renderer |
 | `vormap_watercolor` | Watercolour painter |
 | `vormap_lowpoly` | Low-poly image renderer |
-| `vormap_stipple` | Stippling — image-to-dot-art via weighted Voronoi tessellation |
+| `vormap_stipple` | Stippling - image-to-dot-art via weighted Voronoi tessellation |
 | `vormap_pixelart` | Pixel-art generator |
 | `vormap_halftone` | Halftone renderer |
 | `vormap_emboss` | Emboss and relief renderer |
-| `vormap_hatch` | Hatch pattern generator — pen-plotter / engraving style |
+| `vormap_hatch` | Hatch pattern generator - pen-plotter / engraving style |
 | `vormap_crossstitch` | Cross-stitch pattern generator |
 | `vormap_stringart` | String art generator |
 | `vormap_spiral` | Spiral pattern generator |
 | `vormap_kaleidoscope` | Kaleidoscope generator |
-| `vormap_text` | Voronoi typography — render text as cell mosaics |
+| `vormap_text` | Voronoi typography - render text as cell mosaics |
 | `vormap_texture` | Seamless tileable texture generator |
 | `vormap_tile` | Seamless tileable Voronoi pattern generator |
 | `vormap_photomosaic` | Photo-mosaic renderer |
-| `vormap_jigsaw` | Jigsaw puzzle generator — split images into puzzle pieces |
+| `vormap_jigsaw` | Jigsaw puzzle generator - split images into puzzle pieces |
 | `vormap_noise` | Worley (cellular) noise generator |
-| `vormap_dream` | Synthetic distribution generator — learn and reproduce spatial patterns |
+| `vormap_dream` | Synthetic distribution generator - learn and reproduce spatial patterns |
 | `vormap_displacement` | Displacement and normal-map generator |
 
 ---
@@ -194,12 +199,12 @@ For detailed API documentation of core extension modules, see [Extension Modules
 | Module | Description |
 |--------|-------------|
 | `vormap_voronoi3d` | 3-D Voronoi tessellation visualizer |
-| `vormap_mesh3d` | 3D mesh exporter — extrude Voronoi cells into 3D geometry |
+| `vormap_mesh3d` | 3D mesh exporter - extrude Voronoi cells into 3D geometry |
 | `vormap_kml` | KML export for Google Earth / Google Maps |
 | `vormap_geojson` | GeoJSON export (RFC 7946) |
 | `vormap_gpx` | GPX import/export |
 | `vormap_cartogram` | Area-proportional region distortion |
-| `vormap_treemap` | Voronoi treemap — hierarchical Voronoi tessellations |
+| `vormap_treemap` | Voronoi treemap - hierarchical Voronoi tessellations |
 
 ---
 
@@ -224,9 +229,24 @@ For detailed API documentation of core extension modules, see [Extension Modules
 | Module | Description |
 |--------|-------------|
 | `vormap_privacy` | Differential privacy and k-anonymity for point data |
-| `vormap_guardian` | Spatial constraint guardian — constraint enforcement and auto-repair |
+| `vormap_guardian` | Spatial constraint guardian - constraint enforcement and auto-repair |
 | `vormap_referee` | Spatial fairness referee |
 | `vormap_sentinel` | Proactive distribution monitoring and anomaly alerting |
-| `vormap_forensics` | Spatial anomaly forensics engine — multi-phase investigation |
-| `vormap_narrative` | Spatial narrative generator — natural language analysis summaries |
-| `vormap_negotiator` | Spatial conflict negotiator — multi-party conflict resolution |
+| `vormap_forensics` | Spatial anomaly forensics engine - multi-phase investigation |
+| `vormap_narrative` | Spatial narrative generator - natural language analysis summaries |
+| `vormap_negotiator` | Spatial conflict negotiator - multi-party conflict resolution |
+| `vormap_governance` | Autonomous democratic decision-making on Voronoi tessellations - voting rules, social choice, and consensus protocols |
+
+---
+
+## Agentic Advisors
+
+High-level autonomous advisors that read a dataset and produce prescriptive, decision-ready output.
+
+| Module | Description |
+|--------|-------------|
+| `vormap_brief` | Autonomous executive brief generator - distills VoronoiMap datasets into decision-ready narrative summaries |
+| `vormap_curator` | Agentic spatial dataset curator - quality scoring, deduplication, and provenance-aware filtering |
+| `vormap_handoff` | Agentic shift-handoff advisor - state diffs, open anomalies, and prioritized next actions for the incoming operator |
+| `vormap_redundancy` | Agentic sensor retirement / merge advisor - identifies redundant sensors and proposes consolidation actions |
+| `vormap_sensorplanner` | Agentic budget-aware next-N sensor placement advisor - optimal expansion under coverage and cost constraints |

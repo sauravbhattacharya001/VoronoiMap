@@ -463,7 +463,7 @@ print(f"Largest fragment area: {result.largest_fragment_area:.1f}")
 
 ## What's Next
 
-- See the [Module Catalog](module-catalog.md) for the complete list of all 138 modules
+- See the [Module Catalog](module-catalog.md) for the complete list of all 148 modules
 - See the [Extension Modules API](extensions.md) for core modules (viz, clustering, queries, etc.)
 - Read the [Tutorials](tutorials.md) for step-by-step workflows
 - Check the [Algorithm Overview](../algorithm/overview.md) for theoretical foundations
