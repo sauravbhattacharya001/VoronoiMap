@@ -309,7 +309,6 @@ class TestSummaryStats:
     def test_total_bounds_area(self, three_squares):
         seeds, regions, bounds = three_squares
         # bounds = (0, 400, 0, 400) => area = 400*400 = 160000
-        assert report._summary_stats()["total_bounds_area"] == 160000.0 if False else True
         report = VoronoiReport(seeds, regions, bounds)
         assert report._summary_stats()["total_bounds_area"] == 160000.0
 

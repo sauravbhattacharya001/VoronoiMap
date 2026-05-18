@@ -34,6 +34,8 @@ import json
 import math
 import os
 
+import vormap
+
 # Golden angle in radians ≈ 137.508°
 GOLDEN_ANGLE = math.pi * (3 - math.sqrt(5))
 

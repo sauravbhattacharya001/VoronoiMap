@@ -42,7 +42,6 @@ CLI::
 
 import json
 import math
-import sys
 from collections import namedtuple
 
 from vormap_utils import bounding_box as _bounding_box, euclidean as _dist
@@ -549,7 +548,8 @@ def _print_report(diag):
         if f.fix_command:
             print(f"       \u21b3 Fix: {f.fix_command}")
 
-    print(f"\n{'\u2500'*60}")
+    _line = '\u2500' * 60
+    print(f"\n{_line}")
     print(f"  Summary: {diag.summary}")
     if diag.auto_fix_plan:
         print(f"\n  \U0001f4cb Auto-Fix Plan ({len(diag.auto_fix_plan)} commands):")

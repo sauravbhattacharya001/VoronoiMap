@@ -38,6 +38,7 @@ Example::
 import math
 import json
 import random as _random
+import sys
 
 try:
     import numpy as np
