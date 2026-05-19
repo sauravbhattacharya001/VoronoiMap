@@ -161,6 +161,202 @@ def _safe_stdev(values: List[float]) -> float:
         return 0.0
 
 
+# ---- Verdict ladder: ordered most-severe -> least, with the reason codes
+# that promote a sensor into that verdict. Order matters: first match wins.
+_VERDICT_LADDER: Tuple[Tuple[str, Tuple[str, ...]], ...] = (
+    ("OUT_OF_RANGE",  ("CLAMPING_AT_MAX", "CLAMPING_AT_MIN")),
+    ("BIAS_DRIFT",    ("BIAS_VS_REFERENCE", "BIAS_VS_BASELINE")),
+    ("GAIN_DRIFT",    ("STD_INFLATION_3X", "STD_INFLATION_2X", "STD_COLLAPSE")),
+    ("STICKY_SENSOR", ("STICKY_CONSTANT_VALUE",)),
+    ("NOISE_SPIKE",   ("RECENT_NOISE_BURST",)),
+)
+
+
+def _insufficient_history_verdict(
+    sensor: SensorTimeSeries, n: int, appetite_mult: float
+) -> SensorVerdict:
+    """Build the early-return verdict for sensors with too few readings."""
+    risk = round(min(100.0, _BASE_SEVERITY["INSUFFICIENT_DATA"] * appetite_mult), 2)
+    return SensorVerdict(
+        sensor_id=sensor.sensor_id,
+        verdict="INSUFFICIENT_DATA",
+        priority=_bucket(risk),
+        calibration_risk=risk,
+        reasons=[Reason(
+            code="INSUFFICIENT_HISTORY",
+            weight=20.0,
+            detail=f"only {n} readings (need >=5)",
+        )],
+        n_readings=n,
+    )
+
+
+def _detect_range_clamping(
+    values: List[float], expected_range: Optional[Tuple[float, float]]
+) -> List[Reason]:
+    """Emit CLAMPING_AT_MAX / CLAMPING_AT_MIN when >=20% of readings pin to a bound."""
+    if expected_range is None:
+        return []
+    emin, emax = expected_range
+    n = len(values)
+    reasons: List[Reason] = []
+    max_hits = sum(1 for v in values if v >= emax - 1e-9)
+    min_hits = sum(1 for v in values if v <= emin + 1e-9)
+    if max_hits / n >= 0.20:
+        reasons.append(Reason(
+            code="CLAMPING_AT_MAX",
+            weight=70.0,
+            detail=f"{max_hits}/{n} readings at/above expected max {emax}",
+        ))
+    if min_hits / n >= 0.20:
+        reasons.append(Reason(
+            code="CLAMPING_AT_MIN",
+            weight=70.0,
+            detail=f"{min_hits}/{n} readings at/below expected min {emin}",
+        ))
+    return reasons
+
+
+def _longest_constant_run(values: List[float]) -> int:
+    """Length of the longest consecutive run of (numerically) equal readings."""
+    longest = 1
+    run = 1
+    for i in range(1, len(values)):
+        if abs(values[i] - values[i - 1]) < 1e-12:
+            run += 1
+            if run > longest:
+                longest = run
+        else:
+            run = 1
+    return longest
+
+
+def _detect_sticky(values: List[float], sd: float, sticky_run: int) -> List[Reason]:
+    """Detect frozen / stuck sensors via long constant runs or tail collapse."""
+    n = len(values)
+    longest_run = _longest_constant_run(values)
+    if longest_run >= sticky_run:
+        return [Reason(
+            code="STICKY_CONSTANT_VALUE",
+            weight=50.0,
+            detail=f"{longest_run} consecutive identical readings",
+        )]
+    tail = values[-min(sticky_run, n):]
+    if len(tail) < sticky_run:
+        return []
+    tail_sd = _safe_stdev(tail) if len(tail) >= 2 else 0.0
+    if sd > 0 and tail_sd < sd * 0.02:
+        return [Reason(
+            code="STICKY_CONSTANT_VALUE",
+            weight=50.0,
+            detail=f"last {len(tail)} readings have ~zero stdev",
+        )]
+    return []
+
+
+def _detect_reference_bias(
+    mean: float, sd: float, reference: Optional[float], drift_threshold: float
+) -> List[Reason]:
+    """Compare overall mean to an externally-supplied reference value."""
+    if reference is None:
+        return []
+    delta = mean - reference
+    bound = max(drift_threshold, 2.0 * sd)
+    if abs(delta) <= bound:
+        return []
+    return [Reason(
+        code="BIAS_VS_REFERENCE",
+        weight=60.0,
+        detail=f"mean {mean:.4g} vs reference {reference:.4g} (delta {delta:+.4g})",
+    )]
+
+
+def _detect_baseline_bias(
+    m1: float, m2: float, sd1: float, sd2: float, drift_threshold: float
+) -> List[Reason]:
+    """Compare first-half mean to second-half mean (drift across the window)."""
+    pooled = max(sd1, sd2, 1e-9)
+    delta = m2 - m1
+    if abs(delta) > drift_threshold and abs(delta) > 2.0 * pooled:
+        return [Reason(
+            code="BIAS_VS_BASELINE",
+            weight=60.0,
+            detail=f"first-half mean {m1:.4g} vs second-half {m2:.4g} (delta {delta:+.4g})",
+        )]
+    return []
+
+
+def _detect_gain_drift(sd1: float, sd2: float, drift_threshold: float) -> List[Reason]:
+    """Detect stdev inflation / collapse between the first and second halves."""
+    if sd1 > 1e-9:
+        ratio = sd2 / sd1
+        if ratio >= 3.0:
+            return [Reason(
+                code="STD_INFLATION_3X",
+                weight=55.0,
+                detail=f"stdev grew {ratio:.2f}x (first {sd1:.4g} -> second {sd2:.4g})",
+            )]
+        if ratio >= 2.0:
+            return [Reason(
+                code="STD_INFLATION_2X",
+                weight=50.0,
+                detail=f"stdev grew {ratio:.2f}x (first {sd1:.4g} -> second {sd2:.4g})",
+            )]
+        if ratio <= 0.5:
+            return [Reason(
+                code="STD_COLLAPSE",
+                weight=50.0,
+                detail=f"stdev shrank to {ratio:.2f}x baseline (possible sensor freezing)",
+            )]
+        return []
+    if sd2 > drift_threshold:
+        return [Reason(
+            code="STD_INFLATION_3X",
+            weight=55.0,
+            detail=f"baseline stdev ~0 but recent stdev {sd2:.4g}",
+        )]
+    return []
+
+
+def _detect_noise_burst(
+    values: List[float], has_bias: bool
+) -> List[Reason]:
+    """Detect a sudden noise burst in the most recent quarter of the window."""
+    n = len(values)
+    recent_window = max(3, n // 4)
+    recent = values[-recent_window:]
+    recent_sd = _safe_stdev(recent)
+    baseline = values[: max(2, n - recent_window)]
+    baseline_sd = _safe_stdev(baseline)
+    if baseline_sd > 1e-9 and recent_sd >= 3.0 * baseline_sd and not has_bias:
+        return [Reason(
+            code="RECENT_NOISE_BURST",
+            weight=45.0,
+            detail=f"last {len(recent)} readings stdev {recent_sd:.4g} vs baseline {baseline_sd:.4g}",
+        )]
+    return []
+
+
+def _resolve_verdict(reason_codes: set) -> Tuple[str, float]:
+    """Walk the verdict ladder; return (verdict, base_severity)."""
+    for verdict, codes in _VERDICT_LADDER:
+        if any(c in reason_codes for c in codes):
+            return verdict, _BASE_SEVERITY[verdict]
+    return "CALM", _BASE_SEVERITY["CALM"]
+
+
+def _score_risk(reasons: List[Reason], base: float, appetite_mult: float) -> float:
+    """Combine reason weights into a final 0-100 calibration risk score."""
+    if reasons:
+        weights = sorted((r.weight for r in reasons), reverse=True)
+        top = weights[0]
+        rest = weights[1:]
+        risk = top + 0.4 * min(sum(rest), 60.0)
+    else:
+        risk = base
+    return round(max(0.0, min(100.0, risk * appetite_mult)), 2)
+
+
 def _classify_sensor(
     sensor: SensorTimeSeries,
     *,
@@ -168,213 +364,46 @@ def _classify_sensor(
     sticky_run: int,
     appetite_mult: float,
 ) -> SensorVerdict:
+    """Classify a single sensor's time series into a calibration verdict.
+
+    Delegates each anomaly family to a small detector, then resolves the
+    most-severe verdict via :data:`_VERDICT_LADDER` and scores risk.
+    """
     readings = list(sensor.readings)
     n = len(readings)
-    reasons: List[Reason] = []
 
     if n < 5:
-        reasons.append(
-            Reason(
-                code="INSUFFICIENT_HISTORY",
-                weight=20.0,
-                detail=f"only {n} readings (need >=5)",
-            )
-        )
-        risk = round(min(100.0, _BASE_SEVERITY["INSUFFICIENT_DATA"] * appetite_mult), 2)
-        return SensorVerdict(
-            sensor_id=sensor.sensor_id,
-            verdict="INSUFFICIENT_DATA",
-            priority=_bucket(risk),
-            calibration_risk=risk,
-            reasons=reasons,
-            n_readings=n,
-        )
+        return _insufficient_history_verdict(sensor, n, appetite_mult)
 
     values = [v for _, v in readings]
     mean = statistics.fmean(values)
     sd = _safe_stdev(values)
 
-    # ----- Out-of-range / clamping -----
-    out_of_range = False
-    if sensor.expected_range is not None:
-        emin, emax = sensor.expected_range
-        max_hits = sum(1 for v in values if v >= emax - 1e-9)
-        min_hits = sum(1 for v in values if v <= emin + 1e-9)
-        if max_hits / n >= 0.20:
-            reasons.append(
-                Reason(
-                    code="CLAMPING_AT_MAX",
-                    weight=70.0,
-                    detail=f"{max_hits}/{n} readings at/above expected max {emax}",
-                )
-            )
-            out_of_range = True
-        if min_hits / n >= 0.20:
-            reasons.append(
-                Reason(
-                    code="CLAMPING_AT_MIN",
-                    weight=70.0,
-                    detail=f"{min_hits}/{n} readings at/below expected min {emin}",
-                )
-            )
-            out_of_range = True
-
-    # ----- Sticky detection -----
-    sticky = False
-    run = 1
-    longest_run = 1
-    for i in range(1, n):
-        if abs(values[i] - values[i - 1]) < 1e-12:
-            run += 1
-            longest_run = max(longest_run, run)
-        else:
-            run = 1
-    tail = values[-min(sticky_run, n) :]
-    tail_sd = _safe_stdev(tail) if len(tail) >= 2 else 0.0
-    if longest_run >= sticky_run:
-        reasons.append(
-            Reason(
-                code="STICKY_CONSTANT_VALUE",
-                weight=50.0,
-                detail=f"{longest_run} consecutive identical readings",
-            )
-        )
-        sticky = True
-    elif sd > 0 and tail_sd < sd * 0.02 and len(tail) >= sticky_run:
-        reasons.append(
-            Reason(
-                code="STICKY_CONSTANT_VALUE",
-                weight=50.0,
-                detail=f"last {len(tail)} readings have ~zero stdev",
-            )
-        )
-        sticky = True
-
-    # ----- Bias detection -----
-    bias = False
-    if sensor.reference_value is not None:
-        delta = mean - sensor.reference_value
-        bound = max(drift_threshold, 2.0 * sd)
-        if abs(delta) > bound:
-            reasons.append(
-                Reason(
-                    code="BIAS_VS_REFERENCE",
-                    weight=60.0,
-                    detail=f"mean {mean:.4g} vs reference {sensor.reference_value:.4g} (delta {delta:+.4g})",
-                )
-            )
-            bias = True
+    reasons: List[Reason] = []
+    reasons.extend(_detect_range_clamping(values, sensor.expected_range))
+    reasons.extend(_detect_sticky(values, sd, sticky_run))
+    reasons.extend(_detect_reference_bias(mean, sd, sensor.reference_value, drift_threshold))
 
     half = n // 2
-    first = values[:half]
-    second = values[half:]
     if half >= 2:
+        first, second = values[:half], values[half:]
         m1 = statistics.fmean(first)
         m2 = statistics.fmean(second)
         sd1 = _safe_stdev(first)
         sd2 = _safe_stdev(second)
-        pooled = max(sd1, sd2, 1e-9)
-        delta = m2 - m1
-        if abs(delta) > drift_threshold and abs(delta) > 2.0 * pooled:
-            reasons.append(
-                Reason(
-                    code="BIAS_VS_BASELINE",
-                    weight=60.0,
-                    detail=f"first-half mean {m1:.4g} vs second-half {m2:.4g} (delta {delta:+.4g})",
-                )
-            )
-            bias = True
+        baseline_bias = _detect_baseline_bias(m1, m2, sd1, sd2, drift_threshold)
+        reasons.extend(baseline_bias)
+        reasons.extend(_detect_gain_drift(sd1, sd2, drift_threshold))
+        has_bias = bool(baseline_bias) or any(
+            r.code == "BIAS_VS_REFERENCE" for r in reasons
+        )
+        reasons.extend(_detect_noise_burst(values, has_bias))
 
-        # ----- Gain drift -----
-        gain = False
-        if sd1 > 1e-9:
-            ratio = sd2 / sd1
-            if ratio >= 3.0:
-                reasons.append(
-                    Reason(
-                        code="STD_INFLATION_3X",
-                        weight=55.0,
-                        detail=f"stdev grew {ratio:.2f}x (first {sd1:.4g} -> second {sd2:.4g})",
-                    )
-                )
-                gain = True
-            elif ratio >= 2.0:
-                reasons.append(
-                    Reason(
-                        code="STD_INFLATION_2X",
-                        weight=50.0,
-                        detail=f"stdev grew {ratio:.2f}x (first {sd1:.4g} -> second {sd2:.4g})",
-                    )
-                )
-                gain = True
-            elif ratio <= 0.5:
-                reasons.append(
-                    Reason(
-                        code="STD_COLLAPSE",
-                        weight=50.0,
-                        detail=f"stdev shrank to {ratio:.2f}x baseline (possible sensor freezing)",
-                    )
-                )
-                gain = True
-        elif sd2 > drift_threshold:
-            reasons.append(
-                Reason(
-                    code="STD_INFLATION_3X",
-                    weight=55.0,
-                    detail=f"baseline stdev ~0 but recent stdev {sd2:.4g}",
-                )
-            )
-            gain = True
-
-        # ----- Noise burst (recent quarter window) -----
-        recent_window = max(3, n // 4)
-        recent = values[-recent_window:]
-        recent_sd = _safe_stdev(recent)
-        baseline = values[: max(2, n - recent_window)]
-        baseline_sd = _safe_stdev(baseline)
-        if baseline_sd > 1e-9 and recent_sd >= 3.0 * baseline_sd and not bias:
-            reasons.append(
-                Reason(
-                    code="RECENT_NOISE_BURST",
-                    weight=45.0,
-                    detail=f"last {len(recent)} readings stdev {recent_sd:.4g} vs baseline {baseline_sd:.4g}",
-                )
-            )
-    else:
-        gain = False
-
-    # ----- Verdict ladder (most severe wins) -----
-    verdict = "CALM"
-    base = _BASE_SEVERITY["CALM"]
-    # out_of_range trumps everything else by base severity
-    codes = {r.code for r in reasons}
-    if {"CLAMPING_AT_MAX", "CLAMPING_AT_MIN"} & codes:
-        verdict = "OUT_OF_RANGE"
-        base = _BASE_SEVERITY["OUT_OF_RANGE"]
-    elif {"BIAS_VS_REFERENCE", "BIAS_VS_BASELINE"} & codes:
-        verdict = "BIAS_DRIFT"
-        base = _BASE_SEVERITY["BIAS_DRIFT"]
-    elif {"STD_INFLATION_3X", "STD_INFLATION_2X", "STD_COLLAPSE"} & codes:
-        verdict = "GAIN_DRIFT"
-        base = _BASE_SEVERITY["GAIN_DRIFT"]
-    elif "STICKY_CONSTANT_VALUE" in codes:
-        verdict = "STICKY_SENSOR"
-        base = _BASE_SEVERITY["STICKY_SENSOR"]
-    elif "RECENT_NOISE_BURST" in codes:
-        verdict = "NOISE_SPIKE"
-        base = _BASE_SEVERITY["NOISE_SPIKE"]
-
+    verdict, base = _resolve_verdict({r.code for r in reasons})
     if verdict == "CALM":
         reasons.append(Reason(code="HEALTHY", weight=5.0, detail="no calibration anomalies detected"))
 
-    # ----- Risk score -----
-    if reasons:
-        top = max(r.weight for r in reasons)
-        rest = sorted([r.weight for r in reasons], reverse=True)[1:]
-        risk = top + 0.4 * min(sum(rest), 60.0)
-    else:
-        risk = base
-    risk = round(max(0.0, min(100.0, risk * appetite_mult)), 2)
+    risk = _score_risk(reasons, base, appetite_mult)
 
     return SensorVerdict(
         sensor_id=sensor.sensor_id,
