@@ -69,6 +69,7 @@ from vormap_utils import (
     compute_nn_distances,
     euclidean as _dist,
     load_points as _load_points,
+    polygon_area as _polygon_area,  # re-exported for tests/callers
 )
 
 # ---------------------------------------------------------------------------

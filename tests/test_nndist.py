@@ -136,11 +136,11 @@ class TestValidation:
         assert len(pts) == 2
 
     def test_too_few_points(self):
-        with pytest.raises(ValueError, match="At least 2"):
+        with pytest.raises(ValueError, match=r"at least 2"):
             _validate_points([(0, 0)])
 
     def test_empty_list(self):
-        with pytest.raises(ValueError, match="At least 2"):
+        with pytest.raises(ValueError, match=r"at least 2"):
             _validate_points([])
 
     def test_wrong_length(self):

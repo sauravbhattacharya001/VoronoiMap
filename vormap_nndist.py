@@ -71,6 +71,7 @@ def _percentile(values: list, p: float) -> float:
 
 from vormap_utils import polygon_area as _polygon_area_shoelace
 from vormap_utils import validate_points as _validate_points
+from vormap_utils import euclidean as _euclidean  # re-exported for tests/callers
 
 
 # ── Core: k-Nearest Neighbor Distances ──────────────────────────────

@@ -21,6 +21,7 @@ import sys
 from collections import defaultdict
 
 from vormap_utils import euclidean as _dist
+from vormap_utils import polygon_area  # re-exported for callers/tests
 
 # ---------------------------------------------------------------------------
 # Geometry helpers
