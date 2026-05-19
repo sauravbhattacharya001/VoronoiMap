@@ -68,6 +68,15 @@ import json
 import math
 import csv
 import statistics
+
+try:  # pragma: no cover - exercised when numpy/scipy unavailable
+    import numpy as _np  # type: ignore
+    from scipy.spatial import cKDTree as _cKDTree  # type: ignore
+    _HAVE_NUMPY = True
+except Exception:  # pragma: no cover
+    _np = None  # type: ignore
+    _cKDTree = None  # type: ignore
+    _HAVE_NUMPY = False
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple, Dict, Any, Sequence
 
@@ -318,41 +327,109 @@ def _compute_voronoi_cells(points: List[Point],
     dy = height / res
     cell_area_unit = dx * dy
 
-    # Assign grid cells to nearest seed
-    counts = [0] * n
-    cx_sum = [0.0] * n
-    cy_sum = [0.0] * n
+    counts: List[int]
+    cx_sum: List[float]
+    cy_sum: List[float]
     neighbor_sets: List[set] = [set() for _ in range(n)]
+    nn_distances: List[float]
 
-    # Build a grid of owner indices for neighbor detection
-    owner_grid = [[0] * res for _ in range(res)]
+    if _HAVE_NUMPY:
+        # Vectorized grid assignment via cKDTree: O((res^2 + n) log n)
+        # instead of the naive O(res^2 * n) triple loop. Tie-breaking matches
+        # the pure-Python version (first seed wins) because cKDTree returns
+        # the smallest index on exact ties for equidistant query points.
+        seeds = _np.asarray(points, dtype=float)
+        gx_idx = _np.arange(res)
+        gy_idx = _np.arange(res)
+        px_row = west + (gx_idx + 0.5) * dx
+        py_col = south + (gy_idx + 0.5) * dy
+        # Grid query points shape (res*res, 2), row-major over gy then gx,
+        # matching the original (gy outer, gx inner) iteration order.
+        gx_mesh, gy_mesh = _np.meshgrid(px_row, py_col)  # (res, res)
+        grid_pts = _np.column_stack((gx_mesh.ravel(), gy_mesh.ravel()))
 
-    for gy in range(res):
-        py = south + (gy + 0.5) * dy
-        for gx in range(res):
-            px = west + (gx + 0.5) * dx
-            best_idx = 0
-            best_d2 = float("inf")
-            for k, (sx, sy) in enumerate(points):
-                d2 = (px - sx) ** 2 + (py - sy) ** 2
-                if d2 < best_d2:
-                    best_d2 = d2
-                    best_idx = k
-            owner_grid[gy][gx] = best_idx
-            counts[best_idx] += 1
-            cx_sum[best_idx] += px
-            cy_sum[best_idx] += py
+        tree = _cKDTree(seeds)
+        # k=1 returns the single nearest seed index per grid cell.
+        _, owners_flat = tree.query(grid_pts, k=1)
+        owners_flat = owners_flat.astype(_np.intp, copy=False)
+        owner_grid_np = owners_flat.reshape(res, res)
 
-    # Detect neighbors from adjacent grid cells
-    for gy in range(res):
-        for gx in range(res):
-            o = owner_grid[gy][gx]
-            if gx + 1 < res and owner_grid[gy][gx + 1] != o:
-                neighbor_sets[o].add(owner_grid[gy][gx + 1])
-                neighbor_sets[owner_grid[gy][gx + 1]].add(o)
-            if gy + 1 < res and owner_grid[gy + 1][gx] != o:
-                neighbor_sets[o].add(owner_grid[gy + 1][gx])
-                neighbor_sets[owner_grid[gy + 1][gx]].add(o)
+        # Counts and centroid sums via bincount (vectorized).
+        counts_np = _np.bincount(owners_flat, minlength=n)
+        cx_sum_np = _np.bincount(owners_flat, weights=grid_pts[:, 0],
+                                 minlength=n)
+        cy_sum_np = _np.bincount(owners_flat, weights=grid_pts[:, 1],
+                                 minlength=n)
+        counts = counts_np.tolist()
+        cx_sum = cx_sum_np.tolist()
+        cy_sum = cy_sum_np.tolist()
+
+        # Neighbor detection via vectorized adjacency differences.
+        # Horizontal neighbors: owner_grid[:, :-1] vs owner_grid[:, 1:].
+        # Vertical neighbors:   owner_grid[:-1, :] vs owner_grid[1:, :].
+        if res > 1:
+            h_left = owner_grid_np[:, :-1].ravel()
+            h_right = owner_grid_np[:, 1:].ravel()
+            h_mask = h_left != h_right
+            for a, b in zip(h_left[h_mask].tolist(),
+                            h_right[h_mask].tolist()):
+                neighbor_sets[a].add(b)
+                neighbor_sets[b].add(a)
+
+            v_top = owner_grid_np[:-1, :].ravel()
+            v_bot = owner_grid_np[1:, :].ravel()
+            v_mask = v_top != v_bot
+            for a, b in zip(v_top[v_mask].tolist(),
+                            v_bot[v_mask].tolist()):
+                neighbor_sets[a].add(b)
+                neighbor_sets[b].add(a)
+
+        # Nearest-neighbor distances via cKDTree: O(n log n) total.
+        if n >= 2:
+            nn_dd, _ = tree.query(seeds, k=2)
+            nn_distances = nn_dd[:, 1].tolist()
+        else:
+            nn_distances = [0.0] * n
+    else:  # pragma: no cover - fallback when numpy/scipy unavailable
+        counts = [0] * n
+        cx_sum = [0.0] * n
+        cy_sum = [0.0] * n
+        owner_grid = [[0] * res for _ in range(res)]
+        for gy in range(res):
+            py = south + (gy + 0.5) * dy
+            for gx in range(res):
+                px = west + (gx + 0.5) * dx
+                best_idx = 0
+                best_d2 = float("inf")
+                for k, (sx, sy) in enumerate(points):
+                    d2 = (px - sx) ** 2 + (py - sy) ** 2
+                    if d2 < best_d2:
+                        best_d2 = d2
+                        best_idx = k
+                owner_grid[gy][gx] = best_idx
+                counts[best_idx] += 1
+                cx_sum[best_idx] += px
+                cy_sum[best_idx] += py
+        for gy in range(res):
+            for gx in range(res):
+                o = owner_grid[gy][gx]
+                if gx + 1 < res and owner_grid[gy][gx + 1] != o:
+                    neighbor_sets[o].add(owner_grid[gy][gx + 1])
+                    neighbor_sets[owner_grid[gy][gx + 1]].add(o)
+                if gy + 1 < res and owner_grid[gy + 1][gx] != o:
+                    neighbor_sets[o].add(owner_grid[gy + 1][gx])
+                    neighbor_sets[owner_grid[gy + 1][gx]].add(o)
+        nn_distances = []
+        for i, (sx, sy) in enumerate(points):
+            nn_d = float("inf")
+            for j, (ox, oy) in enumerate(points):
+                if j != i:
+                    d = math.sqrt((sx - ox) ** 2 + (sy - oy) ** 2)
+                    if d < nn_d:
+                        nn_d = d
+            if nn_d == float("inf"):
+                nn_d = 0.0
+            nn_distances.append(nn_d)
 
     cells = []
     for i, (sx, sy) in enumerate(points):
@@ -364,20 +441,11 @@ def _compute_voronoi_cells(points: List[Point],
         perimeter_proxy = math.sqrt(area) * 4  # rough
         compactness = (4 * math.pi * area / (perimeter_proxy ** 2)
                        if perimeter_proxy > 0 else 0)
-        # Nearest-neighbor distance
-        nn_d = float("inf")
-        for j, (ox, oy) in enumerate(points):
-            if j != i:
-                d = math.sqrt((sx - ox) ** 2 + (sy - oy) ** 2)
-                if d < nn_d:
-                    nn_d = d
-        if nn_d == float("inf"):
-            nn_d = 0.0
         cells.append({
             "area": area,
             "compactness": compactness,
             "neighbors": neighbor_sets[i],
-            "nn_distance": nn_d,
+            "nn_distance": nn_distances[i],
             "centroid": centroid,
         })
     return cells
