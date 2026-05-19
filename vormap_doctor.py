@@ -163,41 +163,38 @@ def _stddev(vals):
 
 
 def _nn_distances(points):
-    """Brute-force nearest-neighbor distances."""
-    n = len(points)
-    if n < 2:
+    """Nearest-neighbor distances for every point.
+
+    Delegates to :func:`vormap_utils.compute_nn_distances`, which picks the
+    scipy ``KDTree`` (O(n log n)) fast path when available and falls back to
+    a vectorised squared-distance brute force otherwise. Returns ``[]`` when
+    fewer than two points are supplied.
+    """
+    if len(points) < 2:
         return []
-    dists = []
-    for i in range(n):
-        best = float("inf")
-        for j in range(n):
-            if i == j:
-                continue
-            d = _dist(points[i], points[j])
-            if d < best:
-                best = d
-        dists.append(best)
-    return dists
+    from vormap_utils import compute_nn_distances as _cnn
+    return _cnn(points)
 
 
 def _nn_distances_fast(points):
-    """For large datasets, sample-based NN estimation."""
+    """NN distances, sampled for very large datasets.
+
+    For ``n <= 2000`` this is identical to :func:`_nn_distances`. Above that
+    threshold, draws a uniform sample of 2000 query points and computes each
+    one's nearest neighbour against the *full* point set - giving an
+    unbiased estimator of the global NN distribution at fixed cost.
+
+    The full-set NN search is delegated to
+    :func:`vormap_utils.compute_nn_distances` (KDTree fast path when scipy
+    is installed), then indexed by the sample.
+    """
     import random as _rnd
     n = len(points)
     if n <= 2000:
         return _nn_distances(points)
+    all_nn = _nn_distances(points)
     sample_idx = _rnd.sample(range(n), 2000)
-    dists = []
-    for i in sample_idx:
-        best = float("inf")
-        for j in range(n):
-            if i == j:
-                continue
-            d = _dist(points[i], points[j])
-            if d < best:
-                best = d
-        dists.append(best)
-    return dists
+    return [all_nn[i] for i in sample_idx]
 
 
 # ---------------------------------------------------------------------------

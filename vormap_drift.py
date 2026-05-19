@@ -78,7 +78,6 @@ import csv
 import json
 import math
 import statistics
-import sys
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import (
@@ -91,12 +90,6 @@ from typing import (
     Tuple,
     Union,
 )
-
-try:  # opportunistic only
-    import numpy as _np  # noqa: F401
-    _HAS_NUMPY = True
-except Exception:  # pragma: no cover - environment-dependent
-    _HAS_NUMPY = False
 
 
 # ---------------------------------------------------------------------------
@@ -216,21 +209,17 @@ def _dist(a: Tuple[float, float], b: Tuple[float, float]) -> float:
 
 
 def _nn_distances(points: Sequence[Tuple[float, float]]) -> List[float]:
-    n = len(points)
-    if n < 2:
+    """Nearest-neighbour distances for each input point.
+
+    Delegates to :func:`vormap_utils.compute_nn_distances`, which uses
+    scipy ``KDTree`` (O(n log n)) when available and falls back to a
+    squared-distance brute force. Returns ``[]`` when fewer than two points
+    are supplied. All emitted distances are finite by construction (n>=2).
+    """
+    if len(points) < 2:
         return []
-    out: List[float] = []
-    for i in range(n):
-        best = math.inf
-        for j in range(n):
-            if i == j:
-                continue
-            d = _dist(points[i], points[j])
-            if d < best:
-                best = d
-        if math.isfinite(best):
-            out.append(best)
-    return out
+    from vormap_utils import compute_nn_distances as _cnn
+    return _cnn(points)
 
 
 def _quantile(sorted_vals: Sequence[float], q: float) -> float:

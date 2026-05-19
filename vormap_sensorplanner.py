@@ -72,12 +72,6 @@ import sys
 from dataclasses import asdict, dataclass, field
 from typing import Any, Iterable, List, Optional, Sequence, Tuple
 
-try:  # opportunistic only
-    import numpy as _np  # noqa: F401
-    _HAS_NUMPY = True
-except Exception:  # pragma: no cover - environment-dependent
-    _HAS_NUMPY = False
-
 
 # ---------------------------------------------------------------------------
 # Input normalisation
@@ -162,20 +156,17 @@ def _percentile(values: Sequence[float], pct: float) -> float:
 
 
 def _nn_distances(pts: Sequence[Tuple[float, float]]) -> List[float]:
-    """Nearest-neighbour distance from each point to its closest neighbour."""
-    out: List[float] = []
+    """Nearest-neighbour distance from each point to its closest neighbour.
+
+    Delegates to :func:`vormap_utils.compute_nn_distances`, which uses
+    scipy ``KDTree`` (O(n log n)) when available and falls back to a
+    squared-distance brute force. Returns ``[]`` when fewer than two points
+    are supplied.
+    """
     if len(pts) < 2:
-        return out
-    for i, p in enumerate(pts):
-        best = float("inf")
-        for j, q in enumerate(pts):
-            if i == j:
-                continue
-            d = _dist(p, q)
-            if d < best:
-                best = d
-        out.append(best)
-    return out
+        return []
+    from vormap_utils import compute_nn_distances as _cnn
+    return _cnn(list(pts))
 
 
 # ---------------------------------------------------------------------------
