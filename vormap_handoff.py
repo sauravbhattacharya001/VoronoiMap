@@ -44,7 +44,7 @@ import math
 import sys
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 # ---------------------------------------------------------------------------
 # Utilities
@@ -467,7 +467,7 @@ class HandoffAdvisor:
                         reasons.append(
                             {
                                 "code": "INCIDENT_NEARBY",
-                                "message": f"high-sev incident within 50 units",
+                                "message": "high-sev incident within 50 units",
                             }
                         )
                         break

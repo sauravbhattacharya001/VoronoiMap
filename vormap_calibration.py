@@ -20,9 +20,7 @@ from __future__ import annotations
 import argparse
 import copy
 import csv
-import io
 import json
-import math
 import os
 import statistics
 import sys
@@ -30,12 +28,6 @@ import time
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Any, Callable, Iterable, List, Optional, Tuple
-
-try:  # opportunistic numpy
-    import numpy as np  # type: ignore  # noqa: F401
-    _HAVE_NUMPY = True
-except Exception:  # pragma: no cover - numpy not required
-    _HAVE_NUMPY = False
 
 
 # ---------------------------------------------------------------------------
@@ -745,7 +737,7 @@ def to_text(report: CalibrationReport) -> str:
 def to_markdown(report: CalibrationReport) -> str:
     s = report.summary
     out: List[str] = []
-    out.append(f"# Calibration Advisor Report")
+    out.append("# Calibration Advisor Report")
     out.append("")
     out.append(f"_{report.headline}_")
     out.append("")

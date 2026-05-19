@@ -59,12 +59,6 @@ import sys
 from dataclasses import asdict, dataclass, field
 from typing import Any, Iterable, List, Optional, Sequence, Tuple
 
-try:  # opportunistic only
-    import numpy as _np  # noqa: F401
-    _HAS_NUMPY = True
-except Exception:  # pragma: no cover - environment-dependent
-    _HAS_NUMPY = False
-
 
 # ---------------------------------------------------------------------------
 # Input normalisation
@@ -356,10 +350,8 @@ def analyse(points: Iterable[Any],
 
     # Per-point cost share (only used as a modifier so it never dominates).
     if costs_list is not None:
-        total_cost = sum(costs_list)
         max_cost = max(costs_list) if costs_list else 0.0
     else:
-        total_cost = 0.0
         max_cost = 0.0
 
     verdicts: List[RedundancyVerdict] = []
