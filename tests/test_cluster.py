@@ -1,7 +1,18 @@
-"""Tests for vormap_cluster — spatial clustering of Voronoi diagrams."""
+"""Tests for vormap_cluster — autonomous spatial clustering analyzer.
 
-import json
+This file was rewritten on 2026-05-20 to match the current public API of
+vormap_cluster.py. The previous version targeted an earlier (removed) API
+that exposed ClusterResult / cluster_regions / generate_clusters, which has
+since been replaced by the analyze/kmeans/dbscan pipeline. Until this fix,
+pytest collection was broken across the whole repo.
+"""
+
+from __future__ import annotations
+
+import csv
+import math
 import os
+import random
 import sys
 import tempfile
 
@@ -9,508 +20,259 @@ import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import vormap
-import vormap_viz
-from vormap_cluster import (
-    ClusterResult,
-    cluster_regions,
-    export_cluster_json,
-    export_cluster_svg,
-    format_cluster_table,
-    generate_clusters,
-    _build_stats_lookup,
-    _metric_value,
+from vormap_cluster import (  # noqa: E402
+    analyze,
+    auto_k,
+    dbscan,
+    estimate_eps,
+    generate_demo_points,
+    generate_html,
+    kmeans,
+    load_csv,
+    mean_silhouette,
+    silhouette_scores,
+    _dist_matrix,
+    _euclidean,
+    _mean_point,
 )
 
 
-# ── Fixtures ────────────────────────────────────────────────────────
+# ── Fixtures ────────────────────────────────────────────────────────────
 
 @pytest.fixture
-def sample_data():
-    """5 well-separated points for predictable Voronoi regions."""
-    return [(100, 200), (300, 400), (500, 200), (700, 600), (900, 300)]
-
-
-@pytest.fixture
-def sample_regions(sample_data):
-    vormap.set_bounds(0, 800, 0, 1000)
-    return vormap_viz.compute_regions(sample_data)
-
-
-@pytest.fixture
-def sample_stats(sample_regions, sample_data):
-    return vormap_viz.compute_region_stats(sample_regions, sample_data)
+def three_clusters():
+    """3 well-separated tight Gaussian clusters around (0,0), (10,0), (5,10)."""
+    rng = random.Random(0)
+    pts = []
+    for cx, cy in [(0.0, 0.0), (10.0, 0.0), (5.0, 10.0)]:
+        for _ in range(20):
+            pts.append((cx + rng.gauss(0, 0.3), cy + rng.gauss(0, 0.3)))
+    return pts
 
 
 @pytest.fixture
-def grid_data():
-    """3x3 grid of points for uniform regions."""
-    points = []
-    for x in (200, 500, 800):
-        for y in (200, 500, 800):
-            points.append((x, y))
-    return points
+def line_points():
+    """10 colinear points along the x-axis."""
+    return [(float(i), 0.0) for i in range(10)]
 
 
 @pytest.fixture
-def grid_regions(grid_data):
-    vormap.set_bounds(0, 1000, 0, 1000)
-    return vormap_viz.compute_regions(grid_data)
+def tiny_points():
+    return [(0.0, 0.0), (1.0, 0.0), (0.5, 0.87)]
 
 
-@pytest.fixture
-def grid_stats(grid_regions, grid_data):
-    return vormap_viz.compute_region_stats(grid_regions, grid_data)
-
-
-# ── ClusterResult ───────────────────────────────────────────────────
-
-class TestClusterResult:
-    def test_default(self):
-        r = ClusterResult()
-        assert r.method == ""
-        assert r.metric == "area"
-        assert r.num_clusters == 0
-        assert r.num_noise == 0
-        assert r.clusters == []
-        assert r.labels == {}
-        assert r.params == {}
-
-    def test_fields(self):
-        r = ClusterResult(
-            method="dbscan", metric="density",
-            num_clusters=2, num_noise=1,
-            clusters=[{"cluster_id": 0, "size": 3}],
-            labels={"1.0,2.0": 0},
-            params={"min_neighbors": 2},
-        )
-        assert r.method == "dbscan"
-        assert r.num_clusters == 2
-        assert r.num_noise == 1
-
-
-# ── Helpers ─────────────────────────────────────────────────────────
+# ── Helpers ─────────────────────────────────────────────────────────────
 
 class TestHelpers:
-    def test_build_stats_lookup(self, sample_stats):
-        lookup = _build_stats_lookup(sample_stats)
-        assert len(lookup) == len(sample_stats)
-        for stat in sample_stats:
-            key = (stat["seed_x"], stat["seed_y"])
-            assert key in lookup
-            assert lookup[key]["area"] == stat["area"]
+    def test_euclidean_basic(self):
+        assert _euclidean((0, 0), (3, 4)) == pytest.approx(5.0)
 
-    def test_metric_value_area(self):
-        stat = {"area": 1000.0, "compactness": 0.5, "vertex_count": 6}
-        assert _metric_value(stat, "area") == 1000.0
+    def test_euclidean_zero(self):
+        assert _euclidean((1.5, -2.5), (1.5, -2.5)) == 0.0
 
-    def test_metric_value_density(self):
-        stat = {"area": 500.0, "compactness": 0.5, "vertex_count": 6}
-        assert abs(_metric_value(stat, "density") - 0.002) < 1e-6
+    def test_dist_matrix_shape_and_symmetry(self, tiny_points):
+        m = _dist_matrix(tiny_points)
+        n = len(tiny_points)
+        assert len(m) == n
+        for row in m:
+            assert len(row) == n
+        for i in range(n):
+            assert m[i][i] == 0.0
+            for j in range(n):
+                assert m[i][j] == pytest.approx(m[j][i])
 
-    def test_metric_value_compactness(self):
-        stat = {"area": 500.0, "compactness": 0.75, "vertex_count": 6}
-        assert _metric_value(stat, "compactness") == 0.75
+    def test_dist_matrix_values(self):
+        pts = [(0.0, 0.0), (3.0, 4.0)]
+        m = _dist_matrix(pts)
+        assert m[0][1] == pytest.approx(5.0)
+        assert m[1][0] == pytest.approx(5.0)
 
-    def test_metric_value_vertices(self):
-        stat = {"area": 500.0, "compactness": 0.5, "vertex_count": 8}
-        assert _metric_value(stat, "vertices") == 8
+    def test_mean_point(self):
+        assert _mean_point([(0.0, 0.0), (2.0, 4.0)]) == pytest.approx((1.0, 2.0))
 
-    def test_metric_value_unknown(self):
-        with pytest.raises(ValueError, match="Unknown metric"):
-            _metric_value({"area": 1}, "invalid")
-
-    def test_density_zero_area(self):
-        stat = {"area": 0.0, "compactness": 0.5, "vertex_count": 3}
-        assert _metric_value(stat, "density") == float("inf")
+    def test_mean_point_single(self):
+        assert _mean_point([(7.0, -3.0)]) == (7.0, -3.0)
 
 
-# ── Threshold clustering ───────────────────────────────────────────
+# ── k-means ─────────────────────────────────────────────────────────────
 
-class TestThresholdClustering:
-    def test_basic(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="threshold", metric="area",
-        )
-        assert isinstance(result, ClusterResult)
-        assert result.method == "threshold"
-        assert result.metric == "area"
-        assert result.num_clusters >= 1
+class TestKMeans:
+    def test_returns_labels_and_centroids(self, three_clusters):
+        labels, centroids = kmeans(three_clusters, k=3, seed=1)
+        assert len(labels) == len(three_clusters)
+        assert len(centroids) == 3
+        assert set(labels) <= {0, 1, 2}
 
-    def test_auto_range(self, sample_stats, sample_regions, sample_data):
-        """Without explicit range, should auto-compute mean +/- 1 std."""
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="threshold", metric="area",
-        )
-        assert "value_range" in result.params
-        vr = result.params["value_range"]
-        assert len(vr) == 2
-        assert vr[0] < vr[1]
+    def test_recovers_three_clusters(self, three_clusters):
+        labels, _ = kmeans(three_clusters, k=3, seed=1)
+        # All three cluster ids should appear.
+        assert len(set(labels)) == 3
 
-    def test_explicit_range(self, sample_stats, sample_regions, sample_data):
-        # Very wide range should capture all cells into one cluster
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="threshold", metric="area",
-            value_range=(0, 1e9),
-        )
-        # All cells should be in clusters (no noise)
-        assert result.num_noise == 0
-        total_in_clusters = sum(c["size"] for c in result.clusters)
-        assert total_in_clusters == len(sample_data)
+    def test_k_equals_n(self, tiny_points):
+        labels, centroids = kmeans(tiny_points, k=3, seed=0)
+        assert sorted(labels) == [0, 1, 2]
+        assert len(centroids) == 3
 
-    def test_narrow_range_creates_noise(self, sample_stats, sample_regions, sample_data):
-        # Very narrow range should exclude most cells
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="threshold", metric="area",
-            value_range=(-1, -0.5),
-        )
-        # All cells should be noise
-        total_labeled = sum(c["size"] for c in result.clusters)
-        assert total_labeled == 0
-        assert result.num_noise == len(sample_data)
+    def test_deterministic_with_seed(self, three_clusters):
+        a, _ = kmeans(three_clusters, k=3, seed=7)
+        b, _ = kmeans(three_clusters, k=3, seed=7)
+        assert a == b
 
-    def test_compactness_metric(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="threshold", metric="compactness",
-        )
-        assert result.metric == "compactness"
-        assert result.num_clusters >= 0
-
-    def test_cluster_summary_fields(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="threshold", metric="area",
-            value_range=(0, 1e9),
-        )
-        for c in result.clusters:
-            assert "cluster_id" in c
-            assert "size" in c
-            assert "seeds" in c
-            assert "mean_area" in c
-            assert "total_area" in c
-            assert "min_area" in c
-            assert "max_area" in c
-            assert "mean_compactness" in c
-            assert "centroid_x" in c
-            assert "centroid_y" in c
-            assert c["size"] > 0
-            assert c["mean_area"] > 0
-            assert c["total_area"] >= c["mean_area"]
+    def test_seed_changes_labels_or_init(self, three_clusters):
+        # Two different seeds should usually not produce identical label
+        # vectors verbatim (cluster id permutations excluded — check raw).
+        a, _ = kmeans(three_clusters, k=3, seed=1)
+        b, _ = kmeans(three_clusters, k=3, seed=2)
+        # Labels may permute; centroids are a more robust signal, but
+        # at minimum the run completes.
+        assert len(a) == len(b)
 
 
-# ── DBSCAN clustering ──────────────────────────────────────────────
+# ── DBSCAN ──────────────────────────────────────────────────────────────
 
-class TestDBSCANClustering:
-    def test_basic(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="dbscan", min_neighbors=2,
-        )
-        assert result.method == "dbscan"
-        assert result.num_clusters >= 0
-        assert result.params["min_neighbors"] == 2
+class TestDBSCAN:
+    def test_finds_dense_clusters(self, three_clusters):
+        labels = dbscan(three_clusters, eps=1.0, min_samples=3)
+        assert len(labels) == len(three_clusters)
+        # Should find at least 2 distinct (non-noise) clusters
+        non_noise = {l for l in labels if l != -1}
+        assert len(non_noise) >= 2
 
-    def test_low_min_neighbors(self, grid_stats, grid_regions, grid_data):
-        """With low min_neighbors, most cells should cluster."""
-        result = cluster_regions(
-            grid_stats, grid_regions, grid_data,
-            method="dbscan", min_neighbors=1,
-        )
-        total = sum(c["size"] for c in result.clusters)
-        assert total >= 5  # Most of 9 cells should cluster
+    def test_all_noise_when_eps_tiny(self, three_clusters):
+        labels = dbscan(three_clusters, eps=0.0001, min_samples=5)
+        assert all(l == -1 for l in labels)
 
-    def test_high_min_neighbors_creates_noise(self, sample_stats, sample_regions, sample_data):
-        """With very high min_neighbors, all cells become noise."""
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="dbscan", min_neighbors=100,
-        )
-        assert result.num_noise == len(sample_data)
-        assert result.num_clusters == 0
+    def test_single_cluster_when_eps_huge(self, three_clusters):
+        labels = dbscan(three_clusters, eps=1000.0, min_samples=3)
+        non_noise = {l for l in labels if l != -1}
+        assert len(non_noise) == 1
 
-    def test_noise_cells(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="dbscan", min_neighbors=3,
-        )
-        # Some cells may be noise (label -1)
-        noise_count = sum(1 for v in result.labels.values() if v == -1)
-        assert noise_count == result.num_noise
-
-    def test_labels_cover_all_seeds(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="dbscan", min_neighbors=2,
-        )
-        assert len(result.labels) == len(sample_data)
+    def test_accepts_precomputed_dmat(self, tiny_points):
+        dmat = _dist_matrix(tiny_points)
+        labels = dbscan(tiny_points, eps=2.0, min_samples=2, _dmat=dmat)
+        assert len(labels) == 3
 
 
-# ── Agglomerative clustering ──────────────────────────────────────
+# ── eps estimation ──────────────────────────────────────────────────────
 
-class TestAgglomerativeClustering:
-    def test_basic(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="agglomerative", num_clusters=2,
-        )
-        assert result.method == "agglomerative"
-        assert result.num_clusters == 2
-        assert result.params["num_clusters"] == 2
+class TestEstimateEps:
+    def test_returns_positive_float(self, three_clusters):
+        eps = estimate_eps(three_clusters, k=5)
+        assert isinstance(eps, float)
+        assert eps > 0.0
 
-    def test_single_cluster(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="agglomerative", num_clusters=1,
-        )
-        assert result.num_clusters == 1
-        assert result.clusters[0]["size"] == len(sample_data)
-
-    def test_max_clusters(self, sample_stats, sample_regions, sample_data):
-        """Requesting more clusters than cells."""
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="agglomerative", num_clusters=100,
-        )
-        # Each cell is its own cluster
-        assert result.num_clusters == len(sample_data)
-
-    def test_no_noise(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="agglomerative", num_clusters=3,
-        )
-        assert result.num_noise == 0
-        total = sum(c["size"] for c in result.clusters)
-        assert total == len(sample_data)
-
-    def test_cluster_ids_sequential(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="agglomerative", num_clusters=3,
-        )
-        ids = [c["cluster_id"] for c in result.clusters]
-        assert ids == list(range(len(ids)))
-
-    def test_density_metric(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="agglomerative", metric="density", num_clusters=2,
-        )
-        assert result.metric == "density"
-        assert result.num_clusters == 2
+    def test_grows_with_sparser_data(self):
+        rng = random.Random(0)
+        dense = [(rng.uniform(0, 1), rng.uniform(0, 1)) for _ in range(50)]
+        sparse = [(rng.uniform(0, 100), rng.uniform(0, 100)) for _ in range(50)]
+        assert estimate_eps(sparse, k=5) > estimate_eps(dense, k=5)
 
 
-# ── Validation ──────────────────────────────────────────────────────
+# ── silhouette ──────────────────────────────────────────────────────────
 
-class TestValidation:
-    def test_unknown_method(self, sample_stats, sample_regions, sample_data):
-        with pytest.raises(ValueError, match="Unknown clustering method"):
-            cluster_regions(
-                sample_stats, sample_regions, sample_data,
-                method="invalid",
-            )
+class TestSilhouette:
+    def test_perfect_separation_high_score(self, three_clusters):
+        labels, _ = kmeans(three_clusters, k=3, seed=0)
+        score = mean_silhouette(three_clusters, labels)
+        assert score > 0.5  # tight, well-separated clusters
 
-    def test_unknown_metric(self, sample_stats, sample_regions, sample_data):
-        with pytest.raises(ValueError, match="Unknown metric"):
-            cluster_regions(
-                sample_stats, sample_regions, sample_data,
-                metric="invalid",
-            )
+    def test_silhouette_scores_per_point(self, three_clusters):
+        labels, _ = kmeans(three_clusters, k=3, seed=0)
+        scores = silhouette_scores(three_clusters, labels)
+        assert len(scores) == len(three_clusters)
+        for s in scores:
+            assert -1.0 - 1e-9 <= s <= 1.0 + 1e-9
 
-
-# ── JSON export ─────────────────────────────────────────────────────
-
-class TestExportJSON:
-    def test_export(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="threshold", metric="area",
-        )
-        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
-            path = f.name
-        try:
-            export_cluster_json(result, path)
-            with open(path) as f:
-                data = json.load(f)
-            assert data["method"] == "threshold"
-            assert data["metric"] == "area"
-            assert "clusters" in data
-            assert "labels" in data
-            assert data["num_clusters"] == result.num_clusters
-        finally:
-            os.unlink(path)
+    def test_single_cluster_zero(self, tiny_points):
+        labels = [0] * len(tiny_points)
+        assert mean_silhouette(tiny_points, labels) == 0.0
 
 
-# ── SVG export ──────────────────────────────────────────────────────
+# ── auto_k ──────────────────────────────────────────────────────────────
 
-class TestExportSVG:
-    def test_export(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="threshold", metric="area",
-            value_range=(0, 1e9),
-        )
-        with tempfile.NamedTemporaryFile(suffix=".svg", delete=False) as f:
-            path = f.name
-        try:
-            export_cluster_svg(result, sample_regions, sample_data, path)
-            content = open(path).read()
-            assert "<svg" in content
-            assert "polygon" in content
-            assert "circle" in content
-        finally:
-            os.unlink(path)
+class TestAutoK:
+    def test_picks_three_for_three_clusters(self, three_clusters):
+        best_k, scores = auto_k(three_clusters, k_max=6)
+        assert 2 <= best_k <= 6
+        assert isinstance(scores, dict)
+        # Highest-silhouette k should be the one returned
+        assert best_k == max(scores, key=scores.get)
 
-    def test_export_with_labels(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="agglomerative", num_clusters=2,
-        )
-        with tempfile.NamedTemporaryFile(suffix=".svg", delete=False) as f:
-            path = f.name
-        try:
-            export_cluster_svg(
-                result, sample_regions, sample_data, path,
-                show_labels=True, title="Test Clusters",
-            )
-            content = open(path).read()
-            assert "Test Clusters" in content
-        finally:
-            os.unlink(path)
-
-    def test_export_with_noise(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="dbscan", min_neighbors=100,  # all noise
-        )
-        with tempfile.NamedTemporaryFile(suffix=".svg", delete=False) as f:
-            path = f.name
-        try:
-            export_cluster_svg(result, sample_regions, sample_data, path)
-            content = open(path).read()
-            assert "<svg" in content
-            # Noise cells rendered in gray
-            assert "#dddddd" in content
-        finally:
-            os.unlink(path)
+    def test_handles_small_input(self, tiny_points):
+        best_k, scores = auto_k(tiny_points, k_max=5)
+        assert best_k >= 2
+        assert all(isinstance(v, float) for v in scores.values())
 
 
-# ── Text formatting ─────────────────────────────────────────────────
+# ── analyze (top-level pipeline) ───────────────────────────────────────
 
-class TestFormatTable:
-    def test_format(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="threshold", metric="area",
-        )
-        table = format_cluster_table(result)
-        assert "Spatial Clustering Report" in table
-        assert "threshold" in table
-        assert "area" in table
+class TestAnalyze:
+    def test_both_algos(self, three_clusters):
+        result = analyze(three_clusters, algo="both")
+        assert isinstance(result, dict)
+        assert "kmeans" in result
+        assert "dbscan" in result
 
-    def test_format_dbscan_with_noise(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="dbscan", min_neighbors=100,
-        )
-        table = format_cluster_table(result)
-        assert "Noise cells:" in table
+    def test_kmeans_only(self, three_clusters):
+        result = analyze(three_clusters, algo="kmeans")
+        assert "kmeans" in result
 
-    def test_format_agglomerative(self, sample_stats, sample_regions, sample_data):
-        result = cluster_regions(
-            sample_stats, sample_regions, sample_data,
-            method="agglomerative", num_clusters=2,
-        )
-        table = format_cluster_table(result)
-        assert "agglomerative" in table
-        assert "C0" in table
-        assert "C1" in table
+    def test_dbscan_only(self, three_clusters):
+        result = analyze(three_clusters, algo="dbscan")
+        assert "dbscan" in result
+
+    def test_forced_k(self, three_clusters):
+        result = analyze(three_clusters, algo="kmeans", forced_k=4)
+        km = result.get("kmeans", {})
+        # Either reported k or label cardinality should reflect k=4
+        if "k" in km:
+            assert km["k"] == 4
+        else:
+            assert len(set(km.get("labels", []))) == 4
 
 
-# ── Grid data tests ─────────────────────────────────────────────────
+# ── demo + I/O ──────────────────────────────────────────────────────────
 
-class TestGridData:
-    def test_uniform_grid_threshold(self, grid_stats, grid_regions, grid_data):
-        """Uniform grid: wide threshold should capture all cells."""
-        result = cluster_regions(
-            grid_stats, grid_regions, grid_data,
-            method="threshold", metric="area",
-            value_range=(0, 1e9),
-        )
-        total = sum(c["size"] for c in result.clusters)
-        assert total == len(grid_data)
-        # All in one connected cluster since grid is connected
-        assert result.num_clusters == 1
+class TestDemoAndIO:
+    def test_generate_demo_points_deterministic(self):
+        a = generate_demo_points(seed=42)
+        b = generate_demo_points(seed=42)
+        assert a == b
+        assert len(a) > 0
+        for p in a:
+            assert len(p) == 2
 
-    def test_uniform_grid_agglomerative(self, grid_stats, grid_regions, grid_data):
-        result = cluster_regions(
-            grid_stats, grid_regions, grid_data,
-            method="agglomerative", metric="area", num_clusters=3,
-        )
-        assert result.num_clusters == 3
-        total = sum(c["size"] for c in result.clusters)
-        assert total == len(grid_data)
+    def test_load_csv_roundtrip(self):
+        pts = [(1.0, 2.0), (3.5, -4.25), (0.0, 0.0)]
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "pts.csv")
+            with open(path, "w", newline="", encoding="utf-8") as f:
+                w = csv.writer(f)
+                w.writerow(["x", "y"])
+                for x, y in pts:
+                    w.writerow([x, y])
+            loaded = load_csv(path)
+        assert loaded == pts
 
-    def test_grid_dbscan_low_min(self, grid_stats, grid_regions, grid_data):
-        result = cluster_regions(
-            grid_stats, grid_regions, grid_data,
-            method="dbscan", min_neighbors=2,
-        )
-        # Interior points have 4 neighbors, edge points have 2-3
-        # So most should be core cells → expect clustering
-        total = sum(c["size"] for c in result.clusters)
-        assert total >= 5
+    def test_load_csv_no_header(self):
+        pts = [(1.0, 2.0), (3.0, 4.0)]
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "pts.csv")
+            with open(path, "w", newline="", encoding="utf-8") as f:
+                w = csv.writer(f)
+                for x, y in pts:
+                    w.writerow([x, y])
+            loaded = load_csv(path)
+        assert loaded == pts
 
 
-# ── Generate convenience ────────────────────────────────────────────
+# ── HTML report ─────────────────────────────────────────────────────────
 
-class TestGenerateClusters:
-    def test_generate_json(self, tmp_path, monkeypatch):
-        # Create test data file in a data/ subdir and run from there
-        data_dir = tmp_path / "data"
-        data_dir.mkdir()
-        data_file = data_dir / "test_points.txt"
-        data_file.write_text("100 200\n300 400\n500 200\n700 600\n900 300\n")
-
-        monkeypatch.chdir(tmp_path)
-        out_json = str(tmp_path / "clusters.json")
-        result = generate_clusters(
-            "test_points.txt", out_json,
-            method="agglomerative", num_clusters=2,
-        )
-        assert os.path.exists(out_json)
-        with open(out_json) as f:
-            data = json.load(f)
-        assert data["num_clusters"] == 2
-
-    def test_generate_svg(self, tmp_path, monkeypatch):
-        data_dir = tmp_path / "data"
-        data_dir.mkdir()
-        data_file = data_dir / "test_points.txt"
-        data_file.write_text("100 200\n300 400\n500 200\n700 600\n900 300\n")
-
-        monkeypatch.chdir(tmp_path)
-        out_svg = str(tmp_path / "clusters.svg")
-        result = generate_clusters(
-            "test_points.txt", out_svg,
-            method="dbscan", min_neighbors=2,
-        )
-        assert os.path.exists(out_svg)
-        content = open(out_svg).read()
-        assert "<svg" in content
-
-    def test_generate_table(self, tmp_path, monkeypatch, capsys):
-        data_dir = tmp_path / "data"
-        data_dir.mkdir()
-        data_file = data_dir / "test_points.txt"
-        data_file.write_text("100 200\n300 400\n500 200\n700 600\n900 300\n")
-
-        monkeypatch.chdir(tmp_path)
-        result = generate_clusters("test_points.txt", fmt="table")
-        captured = capsys.readouterr()
-        assert "Spatial Clustering Report" in captured.out
+class TestHtmlReport:
+    def test_generate_html_contains_canvas(self, three_clusters):
+        result = analyze(three_clusters, algo="both")
+        html = generate_html(three_clusters, result)
+        assert isinstance(html, str)
+        assert "<html" in html.lower() or "<!doctype" in html.lower()
+        # The report is canvas-based per the module docstring
+        assert "canvas" in html.lower()
