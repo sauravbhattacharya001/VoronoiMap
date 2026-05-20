@@ -22,6 +22,19 @@ import random
 import sys
 from collections import defaultdict
 
+# Optional accelerators. Both are pure speedups: the pure-Python paths below
+# remain authoritative for correctness and are exercised when these imports
+# are missing.
+try:  # pragma: no cover - exercised implicitly when scipy is installed
+    import numpy as _np  # type: ignore
+except Exception:  # pragma: no cover
+    _np = None
+
+try:  # pragma: no cover
+    from scipy.spatial import cKDTree as _cKDTree  # type: ignore
+except Exception:  # pragma: no cover
+    _cKDTree = None
+
 # ---------------------------------------------------------------------------
 # Geometry helpers removed — polygon_area, polygon_centroid, convex_hull
 # were duplicates of vormap_utils / vormap_geometry and unused in this module.
@@ -32,41 +45,101 @@ from collections import defaultdict
 # Simple Voronoi via bounding-box clipped cells (no scipy needed)
 # ---------------------------------------------------------------------------
 
-def _voronoi_cells_simple(points, bbox):
-    """Approximate Voronoi cells by sampling + nearest-neighbor assignment."""
+def _grid_resolution(n):
+    """Pick a sampling resolution for the bbox-clipped Voronoi approximator.
+
+    Historically this was ``max(80, sqrt(n) * 20)`` with no upper bound, which
+    pushed the inner loop into the tens of billions of operations for a few
+    thousand points (``res^2 * n``).  We keep the same lower bound (so small
+    inputs are unaffected) but cap the grid so the work scales reasonably.
+    """
+    return max(80, min(400, int(math.sqrt(max(n, 1)) * 20)))
+
+
+def _voronoi_cells_kdtree(points, bbox, res):
+    """Vectorised nearest-site assignment using NumPy + scipy KDTree.
+
+    Returns ``(areas, centroids)`` matching the semantics of the pure-Python
+    fallback below.  Only called when both ``numpy`` and ``scipy`` are
+    importable.
+    """
     xmin, ymin, xmax, ymax = bbox
     n = len(points)
-    # Assign grid points to nearest site
-    res = max(80, int(math.sqrt(n) * 20))
+    dx = (xmax - xmin) / res
+    dy = (ymax - ymin) / res
+    cell_area = dx * dy
+
+    xs = xmin + (_np.arange(res) + 0.5) * dx
+    ys = ymin + (_np.arange(res) + 0.5) * dy
+    gx, gy = _np.meshgrid(xs, ys)  # shape (res, res)
+    grid = _np.column_stack((gx.ravel(), gy.ravel()))
+
+    tree = _cKDTree(_np.asarray(points, dtype=float))
+    _, idx = tree.query(grid, k=1)
+
+    # counts[i] = number of grid cells whose nearest site is i.
+    counts = _np.bincount(idx, minlength=n)
+    sum_x = _np.bincount(idx, weights=grid[:, 0], minlength=n)
+    sum_y = _np.bincount(idx, weights=grid[:, 1], minlength=n)
+
+    areas = (counts * cell_area).tolist()
+    centroids = []
+    for i in range(n):
+        c = counts[i]
+        if c:
+            centroids.append((float(sum_x[i] / c), float(sum_y[i] / c)))
+        else:
+            centroids.append((float(points[i][0]), float(points[i][1])))
+    return areas, centroids
+
+
+def _voronoi_cells_pure(points, bbox, res):
+    """Pure-Python nearest-site assignment over a regular grid."""
+    xmin, ymin, xmax, ymax = bbox
+    n = len(points)
     dx = (xmax - xmin) / res
     dy = (ymax - ymin) / res
     cell_points = defaultdict(list)
+    pts = list(points)  # snapshot for hot loop
     for gy in range(res):
         py = ymin + (gy + 0.5) * dy
         for gx in range(res):
             px = xmin + (gx + 0.5) * dx
             best_i, best_d = 0, float('inf')
-            for i, (sx, sy) in enumerate(points):
+            for i in range(n):
+                sx, sy = pts[i]
                 d = (px - sx) ** 2 + (py - sy) ** 2
                 if d < best_d:
                     best_d = d
                     best_i = i
             cell_points[best_i].append((px, py))
-    # Compute areas as fraction of bbox area
-    total_area = (xmax - xmin) * (ymax - ymin)
     cell_area = dx * dy
     areas = []
     centroids = []
     for i in range(n):
-        pts = cell_points.get(i, [])
-        areas.append(len(pts) * cell_area)
-        if pts:
-            cx = sum(p[0] for p in pts) / len(pts)
-            cy = sum(p[1] for p in pts) / len(pts)
+        items = cell_points.get(i, [])
+        areas.append(len(items) * cell_area)
+        if items:
+            cx = sum(p[0] for p in items) / len(items)
+            cy = sum(p[1] for p in items) / len(items)
             centroids.append((cx, cy))
         else:
             centroids.append(points[i])
     return areas, centroids
+
+
+def _voronoi_cells_simple(points, bbox):
+    """Approximate Voronoi cells by sampling + nearest-neighbor assignment.
+
+    Uses a scipy ``cKDTree`` accelerator when available (dropping the inner
+    loop from O(res^2 * n) to O(res^2 * log n)); otherwise falls back to a
+    pure-Python implementation with identical semantics.
+    """
+    n = len(points)
+    res = _grid_resolution(n)
+    if _np is not None and _cKDTree is not None and n > 0:
+        return _voronoi_cells_kdtree(points, bbox, res)
+    return _voronoi_cells_pure(points, bbox, res)
 
 
 # ---------------------------------------------------------------------------
