@@ -1,0 +1,89 @@
+name: 🔒 Security Vulnerability (low-severity only)
+description: Report a low-severity security issue. For high-severity vulnerabilities, use private reporting instead.
+title: "[Security]: "
+labels: ["security", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > [!WARNING]
+        > **Do not report high-severity vulnerabilities here.**
+        > Public issues are visible to everyone. If the issue could be exploited to leak data, execute arbitrary code, crash dependents, or compromise users, please use
+        > **[GitHub's private vulnerability reporting](https://github.com/sauravbhattacharya001/VoronoiMap/security/advisories/new)** instead.
+        >
+        > Only use this template for *low-severity*, already-disclosed, or hardening-style reports (e.g. insecure default, dependency CVE that requires non-default config, etc.).
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One-paragraph description of the security concern.
+      placeholder: "vormap.load_geojson() accepts arbitrary file paths from untrusted CLI input without normalization, allowing relative path traversal when run from a privileged context."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Self-assessed severity
+      description: If you think this is High or Critical, **stop and use private reporting instead**.
+      options:
+        - Informational (hardening / best-practice)
+        - Low (limited impact, non-default config)
+        - Medium (requires specific config, no privilege escalation)
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected
+    attributes:
+      label: Affected component(s)
+      description: Module path(s), function(s), CLI subcommand(s), or dependency name + version range.
+      placeholder: |
+        - vormap_access.py: load_geojson()
+        - CLI: `vormap access --supply <path>`
+        - Affected versions: <= 1.x.y
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal steps to demonstrate the issue. Redact anything sensitive.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: What could a malicious actor do? Who is affected (library users, CLI users, CI runners, etc.)?
+    validations:
+      required: true
+
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Suggested mitigation
+      description: Optional. Patch ideas, config workarounds, or references to similar fixes in other libraries.
+
+  - type: input
+    id: cve
+    attributes:
+      label: CVE / advisory reference
+      description: If this corresponds to a published CVE or upstream advisory, paste the ID/URL here.
+      placeholder: "CVE-2025-XXXXX or https://github.com/advisories/GHSA-..."
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have confirmed this is **not** a high/critical severity issue that should be privately disclosed.
+          required: true
+        - label: I have searched existing issues and advisories for duplicates.
+          required: true

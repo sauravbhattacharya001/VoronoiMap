@@ -1,5 +1,8 @@
 blank_issues: false
 contact_links:
+  - name: 🛡️ Report a high-severity vulnerability (private)
+    url: https://github.com/sauravbhattacharya001/VoronoiMap/security/advisories/new
+    about: Use GitHub's private vulnerability reporting for any High/Critical security issue — do not file a public issue.
   - name: 💬 Discussions
     url: https://github.com/sauravbhattacharya001/VoronoiMap/discussions
     about: Ask questions or share ideas in Discussions

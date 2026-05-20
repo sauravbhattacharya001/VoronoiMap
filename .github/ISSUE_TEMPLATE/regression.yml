@@ -1,0 +1,106 @@
+name: ⏪ Regression Report
+description: Something that worked in a previous version is now broken or behaves differently.
+title: "[Regression]: "
+labels: ["regression", "bug", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template when behavior **changed between two VoronoiMap releases** — not for first-time bugs (use the bug report template) and not for performance regressions (use the performance template).
+
+  - type: input
+    id: last-good-version
+    attributes:
+      label: Last known good version
+      description: The most recent version where the behavior was correct.
+      placeholder: "e.g. 1.4.0"
+    validations:
+      required: true
+
+  - type: input
+    id: first-bad-version
+    attributes:
+      label: First known bad version
+      description: The earliest version where the regression appears (use `pip index versions voronoimap` to bisect if unsure).
+      placeholder: "e.g. 1.5.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Behavior change
+      description: What did the code/CLI do before, and what does it do now?
+      placeholder: |
+        Before (1.4.0): `vormap.lloyd_relax(points, iters=10)` converged to a stable tessellation in ~6 iterations.
+        After (1.5.0): The same call diverges; cells flicker between two configurations indefinitely.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: A short, self-contained snippet that demonstrates the regression. Include the input data inline or as a small attachment.
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: output-before
+    attributes:
+      label: Output on the last good version
+      description: Paste actual output, screenshot, or numeric values from the working version.
+      render: shell
+
+  - type: textarea
+    id: output-after
+    attributes:
+      label: Output on the first bad version
+      description: Paste actual output, screenshot, or numeric values from the broken version.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: suspect-commit
+    attributes:
+      label: Suspect commit / PR (optional)
+      description: |
+        If you've bisected, link the commit or PR you believe introduced the regression.
+        `git log --oneline v1.4.0..v1.5.0 -- vormap_relax.py`
+
+  - type: dropdown
+    id: workaround
+    attributes:
+      label: Do you have a workaround?
+      options:
+        - "Yes, I can pin to the last good version"
+        - "Yes, I can change my call site"
+        - "No — this blocks me"
+      default: 0
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, NumPy/SciPy versions, and how you installed VoronoiMap (pip / source / wheel).
+      placeholder: |
+        - OS: Ubuntu 24.04
+        - Python: 3.12.3
+        - NumPy: 2.0.1
+        - SciPy: 1.14.0
+        - Install: pip install voronoimap==1.5.0
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have verified this works on the last good version and fails on the first bad version (not just an environment difference).
+          required: true
+        - label: I have searched existing issues for the same regression.
+          required: true
