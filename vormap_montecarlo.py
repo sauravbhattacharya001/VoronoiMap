@@ -356,7 +356,7 @@ class MonteCarloTest:
         sim_l_values = [[] for _ in radii]
 
         for _ in range(simulations):
-            sim_pts = self._generate_csr(self.n)
+            sim_pts = self._generate_csr(self.n, rng=rng, rng_np=rng_np)
 
             # Build KDTree once per simulation and reuse for both NNI
             # and Ripley's L — avoids building 2 trees per sim.
@@ -510,7 +510,7 @@ class MonteCarloTest:
 
     # ── Internal computations ───────────────────────────────────
 
-    def _generate_csr(self, n):
+    def _generate_csr(self, n, rng=None, rng_np=None):
         """Generate n uniform random points within bounds.
 
         Uses numpy vectorized generation when available — produces all

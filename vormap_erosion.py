@@ -344,7 +344,7 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     import random as _random
-    _random.seed(args.seed)
+    rng = _random.Random(args.seed)
 
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import vormap

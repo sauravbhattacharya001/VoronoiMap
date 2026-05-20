@@ -237,7 +237,7 @@ def _write_png(filepath: str, width: int, height: int, pixels: list) -> None:
 # ── Seed placement strategies ──
 
 def _place_grid(width: int, height: int, n_seeds: int,
-                jitter: float = 0.3) -> List[Tuple[int, int]]:
+                jitter: float = 0.3, rng=None) -> List[Tuple[int, int]]:
     """Place seeds on a jittered grid.
 
     Parameters
@@ -245,6 +245,9 @@ def _place_grid(width: int, height: int, n_seeds: int,
     jitter : float
         Fraction of cell size to randomly perturb each seed (0 = pure grid).
     """
+    if rng is None:
+        rng = random.Random()
+
     aspect = width / height if height > 0 else 1.0
     cols = max(1, int(math.sqrt(n_seeds * aspect)))
     rows = max(1, int(n_seeds / cols))
@@ -258,8 +261,8 @@ def _place_grid(width: int, height: int, n_seeds: int,
             cx = (c + 0.5) * cell_w
             cy = (r + 0.5) * cell_h
             if jitter > 0:
-                cx += random.uniform(-jitter, jitter) * cell_w
-                cy += random.uniform(-jitter, jitter) * cell_h
+                cx += rng.uniform(-jitter, jitter) * cell_w
+                cy += rng.uniform(-jitter, jitter) * cell_h
             sx = max(0, min(width - 1, int(cx)))
             sy = max(0, min(height - 1, int(cy)))
             seeds.append((sx, sy))
@@ -267,13 +270,15 @@ def _place_grid(width: int, height: int, n_seeds: int,
     return seeds
 
 
-def _place_random(width: int, height: int, n_seeds: int) -> List[Tuple[int, int]]:
+def _place_random(width: int, height: int, n_seeds: int, rng=None) -> List[Tuple[int, int]]:
     """Place seeds uniformly at random."""
-    return [(random.randint(0, width - 1), random.randint(0, height - 1))
+    if rng is None:
+        rng = random.Random()
+    return [(rng.randint(0, width - 1), rng.randint(0, height - 1))
             for _ in range(n_seeds)]
 
 
-def _place_poisson_disk(width: int, height: int, n_seeds: int) -> List[Tuple[int, int]]:
+def _place_poisson_disk(width: int, height: int, n_seeds: int, rng=None) -> List[Tuple[int, int]]:
     """Place seeds via Poisson disk sampling (Bridson's algorithm).
 
     Guarantees a minimum spacing between seeds for more uniform regions.
@@ -337,13 +342,16 @@ def _luminance(r: int, g: int, b: int) -> float:
 
 
 def _place_edge_aware(width: int, height: int, n_seeds: int,
-                      pixels: list) -> List[Tuple[int, int]]:
+                      pixels: list, rng=None) -> List[Tuple[int, int]]:
     """Place seeds preferring high-contrast edges.
 
     Uses a Sobel-like gradient magnitude to build a probability map,
     then samples seed positions proportional to gradient strength.
     Falls back to random placement for extra seeds if needed.
     """
+    if rng is None:
+        rng = random.Random()
+
     # Compute gradient magnitude at each pixel (simple finite difference)
     gradient = []
     for y in range(height):
@@ -366,14 +374,14 @@ def _place_edge_aware(width: int, height: int, n_seeds: int,
 
     seeds_set = set()
     for _ in range(n_random):
-        seeds_set.add((random.randint(0, width - 1), random.randint(0, height - 1)))
+        seeds_set.add((rng.randint(0, width - 1), rng.randint(0, height - 1)))
 
     # Sample remaining proportional to gradient
     attempts = 0
     max_attempts = n_edge * 20
     while len(seeds_set) < n_seeds and attempts < max_attempts:
         # Roulette wheel selection
-        threshold = random.uniform(0, total)
+        threshold = rng.uniform(0, total)
         cumulative = 0.0
         chosen = len(gradient) - 1
         for i, g in enumerate(gradient):
@@ -389,7 +397,7 @@ def _place_edge_aware(width: int, height: int, n_seeds: int,
     result = list(seeds_set)[:n_seeds]
     # Fill remaining if we didn't get enough
     while len(result) < n_seeds:
-        result.append((random.randint(0, width - 1), random.randint(0, height - 1)))
+        result.append((rng.randint(0, width - 1), rng.randint(0, height - 1)))
 
     return result
 
@@ -449,15 +457,18 @@ class VoronoiMosaic:
         """
         if n_seeds <= 0:
             raise ValueError("n_seeds must be positive")
+        
         if rng_seed is not None:
-            random.seed(rng_seed)
+            rng = random.Random(rng_seed)
+        else:
+            rng = random.Random()
 
         if placement == "edge_aware":
-            return _place_edge_aware(self.width, self.height, n_seeds, self.pixels)
+            return _place_edge_aware(self.width, self.height, n_seeds, self.pixels, rng=rng)
         elif placement == "grid":
-            return _place_grid(self.width, self.height, n_seeds, jitter=jitter)
+            return _place_grid(self.width, self.height, n_seeds, jitter=jitter, rng=rng)
         elif placement in PLACEMENT_STRATEGIES:
-            return PLACEMENT_STRATEGIES[placement](self.width, self.height, n_seeds)
+            return PLACEMENT_STRATEGIES[placement](self.width, self.height, n_seeds, rng=rng)
         else:
             raise ValueError(
                 f"Unknown placement '{placement}', "

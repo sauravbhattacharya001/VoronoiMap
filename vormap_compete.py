@@ -254,6 +254,8 @@ def simulate_competition(
     seed: Optional[int] = None,
 ) -> CompetitionResult:
     """Run a full territorial competition and return results."""
+    if seed is not None:
+        rng = random.Random(seed)
     _rng = random.Random(seed)  # local RNG; None seed ⇒ OS entropy
     # Inject into module-level so helper functions see it without
     # signature changes.  Still thread-safe per-call because each
