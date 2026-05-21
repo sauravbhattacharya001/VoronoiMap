@@ -40,6 +40,7 @@ CLI::
     python vormap_doctor.py datafile.txt --strict
 """
 
+import html as _html
 import json
 import math
 from collections import namedtuple
@@ -104,16 +105,28 @@ class Diagnosis:
         return text
 
     def to_html(self, path):
+        """Render the diagnosis as a self-contained HTML report.
+
+        All user-controlled fields (``dataset_path``, finding messages,
+        check names, fix commands, summary) are HTML-escaped before
+        interpolation. This prevents reflected HTML/JS injection when
+        the report is opened in a browser — dataset paths and filenames
+        come from CLI input, so without escaping a crafted path such as
+        ``"<script>alert(1)</script>.txt"`` would execute in the viewer.
+        """
         sev_colors = {"ok": "#4caf50", "info": "#2196f3", "warning": "#ff9800", "critical": "#f44336"}
+        esc = _html.escape
         findings_html = ""
         for f in self.findings:
             color = sev_colors.get(f.severity, "#666")
-            fix = f"<code>{f.fix_command}</code>" if f.fix_command else "—"
+            fix = f"<code>{esc(f.fix_command)}</code>" if f.fix_command else "—"
             findings_html += f"""<tr>
-                <td style="color:{color};font-weight:bold">{f.severity.upper()}</td>
-                <td>{f.check}</td><td>{f.message}</td><td>{fix}</td></tr>\n"""
-        fix_plan = "\n".join(f"$ {c}" for c in self.auto_fix_plan) if self.auto_fix_plan else "No fixes needed."
+                <td style="color:{color};font-weight:bold">{esc(f.severity).upper()}</td>
+                <td>{esc(f.check)}</td><td>{esc(f.message)}</td><td>{fix}</td></tr>\n"""
+        fix_plan = "\n".join(f"$ {esc(c)}" for c in self.auto_fix_plan) if self.auto_fix_plan else "No fixes needed."
         gauge_color = "#4caf50" if self.health_score >= 70 else "#ff9800" if self.health_score >= 40 else "#f44336"
+        safe_dataset = esc(str(self.dataset_path))
+        safe_summary = esc(self.summary)
         html = f"""<!DOCTYPE html><html><head><meta charset="utf-8">
 <title>VoronoiMap Doctor Report</title>
 <style>
@@ -127,9 +140,9 @@ display:flex;align-items:center;justify-content:center;font-size:3em;font-weight
 pre{{background:#16213e;padding:1em;border-radius:8px;overflow-x:auto}}
 </style></head><body>
 <h1>&#x1F9E9; VoronoiMap Doctor Report</h1>
-<p><strong>Dataset:</strong> {self.dataset_path} ({self.point_count} points)</p>
+<p><strong>Dataset:</strong> {safe_dataset} ({self.point_count} points)</p>
 <div class="gauge">{self.health_score}</div>
-<p style="text-align:center">{self.summary}</p>
+<p style="text-align:center">{safe_summary}</p>
 <h2>Findings</h2>
 <table><tr><th>Severity</th><th>Check</th><th>Message</th><th>Fix</th></tr>
 {findings_html}</table>
