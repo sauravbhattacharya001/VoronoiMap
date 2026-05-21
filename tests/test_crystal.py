@@ -115,3 +115,18 @@ if __name__ == "__main__":
                 print(f"  PASS  {name}")
             except Exception as e:
                 print(f"  FAIL  {name}: {e}")
+
+
+def test_save_image_rejects_absolute_when_disabled():
+    """save_image enforces containment when allow_absolute=False."""
+    import pytest
+    cfg = CrystalConfig(width=8, height=8, initial_seeds=2,
+                        total_steps=5, seed=1)
+    grid, crystals, _ = simulate(cfg)
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
+        abs_path = f.name
+    try:
+        with pytest.raises(ValueError, match="Absolute paths"):
+            save_image(abs_path, grid, crystals, cfg, allow_absolute=False)
+    finally:
+        os.unlink(abs_path)

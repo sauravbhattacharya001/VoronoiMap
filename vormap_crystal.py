@@ -332,9 +332,16 @@ def render(grid: List[List[int]], crystals: List[Crystal],
 
 def save_image(path: str, grid: List[List[int]], crystals: List[Crystal],
                config: CrystalConfig | None = None,
-               show_borders: bool = True) -> None:
-    """Render and save as PNG."""
-    vormap.validate_output_path(path)
+               show_borders: bool = True,
+               allow_absolute: bool = True) -> None:
+    """Render and save as PNG.
+
+    ``allow_absolute`` defaults to True so library callers (and the CLI,
+    which forwards an explicit ``-o`` argparse path) can use absolute
+    destinations such as ``tempfile.NamedTemporaryFile().name``.  Set
+    False to enforce the workspace-relative containment check.
+    """
+    vormap.validate_output_path(path, allow_absolute=allow_absolute)
     cfg = config or CrystalConfig()
     img = render(grid, crystals, cfg, show_borders)
     h = len(img)
@@ -346,9 +353,13 @@ def save_animation(path: str, frames: List[List[List[int]]],
                    crystals: List[Crystal],
                    config: CrystalConfig | None = None,
                    show_borders: bool = True,
-                   every: int = 1) -> None:
-    """Save growth animation as animated GIF (requires Pillow) or PNG sequence."""
-    vormap.validate_output_path(path)
+                   every: int = 1,
+                   allow_absolute: bool = True) -> None:
+    """Save growth animation as animated GIF (requires Pillow) or PNG sequence.
+
+    See :func:`save_image` for ``allow_absolute`` semantics.
+    """
+    vormap.validate_output_path(path, allow_absolute=allow_absolute)
     cfg = config or CrystalConfig()
     try:
         from PIL import Image as PILImage
