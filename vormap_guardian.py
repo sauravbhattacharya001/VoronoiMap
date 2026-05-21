@@ -768,12 +768,12 @@ def guard(source, constraints=None, auto_repair=False, max_iterations=5):
 
 def _run_demo():
     """Generate a demo with deliberate violations and auto-repair."""
-    random.seed(42)
+    rng = random.Random(42)
     points = []
 
     # Cluster of well-spaced points
     for _ in range(80):
-        points.append((random.uniform(100, 900), random.uniform(100, 900)))
+        points.append((rng.uniform(100, 900), rng.uniform(100, 900)))
 
     # Deliberately close pairs (MinSpacing violations)
     points.append((500.0, 500.0))

@@ -1061,13 +1061,13 @@ svg{{display:block;margin:8px auto}}
 
 def _demo():
     """Run a demo negotiation on generated points."""
-    random.seed(42)
+    rng = random.Random(42)
     # Create a deliberately conflicted layout
     points = []
     # Cluster of crowded points near centre
     for _ in range(6):
-        points.append((500 + random.uniform(-30, 30),
-                        500 + random.uniform(-30, 30)))
+        points.append((500 + rng.uniform(-30, 30),
+                        500 + rng.uniform(-30, 30)))
     # Scattered outliers
     points.append((50, 50))
     points.append((950, 950))
@@ -1075,7 +1075,7 @@ def _demo():
     points.append((950, 50))
     # Mid-range points
     for _ in range(8):
-        points.append((random.uniform(100, 900), random.uniform(100, 900)))
+        points.append((rng.uniform(100, 900), rng.uniform(100, 900)))
 
     print("=" * 60)
     print("  SPATIAL CONFLICT NEGOTIATOR — DEMO")

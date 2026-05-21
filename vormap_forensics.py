@@ -1057,20 +1057,20 @@ def investigate(source, grid_resolution: int = 20) -> ForensicVerdict:
 
 def forensics_demo():
     """Generate demo data with known anomalies and investigate it."""
-    random.seed(42)
+    rng = random.Random(42)
     pts = []
 
     # Base uniform-ish scatter
     for _ in range(200):
-        pts.append((random.uniform(50, 950), random.uniform(50, 950)))
+        pts.append((rng.uniform(50, 950), rng.uniform(50, 950)))
 
     # Inject tight cluster (intentional injection)
     for _ in range(15):
-        pts.append((500 + random.gauss(0, 3), 500 + random.gauss(0, 3)))
+        pts.append((500 + rng.gauss(0, 3), 500 + rng.gauss(0, 3)))
 
     # Inject boundary accumulation
     for _ in range(30):
-        pts.append((random.uniform(0, 5), random.uniform(0, 1000)))
+        pts.append((rng.uniform(0, 5), rng.uniform(0, 1000)))
 
     # Inject grid-aligned points (equipment artifact)
     for gx in range(0, 100, 10):

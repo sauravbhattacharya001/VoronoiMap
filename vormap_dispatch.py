@@ -400,25 +400,25 @@ def read_csv_points(path):
 
 def demo():
     """Run demo with synthetic data."""
-    random.seed(42)
+    rng = random.Random(42)
     # Generate clustered facilities
     facilities = []
     for _ in range(25):
-        facilities.append((random.uniform(5, 95), random.uniform(5, 95)))
+        facilities.append((rng.uniform(5, 95), rng.uniform(5, 95)))
 
     # Generate demand points with clusters (simulating population centers)
     demands = []
     weights = []
     centers = [(20, 20), (80, 30), (50, 70), (30, 80), (75, 75)]
     for _ in range(500):
-        if random.random() < 0.7:
+        if rng.random() < 0.7:
             # Clustered demand
-            cx, cy = random.choice(centers)
-            demands.append((cx + random.gauss(0, 10), cy + random.gauss(0, 10)))
+            cx, cy = rng.choice(centers)
+            demands.append((cx + rng.gauss(0, 10), cy + rng.gauss(0, 10)))
         else:
             # Uniform demand
-            demands.append((random.uniform(0, 100), random.uniform(0, 100)))
-        weights.append(random.uniform(0.5, 2.0))
+            demands.append((rng.uniform(0, 100), rng.uniform(0, 100)))
+        weights.append(rng.uniform(0.5, 2.0))
 
     # Compute auto capacity
     total_weight = sum(weights)

@@ -875,7 +875,7 @@ def analyze_resilience(
 
 def _demo():
     """Run a demo with synthetic data."""
-    random.seed(42)
+    rng = random.Random(42)
     # Create a pattern with obvious vulnerability: one central hub
     points = [(500.0, 500.0)]  # central hub
     for angle_deg in range(0, 360, 45):
@@ -885,7 +885,7 @@ def _demo():
         points.append((x, y))
     # Add some random peripheral points
     for _ in range(12):
-        points.append((random.uniform(100, 900), random.uniform(100, 900)))
+        points.append((rng.uniform(100, 900), rng.uniform(100, 900)))
 
     ra = ResilienceAnalyzer(points)
     result = ra.analyze(cascade_depth=3, suggest_redundancy=True, top_k=5)

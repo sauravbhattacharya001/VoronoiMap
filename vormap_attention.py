@@ -272,7 +272,7 @@ def _strategic_importance(points: List[Tuple[float, float]],
 
     betweenness = [0.0] * n
     sample_size = min(20, n)
-    sources = random.sample(range(n), sample_size)
+    sources = random.Random(0).sample(range(n), sample_size)
 
     for s in sources:
         # BFS from s
@@ -720,18 +720,18 @@ def attention_analyze(path_or_points, top_k: int = 10, **kwargs) -> AttentionRes
 
 def attention_demo():
     """Generate random points and run full analysis."""
-    random.seed(42)
+    rng = random.Random(42)
     # Create clustered point pattern
     points = []
     # Cluster 1
     for _ in range(15):
-        points.append((random.gauss(20, 3), random.gauss(20, 3)))
+        points.append((rng.gauss(20, 3), rng.gauss(20, 3)))
     # Cluster 2
     for _ in range(10):
-        points.append((random.gauss(60, 5), random.gauss(50, 5)))
+        points.append((rng.gauss(60, 5), rng.gauss(50, 5)))
     # Scattered
     for _ in range(8):
-        points.append((random.uniform(0, 80), random.uniform(0, 80)))
+        points.append((rng.uniform(0, 80), rng.uniform(0, 80)))
     # Outlier
     points.append((90, 90))
 
