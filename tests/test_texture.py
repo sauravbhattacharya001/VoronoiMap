@@ -50,10 +50,31 @@ def test_border():
     assert a != b
 
 
+def test_buffer_contains_only_valid_bytes():
+    """Regression: every byte must be a valid int in [0, 255].
+
+    Style functions return floats (e.g. ``base[0] * dark``) and earlier
+    versions wrote those floats directly into the ``bytearray`` backing
+    buffer, which raises ``TypeError`` on modern CPython.  The fix is to
+    ``int(_clamp(...))`` before assignment; this test guards against the
+    regression by exercising every style and verifying the returned bytes
+    are in range.
+    """
+    for style in vt.STYLES:
+        buf = vt.generate_texture(style, 16, 16, num_seeds=8, seed_value=3)
+        assert isinstance(buf, (bytes, bytearray))
+        # Every byte must be a real byte; ``bytes`` already enforces this,
+        # but iterating proves the buffer was actually populated.
+        assert all(0 <= b <= 255 for b in buf)
+        # No all-zero buffer: rendering must have written *something*.
+        assert any(buf), f"{style}: produced an all-zero buffer"
+
+
 if __name__ == "__main__":
     test_all_styles_run()
     test_png_output()
     test_reproducibility()
     test_colormaps()
     test_border()
+    test_buffer_contains_only_valid_bytes()
     print("All tests passed!")

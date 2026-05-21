@@ -273,9 +273,13 @@ def generate_texture(style, width, height, num_seeds=120, colormap="grey",
                     r, g, b = _lerp_color(border_color, (r, g, b), t)
 
             off = (y * width + x) * 3
-            buf[off] = _clamp(r)
-            buf[off + 1] = _clamp(g)
-            buf[off + 2] = _clamp(b)
+            # Style functions and lerp_color can return floats (e.g.
+            # ``base[0] * dark``), so coerce to int before writing to the
+            # byte buffer - ``bytearray`` raises ``TypeError`` on float
+            # assignment under modern CPython.
+            buf[off] = int(_clamp(r))
+            buf[off + 1] = int(_clamp(g))
+            buf[off + 2] = int(_clamp(b))
 
     return bytes(buf)
 
