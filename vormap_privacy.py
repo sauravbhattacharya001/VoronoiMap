@@ -663,7 +663,7 @@ def _cli():
             print(f"  Saved {len(res.points)} points to {args.output}")
         if args.json_out:
             data = {"method": res.method, "best_param": res.best_param, "distortion": res.distortion}
-            with open(args.json_out, "w") as f:
+            with open(args.json_out, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
             print(f"  JSON saved to {args.json_out}")
 
@@ -680,12 +680,12 @@ def _cli():
         print(f"  Hopkins Original: {report.hopkins_original:.4f}")
         print(f"  Hopkins Anonymized: {report.hopkins_anonymized:.4f}")
         if args.json_out:
-            with open(args.json_out, "w") as f:
+            with open(args.json_out, "w", encoding="utf-8") as f:
                 json.dump(report._asdict(), f, indent=2)
             print(f"  JSON saved to {args.json_out}")
         if args.html_out:
             html = _audit_html(report, orig, anon)
-            with open(args.html_out, "w") as f:
+            with open(args.html_out, "w", encoding="utf-8") as f:
                 f.write(html)
             print(f"  HTML report saved to {args.html_out}")
 
