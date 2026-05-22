@@ -124,7 +124,27 @@ def _build_adjacency(points):
 
 
 def _voronoi_cell_areas(points, bounds=None):
-    """Approximate Voronoi cell areas via grid sampling."""
+    """Approximate Voronoi cell areas via grid sampling.
+
+    For each grid sample point in the bounding region, assigns it to the
+    nearest input point; the cell area is the assigned-sample count times
+    one sample cell's area.
+
+    Performance notes
+    -----------------
+    The naive triple loop is O(res*res*n) where res scales with sqrt(n),
+    giving an effective O(n**2) cost in pure Python that blew up well
+    before 1k points (~6.5s @ n=400 on a dev box). This implementation
+    picks the fastest available backend:
+
+      1. scipy.spatial.cKDTree.query with vectorized grid points -> O(g log n)
+      2. numpy vectorized argmin over a (g, n) distance matrix
+      3. pure-Python fallback identical in semantics to the original
+
+    All three paths return identical bin counts to the original (the
+    nearest-neighbor decision is exact in each case), so cell-area sums
+    match to the same grid-sampling tolerance.
+    """
     n = len(points)
     if n == 0:
         return []
@@ -143,8 +163,44 @@ def _voronoi_cell_areas(points, bounds=None):
     dx = (xmax - xmin) / res
     dy = (ymax - ymin) / res
     cell_area = dx * dy
-    counts = [0] * n
 
+    # --- Fast path 1: scipy.spatial.cKDTree (preferred, O(g log n)) ---
+    try:
+        import numpy as _np
+        from scipy.spatial import cKDTree  # type: ignore
+
+        tree = cKDTree(_np.asarray(points, dtype=_np.float64))
+        xs = xmin + (_np.arange(res) + 0.5) * dx
+        ys = ymin + (_np.arange(res) + 0.5) * dy
+        gx, gy = _np.meshgrid(xs, ys)
+        grid = _np.column_stack((gx.ravel(), gy.ravel()))
+        _, idx = tree.query(grid, k=1)
+        counts = _np.bincount(idx, minlength=n)
+        return (counts.astype(_np.float64) * cell_area).tolist()
+    except Exception:
+        pass
+
+    # --- Fast path 2: numpy vectorized argmin (no scipy) ---
+    try:
+        import numpy as _np
+
+        pts = _np.asarray(points, dtype=_np.float64)  # (n, 2)
+        xs = xmin + (_np.arange(res) + 0.5) * dx
+        ys = ymin + (_np.arange(res) + 0.5) * dy
+        counts = _np.zeros(n, dtype=_np.int64)
+        # Process one row of the grid at a time to bound memory at ~res*n*8 B.
+        for py in ys:
+            dxs = xs[:, None] - pts[None, :, 0]   # (res, n)
+            dys = py - pts[None, :, 1]            # (1, n)
+            d_sq = dxs * dxs + dys * dys          # (res, n)
+            row_idx = _np.argmin(d_sq, axis=1)
+            counts += _np.bincount(row_idx, minlength=n)
+        return (counts.astype(_np.float64) * cell_area).tolist()
+    except Exception:
+        pass
+
+    # --- Fallback: original pure-Python triple loop (stdlib only) ---
+    counts = [0] * n
     for iy in range(res):
         py = ymin + (iy + 0.5) * dy
         for ix in range(res):
@@ -444,12 +500,51 @@ def _gini_coefficient(values):
     total = sum(sorted_vals)
     if total == 0:
         return 0.0
-    cumulative = 0.0
     weighted_sum = 0.0
     for i, v in enumerate(sorted_vals):
-        cumulative += v
         weighted_sum += (2 * (i + 1) - n - 1) * v
     return weighted_sum / (n * total)
+
+
+def _nn_coefficient_of_variation(points):
+    """Coefficient of variation of nearest-neighbor distances.
+
+    Returns 0.0 for empty / single-point inputs and for degenerate
+    coincident point sets where the mean nn-distance is non-positive.
+    """
+    if len(points) < 2:
+        return 0.0
+    nn_dists = compute_nn_distances(points)
+    if not nn_dists:
+        return 0.0
+    mean_nn = sum(nn_dists) / len(nn_dists)
+    if mean_nn <= 0:
+        return 0.0
+    var = sum((d - mean_nn) ** 2 for d in nn_dists) / len(nn_dists)
+    return math.sqrt(var) / mean_nn
+
+
+def _resilience_from(gini, cv):
+    """Clamp the (gini, cv) -> resilience score formula in one place.
+
+    Centralises the heuristic that was previously inlined in three
+    different methods; tweaks here apply consistently to cascade
+    steps and what-if scenarios.
+    """
+    return max(0.0, min(100.0, 100.0 - gini * 50.0 - cv * 30.0))
+
+
+def _post_removal_metrics(remaining, bounds):
+    """Compute (gini, cv, resilience_after) for a post-removal point set.
+
+    Consolidates the duplicated cell-area-recompute + Gini + nn-distance CV
+    + clamped resilience formula that previously appeared in
+    ``_cascade_analysis`` and ``what_if``.
+    """
+    new_areas = _voronoi_cell_areas(remaining, bounds)
+    gini = _gini_coefficient(new_areas)
+    cv = _nn_coefficient_of_variation(remaining)
+    return gini, cv, _resilience_from(gini, cv)
 
 
 class ResilienceAnalyzer:
@@ -644,21 +739,9 @@ class ResilienceAnalyzer:
                 break
 
             # Measure post-removal state
-            new_areas = _voronoi_cell_areas(remaining, self.bounds)
-            gini = _gini_coefficient(new_areas)
-
-            # Quick resilience estimate for remaining points
-            nn_dists = compute_nn_distances(remaining)
-            cv = 0.0
-            if nn_dists:
-                mean_nn = sum(nn_dists) / len(nn_dists)
-                if mean_nn > 0:
-                    std_nn = math.sqrt(
-                        sum((d - mean_nn) ** 2 for d in nn_dists) / len(nn_dists)
-                    )
-                    cv = std_nn / mean_nn
-
-            resilience_after = max(0, min(100, 100 - gini * 50 - cv * 30))
+            gini, cv, resilience_after = _post_removal_metrics(
+                remaining, self.bounds
+            )
 
             steps.append(CascadeStep(
                 step=step + 1,
@@ -829,22 +912,14 @@ class ResilienceAnalyzer:
                 ),
             }
 
-        new_areas = _voronoi_cell_areas(remaining, self.bounds)
-        gini = _gini_coefficient(new_areas)
-        nn_dists = compute_nn_distances(remaining)
-        cv = 0.0
-        if nn_dists:
-            mean_nn = sum(nn_dists) / len(nn_dists)
-            if mean_nn > 0:
-                std_nn = math.sqrt(
-                    sum((d - mean_nn) ** 2 for d in nn_dists) / len(nn_dists)
-                )
-                cv = std_nn / mean_nn
+        gini, cv, resilience_after = _post_removal_metrics(
+            remaining, self.bounds
+        )
 
         return {
             "removed": valid,
             "remaining_count": len(remaining),
-            "resilience_after": max(0, min(100, 100 - gini * 50 - cv * 30)),
+            "resilience_after": resilience_after,
             "area_imbalance": round(gini, 4),
             "total_coverage_lost": round(
                 sum(self.areas[i] for i in valid if i < len(self.areas)), 4

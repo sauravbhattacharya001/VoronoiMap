@@ -16,6 +16,9 @@ from vormap_resilience import (
     _polygon_area,
     _demo,
     analyze_resilience,
+    _nn_coefficient_of_variation,
+    _resilience_from,
+    _post_removal_metrics,
 )
 
 
@@ -223,6 +226,50 @@ def test_recommendations_present():
     result = ra.analyze()
     assert len(result.recommendations) > 0
     assert all(isinstance(r, str) for r in result.recommendations)
+
+
+# ---------------------------------------------------------------------------
+# Refactor regression: post-removal metrics helpers
+# ---------------------------------------------------------------------------
+
+
+def test_nn_cv_empty_and_singleton():
+    """CV is 0 for empty/coincident degenerate inputs (matches old inline code)."""
+    assert _nn_coefficient_of_variation([]) == 0.0
+    # Two coincident points -> mean_nn == 0 -> CV must be 0, not NaN/divide.
+    assert _nn_coefficient_of_variation([(0.0, 0.0), (0.0, 0.0)]) == 0.0
+
+
+def test_nn_cv_uniform_grid_is_low():
+    pts = _grid_points(4, 4, 100)
+    cv = _nn_coefficient_of_variation(pts)
+    # All nn-distances equal -> CV must be 0 on an exact lattice.
+    assert cv < 1e-9
+
+
+def test_resilience_from_clamps_to_unit_range():
+    # gini=0, cv=0 -> max score
+    assert _resilience_from(0.0, 0.0) == 100.0
+    # absurd inputs should still land in [0, 100]
+    assert _resilience_from(5.0, 5.0) == 0.0
+    assert _resilience_from(-5.0, -5.0) == 100.0
+    mid = _resilience_from(0.5, 0.5)
+    assert 0.0 <= mid <= 100.0
+
+
+def test_post_removal_metrics_matches_inline_formula():
+    """Helper must reproduce the (gini, cv, 100 - 50g - 30cv) result."""
+    pts = _grid_points(4, 4, 100)
+    remaining = pts[1:]  # drop one to mimic a removal
+    bounds = (0, 0, 400, 400)
+    gini, cv, score = _post_removal_metrics(remaining, bounds)
+    # Re-derive via the now-internal helpers to confirm they agree.
+    expected_gini = _gini_coefficient(_voronoi_cell_areas(remaining, bounds))
+    expected_cv = _nn_coefficient_of_variation(remaining)
+    assert abs(gini - expected_gini) < 1e-12
+    assert abs(cv - expected_cv) < 1e-12
+    assert abs(score - _resilience_from(gini, cv)) < 1e-12
+    assert 0.0 <= score <= 100.0
 
 
 # ---------------------------------------------------------------------------
