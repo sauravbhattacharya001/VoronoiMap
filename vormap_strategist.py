@@ -712,12 +712,14 @@ def _html_round(r, idx):
 # ---------------------------------------------------------------------------
 
 def _demo():
-    random.seed(42)
+    # Uses a local ``random.Random`` instance so the demo does not
+    # perturb the host process's global RNG state. See issue #192.
+    rng = random.Random(42)
     # Create an intentionally imbalanced distribution
     pts = []
     # Cluster in bottom-left
     for _ in range(8):
-        pts.append((random.uniform(1, 3), random.uniform(1, 3)))
+        pts.append((rng.uniform(1, 3), rng.uniform(1, 3)))
     # Sparse top-right
     pts.append((8, 8))
     pts.append((9, 7))

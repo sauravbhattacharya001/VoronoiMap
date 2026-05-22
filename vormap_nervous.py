@@ -943,9 +943,13 @@ def nervous_analyze(
 
 
 def nervous_demo() -> NervousSystemResult:
-    """Run a demo with sample points."""
-    random.seed(42)
-    pts = [(random.uniform(0, 100), random.uniform(0, 100)) for _ in range(25)]
+    """Run a demo with sample points.
+
+    Uses a local ``random.Random`` instance so the demo does not
+    perturb the host process's global RNG state. See issue #192.
+    """
+    rng = random.Random(42)
+    pts = [(rng.uniform(0, 100), rng.uniform(0, 100)) for _ in range(25)]
     engine = NervousSystemEngine(points=pts)
     result = engine.analyze()
     engine.print_report()

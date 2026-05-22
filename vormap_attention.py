@@ -719,19 +719,23 @@ def attention_analyze(path_or_points, top_k: int = 10, **kwargs) -> AttentionRes
 
 
 def attention_demo():
-    """Generate random points and run full analysis."""
-    random.seed(42)
+    """Generate random points and run full analysis.
+
+    Uses a local ``random.Random`` instance so the demo does not
+    perturb the host process's global RNG state. See issue #192.
+    """
+    rng = random.Random(42)
     # Create clustered point pattern
     points = []
     # Cluster 1
     for _ in range(15):
-        points.append((random.gauss(20, 3), random.gauss(20, 3)))
+        points.append((rng.gauss(20, 3), rng.gauss(20, 3)))
     # Cluster 2
     for _ in range(10):
-        points.append((random.gauss(60, 5), random.gauss(50, 5)))
+        points.append((rng.gauss(60, 5), rng.gauss(50, 5)))
     # Scattered
     for _ in range(8):
-        points.append((random.uniform(0, 80), random.uniform(0, 80)))
+        points.append((rng.uniform(0, 80), rng.uniform(0, 80)))
     # Outlier
     points.append((90, 90))
 
