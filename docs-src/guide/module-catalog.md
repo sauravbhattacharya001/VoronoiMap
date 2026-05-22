@@ -1,6 +1,6 @@
 # Module Catalog
 
-Complete reference of all 148 VoronoiMap modules organized by functional area.
+Complete reference of all 151 VoronoiMap modules organized by functional area.
 For detailed API documentation of core extension modules, see [Extension Modules API](extensions.md).
 
 ---
@@ -250,3 +250,6 @@ High-level autonomous advisors that read a dataset and produce prescriptive, dec
 | `vormap_handoff` | Agentic shift-handoff advisor - state diffs, open anomalies, and prioritized next actions for the incoming operator |
 | `vormap_redundancy` | Agentic sensor retirement / merge advisor - identifies redundant sensors and proposes consolidation actions |
 | `vormap_sensorplanner` | Agentic budget-aware next-N sensor placement advisor - optimal expansion under coverage and cost constraints |
+| `vormap_calibration` | Agentic per-sensor calibration drift advisor - time-series sibling to `vormap_drift` that ingests per-sensor reading streams and flags drift, stuck sensors, and recalibration candidates |
+| `vormap_replacement` | Agentic per-sensor replacement / swap-out advisor - ranks sensors for retirement and proposes geometry-aware swap candidates |
+| `vormap_route` | Agentic field-visit route planner advisor - sequences flagged sensors into bounded, depot-anchored visit routes for technicians |

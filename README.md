@@ -53,9 +53,9 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
 
-## Module Catalog (142 Modules)
+## Module Catalog (151 Modules)
 
-VoronoiMap has grown into a comprehensive spatial analysis toolkit with **142 modules** spanning core algorithms, visualization, spatial statistics, simulation, planning, artistic rendering, and autonomous analysis. Every module is listed below by category.
+VoronoiMap has grown into a comprehensive spatial analysis toolkit with **151 modules** spanning core algorithms, visualization, spatial statistics, simulation, planning, artistic rendering, and autonomous analysis. Every module is listed below by category.
 
 ### Core
 
@@ -225,6 +225,14 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit with **142 mo
 | `vormap_governance` | Spatial governance engine: democratic decision-making with voting theory, power indices (Banzhaf/Shapley-Shubik), and coalition analysis |
 | `vormap_metabolism` | Spatial metabolism engine: autonomous resource flow analysis with production, consumption, trade routing, and bottleneck detection |
 | `vormap_nervous` | Spatial nervous system engine: neural signal propagation, reflex arcs, rhythm detection, and Hebbian plasticity on tessellations |
+| `vormap_brief` | Autonomous executive brief generator: distills VoronoiMap datasets into decision-ready narrative summaries |
+| `vormap_curator` | Agentic spatial dataset curator: quality scoring, deduplication, and provenance-aware filtering |
+| `vormap_handoff` | Agentic shift-handoff advisor: state diffs, open anomalies, and prioritized next actions for the incoming operator |
+| `vormap_redundancy` | Agentic sensor retirement / merge advisor: identifies redundant sensors and proposes consolidation actions |
+| `vormap_sensorplanner` | Agentic budget-aware next-N sensor placement advisor: optimal expansion under coverage and cost constraints |
+| `vormap_calibration` | Agentic per-sensor calibration drift advisor: time-series sibling to `vormap_drift` operating on per-sensor reading streams |
+| `vormap_replacement` | Agentic per-sensor replacement / swap-out advisor: ranks sensors for retirement and proposes geometry-aware swap candidates |
+| `vormap_route` | Agentic field-visit route planner advisor: sequences flagged sensors into bounded, depot-anchored visit routes for technicians |
 
 ### Artistic Rendering
 
@@ -527,7 +535,7 @@ vormap_viz.generate_graph("datauni5.txt", "graph.json", fmt="json")
 
 ## 📚 API Reference
 
-> **Full API documentation:** See [docs/API.md](docs/API.md) for complete reference of all 133 modules and their functions.
+> **Full API documentation:** See [docs/API.md](docs/API.md) for complete reference of all 151 modules and their functions.
 
 ### Core Functions
 
