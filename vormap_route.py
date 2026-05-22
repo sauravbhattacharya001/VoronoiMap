@@ -41,7 +41,6 @@ from __future__ import annotations
 import argparse
 import copy
 import csv
-import io
 import json
 import math
 import sys
@@ -247,7 +246,6 @@ class RouteAdvisor:
             else:
                 normalised.append(SensorVisit.from_record(copy.deepcopy(dict(v))))
 
-        appetite = _appetite_mult(risk_appetite)
         urgency_weight = {
             "cautious": 1.25,
             "balanced": 1.0,
@@ -621,12 +619,9 @@ class RouteAdvisor:
                     related_ids=[],
                 )
             )
-        visit_now = [r for r in routed if r.verdict == "VISIT_NOW"]
-        # Heuristic: most VISIT_NOW visits were also recently visited
-        # (last_visited_days < 7 known) -> urgency model is over-reacting.
-        recent = [r for r in visit_now if r.priority == "P0"]
-        # We don't have last_visited_days on RoutedVisit; recompute via reasons skip
-        # Note: we use estimated_minutes & sequence only here. Skip noisy heuristic.
+        # Note: we only have estimated_minutes / sequence on RoutedVisit here,
+        # not last_visited_days, so we don't synthesise a "too-recent revisit"
+        # heuristic. Skipped intentionally.
         if any(r.access_difficulty >= 4 for r in routed if r.sequence is not None):
             actions.append(
                 PlaybookAction(
