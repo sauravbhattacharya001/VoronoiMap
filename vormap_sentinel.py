@@ -55,7 +55,7 @@ import math
 import os
 from collections import namedtuple
 from html import escape as _html_escape
-from datetime import datetime
+from datetime import datetime, timezone
 
 from vormap_utils import polygon_centroid_mean
 
@@ -79,7 +79,7 @@ class SentinelReport:
     )
 
     def __init__(self, *, source_file="", point_count=0):
-        self.timestamp = datetime.utcnow().isoformat() + "Z"
+        self.timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         self.source_file = source_file
         self.point_count = point_count
         self.health_score = 100
@@ -118,7 +118,7 @@ class SentinelReport:
         }
 
     def to_json(self, path):
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=2)
         return path
 
@@ -176,7 +176,7 @@ f'<table><tr><th>Severity</th><th>Channel</th><th>Message</th><th>Value</th><th>
 <table><tr><th>Metric</th><th>Value</th></tr>
 {metric_rows}</table>
 </body></html>"""
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(html)
         return path
 
@@ -557,13 +557,13 @@ class Sentinel:
         data["sensitivity"] = self.sensitivity
         data["eps"] = self.eps
         data["min_cluster_pts"] = self.min_cluster_pts
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
     @classmethod
     def load_baseline(cls, path):
         """Load a saved baseline and return a ready Sentinel."""
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             data = json.load(f)
         s = cls(
             grid_res=data.get("grid_res", 10),
