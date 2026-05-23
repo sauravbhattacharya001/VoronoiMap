@@ -356,7 +356,7 @@ class MonteCarloTest:
         sim_l_values = [[] for _ in radii]
 
         for _ in range(simulations):
-            sim_pts = self._generate_csr(self.n, rng=rng, rng_np=rng_np)
+            sim_pts = self._generate_csr(self.n)
 
             # Build KDTree once per simulation and reuse for both NNI
             # and Ripley's L — avoids building 2 trees per sim.
