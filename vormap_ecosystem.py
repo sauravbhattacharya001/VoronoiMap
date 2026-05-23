@@ -43,8 +43,14 @@ from vormap_utils import build_distance_adjacency
 
 # ── Geometry helpers ────────────────────────────────────────────────
 
-def _random_points(n: int, w: float = 500.0, h: float = 500.0) -> List[Tuple[float, float]]:
-    return [(random.uniform(20, w - 20), random.uniform(20, h - 20)) for _ in range(n)]
+def _random_points(
+    n: int,
+    w: float = 500.0,
+    h: float = 500.0,
+    rng: Optional[random.Random] = None,
+) -> List[Tuple[float, float]]:
+    r = rng if rng is not None else random
+    return [(r.uniform(20, w - 20), r.uniform(20, h - 20)) for _ in range(n)]
 
 
 def _build_adjacency(pts: List[Tuple[float, float]], threshold_factor: float = 2.0) -> Dict[int, List[int]]:
@@ -177,8 +183,9 @@ class EcosystemSimulator:
                  ticks: int = 100, autopilot: bool = False,
                  preset: Optional[str] = None, seed: Optional[int] = None,
                  event_rate: float = 0.07):
-        if seed is not None:
-            random.seed(seed)
+        # Use a local RNG so callers' global ``random`` state is not
+        # mutated by constructing the simulator (issue #194).
+        self._rng = random.Random(seed)
 
         if preset and preset in PRESETS:
             cfg = PRESETS[preset]
@@ -210,7 +217,7 @@ class EcosystemSimulator:
             ))
 
         # Generate points and adjacency
-        self.points = _random_points(n_points)
+        self.points = _random_points(n_points, rng=self._rng)
         self.adj = _build_adjacency(self.points)
 
         # Initialize populations: each cell gets random pop for each species
@@ -218,7 +225,7 @@ class EcosystemSimulator:
         for _ in range(n_points):
             cell = []
             for sp in self.species:
-                cell.append(random.uniform(5, sp.capacity * 0.5))
+                cell.append(self._rng.uniform(5, sp.capacity * 0.5))
             self.populations.append(cell)
 
     def run(self) -> Dict[str, Any]:
@@ -245,7 +252,7 @@ class EcosystemSimulator:
             prev_diversity = div
 
             # Random events
-            if random.random() < self.event_rate:
+            if self._rng.random() < self.event_rate:
                 ev = self._random_event(t)
                 if ev:
                     events.append(ev)
@@ -338,9 +345,9 @@ class EcosystemSimulator:
         }
 
     def _random_event(self, tick: int) -> Optional[Dict[str, Any]]:
-        kind = random.choice(["drought", "disease", "mutation"])
+        kind = self._rng.choice(["drought", "disease", "mutation"])
         if kind == "drought":
-            region = random.sample(range(self.n_points), min(5, self.n_points))
+            region = self._rng.sample(range(self.n_points), min(5, self.n_points))
             for ci in region:
                 for s in range(self.n_species):
                     self.populations[ci][s] *= 0.6
@@ -358,8 +365,8 @@ class EcosystemSimulator:
             return {"tick": tick, "type": "disease", "species": self.species[target].name,
                     "desc": f"Disease struck {self.species[target].name} — 30% population loss"}
         elif kind == "mutation":
-            s = random.randrange(self.n_species)
-            self.species[s].growth *= random.uniform(0.8, 1.3)
+            s = self._rng.randrange(self.n_species)
+            self.species[s].growth *= self._rng.uniform(0.8, 1.3)
             return {"tick": tick, "type": "mutation", "species": self.species[s].name,
                     "desc": f"{self.species[s].name} mutated — growth rate changed"}
         return None
@@ -400,7 +407,7 @@ class EcosystemSimulator:
                     totals[s] += self.populations[ci][s]
             weakest = totals.index(min(totals))
             boost = self.species[weakest].capacity * 0.3
-            for ci in random.sample(range(self.n_points), min(5, self.n_points)):
+            for ci in self._rng.sample(range(self.n_points), min(5, self.n_points)):
                 self.populations[ci][weakest] += boost
             return {"tick": tick, "action": "habitat_restoration",
                     "species": self.species[weakest].name,

@@ -123,23 +123,27 @@ def _hopkins(pts, bbox, m=None):
 # ---------------------------------------------------------------------------
 # Privacy techniques
 
-def laplace_noise(points, epsilon=1.0, seed=None):
+def laplace_noise(points, epsilon=1.0, seed=None, rng=None):
     """Add Laplace noise calibrated to eps-differential privacy.
 
     Sensitivity is estimated from the bounding box diagonal.  Each
     coordinate gets independent Laplace(0, sensitivity/eps) noise.
+
+    Either ``seed`` (constructs a local ``random.Random``) or ``rng``
+    (an existing ``random.Random``) may be provided.  Neither argument
+    mutates the global ``random`` module state (issue #194).
     """
     if not points:
         return []
-    if seed is not None:
-        random.seed(seed)
+    if rng is None:
+        rng = random.Random(seed) if seed is not None else random
     bbox = _bounding_box(points)
     diag = math.hypot(bbox[2] - bbox[0], bbox[3] - bbox[1])
     sensitivity = diag / max(len(points), 1)
     scale = sensitivity / max(epsilon, 1e-12)
 
     def _lap():
-        u = random.random() - 0.5
+        u = rng.random() - 0.5
         return -scale * (1 if u >= 0 else -1) * math.log(1 - 2 * abs(u) + 1e-15)
 
     return [(x + _lap(), y + _lap()) for x, y in points]
@@ -206,16 +210,20 @@ def grid_snap(points, cell_size=10.0):
     return result
 
 
-def donut_mask(points, r_min=5.0, r_max=20.0, seed=None):
-    """Displace each point by random distance in [r_min, r_max], random angle."""
+def donut_mask(points, r_min=5.0, r_max=20.0, seed=None, rng=None):
+    """Displace each point by random distance in [r_min, r_max], random angle.
+
+    Either ``seed`` or ``rng`` may be provided.  Neither argument mutates
+    the global ``random`` module state (issue #194).
+    """
     if not points:
         return []
-    if seed is not None:
-        random.seed(seed)
+    if rng is None:
+        rng = random.Random(seed) if seed is not None else random
     result = []
     for x, y in points:
-        angle = random.uniform(0, 2 * math.pi)
-        dist = random.uniform(r_min, r_max)
+        angle = rng.uniform(0, 2 * math.pi)
+        dist = rng.uniform(r_min, r_max)
         result.append((x + dist * math.cos(angle), y + dist * math.sin(angle)))
     return result
 
@@ -254,18 +262,22 @@ def optimize_privacy(points, method="laplace", max_distortion=15.0, seed=None):
 
     Returns ``_OptResult(method, best_param, distortion, points)``.
     """
-    if seed is not None:
-        random.seed(seed)
+    # Local RNG: never mutate the global ``random`` module state (issue
+    # #194).  When ``seed`` is provided, derive a deterministic local
+    # generator for the binary search trials so that distinct ``seed``
+    # values give distinct trial trajectories (was previously broken by
+    # the hard-coded ``seed=42`` passed into the trial helpers).
+    trial_rng = random.Random(seed) if seed is not None else random.Random()
 
     def _trial(param):
         if method == "laplace":
-            priv = laplace_noise(points, epsilon=param, seed=42)
+            priv = laplace_noise(points, epsilon=param, rng=trial_rng)
         elif method == "k-anon":
             priv = k_anonymize(points, k=int(param))
         elif method == "grid":
             priv = grid_snap(points, cell_size=param)
         elif method == "donut":
-            priv = donut_mask(points, r_min=param * 0.25, r_max=param, seed=42)
+            priv = donut_mask(points, r_min=param * 0.25, r_max=param, rng=trial_rng)
         else:
             raise ValueError(f"Unknown method: {method}")
         return priv, _mean_displacement(points, priv)

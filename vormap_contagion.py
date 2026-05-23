@@ -47,8 +47,14 @@ from vormap_utils import build_distance_adjacency
 
 # ── Geometry helpers ────────────────────────────────────────────────
 
-def _random_points(n: int, w: float = 500.0, h: float = 500.0) -> List[Tuple[float, float]]:
-    return [(random.uniform(20, w - 20), random.uniform(20, h - 20)) for _ in range(n)]
+def _random_points(
+    n: int,
+    w: float = 500.0,
+    h: float = 500.0,
+    rng: Optional[random.Random] = None,
+) -> List[Tuple[float, float]]:
+    r = rng if rng is not None else random
+    return [(r.uniform(20, w - 20), r.uniform(20, h - 20)) for _ in range(n)]
 
 
 def _build_adjacency(pts: List[Tuple[float, float]], threshold_factor: float = 2.0) -> Dict[int, List[int]]:
@@ -90,10 +96,11 @@ class ContagionSimulator:
         self.gamma = gamma
         self.migration_rate = migration_rate
         self.autopilot = autopilot
-        if seed is not None:
-            random.seed(seed)
+        # Use a local RNG so that callers' global ``random`` state is
+        # never mutated by constructing a simulator (issue #194).
+        self._rng = random.Random(seed)
 
-        self.pts = _random_points(n_points)
+        self.pts = _random_points(n_points, rng=self._rng)
         self.adj = _build_adjacency(self.pts)
         self.pop = [100.0] * n_points  # each cell has 100 people
 
@@ -106,8 +113,8 @@ class ContagionSimulator:
         self.q = [1.0] * n_points
 
         # seed patient zero in 1-3 cells
-        n_seeds = random.randint(1, min(3, n_points))
-        for idx in random.sample(range(n_points), n_seeds):
+        n_seeds = self._rng.randint(1, min(3, n_points))
+        for idx in self._rng.sample(range(n_points), n_seeds):
             infected = self.pop[idx] * 0.1
             self.S[idx] -= infected
             self.I[idx] += infected
