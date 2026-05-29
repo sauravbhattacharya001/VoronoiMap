@@ -106,10 +106,14 @@ def polygon_centroid_mean(vertices):
 
 
 def assign_cells_grid(width, height, seeds):
-    """Assign each pixel to its nearest seed (brute-force Voronoi).
+    """Assign each pixel to its nearest seed (Voronoi assignment).
 
     Returns a 2D grid (list of lists) where ``grid[y][x]`` is the index
     of the nearest seed in *seeds*.
+
+    Uses numpy vectorized computation when available (O(W*H + K) memory,
+    much faster for large grids).  Falls back to scipy KDTree for
+    medium grids or pure Python brute-force when neither is available.
 
     Parameters
     ----------
@@ -122,13 +126,56 @@ def assign_cells_grid(width, height, seeds):
     -------
     list of list of int
     """
+    n_seeds = len(seeds)
+    if n_seeds == 0:
+        return [[0] * width for _ in range(height)]
+    if n_seeds == 1:
+        return [[0] * width for _ in range(height)]
+
+    # Fast path: numpy vectorized (broadcasts seed array against pixel grid)
+    if _HAS_NUMPY:
+        sx = np.array([s[0] for s in seeds])
+        sy = np.array([s[1] for s in seeds])
+        ys = np.arange(height)
+        xs = np.arange(width)
+        # Shape: (height, width, 1) vs (1, 1, n_seeds)
+        # For very large grids, process in row chunks to limit memory
+        chunk_size = max(1, min(height, 500_000_000 // (width * n_seeds * 8)))
+        grid = [[0] * width for _ in range(height)]
+        for y_start in range(0, height, chunk_size):
+            y_end = min(y_start + chunk_size, height)
+            chunk_h = y_end - y_start
+            yy = ys[y_start:y_end].reshape(chunk_h, 1, 1)
+            xx = xs.reshape(1, width, 1)
+            sx_b = sx.reshape(1, 1, n_seeds)
+            sy_b = sy.reshape(1, 1, n_seeds)
+            dists_sq = (xx - sx_b) ** 2 + (yy - sy_b) ** 2
+            indices = np.argmin(dists_sq, axis=2)
+            for row_offset in range(chunk_h):
+                grid[y_start + row_offset] = indices[row_offset].tolist()
+        return grid
+
+    # Medium path: scipy KDTree
+    try:
+        from scipy.spatial import KDTree
+        tree = KDTree(seeds)
+        grid = [[0] * width for _ in range(height)]
+        for y in range(height):
+            row_pts = [(x, y) for x in range(width)]
+            _, indices = tree.query(row_pts)
+            grid[y] = list(indices)
+        return grid
+    except ImportError:
+        pass
+
+    # Fallback: pure Python brute-force
     grid = [[0] * width for _ in range(height)]
     for y in range(height):
         for x in range(width):
             best_d = float("inf")
             best_i = 0
-            for i, (sx, sy) in enumerate(seeds):
-                d = (x - sx) ** 2 + (y - sy) ** 2
+            for i, (sx_i, sy_i) in enumerate(seeds):
+                d = (x - sx_i) ** 2 + (y - sy_i) ** 2
                 if d < best_d:
                     best_d = d
                     best_i = i
@@ -334,13 +381,30 @@ def build_distance_adjacency(points, threshold_factor=2.0):
     avg_nn = sum(nn_dists) / len(nn_dists)
     threshold = avg_nn * threshold_factor
 
+    # Fast path: scipy KDTree query_ball_point avoids O(n²) pairwise scan
+    try:
+        from scipy.spatial import KDTree
+        tree = KDTree(points)
+        adj = {i: [] for i in range(n)}
+        neighbors = tree.query_ball_point(points, threshold)
+        for i, nbrs in enumerate(neighbors):
+            for j in nbrs:
+                if j > i:
+                    adj[i].append(j)
+                    adj[j].append(i)
+        return adj
+    except ImportError:
+        pass
+
+    # Fallback: brute-force O(n²)
     adj = {i: [] for i in range(n)}
+    threshold_sq = threshold * threshold
     for i in range(n):
         xi, yi = points[i]
         for j in range(i + 1, n):
             dx = xi - points[j][0]
             dy = yi - points[j][1]
-            if math.sqrt(dx * dx + dy * dy) <= threshold:
+            if dx * dx + dy * dy <= threshold_sq:
                 adj[i].append(j)
                 adj[j].append(i)
     return adj
