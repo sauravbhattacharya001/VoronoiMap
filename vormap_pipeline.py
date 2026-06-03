@@ -239,6 +239,16 @@ def validate_pipeline(config: Dict[str, Any]) -> List[ValidationIssue]:
     if "data_file" not in config:
         issues.append(ValidationIssue("error", None,
                                       "Missing required field: data_file"))
+    else:
+        df = config["data_file"]
+        if isinstance(df, str) and df:
+            cleaned = df.replace("\\", "/")
+            if os.path.isabs(cleaned) or (len(cleaned) >= 2 and cleaned[1] == ":"):
+                issues.append(ValidationIssue("error", None,
+                                              f"data_file must be a relative path: {df!r}"))
+            elif ".." in cleaned.split("/"):
+                issues.append(ValidationIssue("error", None,
+                                              f"data_file contains path traversal: {df!r}"))
     if "num_points" not in config:
         issues.append(ValidationIssue("error", None,
                                       "Missing required field: num_points"))
@@ -336,7 +346,18 @@ class Pipeline:
     def __init__(self, config: Dict[str, Any]):
         self.config = config
         self.name = config.get("name", "Unnamed Pipeline")
-        self.data_file = config.get("data_file", "")
+        raw_data_file = config.get("data_file", "")
+        # Security: reject absolute paths and traversal in data_file to prevent
+        # arbitrary file reads when pipeline configs come from untrusted sources.
+        if raw_data_file:
+            cleaned = raw_data_file.replace("\\", "/")
+            if os.path.isabs(cleaned) or (len(cleaned) >= 2 and cleaned[1] == ":"):
+                raise ValueError(
+                    f"data_file must be a relative path: {raw_data_file!r}")
+            if ".." in cleaned.split("/"):
+                raise ValueError(
+                    f"data_file contains path traversal: {raw_data_file!r}")
+        self.data_file = raw_data_file
         self.num_points = config.get("num_points", 5)
         self.steps = config.get("steps", [])
         self.output_dir = config.get("output_dir", ".")
