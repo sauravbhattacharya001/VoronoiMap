@@ -1,6 +1,6 @@
 # Module Catalog
 
-Complete reference of all 151 VoronoiMap modules organized by functional area.
+Complete reference of all 154 VoronoiMap modules organized by functional area.
 For detailed API documentation of core extension modules, see [Extension Modules API](extensions.md).
 
 ---
