@@ -1,8 +1,15 @@
 
-import random
 import math
 import os
+import random
 import warnings
+
+try:
+    from importlib.metadata import version as _pkg_version
+
+    __version__ = _pkg_version("voronoimap")
+except Exception:  # pragma: no cover - source checkout without installed metadata
+    __version__ = "0.0.0+unknown"
 
 # ── Resource limits to prevent denial-of-service via crafted input ───
 # These can be overridden by callers before loading data.
@@ -565,7 +572,7 @@ class VoronoiEstimator:
 _default = VoronoiEstimator()
 
 
-import re as _re
+import re as _re  # noqa: E402
 
 _CSS_VALUE_RE = _re.compile(r'^[a-zA-Z0-9#_.,() /%+-]+$')
 
@@ -797,7 +804,6 @@ def _detect_format(filepath):
             with open(filepath, encoding="utf-8") as f:
                 # Read first non-whitespace chars to detect GeoJSON
                 content = f.read(2048)
-                content_stripped = content.lstrip()
                 if '"type"' in content and ('"FeatureCollection"' in content
                                             or '"Feature"' in content):
                     return 'geojson'
@@ -2562,6 +2568,12 @@ def _build_parser():
         epilog='Example: voronoimap datauni5.txt 5',
     )
     parser.add_argument(
+        '--version',
+        action='version',
+        version='%(prog)s ' + __version__,
+        help='Show the installed VoronoiMap version and exit.',
+    )
+    parser.add_argument(
         'datafile',
         help='Point data filename inside the data/ directory (e.g. datauni5.txt)',
     )
@@ -3350,7 +3362,9 @@ def _cmd_summary(args, data):
     data without materialising separate x/y coordinate lists.
     """
     import json as _json
-    from vormap_utils import bounding_box as _bbox, compute_nn_distances
+
+    from vormap_utils import bounding_box as _bbox
+    from vormap_utils import compute_nn_distances
 
     if data is None:
         data = load_data(args.datafile)

@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=82.0.1", "wheel"]
+requires = ["setuptools>=82.0.1", "wheel", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "voronoimap"
-version = "1.1.0"
+dynamic = ["version"]
 description = "Estimate aggregate statistics of unknown point sets using Voronoi partitioning and nearest-neighbor oracles"
 readme = "README.md"
 license = {text = "MIT"}
@@ -56,6 +56,14 @@ Homepage = "https://github.com/sauravbhattacharya001/VoronoiMap"
 Repository = "https://github.com/sauravbhattacharya001/VoronoiMap"
 Issues = "https://github.com/sauravbhattacharya001/VoronoiMap/issues"
 Documentation = "https://sauravbhattacharya001.github.io/VoronoiMap/"
+
+[tool.setuptools_scm]
+# Derive the package version from the latest git tag (e.g. v1.56.0 -> 1.56.0).
+# Keeps the published version in lock-step with releases so PyPI never sees a
+# stale/duplicate version. Falls back to the last tag for non-tagged builds.
+version_scheme = "only-version"
+local_scheme = "no-local-version"
+fallback_version = "1.56.0"
 
 [tool.setuptools]
 py-modules = [

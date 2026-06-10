@@ -2,6 +2,35 @@
 
 All notable changes to VoronoiMap are documented here.
 
+## [1.56.0] - 2026-06-10
+
+### Fixed
+
+- **Packaging: build now produces the correct, release-matching version.**
+  `pyproject.toml` had a hard-coded `version = "1.1.0"` that was never bumped,
+  so every release from v1.50 through v1.55 built and attempted to publish the
+  package as `1.1.0`. The version is now derived from the git tag via
+  `setuptools-scm` (`v1.56.0` -> `1.56.0`), keeping the packaged version in
+  lock-step with releases and preventing duplicate-version uploads to PyPI.
+
+### Added
+
+- **`voronoimap --version`** CLI flag, reporting the installed package version.
+- **`vormap.__version__`** attribute, resolved at runtime from installed
+  package metadata (`importlib.metadata`).
+
+### CI
+
+- **publish workflow:** `actions/checkout` now uses `fetch-depth: 0` so the
+  full tag history is available for `setuptools-scm` version resolution.
+- **Lint is green again.** Fixed 4 long-standing `ruff` errors in `vormap.py`
+  that were failing the CI `lint` job on every push: unsorted top-level and
+  function-local import blocks (`I001`), a dead `content_stripped` local
+  (`F841`), and an intentional mid-module `import re` now annotated
+  `# noqa: E402`.
+
+---
+
 ## [1.55.0] - 2026-06-04
 
 ### Security
