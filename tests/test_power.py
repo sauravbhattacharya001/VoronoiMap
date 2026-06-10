@@ -8,13 +8,30 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import vormap_power as _vp
 from vormap_power import (
-    assign_weights, weighted_distance, compute_weighted_nn,
-    batch_weighted_nn, compute_power_regions, compute_power_diagram,
-    weight_effect_analysis, export_power_json, export_power_svg,
-    WeightedSeed, PowerDiagramResult,
-    _power_distance, _multiplicative_distance, _additive_distance,
-    _polygon_area, _polygon_centroid, _polygon_perimeter, _convex_hull,
+    PowerDiagramResult,
+    WeightedSeed,
+    _additive_distance,
+    _assign_grid_python,
+    _cell_is_boundary,
+    _convex_hull,
+    _extract_region_polygons,
+    _multiplicative_distance,
+    _polygon_area,
+    _polygon_centroid,
+    _polygon_perimeter,
+    _power_distance,
+    _resolve_power_bounds,
+    assign_weights,
+    batch_weighted_nn,
+    compute_power_diagram,
+    compute_power_regions,
+    compute_weighted_nn,
+    export_power_json,
+    export_power_svg,
+    weight_effect_analysis,
+    weighted_distance,
 )
 
 
@@ -608,6 +625,138 @@ class TestEdgeCases(unittest.TestCase):
             hull_area = abs(_polygon_area(hull))
             # Traced boundary should be <= convex hull (preserves concavity)
             self.assertLessEqual(traced_area, hull_area + 1e-6)
+
+
+class TestPowerRegionHelpers(unittest.TestCase):
+    """Direct tests for the helpers extracted from compute_power_regions().
+
+    These cover the decomposed building blocks in isolation and, most
+    importantly, assert that the numpy fast path and the pure-Python
+    fallback produce identical grid assignments.
+    """
+
+    def test_resolve_bounds_passthrough(self):
+        """Explicit bounds are returned unchanged."""
+        bounds = (0, 200, 0, 100)
+        self.assertEqual(
+            _resolve_power_bounds([(10, 10), (50, 50)], bounds), bounds)
+
+    def test_resolve_bounds_autocompute_padding(self):
+        """Auto bounds apply 15% padding per axis around the seed extent."""
+        seeds = [(0, 0), (100, 200)]
+        x_min, x_max, y_min, y_max = _resolve_power_bounds(seeds, None)
+        # 15% of width(100)=15, height(200)=30
+        self.assertAlmostEqual(x_min, -15.0)
+        self.assertAlmostEqual(x_max, 115.0)
+        self.assertAlmostEqual(y_min, -30.0)
+        self.assertAlmostEqual(y_max, 230.0)
+
+    def test_resolve_bounds_minimum_pad(self):
+        """Degenerate (coincident) seeds still get the 10-unit pad floor."""
+        x_min, x_max, y_min, y_max = _resolve_power_bounds([(5, 5), (5, 5)],
+                                                           None)
+        self.assertAlmostEqual(x_min, -5.0)
+        self.assertAlmostEqual(x_max, 15.0)
+        self.assertAlmostEqual(y_min, -5.0)
+        self.assertAlmostEqual(y_max, 15.0)
+
+    def test_cell_is_boundary_interior(self):
+        """A cell fully surrounded by same-seed cells is not a boundary."""
+        grid = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        self.assertFalse(_cell_is_boundary(grid, 1, 1, 0, 3))
+
+    def test_cell_is_boundary_edge_of_grid(self):
+        """A cell on the grid edge is always a boundary (neighbour OOB)."""
+        grid = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        self.assertTrue(_cell_is_boundary(grid, 0, 0, 0, 3))
+
+    def test_cell_is_boundary_adjacent_other_seed(self):
+        """A cell touching a different seed's cell is a boundary."""
+        grid = [[0, 0, 1], [0, 0, 1], [0, 0, 1]]
+        # (1,1) is owned by 0 and (1,2) is owned by 1 -> boundary
+        self.assertTrue(_cell_is_boundary(grid, 1, 1, 0, 3))
+
+    def test_assign_grid_python_picks_weighted_nearest(self):
+        """Pure-Python assignment selects the weighted-nearest seed index."""
+        seeds = [(0, 0), (100, 0)]
+        weights = [1.0, 1.0]
+        bounds = (0, 100, 0, 100)
+        res = 4
+        dx = (bounds[1] - bounds[0]) / res
+        dy = (bounds[3] - bounds[2]) / res
+        grid = _assign_grid_python(
+            seeds, weights, _power_distance, bounds, res, dx, dy)
+        self.assertEqual(len(grid), res)
+        self.assertEqual(len(grid[0]), res)
+        # Left column closest to seed 0, right column closest to seed 1
+        for row in grid:
+            self.assertEqual(row[0], 0)
+            self.assertEqual(row[-1], 1)
+
+    @unittest.skipUnless(_vp._HAS_NUMPY, "numpy not installed")
+    def test_numpy_and_python_grids_match(self):
+        """The numpy fast path and pure-Python fallback must agree exactly.
+
+        This is the core regression guard for the compute_power_regions
+        refactor: both grid-assignment implementations must produce the
+        same per-cell seed ownership for every mode.
+        """
+        seeds = [(100, 200), (300, 400), (500, 100), (250, 550), (620, 250)]
+        weights = [10.0, 50.0, 30.0, 5.0, 40.0]
+        bounds = (0, 700, 0, 700)
+        res = 50
+        dx = (bounds[1] - bounds[0]) / res
+        dy = (bounds[3] - bounds[2]) / res
+        for mode in ('power', 'multiplicative', 'additive'):
+            np_grid = _vp._assign_grid_numpy(
+                seeds, weights, mode, bounds, res, dx, dy)
+            py_grid = _assign_grid_python(
+                seeds, weights, _vp._DISTANCE_FUNCS[mode],
+                bounds, res, dx, dy)
+            self.assertEqual(
+                np_grid, py_grid,
+                msg=f"numpy/python grid mismatch for mode={mode!r}")
+
+    def test_full_pipeline_matches_between_backends(self):
+        """compute_power_regions output is identical with and without numpy."""
+        seeds = [(100, 200), (300, 400), (500, 100), (250, 550)]
+        weights = [10.0, 50.0, 30.0, 20.0]
+        original = _vp._HAS_NUMPY
+        try:
+            _vp._HAS_NUMPY = True
+            with_np = compute_power_regions(
+                seeds, weights, mode='power',
+                bounds=(0, 700, 0, 700), resolution=40)
+            _vp._HAS_NUMPY = False
+            without_np = compute_power_regions(
+                seeds, weights, mode='power',
+                bounds=(0, 700, 0, 700), resolution=40)
+        finally:
+            _vp._HAS_NUMPY = original
+        self.assertEqual(with_np, without_np)
+
+    def test_extract_region_polygons_power_uses_hull(self):
+        """Power mode boundary extraction returns a convex polygon per seed."""
+        # 4x4 grid split left/right between two seeds.
+        grid = [
+            [0, 0, 1, 1],
+            [0, 0, 1, 1],
+            [0, 0, 1, 1],
+            [0, 0, 1, 1],
+        ]
+        bounds = (0, 4, 0, 4)
+        regions = _extract_region_polygons(
+            grid, 'power', bounds, 4, 1.0, 1.0, 2)
+        self.assertEqual(len(regions), 2)
+        for poly in regions:
+            self.assertGreaterEqual(len(poly), 3)
+
+    def test_extract_region_polygons_absent_seed_is_empty(self):
+        """A seed with no owned cells yields an empty polygon list."""
+        grid = [[0, 0], [0, 0]]  # seed 1 owns nothing
+        regions = _extract_region_polygons(
+            grid, 'power', (0, 2, 0, 2), 2, 1.0, 1.0, 2)
+        self.assertEqual(regions[1], [])
 
 
 if __name__ == '__main__':

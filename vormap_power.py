@@ -35,8 +35,8 @@ Example::
     print(result.summary())
 """
 
-import math
 import json
+import math
 import random as _random
 import sys
 
@@ -304,11 +304,135 @@ def batch_weighted_nn(points, seeds, weights, mode='power'):
 # Power Voronoi region computation
 # ---------------------------------------------------------------------------
 
-from vormap_geometry import (
-    polygon_area as _polygon_area,
-    polygon_centroid as _polygon_centroid,
-    polygon_perimeter as _polygon_perimeter,
-)
+from vormap_geometry import polygon_area as _polygon_area  # noqa: E402
+from vormap_geometry import polygon_centroid as _polygon_centroid  # noqa: E402
+from vormap_geometry import polygon_perimeter as _polygon_perimeter  # noqa: E402
+
+
+def _resolve_power_bounds(seeds, bounds):
+    """Return ``(x_min, x_max, y_min, y_max)`` for a power diagram.
+
+    When *bounds* is provided it is returned unchanged.  Otherwise a padded
+    bounding box is computed from *seeds* (15% padding per axis, with a
+    10-unit floor so degenerate/collinear inputs still get a usable box).
+    """
+    if bounds is not None:
+        return bounds
+    xs = [s[0] for s in seeds]
+    ys = [s[1] for s in seeds]
+    pad_x = max((max(xs) - min(xs)) * 0.15, 10.0)
+    pad_y = max((max(ys) - min(ys)) * 0.15, 10.0)
+    return (min(xs) - pad_x, max(xs) + pad_x,
+            min(ys) - pad_y, max(ys) + pad_y)
+
+
+def _assign_grid_numpy(seeds, weights, mode, bounds, resolution, dx, dy):
+    """Vectorized grid-to-seed assignment (numpy fast path).
+
+    Returns a ``resolution x resolution`` nested list where ``grid[iy][ix]``
+    is the index of the weighted-nearest seed for that cell centre.
+    """
+    x_min, x_max, y_min, y_max = bounds
+    gx = np.linspace(x_min + 0.5 * dx, x_max - 0.5 * dx, resolution)
+    gy = np.linspace(y_min + 0.5 * dy, y_max - 0.5 * dy, resolution)
+    gxx, gyy = np.meshgrid(gx, gy)                  # (res, res)
+    flat_x = gxx.ravel()                            # (res²,)
+    flat_y = gyy.ravel()
+
+    ss = np.asarray(seeds, dtype=np.float64)        # (n, 2)
+    ws = np.asarray(weights, dtype=np.float64)      # (n,)
+
+    # dsq[i, k] = squared distance from grid point i to seed k
+    dxm = flat_x[:, None] - ss[:, 0]                # (res², n)
+    dym = flat_y[:, None] - ss[:, 1]
+    dsq = dxm * dxm + dym * dym
+
+    if mode == 'power':
+        wd = dsq - ws
+    elif mode == 'additive':
+        wd = np.sqrt(dsq) - ws
+    else:  # multiplicative
+        safe_ws = np.where(ws > 0, ws, np.inf)
+        wd = np.sqrt(dsq) / safe_ws
+
+    grid_flat = np.argmin(wd, axis=1)               # (res²,)
+    return grid_flat.reshape(resolution, resolution).tolist()
+
+
+def _assign_grid_python(seeds, weights, fn, bounds, resolution, dx, dy):
+    """Pure-Python grid-to-seed assignment (numpy-free fallback).
+
+    Mirrors :func:`_assign_grid_numpy` exactly, using the scalar distance
+    function *fn* from :data:`_DISTANCE_FUNCS`.
+    """
+    x_min, _x_max, y_min, _y_max = bounds
+    n = len(seeds)
+    grid = []
+    for iy in range(resolution):
+        row = []
+        py = y_min + (iy + 0.5) * dy
+        for ix in range(resolution):
+            px = x_min + (ix + 0.5) * dx
+            best = 0
+            best_d = fn(px, py, seeds[0][0], seeds[0][1], weights[0])
+            for k in range(1, n):
+                d = fn(px, py, seeds[k][0], seeds[k][1], weights[k])
+                if d < best_d:
+                    best_d = d
+                    best = k
+            row.append(best)
+        grid.append(row)
+    return grid
+
+
+def _cell_is_boundary(grid, iy, ix, k, resolution):
+    """True if cell ``(iy, ix)`` (owned by seed *k*) touches a different cell.
+
+    A cell is on the region boundary when any of its 8 neighbours is out of
+    bounds or assigned to a different seed.
+    """
+    for diy in (-1, 0, 1):
+        for dix in (-1, 0, 1):
+            if diy == 0 and dix == 0:
+                continue
+            ny, nx = iy + diy, ix + dix
+            if (ny < 0 or ny >= resolution or
+                    nx < 0 or nx >= resolution or
+                    grid[ny][nx] != k):
+                return True
+    return False
+
+
+def _extract_region_polygons(grid, mode, bounds, resolution, dx, dy, n):
+    """Trace one polygon per seed from a grid assignment.
+
+    For each seed *k* the boundary cell centres are collected, then turned
+    into a polygon: power-mode cells are convex so an exact convex hull is
+    used, while multiplicative/additive (Apollonius) cells are non-convex
+    and use an ordered boundary trace.
+    """
+    x_min, _x_max, y_min, _y_max = bounds
+    regions = []
+    for k in range(n):
+        pts = []
+        for iy in range(resolution):
+            for ix in range(resolution):
+                if grid[iy][ix] == k and _cell_is_boundary(
+                        grid, iy, ix, k, resolution):
+                    cx = x_min + (ix + 0.5) * dx
+                    cy = y_min + (iy + 0.5) * dy
+                    pts.append((cx, cy))
+
+        if not pts:
+            regions.append([])
+        elif mode == 'power':
+            # Power diagram cells are always convex — hull is exact.
+            regions.append(_convex_hull(pts))
+        else:
+            # Multiplicative/additive modes produce non-convex regions
+            # (Apollonius circles). Use ordered boundary trace instead.
+            regions.append(_ordered_boundary(pts))
+    return regions
 
 
 def compute_power_regions(seeds, weights, mode='power', bounds=None,
@@ -353,107 +477,24 @@ def compute_power_regions(seeds, weights, mode='power', bounds=None,
         return [[(x_min, y_min), (x_max, y_min),
                  (x_max, y_max), (x_min, y_max)]]
 
-    # Determine bounds
-    if bounds is None:
-        xs = [s[0] for s in seeds]
-        ys = [s[1] for s in seeds]
-        pad_x = max((max(xs) - min(xs)) * 0.15, 10.0)
-        pad_y = max((max(ys) - min(ys)) * 0.15, 10.0)
-        bounds = (min(xs) - pad_x, max(xs) + pad_x,
-                  min(ys) - pad_y, max(ys) + pad_y)
-
+    bounds = _resolve_power_bounds(seeds, bounds)
     x_min, x_max, y_min, y_max = bounds
-    fn = _DISTANCE_FUNCS[mode]
 
-    # Grid assignment
     resolution = max(resolution, 20)
     dx = (x_max - x_min) / resolution
     dy = (y_max - y_min) / resolution
 
-    # Assign each grid cell to nearest weighted seed — numpy vectorized
+    # Assign each grid cell to its weighted-nearest seed.
     if _HAS_NUMPY:
-        gx = np.linspace(x_min + 0.5 * dx, x_max - 0.5 * dx, resolution)
-        gy = np.linspace(y_min + 0.5 * dy, y_max - 0.5 * dy, resolution)
-        gxx, gyy = np.meshgrid(gx, gy)                # (res, res)
-        flat_x = gxx.ravel()                           # (res²,)
-        flat_y = gyy.ravel()
-
-        ss = np.asarray(seeds, dtype=np.float64)       # (n, 2)
-        ws = np.asarray(weights, dtype=np.float64)     # (n,)
-
-        # dsq[i, k] = squared distance from grid point i to seed k
-        dxm = flat_x[:, None] - ss[:, 0]               # (res², n)
-        dym = flat_y[:, None] - ss[:, 1]
-        dsq = dxm * dxm + dym * dym
-
-        if mode == 'power':
-            wd = dsq - ws
-        elif mode == 'additive':
-            wd = np.sqrt(dsq) - ws
-        else:  # multiplicative
-            safe_ws = np.where(ws > 0, ws, np.inf)
-            wd = np.sqrt(dsq) / safe_ws
-
-        grid_flat = np.argmin(wd, axis=1)              # (res²,)
-        grid = grid_flat.reshape(resolution, resolution).tolist()
+        grid = _assign_grid_numpy(seeds, weights, mode, bounds,
+                                  resolution, dx, dy)
     else:
-        grid = []
-        for iy in range(resolution):
-            row = []
-            py = y_min + (iy + 0.5) * dy
-            for ix in range(resolution):
-                px = x_min + (ix + 0.5) * dx
-                best = 0
-                best_d = fn(px, py, seeds[0][0], seeds[0][1], weights[0])
-                for k in range(1, n):
-                    d = fn(px, py, seeds[k][0], seeds[k][1], weights[k])
-                    if d < best_d:
-                        best_d = d
-                        best = k
-                row.append(best)
-            grid.append(row)
+        grid = _assign_grid_python(seeds, weights, _DISTANCE_FUNCS[mode],
+                                   bounds, resolution, dx, dy)
 
-    # Extract region polygons via marching squares (convex hull of cells)
-    regions = []
-    for k in range(n):
-        pts = []
-        for iy in range(resolution):
-            for ix in range(resolution):
-                if grid[iy][ix] == k:
-                    cx = x_min + (ix + 0.5) * dx
-                    cy = y_min + (iy + 0.5) * dy
-                    # Check if boundary cell
-                    is_boundary = False
-                    for diy in (-1, 0, 1):
-                        for dix in (-1, 0, 1):
-                            if diy == 0 and dix == 0:
-                                continue
-                            ny, nx = iy + diy, ix + dix
-                            if (ny < 0 or ny >= resolution or
-                                    nx < 0 or nx >= resolution or
-                                    grid[ny][nx] != k):
-                                is_boundary = True
-                                break
-                        if is_boundary:
-                            break
-                    if is_boundary:
-                        pts.append((cx, cy))
-
-        if not pts:
-            regions.append([])
-            continue
-
-        if mode == 'power':
-            # Power diagram cells are always convex — hull is exact.
-            hull = _convex_hull(pts)
-            regions.append(hull)
-        else:
-            # Multiplicative/additive modes produce non-convex regions
-            # (Apollonius circles). Use ordered boundary trace instead.
-            boundary = _ordered_boundary(pts)
-            regions.append(boundary)
-
-    return regions
+    # Trace one boundary polygon per seed from the grid assignment.
+    return _extract_region_polygons(grid, mode, bounds,
+                                    resolution, dx, dy, n)
 
 
 def _convex_hull(points):
@@ -1059,7 +1100,7 @@ def main():
         analysis = weight_effect_analysis(seeds, weights, mode=args.mode,
                                           resolution=args.resolution)
         if not args.quiet:
-            print(f"\n--- Weight Effect Analysis ---")
+            print("\n--- Weight Effect Analysis ---")
             print(f"  Baseline Gini: {analysis['baseline_gini']}")
             print(f"  Weighted Gini: {analysis['weighted_gini']}")
             print(f"  Correlation:   {analysis['weight_area_correlation']}")
