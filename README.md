@@ -53,9 +53,9 @@ The algorithm discovers data points by sampling random locations, queries a near
 - **Neighbourhood Graph** — Delaunay dual adjacency extraction with 14 graph metrics, degree distribution, clustering coefficient
 
 
-## Module Catalog (151 Modules)
+## Module Catalog (152 Modules)
 
-VoronoiMap has grown into a comprehensive spatial analysis toolkit with **151 modules** spanning core algorithms, visualization, spatial statistics, simulation, planning, artistic rendering, and autonomous analysis. Every module is listed below by category.
+VoronoiMap has grown into a comprehensive spatial analysis toolkit with **152 modules** spanning core algorithms, visualization, spatial statistics, simulation, planning, artistic rendering, and autonomous analysis. Every module is listed below by category.
 
 ### Core
 
@@ -143,6 +143,7 @@ VoronoiMap has grown into a comprehensive spatial analysis toolkit with **151 mo
 | `vormap_merge` | Region merger: merge adjacent cells by attribute similarity |
 | `vormap_contour` | Contour extraction: isolines, IDW interpolation, 4 colormaps |
 | `vormap_query` | Spatial queries: KD-tree nearest-neighbor, k-nearest, radius, point location |
+| `vormap_skeleton` | Voronoi skeleton (medial-axis roadmap): extract internal edges, max-clearance routing, JSON/CSV/SVG export |
 | `vormap_sample` | Spatial sampling: stratified, systematic, centroid, boundary, density-weighted |
 | `vormap_transect` | Transect profiler: cross-section analysis along lines through the diagram |
 | `vormap_compare` | Diagram comparison: seed displacement, area change, topology difference |
@@ -532,6 +533,56 @@ print(vormap_viz.format_graph_stats_table(graph))
 # One-call convenience
 vormap_viz.generate_graph("datauni5.txt", "graph.json", fmt="json")
 ```
+
+### Voronoi Skeleton (medial-axis roadmap)
+
+The internal Voronoi edges — the segments shared between two adjacent cells —
+form the diagram's **skeleton**: a network of curves that are locally
+equidistant from the two nearest seeds. Travelling along it keeps you as far
+as possible from the surrounding sites, which is exactly the *maximum-clearance
+roadmap* used in motion planning. Unlike `vormap_graph` / `vormap_network`
+(which build the Delaunay **dual** — seed-to-seed adjacency) this module works
+on the Voronoi **edge** network itself.
+
+```bash
+# Metrics summary (text or JSON)
+python vormap_skeleton.py datauni5.txt 12
+python vormap_skeleton.py datauni5.txt 12 --format json
+
+# Export nodes/edges/metrics and an SVG overlay
+python vormap_skeleton.py datauni5.txt 12 --json skel.json --csv skel.csv --svg skel.svg
+
+# Max-clearance route between two points (snapped to the skeleton);
+# the SVG highlights the chosen corridor
+python vormap_skeleton.py datauni5.txt 12 --path 120,120 880,640 --svg route.svg
+
+# No data directory needed — built-in jittered-grid demo
+python vormap_skeleton.py --demo --path 100,100 500,400
+```
+
+```python
+import vormap_viz
+from vormap_skeleton import extract_skeleton, skeleton_metrics, export_skeleton_svg
+
+seeds = [(100, 100), (300, 100), (200, 300), (400, 400)]
+regions = vormap_viz.compute_regions(seeds)
+skel = extract_skeleton(regions)
+
+# Summary metrics: total length, junctions (deg>=3), endpoints, clearance, etc.
+m = skeleton_metrics(skel)
+print(m.total_length, m.num_junctions, m.mean_clearance, m.longest_corridor)
+
+# Maximum-clearance route between two arbitrary points
+path = skel.shortest_path((120, 120), (390, 390))
+print(path.reachable, path.length, path.min_clearance, path.nodes)
+
+# Render the skeleton with the route highlighted
+export_skeleton_svg(skel, "route.svg", highlight_path=path)
+```
+
+**Each skeleton edge reports:** its length, the **clearance** at its midpoint
+(distance to the nearest seed) and the two seeds it separates. Nodes are
+classified as **junctions** (degree ≥ 3) or **endpoints** (degree 1).
 
 ## 📚 API Reference
 
